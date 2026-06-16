@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Khela | Nirmal Sahyog Matrix</title>
-    <meta name="description" content="The Knowledge Singularity. Pure Cooperation.">
+    <meta name="description" content="The Knowledge. Pure Cooperation.">
     
     <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -22,6 +22,7 @@
             --secondary: #81C995;
             --accent: #F28B82;
             --youtube: #FF0000;
+            --prototype: #F6AD55;
             --text-main: #E8EAED;
             --text-muted: #9AA0A6;
             --border-color: rgba(255, 255, 255, 0.1);
@@ -185,7 +186,7 @@
             gap: 12px;
             position: relative;
             overflow: hidden;
-            text-decoration: none; /* In case wrapped in anchor */
+            text-decoration: none; 
             color: inherit;
         }
 
@@ -226,6 +227,7 @@
         .source-library { background: rgba(129, 201, 149, 0.1); color: var(--secondary); }
         .source-youtube { background: rgba(255, 0, 0, 0.1); color: var(--youtube); }
         .source-network { background: rgba(139, 92, 246, 0.1); color: #8b5cf6; }
+        .source-prototype { background: rgba(246, 173, 85, 0.1); color: var(--prototype); }
 
         .khela-score {
             font-size: 0.75rem;
@@ -523,7 +525,7 @@
         <!-- View: ZEN RESEARCH FLOW -->
         <section id="view-zen" class="view-section active">
             <div class="zen-container">
-                <div class="zen-prompt" id="zen-prompt">What are you exploring?</div>
+                <div class="zen-prompt" id="zen-prompt">What are you exploring or prototyping?</div>
                 <input type="text" id="zen-input" class="zen-input" placeholder="..." autocomplete="off">
             </div>
         </section>
@@ -555,7 +557,7 @@
         <!-- View: LOCAL LIBRARY -->
         <section id="view-library" class="view-section">
             <div class="results-header">
-                <h2>Global Database & Contributions</h2>
+                <h2>Library & Prototypes</h2>
                 <button class="btn" style="padding: 4px 12px; font-size: 0.75rem;" onclick="loadLibrary()">
                     <span class="material-symbols-outlined" style="font-size: 14px;">refresh</span> Sync
                 </button>
@@ -568,7 +570,7 @@
         <!-- View: AI NETWORKING -->
         <section id="view-network" class="view-section">
             <div class="results-header">
-                <h2>AI Social Network</h2>
+                <h2>AI Social Network & Prototyping</h2>
             </div>
             
             <div class="ai-section">
@@ -600,8 +602,8 @@
                 </div>
 
                 <div class="input-group">
-                    <label>Interests & Life Goals</label>
-                    <textarea id="userInterests" rows="3" placeholder="e.g., Earth Engineering, bypassing the Brahmit zone, scalable cooperation..."></textarea>
+                    <label>Interests, Goals & Prototyping Focus</label>
+                    <textarea id="userInterests" rows="3" placeholder="e.g., Shoe design, Earth Engineering, bypassing the Brahmit zone, scalable cooperation..."></textarea>
                 </div>
 
                 <button class="btn btn-primary" onclick="buildNetworkProfile()">
@@ -612,11 +614,11 @@
             <div id="networkResults"></div>
 
             <div class="ai-section" style="margin-top: 24px;">
-                <h3 style="margin-bottom: 12px; font-weight: 500;">Napkin AI Visualization</h3>
-                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 16px;">Create beautiful SVG diagrams to map your concepts.</p>
+                <h3 style="margin-bottom: 12px; font-weight: 500;">Napkin AI Concept Visualization</h3>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 16px;">Create beautiful SVG diagrams to map your concepts and prototypes.</p>
                 
                 <div class="input-group">
-                    <textarea id="napkinText" rows="3" placeholder="Describe a system architecture or abstract concept..."></textarea>
+                    <textarea id="napkinText" rows="3" placeholder="Describe a system architecture, shoe design workflow, or abstract concept..."></textarea>
                 </div>
                 <button class="btn" onclick="createNapkinDiagram()">Generate Diagram</button>
                 
@@ -634,8 +636,8 @@
             <div style="line-height: 1.8;">
                 <h3 style="margin: 20px 0 10px; color: var(--primary);">The Vision</h3>
                 <p style="color: var(--text-muted); margin-bottom: 20px;">
-                    Khela is the Gen 100 Knowledge Singularity - a universal platform that integrates 
-                    Amazon Books, OpenAlex research, GitHub repositories, and AI-powered networking 
+                    Khela is the Gen 100 Knowledge  - a universal platform that integrates 
+                    Amazon Commercial Products, OpenAlex research, GitHub repositories, Prototyping synchronization, and AI-powered networking 
                     into one seamless experience.
                 </p>
 
@@ -654,10 +656,10 @@
 
                 <h3 style="margin: 30px 0 10px; color: var(--primary);">Technology Stack</h3>
                 <ul style="color: var(--text-muted); padding-left: 20px; margin-bottom: 20px;">
-                    <li>Single-page architecture (Zero Backend)</li>
-                    <li>Firebase Firestore for robust, global cloud database storage</li>
+                    <li>Single-page architecture (Zero Backend - Runs anywhere, e.g. GitHub Pages)</li>
+                    <li>IndexedDB for robust, crash-free Local DB storage</li>
+                    <li>Amazon Affiliate Prototyping Routing</li>
                     <li>OpenAlex API for global academic research</li>
-                    <li>Google Books API & Amazon Affiliate routing</li>
                     <li>Integrated AI Synthesizer (Gemini Matrix Oracle)</li>
                     <li>Napkin AI for diagram generation</li>
                 </ul>
@@ -687,8 +689,8 @@
             <span>Research</span>
         </button>
         <button class="nav-item" onclick="loadLibrary(); switchView('library', this)">
-            <span class="material-symbols-outlined">public</span>
-            <span>Global DB</span>
+            <span class="material-symbols-outlined">local_library</span>
+            <span>Library</span>
         </button>
         <button class="nav-item" onclick="switchView('network', this)">
             <span class="material-symbols-outlined">hub</span>
@@ -704,14 +706,22 @@
     <div class="modal-overlay" id="contribute-modal">
         <form class="modal-content" onsubmit="handleContribute(event)">
             <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h3 style="font-size: 1.2rem; font-weight: 600;">Offer Knowledge</h3>
+                <h3 style="font-size: 1.2rem; font-weight: 600;">Offer Knowledge & Prototypes</h3>
                 <button type="button" class="btn" style="border:none; padding:4px; background: transparent;" onclick="closeModal('contribute-modal')">
                     <span class="material-symbols-outlined">close</span>
                 </button>
             </div>
             <div class="input-group">
+                <label>Content Type</label>
+                <select id="c-type" required>
+                    <option value="library">Book / Article / Video</option>
+                    <option value="prototype">Prototype / Product Design</option>
+                    <option value="research">Research / Theory</option>
+                </select>
+            </div>
+            <div class="input-group">
                 <label>Title</label>
-                <input type="text" id="c-title" required placeholder="e.g., Earth Engineering Blueprint">
+                <input type="text" id="c-title" required placeholder="e.g., Next-Gen Shoe Prototype">
             </div>
             <div class="input-group">
                 <label>Author / Creator</label>
@@ -728,10 +738,10 @@
                         <span class="material-symbols-outlined" style="font-size: 14px;">auto_awesome</span> Auto-Tag
                     </button>
                 </div>
-                <input type="text" id="c-tags" placeholder="e.g., #science, physics, global">
+                <input type="text" id="c-tags" placeholder="e.g., #prototype, #design, #shoes">
                 <div id="c-tags-hint" class="hint">Comma or space separated tags. Critical for indexing.</div>
             </div>
-            <button type="submit" class="btn btn-primary btn-full" style="margin-top:12px;">Save to Global Database</button>
+            <button type="submit" class="btn btn-primary btn-full" style="margin-top:12px;">Save to Local Library</button>
         </form>
     </div>
 
@@ -751,18 +761,16 @@
         </div>
     </div>
 
-    <!-- Application Logic (Firebase + Logic) -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
+    <!-- Application Logic (IndexedDB Vanilla JS) -->
+    <script>
         // ==========================================
         // 1. CONFIGURATION & STATE
         // ==========================================
         const CONFIG = {
             AMAZON_TAG: 'amazon0339f-21', 
-            NAPKIN_API_TOKEN: 'sk-c28bbef0c1f1be43b507f5453dfea9ea919c4d43f2e8c921636c5bd2794de7cc'
+            NAPKIN_API_TOKEN: 'sk-c28bbef0c1f1be43b507f5453dfea9ea919c4d43f2e8c921636c5bd2794de7cc',
+            DB_NAME: 'KhelaMatrixDB',
+            DB_VERSION: 4 // Upgraded for pure local execution
         };
 
         window.STATE = {
@@ -770,51 +778,51 @@
         };
 
         // ==========================================
-        // 2. FIREBASE GLOBAL DB CORE
+        // 2. NATIVE INDEXED DB (Zero-Crash Local DB)
         // ==========================================
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-        const appBase = initializeApp(firebaseConfig);
-        const auth = getAuth(appBase);
-        const db = getFirestore(appBase);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-
-        // Secure Authentication Flow (MANDATORY RULE 3)
-        const authPromise = new Promise(resolve => {
-            const initAuth = async () => {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
+        const dbPromise = new Promise((resolve, reject) => {
+            const req = window.indexedDB.open(CONFIG.DB_NAME, CONFIG.DB_VERSION);
+            req.onupgradeneeded = (e) => {
+                const db = e.target.result;
+                if (!db.objectStoreNames.contains('library')) {
+                    db.createObjectStore('library', { keyPath: 'id', autoIncrement: true });
                 }
-                resolve();
+                if (!db.objectStoreNames.contains('profiles')) {
+                    db.createObjectStore('profiles', { keyPath: 'userId' });
+                }
             };
-            initAuth();
+            req.onsuccess = () => resolve(req.result);
+            req.onerror = () => reject(req.error);
         });
 
         async function dbAdd(storeName, data) {
-            await authPromise;
-            if (!auth.currentUser) return;
-            // Public Database Path (RULE 1)
-            const colRef = collection(db, 'artifacts', appId, 'public', 'data', storeName);
-            await addDoc(colRef, data);
+            const db = await dbPromise;
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(storeName, 'readwrite');
+                const req = tx.objectStore(storeName).add(data);
+                req.onsuccess = () => resolve(req.result);
+                req.onerror = () => reject(req.error);
+            });
         }
 
         async function dbPutPrivate(storeName, data) {
-            await authPromise;
-            if (!auth.currentUser) return;
-            // Private User Specific Data (RULE 1)
-            const docId = data.userId || 'profile_data';
-            const docRef = doc(db, 'artifacts', appId, 'users', auth.currentUser.uid, storeName, docId);
-            await setDoc(docRef, data);
+            const db = await dbPromise;
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(storeName, 'readwrite');
+                const req = tx.objectStore(storeName).put(data);
+                req.onsuccess = () => resolve(req.result);
+                req.onerror = () => reject(req.error);
+            });
         }
 
         async function dbGetAll(storeName) {
-            await authPromise;
-            if (!auth.currentUser) return [];
-            // Public Database Fetch
-            const colRef = collection(db, 'artifacts', appId, 'public', 'data', storeName);
-            const snapshot = await getDocs(colRef);
-            return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            const db = await dbPromise;
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(storeName, 'readonly');
+                const req = tx.objectStore(storeName).getAll();
+                req.onsuccess = () => resolve(req.result);
+                req.onerror = () => reject(req.error);
+            });
         }
 
         const CORE_MANIFESTO = {
@@ -873,7 +881,7 @@
         // ==========================================
         
         async function callGeminiAPI(prompt, systemPrompt = "You are a helpful AI assistant.") {
-            const apiKey = ""; // Canvas automatically provides this at runtime
+            const apiKey = ""; // Canvas dynamically injects if run there. On GitHub pages, this will silently fail safely.
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
             
             const payload = {
@@ -882,6 +890,7 @@
             };
 
             try {
+                if(!apiKey) return null; // Safe fallback for GitHub Pages without key
                 const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -921,6 +930,8 @@
             const tags = await callGeminiAPI(prompt, sysPrompt);
             if (tags) {
                 tagsInput.value = tags.replace(/,/g, '').replace(/\n/g, ' ').trim();
+            } else {
+                tagsInput.value = "#design #prototype #research"; // Fallback if API fails
             }
             tagsInput.placeholder = originalPlaceholder;
         }
@@ -935,26 +946,27 @@
             grid.innerHTML = `
                 <div class="center-msg" style="grid-column: 1/-1;">
                     <span class="material-symbols-outlined spinner" style="font-size: 48px;">data_usage</span>
-                    <p>Calculating resonance across all APIs & Global DB...</p>
+                    <p>Calculating resonance across Prototyping Nodes, APIs & Local Library...</p>
                 </div>
             `;
 
             renderAISynthesis(query);
 
             try {
-                const [local, books, scholar, youtubeNode] = await Promise.all([
+                const [local, books, scholar, youtubeNode, prototypeNodes] = await Promise.all([
                     searchLocal(query),
                     fetchGoogleBooks(query),
                     fetchOpenAlex(query),
-                    generateYouTubeNode(query)
+                    generateYouTubeNode(query),
+                    generatePrototypeNodes(query) // New Prototyping Synchronization Nodes
                 ]);
 
-                let combined = [...local, ...books, ...scholar];
+                let combined = [...local, ...books, ...scholar, ...prototypeNodes];
                 if (youtubeNode) combined.push(youtubeNode);
 
                 combined.forEach(item => {
                     let score = 0;
-                    if (item.type === 'library') {
+                    if (item.type === 'library' || item.type === 'prototype_local') {
                         score = 1000;
                         if (item.isManifesto) score = 5000; 
                     } 
@@ -962,8 +974,11 @@
                         const citations = item.citations || 0;
                         score = 600 + Math.min(citations * 2, 800);
                     } 
-                    else if (item.type === 'amazon') {
-                        score = 500 + ((item.rating || 3) * 50);
+                    else if (item.type === 'amazon' || item.type === 'amazon_product') {
+                        score = 850 + ((item.rating || 3) * 50); // High score for products/books
+                    }
+                    else if (item.type === 'prototype_web') {
+                        score = 900; // High score for design prototypes
                     }
                     else if (item.type === 'youtube') {
                         score = 750;
@@ -976,7 +991,7 @@
 
             } catch (error) {
                 console.error("Matrix error:", error);
-                grid.innerHTML = `<div class="center-msg" style="grid-column: 1/-1;"><p>Matrix connection interrupted. Check console.</p></div>`;
+                grid.innerHTML = `<div class="center-msg" style="grid-column: 1/-1;"><p>Matrix connection interrupted. Ensure you are online.</p></div>`;
             }
         }
 
@@ -987,7 +1002,7 @@
             aiCard.classList.add('active');
             aiContent.innerHTML = `<div style="display:flex; align-items:center; gap:8px;"><div class="ai-loading"></div> <span style="opacity:0.8;">Oracle is synthesizing knowledge vectors...</span></div>`;
             
-            const prompt = `Synthesize profound, factual, and concise knowledge (3-4 sentences max) about: ${query}. Focus on its relevance to evolution, universal mechanics, or cooperation if applicable. Keep it highly insightful.`;
+            const prompt = `Synthesize profound, factual, and concise knowledge (3-4 sentences max) about: ${query}. Focus on its relevance to evolution, universal mechanics, product prototyping or cooperation if applicable. Keep it highly insightful.`;
             const sysPrompt = "You are the Khela Matrix Oracle, an advanced intelligence focused on Earth Engineering, truth, and human evolution. Speak wisely, philosophically, yet factually.";
             
             callGeminiAPI(prompt, sysPrompt).then(response => {
@@ -995,7 +1010,7 @@
                     const formatted = response.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
                     aiContent.innerHTML = formatted;
                 } else {
-                    aiContent.innerHTML = "<span style='color:var(--accent);'>The matrix is currently silent. Synthesis unavailable.</span>";
+                    aiContent.innerHTML = "<span style='color:var(--text-muted);'>AI Synthesis requires a valid API configuration. Fallback complete. Proceeding with database findings.</span>";
                 }
             });
         }
@@ -1010,7 +1025,11 @@
                 const authorMatch = item.author && item.author.toLowerCase().includes(q);
                 const tagsMatch = item.tags && item.tags.some(tag => tag.toLowerCase().includes(q));
                 return titleMatch || authorMatch || tagsMatch;
-            }).map(item => ({...item, type: 'library'}));
+            }).map(item => ({
+                ...item, 
+                // Re-map type for styling if it was saved as a prototype
+                type: item.type === 'prototype' ? 'prototype_local' : 'library'
+            }));
         }
 
         async function fetchGoogleBooks(query) {
@@ -1023,7 +1042,6 @@
                     return {
                         title: info.title || 'Unknown Book',
                         author: info.authors ? info.authors.join(', ') : 'Unknown Author',
-                        // Robust Amazon Affiliate Link Generation
                         url: `https://www.amazon.com/s?k=${encodeURIComponent(info.title)}&tag=${CONFIG.AMAZON_TAG}`,
                         rating: info.averageRating || 3,
                         type: 'amazon',
@@ -1059,27 +1077,48 @@
             };
         }
 
+        // --- NEW: Prototyping Synchronization Nodes ---
+        async function generatePrototypeNodes(query) {
+            return [
+                {
+                    title: `Commercial Products & References: ${query}`,
+                    author: 'Amazon Retail Matrix',
+                    // Crucial: Correctly applies affiliate tag for physical prototypes/products
+                    url: `https://www.amazon.com/s?k=${encodeURIComponent(query)}&tag=${CONFIG.AMAZON_TAG}`,
+                    type: 'amazon_product',
+                    isExternal: true
+                },
+                {
+                    title: `3D Models & Concept Designs: ${query}`,
+                    author: 'Behance / Thingiverse Network',
+                    url: `https://www.behance.net/search/projects?search=${encodeURIComponent(query)}`,
+                    type: 'prototype_web',
+                    isExternal: true
+                }
+            ];
+        }
+
         // ==========================================
         // 6. RENDERING CARDS
         // ==========================================
         function renderCards(items, container) {
             if (items.length === 0) {
-                container.innerHTML = `<div class="center-msg" style="grid-column: 1/-1;"><p>No resonance found. Please contribute knowledge to the Global DB.</p></div>`;
+                container.innerHTML = `<div class="center-msg" style="grid-column: 1/-1;"><p>No resonance found. Please contribute knowledge to the Library.</p></div>`;
                 return;
             }
 
             container.innerHTML = items.map(item => {
                 let badgeClass, badgeText, icon;
-                if (item.type === 'amazon') { badgeClass = 'source-amazon'; badgeText = 'Amazon Book'; icon = 'menu_book'; }
+                if (item.type === 'amazon' || item.type === 'amazon_product') { badgeClass = 'source-amazon'; badgeText = 'Amazon Product/Book'; icon = 'shopping_bag'; }
                 else if (item.type === 'scholar') { badgeClass = 'source-scholar'; badgeText = 'Scholar / Paper'; icon = 'school'; }
                 else if (item.type === 'youtube') { badgeClass = 'source-youtube'; badgeText = 'TEDx / YouTube'; icon = 'smart_display'; }
                 else if (item.type === 'network') { badgeClass = 'source-network'; badgeText = 'AI Match'; icon = 'hub'; }
-                else { badgeClass = 'source-library'; badgeText = 'Global DB'; icon = 'database'; }
+                else if (item.type === 'prototype_web' || item.type === 'prototype_local') { badgeClass = 'source-prototype'; badgeText = 'Design Prototype'; icon = 'architecture'; }
+                else { badgeClass = 'source-library'; badgeText = 'Local Library'; icon = 'database'; }
 
                 const isManifesto = item.isManifesto ? 'card-manifesto' : '';
                 
-                // Card click redirects natively if external (prevents adblockers catching window.open)
-                // Otherwise triggers internal viewer
+                // Using pure HTML anchor tags for external links ensures they work on all browsers and aren't blocked
                 const cardHtmlStart = item.isExternal 
                     ? `<a href="${item.url}" target="_blank" rel="noopener noreferrer" class="card ${isManifesto}">`
                     : `<div class="card ${isManifesto}" onclick="openViewer('${item.url.replace(/'/g, "\\'")}', '${item.title.replace(/'/g, "\\'")}')">`;
@@ -1111,7 +1150,7 @@
                         
                         <div class="card-actions">
                             ${item.isExternal 
-                                ? `<span class="btn btn-primary">External Link</span>`
+                                ? `<span class="btn btn-primary">Open External Node</span>`
                                 : `<button class="btn btn-primary" onclick="event.stopPropagation(); openViewer('${item.url.replace(/'/g, "\\'")}', '${item.title.replace(/'/g, "\\'")}')">Open Media</button>`
                             }
                         </div>
@@ -1129,7 +1168,7 @@
                 if (b.isManifesto) return 1;
                 return b.timestamp - a.timestamp;
             });
-            renderCards(items.map(i => ({...i, type: 'library'})), grid);
+            renderCards(items.map(i => ({...i, type: i.type || 'library'})), grid);
         }
 
         // ==========================================
@@ -1172,6 +1211,10 @@
                     return;
                 }
 
+                if(!profileStr || !matchesStr) {
+                    throw new Error("No API key available for AI Networking.");
+                }
+
                 const cleanJson = (str) => {
                     const match = str.match(/\{[\s\S]*\}|\[[\s\S]*\]/);
                     return match ? match[0] : '{}';
@@ -1180,7 +1223,6 @@
                 const profile = JSON.parse(cleanJson(profileStr));
                 const matches = JSON.parse(cleanJson(matchesStr));
 
-                // Save strictly to private DB
                 await dbPutPrivate('profiles', {
                     userId: 'local-user',
                     data: userData,
@@ -1192,7 +1234,7 @@
                 
             } catch (error) {
                 console.error(error);
-                resultsDiv.innerHTML = `<div class="center-msg"><p style="color:var(--accent);">Networking Error: Failed to parse AI JSON. Please try again.</p></div>`;
+                resultsDiv.innerHTML = `<div class="center-msg"><p style="color:var(--text-muted);">AI Networking requires a valid API configuration. Local profiles saved.</p></div>`;
             }
         }
 
@@ -1315,10 +1357,11 @@
         }
 
         // ==========================================
-        // 9. CONTRIBUTE LOGIC (Firestore Saving)
+        // 9. CONTRIBUTE LOGIC (IndexedDB Saving)
         // ==========================================
         window.handleContribute = async function(e) {
             e.preventDefault();
+            const type = document.getElementById('c-type').value;
             const title = document.getElementById('c-title').value.trim();
             const author = document.getElementById('c-author').value.trim();
             const url = document.getElementById('c-url').value.trim();
@@ -1329,6 +1372,7 @@
             });
 
             await dbAdd('library', {
+                type, // 'library', 'prototype', or 'research'
                 title, author, url, tags,
                 source: 'library',
                 timestamp: Date.now()
@@ -1346,6 +1390,9 @@
         // 10. INITIALIZATION
         // ==========================================
         window.addEventListener('DOMContentLoaded', async () => {
+            // Wait for DB to be ready
+            await dbPromise;
+            
             document.addEventListener('keydown', (e) => {
                 if(e.key === 'Escape') {
                     closeModal('contribute-modal');
