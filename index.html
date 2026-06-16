@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Khela | The Gen 100 Knowledge Singularity</title>
+    <meta name="description" content="Bypass the noise. Enter the Witness. The universal, dependency-free knowledge platform.">
+    
+    <!-- PDF.js for universal rendering -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    
+    <style>
+        /* =========================================
+           THE RESONANCE DESIGN SYSTEM (Gen 100)
+           Inspired by Param Vishram & Nirmal Sahyog
+           ========================================= */
+        :root {
+            --bg-primary: #050505;
+            --bg-secondary: #0a0a0c;
+            --bg-glass: rgba(255, 255, 255, 0.03);
+            --border-glass: rgba(255, 255, 255, 0.08);
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --accent-savita: #f59e0b; /* Sunlight / Action */
+            --accent-mitti: #10b981;  /* Earth / Grounding */
+            --accent-akasha: #8b5cf6; /* Space / Consciousness */
+            --shadow-resonance: 0 8px 32px rgba(0, 0, 0, 0.5);
+            --transition-fluid: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-glass: rgba(255, 255, 255, 0.7);
+            --border-glass: rgba(0, 0, 0, 0.05);
+            --text-primary: #111827;
+            --text-secondary: #4b5563;
+            --shadow-resonance: 0 8px 32px rgba(0, 0, 0, 0.08);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            transition: var(--transition-fluid);
+        }
+
+        /* Scrollbar of Silence */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border-glass); border-radius: 10px; }
+
+        /* =========================================
+           LAYOUT & NAVIGATION
+           ========================================= */
+        .app-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .nav-bar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            background: var(--bg-glass);
+            border-bottom: 1px solid var(--border-glass);
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: var(--transition-fluid);
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .nav-brand span {
+            background: linear-gradient(135deg, var(--accent-savita), var(--accent-akasha));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: var(--transition-fluid);
+            cursor: pointer;
+        }
+
+        .nav-link:hover, .nav-link.active { color: var(--text-primary); }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border-glass);
+            background: var(--bg-glass);
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition-fluid);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover { border-color: var(--accent-savita); transform: translateY(-2px); }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-savita), var(--accent-mitti));
+            border: none;
+            color: #fff;
+        }
+
+        /* =========================================
+           VIEWS (The Singularity Pages)
+           ========================================= */
+        .view {
+            display: none;
+            flex: 1;
+            padding: 40px 32px;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .view.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- HOME VIEW (The Bypass) --- */
+        .hero {
+            text-align: center;
+            padding: 10vh 0;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            background: linear-gradient(to right, var(--text-primary), var(--text-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 40px;
+        }
+
+        .search-singularity {
+            max-width: 700px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 20px 24px;
+            font-size: 1.1rem;
+            border-radius: 16px;
+            border: 1px solid var(--border-glass);
+            background: var(--bg-glass);
+            color: var(--text-primary);
+            outline: none;
+            transition: var(--transition-fluid);
+            backdrop-filter: blur(10px);
+        }
+
+        .search-input:focus {
+            border-color: var(--accent-akasha);
+            box-shadow: 0 0 40px rgba(139, 92, 246, 0.15);
+        }
+
+        /* --- LIBRARY VIEW (The Manifestation) --- */
+        .library-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+            margin-top: 40px;
+        }
+
+        .book-card {
+            background: var(--bg-glass);
+            border: 1px solid var(--border-glass);
+            border-radius: 16px;
+            padding: 24px;
+            cursor: pointer;
+            transition: var(--transition-fluid);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .book-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 2px;
+            background: linear-gradient(90deg, var(--accent-savita), var(--accent-mitti), var(--accent-akasha));
+            opacity: 0;
+            transition: var(--transition-fluid);
+        }
+
+        .book-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-resonance);
+            border-color: var(--accent-akasha);
+        }
+
+        .book-card:hover::before { opacity: 1; }
+
+        .book-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 8px; }
+        .book-meta { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 16px; }
+        .book-desc { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.5; }
+
+        /* --- READER VIEW (Param Vishram / Supreme Witness) --- */
+        .reader-container {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 24px;
+            height: calc(100vh - 120px);
+        }
+
+        .reader-main {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            border: 1px solid var(--border-glass);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .reader-toolbar {
+            padding: 12px 24px;
+            border-bottom: 1px solid var(--border-glass);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-glass);
+        }
+
+        .reader-content {
+            flex: 1;
+            overflow: auto;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .reader-content iframe, .reader-content canvas {
+            max-width: 100%;
+            max-height: 100%;
+            border: none;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            border-radius: 4px;
+        }
+
+        /* Resonance Panel (The Nirmal Sahyog Connector) */
+        .resonance-panel {
+            background: var(--bg-glass);
+            border: 1px solid var(--border-glass);
+            border-radius: 16px;
+            padding: 24px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .resonance-section h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--accent-savita);
+        }
+
+        .resonance-item {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-glass);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+            transition: var(--transition-fluid);
+        }
+
+        .resonance-item:hover { border-color: var(--accent-mitti); }
+
+        .yt-embed {
+            width: 100%;
+            aspect-ratio: 16/9;
+            border-radius: 12px;
+            border: 1px solid var(--border-glass);
+        }
+
+        /* --- ADMIN & API VIEWS --- */
+        .admin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: var(--bg-glass);
+            border: 1px solid var(--border-glass);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .stat-value { font-size: 2.5rem; font-weight: 800; color: var(--accent-mitti); }
+        .stat-label { font-size: 0.9rem; color: var(--text-secondary); margin-top: 8px; }
+
+        .terminal {
+            background: #000;
+            color: #10b981;
+            font-family: 'Courier New', monospace;
+            padding: 24px;
+            border-radius: 16px;
+            border: 1px solid var(--border-glass);
+            height: 400px;
+            overflow-y: auto;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .terminal-input {
+            background: transparent;
+            border: none;
+            color: #10b981;
+            font-family: inherit;
+            font-size: inherit;
+            outline: none;
+            width: 80%;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active { display: flex; }
+
+        .modal-content {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-glass);
+            border-radius: 24px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: var(--shadow-resonance);
+        }
+
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; margin-bottom: 8px; font-size: 0.9rem; color: var(--text-secondary); }
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border-glass);
+            background: var(--bg-glass);
+            color: var(--text-primary);
+            font-size: 1rem;
+            outline: none;
+        }
+        .form-input:focus { border-color: var(--accent-akasha); }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .reader-container { grid-template-columns: 1fr; height: auto; }
+            .resonance-panel { max-height: 500px; }
+            .nav-links { gap: 12px; }
+            .nav-link { font-size: 0.85rem; }
+        }
+
+        /* The "Param Vishram" Focus Mode */
+        body.witness-mode .nav-bar,
+        body.witness-mode .resonance-panel {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.8s ease;
+        }
+        body.witness-mode:hover .nav-bar { opacity: 1; pointer-events: all; }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Navigation -->
+        <nav class="nav-bar">
+            <a class="nav-brand" onclick="router.navigate('/')">
+                🌐 <span>Khela</span>
+            </a>
+            <div class="nav-links">
+                <a class="nav-link" onclick="router.navigate('/library')">Library</a>
+                <a class="nav-link" onclick="router.navigate('/api')">API</a>
+                <a class="nav-link" onclick="router.navigate('/admin')">Admin</a>
+                <button class="btn" onclick="toggleTheme()">🌗</button>
+                <button class="btn btn-primary" onclick="router.navigate('/upload')">+ Contribute</button>
+            </div>
+        </nav>
+
+        <!-- Views Container -->
+        <main id="app-views">
+            <!-- Dynamically Rendered by JS -->
+        </main>
+    </div>
+
+    <!-- Upload Modal -->
+    <div class="modal-overlay" id="uploadModal">
+        <div class="modal-content">
+            <h2 style="margin-bottom: 24px;">Contribute to the Singularity</h2>
+            <form id="uploadForm">
+                <div class="form-group">
+                    <label class="form-label">Book Title</label>
+                    <input type="text" class="form-input" id="inTitle" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Author / Source</label>
+                    <input type="text" class="form-input" id="inAuthor">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">URL (PDF, GitHub Repo, or Website)</label>
+                    <input type="url" class="form-input" id="inUrl" required placeholder="https://...">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-input" id="inDesc" rows="3"></textarea>
+                </div>
+                <div style="display: flex; gap: 12px;">
+                    <button type="button" class="btn" style="flex:1" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" style="flex:1">Manifest</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        /* =========================================
+           THE GEN 100 ENGINE (Zero Dependency Core)
+           ========================================= */
+
+        // 1. DATABASE LAYER (IndexedDB - The Local Memory)
+        class KhelaDB {
+            constructor() {
+                this.dbName = 'KhelaSingularity';
+                this.dbVersion = 1;
+                this.db = null;
+            }
+
+            async init() {
+                return new Promise((resolve, reject) => {
+                    const request = indexedDB.open(this.dbName, this.dbVersion);
+                    request.onerror = () => reject(request.error);
+                    request.onsuccess = () => { this.db = request.result; resolve(this.db); };
+                    request.onupgradeneeded = (event) => {
+                        const db = event.target.result;
+                        if (!db.objectStoreNames.contains('books')) {
+                            db.createObjectStore('books', { keyPath: 'id', autoIncrement: true });
+                        }
+                        if (!db.objectStoreNames.contains('analytics')) {
+                            db.createObjectStore('analytics', { keyPath: 'id', autoIncrement: true });
+                        }
+                    };
+                });
+            }
+
+            async addBook(book) {
+                return this._tx('books', 'readwrite', store => store.add(book));
+            }
+
+            async getAllBooks() {
+                return this._tx('books', 'readonly', store => store.getAll());
+            }
+
+            async trackEvent(type, data) {
+                // Auto-cleanup older than 14 days (The Law of Impermanence)
+                const cutoff = Date.now() - (14 * 24 * 60 * 60 * 1000);
+                const events = await this._tx('analytics', 'readonly', s => s.getAll());
+                events.forEach(e => {
+                    if(e.timestamp < cutoff) this._tx('analytics', 'readwrite', s => s.delete(e.id));
+                });
+
+                return this._tx('analytics', 'readwrite', store => store.add({
+                    type, data, timestamp: Date.now()
+                }));
+            }
+
+            _tx(storeName, mode, callback) {
+                return new Promise((resolve, reject) => {
+                    const tx = this.db.transaction([storeName], mode);
+                    const store = tx.objectStore(storeName);
+                    const request = callback(store);
+                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = () => reject(request.error);
+                });
+            }
+        }
+
+        // 2. ROUTER (The Singularity Navigator)
+        class Router {
+            constructor(routes) {
+                this.routes = routes;
+                window.addEventListener('hashchange', () => this.resolve());
+                this.resolve();
+            }
+
+            navigate(path) {
+                window.location.hash = path;
+            }
+
+            resolve() {
+                const hash = window.location.hash.slice(1) || '/';
+                const [path, param] = hash.split('/').filter(Boolean);
+                
+                document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+                
+                if (this.routes[path]) {
+                    this.routes[path](param);
+                } else {
+                    this.routes['home']();
+                }
+            }
+        }
+
+        // 3. RESONANCE ENGINE (External AI/Source Connector)
+        async function fetchResonance(title) {
+            const container = document.getElementById('resonance-data');
+            if(!container) return;
+            container.innerHTML = '<p style="color:var(--text-secondary)">Scanning the cosmos for resonance...</p>';
+
+            let html = '';
+
+            // A. YouTube Resonance (Zero API Key Hack)
+            html += `
+                <div class="resonance-section">
+                    <h3>📺 Video Resonance</h3>
+                    <iframe class="yt-embed" src="https://www.youtube.com/embed?listType=search&list=${encodeURIComponent(title)}" allowfullscreen></iframe>
+                </div>
+            `;
+
+            // B. GitHub Open Source Resonance
+            try {
+                const ghRes = await fetch(`https://api.github.com/search/repositories?q=${encodeURIComponent(title)}&sort=stars&per_page=3`);
+                const ghData = await ghRes.json();
+                
+                if (ghData.items && ghData.items.length > 0) {
+                    html += `<div class="resonance-section"><h3>💻 Code & Repositories</h3>`;
+                    ghData.items.forEach(repo => {
+                        html += `
+                            <a href="${repo.html_url}" target="_blank" class="resonance-item" style="text-decoration:none; color:inherit; display:block;">
+                                <strong>${repo.name}</strong> <span style="color:var(--accent-savita)">⭐ ${repo.stargazers_count}</span>
+                                <p style="font-size:0.8rem; margin-top:4px;">${repo.description || 'No description'}</p>
+                            </a>
+                        `;
+                    });
+                    html += `</div>`;
+                }
+            } catch (e) { console.log("GitHub API limit reached, maintaining silence."); }
+
+            container.innerHTML = html;
+        }
+
+        // 4. APPLICATION STATE & VIEWS
+        const db = new KhelaDB();
+        const viewsContainer = document.getElementById('app-views');
+
+        // Seed initial data if empty
+        async function seedData() {
+            const books = await db.getAllBooks();
+            if (books.length === 0) {
+                await db.addBook({
+                    title: "The Nirmal Sahyog: Mukti Yojana",
+                    author: "Earth Engineering Archive",
+                    url: "https://github.com/bhearth", // Placeholder URL
+                    desc: "Navigating the 2086 Paradox. Bypassing the Brahmit Zone. The architecture of Supreme Witness (Param Vishram) and Pure Cooperation.",
+                    type: "concept"
+                });
+                await db.addBook({
+                    title: "Earth Resonance & Planetary Sync",
+                    author: "Krishna Bhearth",
+                    url: "https://github.com/krishnabhearth-svg/hosa-dharma",
+                    desc: "The physical manifestation of Yug Nirman. Moving beyond ideological devotion to synchronized planetary architecture.",
+                    type: "github"
+                });
+            }
+        }
+
+        // View Renderers
+        const routes = {
+            'home': () => {
+                viewsContainer.innerHTML = `
+                    <div class="view active hero">
+                        <h1>Bypass the Noise.<br>Enter the Witness.</h1>
+                        <p>The Gen 100 Knowledge Singularity. A dependency-free, self-organizing library of human resonance. No algorithms. No ego. Just pure Nirmal Sahyog.</p>
+                        <div class="search-singularity">
+                            <input type="text" class="search-input" placeholder="Search the manifest..." id="heroSearch" onkeypress="if(event.key==='Enter') searchLibrary(this.value)">
+                        </div>
+                        <div style="margin-top:60px; display:flex; justify-content:center; gap:40px; color:var(--text-secondary); font-size:0.9rem;">
+                            <div><strong style="color:var(--accent-savita); font-size:1.5rem; display:block;" id="stat-books">0</strong> Manifested Books</div>
+                            <div><strong style="color:var(--accent-mitti); font-size:1.5rem; display:block;">∞</strong> Resonance Connections</div>
+                            <div><strong style="color:var(--accent-akasha); font-size:1.5rem; display:block;">0</strong> External Dependencies</div>
+                        </div>
+                    </div>
+                `;
+                db.getAllBooks().then(b => document.getElementById('stat-books').innerText = b.length);
+            },
+
+            'library': async () => {
+                const books = await db.getAllBooks();
+                viewsContainer.innerHTML = `
+                    <div class="view active">
+                        <h2 style="font-size:2rem; margin-bottom:8px;">The Manifestation</h2>
+                        <p style="color:var(--text-secondary); margin-bottom:24px;">All knowledge, perfectly readable, anywhere.</p>
+                        <div class="library-grid" id="lib-grid">
+                            ${books.map(b => `
+                                <div class="book-card" onclick="router.navigate('/reader/${b.id}')">
+                                    <div class="book-title">${b.title}</div>
+                                    <div class="book-meta">${b.author || 'Unknown'} • ${b.type || 'concept'}</div>
+                                    <div class="book-desc">${b.desc || ''}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            },
+
+            'reader': async (id) => {
+                const books = await db.getAllBooks();
+                const book = books.find(b => b.id == id);
+                if (!book) return router.navigate('/library');
+                
+                db.trackEvent('read', { bookId: id, title: book.title });
+
+                viewsContainer.innerHTML = `
+                    <div class="view active" style="padding: 20px 32px;">
+                        <div class="reader-container">
+                            <div class="reader-main">
+                                <div class="reader-toolbar">
+                                    <div>
+                                        <strong>${book.title}</strong>
+                                        <span style="color:var(--text-secondary); font-size:0.8rem; margin-left:12px;">${book.author}</span>
+                                    </div>
+                                    <button class="btn" onclick="document.body.classList.toggle('witness-mode')">🧘 Param Vishram (Focus)</button>
+                                </div>
+                                <div class="reader-content">
+                                    ${renderContent(book)}
+                                </div>
+                            </div>
+                            <div class="resonance-panel">
+                                <h2 style="font-size:1.2rem;">Nirmal Sahyog Connector</h2>
+                                <p style="font-size:0.85rem; color:var(--text-secondary);">Real-time synchronization with global knowledge nodes.</p>
+                                <div id="resonance-data"></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                fetchResonance(book.title);
+            },
+
+            'api': () => {
+                viewsContainer.innerHTML = `
+                    <div class="view active">
+                        <h2 style="font-size:2rem;">The Open API (Nirmal Sahyog Protocol)</h2>
+                        <p style="color:var(--text-secondary); margin-bottom:24px;">Connect any AI, LLM, or website to the Khela Singularity. Zero friction.</p>
+                        <div class="terminal" id="terminal">
+                            <div>> Khela API v1.0.0 Initialized.</div>
+                            <div>> Type <strong style="color:#f59e0b">help</strong> to see available commands.</div>
+                            <div style="margin-top:10px;">
+                                <span>> </span>
+                                <input type="text" class="terminal-input" id="termInput" onkeypress="handleTerminal(event)" autofocus>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('termInput').focus();
+            },
+
+            'admin': async () => {
+                const books = await db.getAllBooks();
+                viewsContainer.innerHTML = `
+                    <div class="view active">
+                        <h2 style="font-size:2rem;">Architect Dashboard</h2>
+                        <div class="admin-grid">
+                            <div class="stat-card">
+                                <div class="stat-value">${books.length}</div>
+                                <div class="stat-label">Total Manifestations</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">14</div>
+                                <div class="stat-label">Days Auto-Cleanup Cycle</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">0</div>
+                                <div class="stat-label">External Servers Needed</div>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" onclick="openModal()">+ Add New Manifestation</button>
+                        <button class="btn" style="margin-left:12px; color:#ef4444; border-color:#ef4444;" onclick="wipeDB()">🗑️ Purge Local Memory</button>
+                    </div>
+                `;
+            },
+
+            'upload': () => {
+                openModal();
+                router.navigate('/library');
+            }
+        };
+
+        function renderContent(book) {
+            if (book.url && book.url.includes('.pdf')) {
+                return `<iframe src="${book.url}" style="width:100%; height:100%;"></iframe>`;
+            } else if (book.url && book.url.includes('github.com')) {
+                return `<iframe src="${book.url}" style="width:100%; height:100%; border-radius:8px;"></iframe>`;
+            } else if (book.url) {
+                return `<iframe src="${book.url}" style="width:100%; height:100%;"></iframe>`;
+            }
+            return `<div style="padding:40px; text-align:center; color:var(--text-secondary);">
+                <h3>${book.title}</h3>
+                <p style="margin-top:16px;">${book.desc}</p>
+                <p style="margin-top:24px; font-style:italic;">"Words do not explain the future. Time and manifestation do."</p>
+            </div>`;
+        }
+
+        // 5. INTERACTIONS & UTILITIES
+        const router = new Router(routes);
+
+        function openModal() { document.getElementById('uploadModal').classList.add('active'); }
+        function closeModal() { document.getElementById('uploadModal').classList.remove('active'); }
+
+        document.getElementById('uploadForm').onsubmit = async (e) => {
+            e.preventDefault();
+            await db.addBook({
+                title: document.getElementById('inTitle').value,
+                author: document.getElementById('inAuthor').value,
+                url: document.getElementById('inUrl').value,
+                desc: document.getElementById('inDesc').value,
+                type: 'user-contribution'
+            });
+            closeModal();
+            e.target.reset();
+            router.navigate('/library');
+        };
+
+        async function wipeDB() {
+            if(confirm('Are you sure? This returns the local memory to the void.')) {
+                indexedDB.deleteDatabase('KhelaSingularity');
+                setTimeout(() => location.reload(), 500);
+            }
+        }
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-theme');
+            html.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+        }
+
+        async function searchLibrary(q) {
+            router.navigate('/library');
+            setTimeout(() => {
+                const cards = document.querySelectorAll('.book-card');
+                cards.forEach(c => {
+                    c.style.display = c.innerText.toLowerCase().includes(q.toLowerCase()) ? 'block' : 'none';
+                });
+            }, 100);
+        }
+
+        // Terminal API Handler
+        async function handleTerminal(e) {
+            if (e.key !== 'Enter') return;
+            const input = e.target;
+            const cmd = input.value.trim();
+            const term = document.getElementById('terminal');
+            
+            term.innerHTML = term.innerHTML.replace(input.parentElement.outerHTML, `<div>> ${cmd}</div>`);
+            
+            let output = '';
+            if (cmd === 'help') {
+                output = `Available: getBooks(), search(query), addBook(json), clear(),共振 (resonance)`;
+            } else if (cmd === 'getBooks()') {
+                const books = await db.getAllBooks();
+                output = JSON.stringify(books, null, 2);
+            } else if (cmd.startsWith('search(')) {
+                const q = cmd.match(/search\((.*)\)/)[1].replace(/['"]/g, '');
+                const books = await db.getAllBooks();
+                output = JSON.stringify(books.filter(b => b.title.includes(q)));
+            } else if (cmd === 'clear()') {
+                term.innerHTML = '<div>> Terminal cleared.</div><div style="margin-top:10px;"><span>> </span><input type="text" class="terminal-input" id="termInput" onkeypress="handleTerminal(event)"></div>';
+                document.getElementById('termInput').focus();
+                return;
+            } else {
+                output = `Command not recognized. The universe remains silent.`;
+            }
+            
+            term.innerHTML += `<div style="color:#8b5cf6; white-space:pre-wrap;">${output}</div>`;
+            term.innerHTML += `<div style="margin-top:10px;"><span>> </span><input type="text" class="terminal-input" id="termInput" onkeypress="handleTerminal(event)"></div>`;
+            document.getElementById('termInput').focus();
+            term.scrollTop = term.scrollHeight;
+        }
+
+        // 6. GLOBAL API EXPOSURE (For External AI/Sites)
+        window.Khela = {
+            db: db,
+            getBooks: () => db.getAllBooks(),
+            addBook: (b) => db.addBook(b),
+            search: async (q) => {
+                const books = await db.getAllBooks();
+                return books.filter(b => b.title.toLowerCase().includes(q.toLowerCase()) || b.desc.toLowerCase().includes(q.toLowerCase()));
+            },
+            version: "Gen 100.0.0 - Singularity"
+        };
+
+        // Initialize
+        db.init().then(() => seedData());
+    </script>
+</body>
+</html>
