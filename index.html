@@ -179,13 +179,14 @@
             border: 1px solid var(--border-color);
             border-radius: var(--radius-md);
             padding: 20px;
-            cursor: pointer;
             transition: var(--transition);
             display: flex;
             flex-direction: column;
             gap: 12px;
             position: relative;
             overflow: hidden;
+            text-decoration: none; /* In case wrapped in anchor */
+            color: inherit;
         }
 
         .card:hover {
@@ -554,7 +555,7 @@
         <!-- View: LOCAL LIBRARY -->
         <section id="view-library" class="view-section">
             <div class="results-header">
-                <h2>Core Local DB & Contributions</h2>
+                <h2>Global Database & Contributions</h2>
                 <button class="btn" style="padding: 4px 12px; font-size: 0.75rem;" onclick="loadLibrary()">
                     <span class="material-symbols-outlined" style="font-size: 14px;">refresh</span> Sync
                 </button>
@@ -653,16 +654,16 @@
 
                 <h3 style="margin: 30px 0 10px; color: var(--primary);">Technology Stack</h3>
                 <ul style="color: var(--text-muted); padding-left: 20px; margin-bottom: 20px;">
-                    <li>Single-page architecture (zero backend logic required to run)</li>
-                    <li>IndexedDB for robust local storage & caching</li>
+                    <li>Single-page architecture (Zero Backend)</li>
+                    <li>Firebase Firestore for robust, global cloud database storage</li>
                     <li>OpenAlex API for global academic research</li>
-                    <li>Google Books API & Affiliate routing</li>
+                    <li>Google Books API & Amazon Affiliate routing</li>
                     <li>Integrated AI Synthesizer (Gemini Matrix Oracle)</li>
                     <li>Napkin AI for diagram generation</li>
                 </ul>
 
                 <p style="color: var(--text-muted); margin-top: 40px;">
-                    <strong>Admin Contact:</strong> ${CONFIG.ADMIN_EMAIL}<br>
+                    <strong>Admin Contact:</strong> krishna.bh.earth@gmail.com<br>
                 </p>
 
                 <div class="revenue-notice" style="margin-top: 40px; background: transparent; border-color: var(--border-color);">
@@ -686,8 +687,8 @@
             <span>Research</span>
         </button>
         <button class="nav-item" onclick="loadLibrary(); switchView('library', this)">
-            <span class="material-symbols-outlined">local_library</span>
-            <span>Local DB</span>
+            <span class="material-symbols-outlined">public</span>
+            <span>Global DB</span>
         </button>
         <button class="nav-item" onclick="switchView('network', this)">
             <span class="material-symbols-outlined">hub</span>
@@ -730,7 +731,7 @@
                 <input type="text" id="c-tags" placeholder="e.g., #science, physics, global">
                 <div id="c-tags-hint" class="hint">Comma or space separated tags. Critical for indexing.</div>
             </div>
-            <button type="submit" class="btn btn-primary btn-full" style="margin-top:12px;">Save to Local DB</button>
+            <button type="submit" class="btn btn-primary btn-full" style="margin-top:12px;">Save to Global Database</button>
         </form>
     </div>
 
@@ -741,7 +742,7 @@
                 <span class="material-symbols-outlined">arrow_back</span>
             </button>
             <div class="viewer-title" id="viewer-title">Document Title</div>
-            <a id="viewer-link" href="#" target="_blank" class="btn" style="border:none; color:var(--primary); background:transparent; padding:6px;" title="Open External">
+            <a id="viewer-link" href="#" target="_blank" rel="noopener noreferrer" class="btn" style="border:none; color:var(--primary); background:transparent; padding:6px;" title="Open External">
                 <span class="material-symbols-outlined">open_in_new</span>
             </a>
         </div>
@@ -750,100 +751,93 @@
         </div>
     </div>
 
-    <!-- Application Logic -->
-    <script>
+    <!-- Application Logic (Firebase + Logic) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
         // ==========================================
         // 1. CONFIGURATION & STATE
         // ==========================================
         const CONFIG = {
             AMAZON_TAG: 'amazon0339f-21', 
-            NAPKIN_API_TOKEN: 'sk-c28bbef0c1f1be43b507f5453dfea9ea919c4d43f2e8c921636c5bd2794de7cc',
-            ADMIN_EMAIL: 'krishna.bh.earth@gmail.com',
-            DB_NAME: 'KhelaMatrixDB',
-            DB_VERSION: 3 // Upgraded to add profiles store
+            NAPKIN_API_TOKEN: 'sk-c28bbef0c1f1be43b507f5453dfea9ea919c4d43f2e8c921636c5bd2794de7cc'
         };
 
-        const STATE = {
+        window.STATE = {
             currentQuery: ""
         };
 
         // ==========================================
-        // 2. THEME & UTILS
+        // 2. FIREBASE GLOBAL DB CORE
         // ==========================================
-        function toggleTheme() {
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const appBase = initializeApp(firebaseConfig);
+        const auth = getAuth(appBase);
+        const db = getFirestore(appBase);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+        // Secure Authentication Flow (MANDATORY RULE 3)
+        const authPromise = new Promise(resolve => {
+            const initAuth = async () => {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+                resolve();
+            };
+            initAuth();
+        });
+
+        async function dbAdd(storeName, data) {
+            await authPromise;
+            if (!auth.currentUser) return;
+            // Public Database Path (RULE 1)
+            const colRef = collection(db, 'artifacts', appId, 'public', 'data', storeName);
+            await addDoc(colRef, data);
+        }
+
+        async function dbPutPrivate(storeName, data) {
+            await authPromise;
+            if (!auth.currentUser) return;
+            // Private User Specific Data (RULE 1)
+            const docId = data.userId || 'profile_data';
+            const docRef = doc(db, 'artifacts', appId, 'users', auth.currentUser.uid, storeName, docId);
+            await setDoc(docRef, data);
+        }
+
+        async function dbGetAll(storeName) {
+            await authPromise;
+            if (!auth.currentUser) return [];
+            // Public Database Fetch
+            const colRef = collection(db, 'artifacts', appId, 'public', 'data', storeName);
+            const snapshot = await getDocs(colRef);
+            return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        }
+
+        const CORE_MANIFESTO = {
+            title: 'The Nirmal Sahyog: Mukti Yojana',
+            author: 'Earth Engineering Archive',
+            url: 'https://drive.google.com/file/d/1zo0-LUktX_If_X2Cz2Fjr62I34Dj1IuI/view?usp=sharing',
+            tags: ['#manifesto', '#mukti', '#earth'],
+            source: 'library',
+            isManifesto: true,
+            timestamp: 9999999999999, // Always sorts to top
+            type: 'library'
+        };
+
+        // ==========================================
+        // 3. THEME & UTILS
+        // ==========================================
+        window.toggleTheme = function() {
             const html = document.documentElement;
             const current = html.getAttribute('data-theme');
             html.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
         }
 
-        // ==========================================
-        // 3. INDEXED DB (Local Storage Core)
-        // ==========================================
-        const dbPromise = new Promise((resolve, reject) => {
-            const req = indexedDB.open(CONFIG.DB_NAME, CONFIG.DB_VERSION);
-            req.onupgradeneeded = (e) => {
-                const db = e.target.result;
-                if (!db.objectStoreNames.contains('library')) {
-                    db.createObjectStore('library', { keyPath: 'id', autoIncrement: true });
-                }
-                if (!db.objectStoreNames.contains('profiles')) {
-                    db.createObjectStore('profiles', { keyPath: 'userId' });
-                }
-            };
-            req.onsuccess = () => resolve(req.result);
-            req.onerror = () => reject(req.error);
-        });
-
-        async function dbAdd(storeName, data) {
-            const db = await dbPromise;
-            return new Promise((resolve, reject) => {
-                const tx = db.transaction(storeName, 'readwrite');
-                const req = tx.objectStore(storeName).add(data);
-                req.onsuccess = () => resolve(req.result);
-                req.onerror = () => reject(req.error);
-            });
-        }
-
-        async function dbPut(storeName, data) {
-            const db = await dbPromise;
-            return new Promise((resolve, reject) => {
-                const tx = db.transaction(storeName, 'readwrite');
-                const req = tx.objectStore(storeName).put(data);
-                req.onsuccess = () => resolve(req.result);
-                req.onerror = () => reject(req.error);
-            });
-        }
-
-        async function dbGetAll(storeName) {
-            const db = await dbPromise;
-            return new Promise((resolve, reject) => {
-                const tx = db.transaction(storeName, 'readonly');
-                const req = tx.objectStore(storeName).getAll();
-                req.onsuccess = () => resolve(req.result);
-                req.onerror = () => reject(req.error);
-            });
-        }
-
-        // Seed Manifesto if empty
-        async function seedDatabase() {
-            const items = await dbGetAll('library');
-            if (items.length === 0) {
-                await dbAdd('library', {
-                    title: 'The Nirmal Sahyog: Mukti Yojana',
-                    author: 'Earth Engineering Archive',
-                    url: 'https://drive.google.com/file/d/1zo0-LUktX_If_X2Cz2Fjr62I34Dj1IuI/view?usp=sharing',
-                    tags: ['#manifesto', '#mukti', '#earth'],
-                    source: 'library',
-                    isManifesto: true,
-                    timestamp: Date.now()
-                });
-            }
-        }
-
-        // ==========================================
-        // 4. UI NAVIGATION & MODALS
-        // ==========================================
-        function switchView(viewId, navElement) {
+        window.switchView = function(viewId, navElement) {
             if (navElement) {
                 document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
                 navElement.classList.add('active');
@@ -856,11 +850,11 @@
             }
         }
 
-        function openModal(id) { document.getElementById(id).classList.add('active'); }
-        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+        window.openModal = function(id) { document.getElementById(id).classList.add('active'); }
+        window.closeModal = function(id) { document.getElementById(id).classList.remove('active'); }
 
         // ==========================================
-        // 5. ZEN FLOW LOGIC
+        // 4. ZEN FLOW LOGIC
         // ==========================================
         const zenInput = document.getElementById('zen-input');
         
@@ -875,12 +869,12 @@
         });
 
         // ==========================================
-        // 6. THE PERFECT RANKING & SEARCH APIS
+        // 5. THE PERFECT RANKING & SEARCH APIS
         // ==========================================
         
         async function callGeminiAPI(prompt, systemPrompt = "You are a helpful AI assistant.") {
             const apiKey = ""; // Canvas automatically provides this at runtime
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
             
             const payload = {
                 contents: [{ parts: [{ text: prompt }] }],
@@ -901,27 +895,7 @@
             }
         }
 
-        function renderAISynthesis(query) {
-            const aiCard = document.getElementById('ai-synthesis-card');
-            const aiContent = document.getElementById('ai-synthesis-content');
-            
-            aiCard.classList.add('active');
-            aiContent.innerHTML = `<div style="display:flex; align-items:center; gap:8px;"><div class="ai-loading"></div> <span style="opacity:0.8;">Oracle is synthesizing knowledge vectors...</span></div>`;
-            
-            const prompt = `Synthesize profound, factual, and concise knowledge (3-4 sentences max) about: ${query}. Focus on its relevance to evolution, universal mechanics, or cooperation if applicable. Keep it highly insightful.`;
-            const sysPrompt = "You are the Khela Matrix Oracle, an advanced intelligence focused on Earth Engineering, truth, and human evolution. Speak wisely, philosophically, yet factually.";
-            
-            callGeminiAPI(prompt, sysPrompt).then(response => {
-                if (response) {
-                    const formatted = response.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-                    aiContent.innerHTML = formatted;
-                } else {
-                    aiContent.innerHTML = "<span style='color:var(--accent);'>The matrix is currently silent. Synthesis unavailable.</span>";
-                }
-            });
-        }
-
-        async function autoGenerateTags() {
+        window.autoGenerateTags = async function() {
             const title = document.getElementById('c-title').value.trim();
             const author = document.getElementById('c-author').value.trim();
             const hint = document.getElementById('c-tags-hint');
@@ -951,7 +925,7 @@
             tagsInput.placeholder = originalPlaceholder;
         }
 
-        async function triggerSearch(query) {
+        window.triggerSearch = async function(query) {
             if (!query) return;
             STATE.currentQuery = query;
             document.getElementById('results-query-text').innerText = query;
@@ -961,7 +935,7 @@
             grid.innerHTML = `
                 <div class="center-msg" style="grid-column: 1/-1;">
                     <span class="material-symbols-outlined spinner" style="font-size: 48px;">data_usage</span>
-                    <p>Calculating resonance across all APIs & DB...</p>
+                    <p>Calculating resonance across all APIs & Global DB...</p>
                 </div>
             `;
 
@@ -1006,9 +980,31 @@
             }
         }
 
+        function renderAISynthesis(query) {
+            const aiCard = document.getElementById('ai-synthesis-card');
+            const aiContent = document.getElementById('ai-synthesis-content');
+            
+            aiCard.classList.add('active');
+            aiContent.innerHTML = `<div style="display:flex; align-items:center; gap:8px;"><div class="ai-loading"></div> <span style="opacity:0.8;">Oracle is synthesizing knowledge vectors...</span></div>`;
+            
+            const prompt = `Synthesize profound, factual, and concise knowledge (3-4 sentences max) about: ${query}. Focus on its relevance to evolution, universal mechanics, or cooperation if applicable. Keep it highly insightful.`;
+            const sysPrompt = "You are the Khela Matrix Oracle, an advanced intelligence focused on Earth Engineering, truth, and human evolution. Speak wisely, philosophically, yet factually.";
+            
+            callGeminiAPI(prompt, sysPrompt).then(response => {
+                if (response) {
+                    const formatted = response.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                    aiContent.innerHTML = formatted;
+                } else {
+                    aiContent.innerHTML = "<span style='color:var(--accent);'>The matrix is currently silent. Synthesis unavailable.</span>";
+                }
+            });
+        }
+
         async function searchLocal(query) {
             const q = query.toLowerCase();
-            const all = await dbGetAll('library');
+            let all = await dbGetAll('library');
+            all.push(CORE_MANIFESTO);
+
             return all.filter(item => {
                 const titleMatch = item.title.toLowerCase().includes(q);
                 const authorMatch = item.author && item.author.toLowerCase().includes(q);
@@ -1027,6 +1023,7 @@
                     return {
                         title: info.title || 'Unknown Book',
                         author: info.authors ? info.authors.join(', ') : 'Unknown Author',
+                        // Robust Amazon Affiliate Link Generation
                         url: `https://www.amazon.com/s?k=${encodeURIComponent(info.title)}&tag=${CONFIG.AMAZON_TAG}`,
                         rating: info.averageRating || 3,
                         type: 'amazon',
@@ -1063,11 +1060,11 @@
         }
 
         // ==========================================
-        // 7. RENDERING CARDS
+        // 6. RENDERING CARDS
         // ==========================================
         function renderCards(items, container) {
             if (items.length === 0) {
-                container.innerHTML = `<div class="center-msg" style="grid-column: 1/-1;"><p>No resonance found. Please contribute knowledge to the DB.</p></div>`;
+                container.innerHTML = `<div class="center-msg" style="grid-column: 1/-1;"><p>No resonance found. Please contribute knowledge to the Global DB.</p></div>`;
                 return;
             }
 
@@ -1077,12 +1074,17 @@
                 else if (item.type === 'scholar') { badgeClass = 'source-scholar'; badgeText = 'Scholar / Paper'; icon = 'school'; }
                 else if (item.type === 'youtube') { badgeClass = 'source-youtube'; badgeText = 'TEDx / YouTube'; icon = 'smart_display'; }
                 else if (item.type === 'network') { badgeClass = 'source-network'; badgeText = 'AI Match'; icon = 'hub'; }
-                else { badgeClass = 'source-library'; badgeText = 'Local DB'; icon = 'database'; }
+                else { badgeClass = 'source-library'; badgeText = 'Global DB'; icon = 'database'; }
 
                 const isManifesto = item.isManifesto ? 'card-manifesto' : '';
-                const clickHandler = item.isExternal 
-                    ? `window.open('${item.url}', '_blank')` 
-                    : `openViewer('${item.url}', '${item.title.replace(/'/g, "\\'")}')`;
+                
+                // Card click redirects natively if external (prevents adblockers catching window.open)
+                // Otherwise triggers internal viewer
+                const cardHtmlStart = item.isExternal 
+                    ? `<a href="${item.url}" target="_blank" rel="noopener noreferrer" class="card ${isManifesto}">`
+                    : `<div class="card ${isManifesto}" onclick="openViewer('${item.url.replace(/'/g, "\\'")}', '${item.title.replace(/'/g, "\\'")}')">`;
+                
+                const cardHtmlEnd = item.isExternal ? `</a>` : `</div>`;
 
                 let tagsHtml = '';
                 if (item.tags && item.tags.length > 0) {
@@ -1092,7 +1094,7 @@
                 }
 
                 return `
-                    <div class="card ${isManifesto}" onclick="${clickHandler}">
+                    ${cardHtmlStart}
                         ${item.isManifesto ? `<div style="font-size:2rem; font-weight:700; color:var(--secondary); margin-bottom:8px; letter-spacing:2px;">E = ma²</div>` : ''}
                         
                         <div class="card-header-row">
@@ -1109,18 +1111,19 @@
                         
                         <div class="card-actions">
                             ${item.isExternal 
-                                ? `<button class="btn btn-primary" onclick="event.stopPropagation(); window.open('${item.url}', '_blank')">External Link</button>`
-                                : `<button class="btn btn-primary" onclick="event.stopPropagation(); openViewer('${item.url}', '${item.title.replace(/'/g, "\\'")}')">Open Media</button>`
+                                ? `<span class="btn btn-primary">External Link</span>`
+                                : `<button class="btn btn-primary" onclick="event.stopPropagation(); openViewer('${item.url.replace(/'/g, "\\'")}', '${item.title.replace(/'/g, "\\'")}')">Open Media</button>`
                             }
                         </div>
-                    </div>
+                    ${cardHtmlEnd}
                 `;
             }).join('');
         }
 
-        async function loadLibrary() {
+        window.loadLibrary = async function() {
             const grid = document.getElementById('library-grid');
-            const items = await dbGetAll('library');
+            let items = await dbGetAll('library');
+            items.push(CORE_MANIFESTO);
             items.sort((a, b) => {
                 if (a.isManifesto) return -1;
                 if (b.isManifesto) return 1;
@@ -1130,9 +1133,9 @@
         }
 
         // ==========================================
-        // 8. SOCIAL AI NETWORKING 
+        // 7. SOCIAL AI NETWORKING 
         // ==========================================
-        async function buildNetworkProfile() {
+        window.buildNetworkProfile = async function() {
             const provider = document.getElementById('aiProvider').value;
             const apiKey = document.getElementById('apiKey').value;
             
@@ -1155,7 +1158,6 @@
             resultsDiv.innerHTML = `<div class="center-msg"><span class="material-symbols-outlined spinner" style="font-size: 48px;">hub</span><p>Building your AI profile and finding global matches...</p></div>`;
 
             try {
-                // Determine which API to use
                 let profileStr = '';
                 let matchesStr = '';
 
@@ -1163,16 +1165,13 @@
                 const matchPrompt = `Based on this user: ${JSON.stringify(userData)}, generate a JSON array of 3 realistic but simulated global collaborators. Fields: name, reason (why they match), score (number 1-100), socialLinks (mock object with github/linkedin). Return strictly valid JSON array.`;
                 
                 if (provider === 'gemini') {
-                    // Use native canvas Gemini API route
                     profileStr = await callGeminiAPI(profilePrompt, "You are a networking AI outputting strictly valid JSON.");
                     matchesStr = await callGeminiAPI(matchPrompt, "You are a networking AI outputting strictly valid JSON array.");
                 } else {
-                    // Fallback to fetch for custom API keys if user desires
                     resultsDiv.innerHTML = `<div class="center-msg"><p>External APIs require specific CORS configurations. Using Default Gemini engine is recommended on this platform.</p></div>`;
                     return;
                 }
 
-                // Clean JSON from markdown if exists
                 const cleanJson = (str) => {
                     const match = str.match(/\{[\s\S]*\}|\[[\s\S]*\]/);
                     return match ? match[0] : '{}';
@@ -1181,8 +1180,8 @@
                 const profile = JSON.parse(cleanJson(profileStr));
                 const matches = JSON.parse(cleanJson(matchesStr));
 
-                // Save to IndexedDB
-                await dbPut('profiles', {
+                // Save strictly to private DB
+                await dbPutPrivate('profiles', {
                     userId: 'local-user',
                     data: userData,
                     profileData: profile,
@@ -1221,8 +1220,8 @@
                             <div class="card-title">${m.name || 'Anonymous Creator'}</div>
                             <div class="card-meta" style="margin-top: 8px;">${m.reason || 'Semantic alignment found.'}</div>
                             <div class="card-actions">
-                                ${m.socialLinks?.github ? `<a href="${m.socialLinks.github}" target="_blank" class="btn">GitHub</a>` : ''}
-                                ${m.socialLinks?.linkedin ? `<a href="${m.socialLinks.linkedin}" target="_blank" class="btn">LinkedIn</a>` : ''}
+                                ${m.socialLinks?.github ? `<a href="${m.socialLinks.github}" target="_blank" rel="noopener noreferrer" class="btn">GitHub</a>` : ''}
+                                ${m.socialLinks?.linkedin ? `<a href="${m.socialLinks.linkedin}" target="_blank" rel="noopener noreferrer" class="btn">LinkedIn</a>` : ''}
                             </div>
                         </div>
                     `;
@@ -1233,7 +1232,7 @@
             resultsDiv.innerHTML = html;
         }
 
-        async function createNapkinDiagram() {
+        window.createNapkinDiagram = async function() {
             const text = document.getElementById('napkinText').value.trim();
             const output = document.getElementById('napkinOutput');
             
@@ -1273,9 +1272,9 @@
         }
 
         // ==========================================
-        // 9. UNIVERSAL MEDIA VIEWER (Video, Audio, PDF, Text, IMG)
+        // 8. UNIVERSAL MEDIA VIEWER 
         // ==========================================
-        function openViewer(url, title) {
+        window.openViewer = function(url, title) {
             document.getElementById('viewer-title').innerText = title || 'Media Viewer';
             document.getElementById('viewer-link').href = url;
             
@@ -1310,15 +1309,15 @@
             document.getElementById('viewer').classList.add('active');
         }
 
-        function closeViewer() {
+        window.closeViewer = function() {
             document.getElementById('viewer').classList.remove('active');
-            document.getElementById('viewer-body').innerHTML = ''; // Destroy iframe/video to stop playing
+            document.getElementById('viewer-body').innerHTML = ''; // Destroy iframe
         }
 
         // ==========================================
-        // 10. CONTRIBUTE LOGIC (Hashtags saving)
+        // 9. CONTRIBUTE LOGIC (Firestore Saving)
         // ==========================================
-        async function handleContribute(e) {
+        window.handleContribute = async function(e) {
             e.preventDefault();
             const title = document.getElementById('c-title').value.trim();
             const author = document.getElementById('c-author').value.trim();
@@ -1344,11 +1343,9 @@
         }
 
         // ==========================================
-        // 11. INITIALIZATION
+        // 10. INITIALIZATION
         // ==========================================
         window.addEventListener('DOMContentLoaded', async () => {
-            await seedDatabase();
-            
             document.addEventListener('keydown', (e) => {
                 if(e.key === 'Escape') {
                     closeModal('contribute-modal');
