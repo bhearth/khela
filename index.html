@@ -2,1314 +2,919 @@
 <html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Khela | Nirmal Sahyog - Universal Knowledge Platform</title>
-    <meta name="description" content="The Gen 100 Knowledge Singularity - Amazon, OpenAlex, GitHub, AI Networking in One Platform">
-    
-    <!-- PDF.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Khela | E = ma² | Nirmal Sahyog</title>
+    <meta name="description" content="The Gen 100 Knowledge Singularity. Pure Cooperation. Param Vishram.">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     
     <style>
+        /* =========================================
+           MATERIAL DESIGN 3 - PARAM VISHRAM THEME
+           Optimized for Old Devices & Mobile First
+           ========================================= */
         :root {
-            --bg-primary: #050505;
-            --bg-secondary: #0a0a0c;
-            --bg-glass: rgba(255, 255, 255, 0.03);
-            --border-glass: rgba(255, 255, 255, 0.08);
-            --text-primary: #f3f4f6;
-            --text-secondary: #9ca3af;
-            --accent-amazon: #ff9900;
-            --accent-github: #58a6ff;
-            --accent-scholar: #4285f4;
-            --accent-ai: #8b5cf6;
-            --accent-nature: #10b981;
-            --shadow-resonance: 0 8px 32px rgba(0, 0, 0, 0.5);
-            --transition-fluid: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            --md-sys-color-primary: #8AB4F8;
+            --md-sys-color-on-primary: #062E6F;
+            --md-sys-color-secondary: #81C995;
+            --md-sys-color-surface: #0F1115;
+            --md-sys-color-surface-variant: #1A1D24;
+            --md-sys-color-on-surface: #E3E2E6;
+            --md-sys-color-on-surface-variant: #C4C6D0;
+            --md-sys-color-outline: #3D4048;
+            --md-sys-color-error: #F2B8B5;
+            --md-sys-color-amazon: #FF9900;
+            --md-sys-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            --md-sys-radius: 16px;
+            --md-sys-transition: cubic-bezier(0.2, 0, 0, 1);
         }
 
         [data-theme="light"] {
-            --bg-primary: #ffffff;
-            --bg-secondary: #f9fafb;
-            --bg-glass: rgba(255, 255, 255, 0.7);
-            --border-glass: rgba(0, 0, 0, 0.05);
-            --text-primary: #111827;
-            --text-secondary: #4b5563;
-            --shadow-resonance: 0 8px 32px rgba(0, 0, 0, 0.08);
+            --md-sys-color-primary: #0B57D0;
+            --md-sys-color-on-primary: #FFFFFF;
+            --md-sys-color-secondary: #0D652D;
+            --md-sys-color-surface: #FDFCFE;
+            --md-sys-color-surface-variant: #F1F0F5;
+            --md-sys-color-on-surface: #1C1B1F;
+            --md-sys-color-on-surface-variant: #49454F;
+            --md-sys-color-outline: #CAC4D0;
+            --md-sys-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
+            font-family: 'Roboto', system-ui, sans-serif;
+            background: var(--md-sys-color-surface);
+            color: var(--md-sys-color-on-surface);
             line-height: 1.6;
             overflow-x: hidden;
+            min-height: 100vh;
+            padding-bottom: 80px; /* Space for FAB and Bottom Nav */
         }
 
-        /* Navigation */
-        .nav-bar {
+        /* Typography */
+        h1 { font-size: 28px; font-weight: 500; letter-spacing: -0.5px; margin-bottom: 16px; }
+        h2 { font-size: 22px; font-weight: 500; margin-bottom: 12px; }
+        h3 { font-size: 18px; font-weight: 500; margin-bottom: 8px; }
+        p { color: var(--md-sys-color-on-surface-variant); font-size: 15px; }
+
+        /* App Shell */
+        .app-bar {
             position: sticky;
             top: 0;
             z-index: 100;
-            backdrop-filter: blur(20px);
-            background: var(--bg-glass);
-            border-bottom: 1px solid var(--border-glass);
-            padding: 16px 32px;
+            background: var(--md-sys-color-surface);
+            border-bottom: 1px solid var(--md-sys-color-outline);
+            padding: 16px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            backdrop-filter: blur(10px);
         }
 
         .logo {
-            font-size: 1.5rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--accent-amazon), var(--accent-ai));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            cursor: pointer;
-        }
-
-        .nav-links {
             display: flex;
-            gap: 24px;
             align-items: center;
+            gap: 10px;
+            font-size: 20px;
+            font-weight: 500;
+            color: var(--md-sys-color-primary);
         }
 
-        .nav-link {
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: var(--transition-fluid);
-        }
-
-        .nav-link:hover, .nav-link.active { color: var(--text-primary); }
-
-        .btn {
-            padding: 10px 20px;
-            border-radius: 8px;
-            border: 1px solid var(--border-glass);
-            background: var(--bg-glass);
-            color: var(--text-primary);
-            cursor: pointer;
-            transition: var(--transition-fluid);
-        }
-
-        .btn:hover { transform: translateY(-2px); }
+        .app-bar-actions { display: flex; gap: 16px; align-items: center; }
         
-        .btn-primary {
-            background: linear-gradient(135deg, var(--accent-amazon), var(--accent-nature));
+        .icon-btn {
+            background: none;
             border: none;
-            color: #fff;
-        }
-
-        .btn-amazon { background: var(--accent-amazon); color: #000; border: none; }
-        .btn-github { background: var(--accent-github); color: #fff; border: none; }
-        .btn-scholar { background: var(--accent-scholar); color: #fff; border: none; }
-
-        /* Main Container */
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 40px 32px;
-        }
-
-        /* Search Hero */
-        .search-hero {
-            text-align: center;
-            padding: 60px 0;
-        }
-
-        .search-hero h1 {
-            font-size: clamp(2rem, 5vw, 3.5rem);
-            margin-bottom: 20px;
-            background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .search-box {
-            max-width: 800px;
-            margin: 0 auto 30px;
+            color: var(--md-sys-color-on-surface-variant);
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             position: relative;
+            transition: background 0.2s;
+        }
+        .icon-btn:hover { background: var(--md-sys-color-surface-variant); }
+        
+        .badge {
+            position: absolute;
+            top: 4px; right: 4px;
+            background: var(--md-sys-color-error);
+            color: white;
+            font-size: 10px;
+            width: 16px; height: 16px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
+        /* Main Content Area */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Search Bar (Material Design) */
+        .search-container {
+            position: relative;
+            margin-bottom: 24px;
+        }
         .search-input {
             width: 100%;
-            padding: 18px 24px;
-            font-size: 1.1rem;
-            border-radius: 12px;
-            border: 1px solid var(--border-glass);
-            background: var(--bg-glass);
-            color: var(--text-primary);
+            padding: 16px 20px 16px 56px;
+            background: var(--md-sys-color-surface-variant);
+            border: 1px solid var(--md-sys-color-outline);
+            border-radius: 28px;
+            color: var(--md-sys-color-on-surface);
+            font-size: 16px;
             outline: none;
+            transition: all 0.3s var(--md-sys-transition);
         }
-
         .search-input:focus {
-            border-color: var(--accent-ai);
-            box-shadow: 0 0 40px rgba(139, 92, 246, 0.2);
+            border-color: var(--md-sys-color-primary);
+            box-shadow: 0 0 0 2px rgba(138, 180, 248, 0.2);
+        }
+        .search-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--md-sys-color-on-surface-variant);
         }
 
-        .search-tabs {
+        /* Cards (Library & Manifesto) */
+        .card {
+            background: var(--md-sys-color-surface-variant);
+            border: 1px solid var(--md-sys-color-outline);
+            border-radius: var(--md-sys-radius);
+            padding: 20px;
+            margin-bottom: 16px;
+            transition: transform 0.2s var(--md-sys-transition), box-shadow 0.2s;
+            cursor: pointer;
+        }
+        .card:active { transform: scale(0.98); }
+        
+        .card-manifesto {
+            background: linear-gradient(135deg, rgba(138, 180, 248, 0.1), rgba(129, 201, 149, 0.1));
+            border: 1px solid var(--md-sys-color-primary);
+            text-align: center;
+            padding: 32px 20px;
+        }
+        .card-manifesto h2 { color: var(--md-sys-color-primary); }
+        .card-manifesto .equation { font-size: 24px; font-weight: 700; margin: 16px 0; color: var(--md-sys-color-secondary); }
+
+        .book-card {
             display: flex;
-            gap: 12px;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-bottom: 30px;
+            gap: 16px;
+            align-items: flex-start;
         }
-
-        .search-tab {
+        .book-cover {
+            width: 80px;
+            height: 120px;
+            background: var(--md-sys-color-outline);
+            border-radius: 8px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+        .book-info { flex: 1; min-width: 0; }
+        .book-title { font-size: 16px; font-weight: 500; margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .book-meta { font-size: 13px; color: var(--md-sys-color-on-surface-variant); margin-bottom: 8px; }
+        
+        .book-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+        
+        .btn {
             padding: 10px 20px;
             border-radius: 20px;
-            border: 1px solid var(--border-glass);
-            background: var(--bg-glass);
-            cursor: pointer;
-            transition: var(--transition-fluid);
-        }
-
-        .search-tab.active {
-            background: var(--accent-ai);
-            color: white;
-            border-color: var(--accent-ai);
-        }
-
-        /* Results Grid */
-        .results-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 24px;
-            margin-top: 40px;
-        }
-
-        .result-card {
-            background: var(--bg-glass);
-            border: 1px solid var(--border-glass);
-            border-radius: 12px;
-            padding: 24px;
-            transition: var(--transition-fluid);
-            cursor: pointer;
-        }
-
-        .result-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-resonance);
-            border-color: var(--accent-ai);
-        }
-
-        .result-card.amazon { border-top: 3px solid var(--accent-amazon); }
-        .result-card.github { border-top: 3px solid var(--accent-github); }
-        .result-card.scholar { border-top: 3px solid var(--accent-scholar); }
-
-        .result-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-
-        .result-meta {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            margin-bottom: 12px;
-        }
-
-        .result-desc {
-            font-size: 0.95rem;
-            color: var(--text-secondary);
-            line-height: 1.5;
-        }
-
-        .result-actions {
-            display: flex;
-            gap: 12px;
-            margin-top: 16px;
-        }
-
-        /* AI Networking Section */
-        .ai-section {
-            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(16, 185, 129, 0.1));
-            border: 1px solid var(--border-glass);
-            border-radius: 16px;
-            padding: 40px;
-            margin: 40px 0;
-        }
-
-        .ai-config {
-            display: grid;
-            gap: 20px;
-            margin: 30px 0;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .form-label {
+            border: none;
+            font-size: 14px;
             font-weight: 500;
-            color: var(--text-secondary);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+            text-decoration: none;
         }
+        .btn-primary { background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); }
+        .btn-amazon { background: var(--md-sys-color-amazon); color: #000; }
+        .btn-outline { background: transparent; border: 1px solid var(--md-sys-color-outline); color: var(--md-sys-color-on-surface); }
+        .btn-sm { padding: 6px 12px; font-size: 12px; }
 
-        .form-input, .form-textarea, .form-select {
-            padding: 12px 16px;
-            border-radius: 8px;
-            border: 1px solid var(--border-glass);
-            background: var(--bg-glass);
-            color: var(--text-primary);
-            font-size: 1rem;
-        }
-
-        .social-links-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 16px;
-            margin: 20px 0;
-        }
-
-        /* Match Results */
-        .match-card {
-            background: var(--bg-glass);
-            border: 1px solid var(--border-glass);
-            border-radius: 12px;
-            padding: 24px;
-            margin: 16px 0;
-        }
-
-        .match-score {
-            display: inline-block;
-            padding: 6px 12px;
-            border-radius: 20px;
-            background: linear-gradient(135deg, var(--accent-ai), var(--accent-nature));
-            color: white;
-            font-weight: 600;
-            margin-bottom: 12px;
-        }
-
-        .match-reasons {
-            margin-top: 12px;
-            padding-left: 20px;
-            color: var(--text-secondary);
-        }
-
-        .match-reasons li {
-            margin: 8px 0;
-        }
-
-        /* Napkin AI Integration */
-        .napkin-section {
-            background: var(--bg-glass);
-            border: 1px solid var(--border-glass);
-            border-radius: 12px;
-            padding: 24px;
-            margin: 20px 0;
-        }
-
-        .napkin-canvas {
-            width: 100%;
-            min-height: 400px;
-            border-radius: 8px;
-            margin-top: 16px;
-            background: var(--bg-secondary);
-        }
-
-        /* Modal */
-        .modal {
-            display: none;
+        /* FAB (The Whisper / Contribute Button) */
+        .fab {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.8);
-            z-index: 1000;
+            bottom: 90px;
+            right: 24px;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: var(--md-sys-color-primary);
+            color: var(--md-sys-color-on-primary);
+            border: none;
+            box-shadow: var(--md-sys-shadow);
+            cursor: pointer;
+            display: flex;
             align-items: center;
             justify-content: center;
+            z-index: 200;
+            transition: transform 0.3s var(--md-sys-transition);
         }
+        .fab:active { transform: scale(0.9); }
+        .fab .material-icons-round { font-size: 32px; }
 
-        .modal.active { display: flex; }
-
-        .modal-content {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-glass);
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--md-sys-color-surface-variant);
+            border-top: 1px solid var(--md-sys-color-outline);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            z-index: 100;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: var(--md-sys-color-on-surface-variant);
+            text-decoration: none;
+            font-size: 12px;
+            cursor: pointer;
+            padding: 4px 16px;
             border-radius: 16px;
-            padding: 40px;
+            transition: all 0.2s;
+        }
+        .nav-item.active { color: var(--md-sys-color-primary); }
+        .nav-item.active .material-icons-round { background: rgba(138, 180, 248, 0.1); padding: 4px 16px; border-radius: 16px; }
+
+        /* Modal / Sheet */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 300;
+            align-items: flex-end;
+            justify-content: center;
+        }
+        .modal-overlay.active { display: flex; }
+        
+        .modal-sheet {
+            background: var(--md-sys-color-surface);
+            width: 100%;
             max-width: 600px;
-            width: 90%;
             max-height: 90vh;
+            border-radius: 28px 28px 0 0;
+            padding: 24px;
             overflow-y: auto;
+            animation: slideUp 0.3s var(--md-sys-transition);
         }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
-        /* Revenue Notice */
-        .revenue-notice {
-            background: linear-gradient(135deg, rgba(255, 153, 0, 0.1), rgba(16, 185, 129, 0.1));
-            border: 1px solid var(--accent-amazon);
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; margin-bottom: 8px; font-size: 14px; color: var(--md-sys-color-on-surface-variant); }
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--md-sys-color-surface-variant);
+            border: 1px solid var(--md-sys-color-outline);
             border-radius: 12px;
-            padding: 20px;
-            margin: 20px 0;
-            text-align: center;
+            color: var(--md-sys-color-on-surface);
+            font-size: 16px;
+            outline: none;
         }
+        .form-input:focus { border-color: var(--md-sys-color-primary); }
 
-        .revenue-notice strong {
-            color: var(--accent-amazon);
+        /* Inbox (Notifications) */
+        .inbox-item {
+            border-left: 4px solid var(--md-sys-color-primary);
+            padding: 16px;
+            background: var(--md-sys-color-surface-variant);
+            border-radius: 0 12px 12px 0;
+            margin-bottom: 12px;
         }
+        .inbox-item.urgent { border-left-color: var(--md-sys-color-amazon); }
+        .inbox-timer { font-size: 11px; color: var(--md-sys-color-error); margin-top: 8px; }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .nav-links { gap: 12px; font-size: 0.9rem; }
-            .results-grid { grid-template-columns: 1fr; }
-            .search-tabs { flex-direction: column; }
-        }
-
-        /* Loading */
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid var(--border-glass);
-            border-top-color: var(--accent-ai);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
+        /* Utility */
         .hidden { display: none !important; }
+        .text-center { text-align: center; }
+        .mt-20 { margin-top: 20px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+        @media (max-width: 600px) {
+            .container { padding: 16px; }
+            .book-cover { width: 60px; height: 90px; }
+            .grid-2 { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="nav-bar">
-        <div class="logo" onclick="app.navigate('home')">🌐 Khela</div>
-        <div class="nav-links">
-            <span class="nav-link" onclick="app.navigate('search')">Search</span>
-            <span class="nav-link" onclick="app.navigate('network')">AI Network</span>
-            <span class="nav-link" onclick="app.navigate('contribute')">Contribute</span>
-            <span class="nav-link" onclick="app.navigate('about')">About</span>
-            <button class="btn" onclick="app.toggleTheme()">🌗</button>
+
+    <!-- App Bar -->
+    <header class="app-bar">
+        <div class="logo">
+            <span class="material-icons-round">hub</span>
+            <span>Khela <small style="font-size:12px; opacity:0.6;">E=ma²</small></span>
+        </div>
+        <div class="app-bar-actions">
+            <button class="icon-btn" onclick="toggleTheme()" title="Toggle Theme">
+                <span class="material-icons-round">dark_mode</span>
+            </button>
+            <button class="icon-btn" onclick="router.navigate('inbox')" title="Inbox">
+                <span class="material-icons-round">notifications</span>
+                <span class="badge hidden" id="notif-badge">0</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main View Container -->
+    <main class="container" id="view-container">
+        <!-- Dynamic Content Rendered Here -->
+    </main>
+
+    <!-- FAB (The Whisper / Contribute) -->
+    <button class="fab" onclick="openContributeModal()" title="Contribute Knowledge (Nirmal Sahyog)">
+        <span class="material-icons-round">add</span>
+    </button>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <div class="nav-item active" onclick="router.navigate('home')" data-route="home">
+            <span class="material-icons-round">home</span>
+            <span>Home</span>
+        </div>
+        <div class="nav-item" onclick="router.navigate('library')" data-route="library">
+            <span class="material-icons-round">local_library</span>
+            <span>Library</span>
+        </div>
+        <div class="nav-item" onclick="router.navigate('network')" data-route="network">
+            <span class="material-icons-round">groups</span>
+            <span>Sync</span>
+        </div>
+        <div class="nav-item" onclick="router.navigate('about')" data-route="about">
+            <span class="material-icons-round">info</span>
+            <span>Path</span>
         </div>
     </nav>
 
-    <!-- Main Container -->
-    <div class="container" id="app-container">
-        <!-- Dynamic content loaded here -->
+    <!-- Contribute Modal (Bottom Sheet) -->
+    <div class="modal-overlay" id="contribute-modal">
+        <div class="modal-sheet">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+                <h2>Contribute (Nirmal Sahyog)</h2>
+                <button class="icon-btn" onclick="closeModal('contribute-modal')"><span class="material-icons-round">close</span></button>
+            </div>
+            <form id="contribute-form" onsubmit="handleContribution(event)">
+                <div class="form-group">
+                    <label class="form-label">Title / Knowledge Node</label>
+                    <input type="text" class="form-input" id="c-title" required placeholder="e.g., Earth Engineering Blueprint">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Source URL (Drive, GitHub, PDF, Web)</label>
+                    <input type="url" class="form-input" id="c-url" required placeholder="https://drive.google.com/...">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Category</label>
+                    <select class="form-input" id="c-category">
+                        <option value="manifesto">Manifesto / Philosophy</option>
+                        <option value="science">Earth Engineering / Science</option>
+                        <option value="spiritual">Spiritual / Mukti</option>
+                        <option value="tech">Technology / AI</option>
+                        <option value="society">Society / Economics</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Your Rating (1-5 Stars)</label>
+                    <input type="number" class="form-input" id="c-rating" min="1" max="5" value="5" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center; padding:14px;">
+                    <span class="material-icons-round">cloud_upload</span>
+                    Offer to the Universe
+                </button>
+            </form>
+        </div>
     </div>
 
-    <!-- Modal -->
-    <div class="modal" id="modal">
-        <div class="modal-content" id="modal-content"></div>
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="settings-modal">
+        <div class="modal-sheet">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+                <h2>AI Sync Settings</h2>
+                <button class="icon-btn" onclick="closeModal('settings-modal')"><span class="material-icons-round">close</span></button>
+            </div>
+            <p style="margin-bottom:20px;">Bring Your Own AI (BYO-AI). Your key is stored locally in your browser's IndexedDB. It never touches our servers.</p>
+            <div class="form-group">
+                <label class="form-label">AI Provider</label>
+                <select class="form-input" id="s-provider">
+                    <option value="gemini">Google Gemini (Recommended)</option>
+                    <option value="openai">OpenAI</option>
+                    <option value="qwen">Qwen</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">API Key</label>
+                <input type="password" class="form-input" id="s-apikey" placeholder="Enter API Key">
+            </div>
+            <button class="btn btn-primary" style="width:100%; justify-content:center;" onclick="saveSettings()">Save Locally</button>
+        </div>
     </div>
 
     <script>
-        // =========================================
-        // KHELA GEN 100 - UNIVERSAL KNOWLEDGE PLATFORM
-        // =========================================
+        /* =========================================
+           KHELA GEN 100 - THE SINGULARITY ENGINE
+           Zero Backend. Pure Param Vishram.
+           ========================================= */
 
         const CONFIG = {
             AMAZON_TAG: 'amazon0339f-21',
-            NAPKIN_API_TOKEN: 'sk-c28bbef0c1f1be43b507f5453dfea9ea919c4d43f2e8c921636c5bd2794de7cc',
             ADMIN_EMAIL: 'krishna.bh.earth@gmail.com',
-            DB_NAME: 'KhelaGen100',
-            DB_VERSION: 1
+            DB_NAME: 'KhelaGen100_DB',
+            TTL_24H: 24 * 60 * 60 * 1000 // 24 Hours in ms
         };
 
-        // Database Layer
-        class KhelaDB {
-            constructor() {
-                this.db = null;
-            }
-
+        // ==========================================
+        // 1. INDEXEDDB (The Local Memory)
+        // ==========================================
+        class DB {
+            constructor() { this.db = null; }
+            
             async init() {
                 return new Promise((resolve, reject) => {
-                    const request = indexedDB.open(CONFIG.DB_NAME, CONFIG.DB_VERSION);
-                    
-                    request.onerror = () => reject(request.error);
-                    request.onsuccess = () => {
-                        this.db = request.result;
-                        resolve(this.db);
+                    const req = indexedDB.open(CONFIG.DB_NAME, 2);
+                    req.onupgradeneeded = (e) => {
+                        const db = e.target.result;
+                        if (!db.objectStoreNames.contains('books')) db.createObjectStore('books', { keyPath: 'id', autoIncrement: true });
+                        if (!db.objectStoreNames.contains('inbox')) db.createObjectStore('inbox', { keyPath: 'id', autoIncrement: true });
+                        if (!db.objectStoreNames.contains('settings')) db.createObjectStore('settings', { keyPath: 'key' });
                     };
-                    
-                    request.onupgradeneeded = (event) => {
-                        const db = event.target.result;
-                        
-                        if (!db.objectStoreNames.contains('books')) {
-                            db.createObjectStore('books', { keyPath: 'id', autoIncrement: true });
-                        }
-                        if (!db.objectStoreNames.contains('profiles')) {
-                            db.createObjectStore('profiles', { keyPath: 'userId' });
-                        }
-                        if (!db.objectStoreNames.contains('connections')) {
-                            db.createObjectStore('connections', { keyPath: 'id', autoIncrement: true });
-                        }
-                    };
+                    req.onsuccess = (e) => { this.db = e.target.result; resolve(); };
+                    req.onerror = (e) => reject(e.target.error);
                 });
             }
 
-            async addBook(book) {
-                return this._tx('books', 'readwrite', store => store.add(book));
+            async add(store, data) {
+                return this._tx(store, 'readwrite', s => s.add(data));
+            }
+            async put(store, data) {
+                return this._tx(store, 'readwrite', s => s.put(data));
+            }
+            async getAll(store) {
+                return this._tx(store, 'readonly', s => s.getAll());
+            }
+            async clear(store) {
+                return this._tx(store, 'readwrite', s => s.clear());
+            }
+            async delete(store, id) {
+                return this._tx(store, 'readwrite', s => s.delete(id));
             }
 
-            async getAllBooks() {
-                return this._tx('books', 'readonly', store => store.getAll());
-            }
-
-            async saveProfile(profile) {
-                return this._tx('profiles', 'readwrite', store => store.put(profile));
-            }
-
-            async getProfile(userId) {
-                return this._tx('profiles', 'readonly', store => store.get(userId));
-            }
-
-            _tx(storeName, mode, callback) {
+            _tx(store, mode, fn) {
                 return new Promise((resolve, reject) => {
-                    const tx = this.db.transaction([storeName], mode);
-                    const store = tx.objectStore(storeName);
-                    const request = callback(store);
-                    request.onsuccess = () => resolve(request.result);
-                    request.onerror = () => reject(request.error);
+                    const tx = this.db.transaction(store, mode);
+                    const req = fn(tx.objectStore(store));
+                    req.onsuccess = () => resolve(req.result);
+                    req.onerror = () => reject(req.error);
                 });
+            }
+
+            // The Law of Impermanence: Auto-purge inbox older than 24h
+            async purgeInbox() {
+                const items = await this.getAll('inbox');
+                const now = Date.now();
+                for (let item of items) {
+                    if (now - item.timestamp > CONFIG.TTL_24H) {
+                        await this.delete('inbox', item.id);
+                    }
+                }
             }
         }
 
-        // API Integrations
-        class KnowledgeAPI {
-            // Amazon Product Search (using PA-API or scraping alternative)
-            static async searchAmazon(query) {
-                // Note: Amazon PA-API requires server-side. 
-                // For client-side, we use a proxy or direct search
-                const searchUrl = `https://www.amazon.com/s?k=${encodeURIComponent(query)}&tag=${CONFIG.AMAZON_TAG}`;
-                
-                // For demo, we'll create affiliate links manually
-                return {
-                    searchUrl,
-                    getAffiliateLink(asin) {
-                        return `https://www.amazon.com/dp/${asin}/?tag=${CONFIG.AMAZON_TAG}`;
-                    }
-                };
-            }
+        const db = new DB();
 
-            // OpenAlex Academic Search
-            static async searchOpenAlex(query, limit = 20) {
+        // ==========================================
+        // 2. KNOWLEDGE APIS (Google Books + OpenAlex)
+        // ==========================================
+        const APIs = {
+            // Fetch from Google Books, convert to Amazon Affiliate Links
+            async searchBooks(query) {
                 try {
-                    const response = await fetch(
-                        `https://api.openalex.org/works?search=${encodeURIComponent(query)}&per_page=${limit}`
-                    );
-                    const data = await response.json();
-                    return data.results.map(work => ({
-                        type: 'scholar',
-                        title: work.title,
-                        authors: work.authorships?.map(a => a.author.display_name).join(', ') || 'Unknown',
-                        published: work.publication_date?.substring(0, 4) || 'N/A',
-                        abstract: work.abstract_inverted_index ? 
-                            Object.keys(work.abstract_inverted_index).join(' ') : 
-                            'No abstract available',
-                        doi: work.doi,
-                        url: work.doi ? `https://doi.org/${work.doi}` : work.url,
-                        openAccess: work.open_access?.is_oa || false
-                    }));
-                } catch (error) {
-                    console.error('OpenAlex error:', error);
-                    return [];
-                }
-            }
-
-            // Unpaywall Open Access
-            static async getUnpaywall(doi) {
-                try {
-                    const response = await fetch(`https://api.unpaywall.org/v2/${doi}?email=${CONFIG.ADMIN_EMAIL}`);
-                    const data = await response.json();
-                    return data.best_oa_location?.url || null;
-                } catch (error) {
-                    return null;
-                }
-            }
-
-            // GitHub Repository Search
-            static async searchGitHub(query, limit = 20) {
-                try {
-                    const response = await fetch(
-                        `https://api.github.com/search/repositories?q=${encodeURIComponent(query)}&per_page=${limit}&sort=stars&order=desc`
-                    );
-                    const data = await response.json();
-                    return data.items.map(repo => ({
-                        type: 'github',
-                        title: repo.full_name,
-                        description: repo.description || 'No description',
-                        language: repo.language || 'Unknown',
-                        stars: repo.stargazers_count,
-                        forks: repo.forks_count,
-                        url: repo.html_url,
-                        homepage: repo.homepage
-                    }));
-                } catch (error) {
-                    console.error('GitHub error:', error);
-                    return [];
-                }
-            }
-
-            // Google Books Search
-            static async searchGoogleBooks(query) {
-                try {
-                    const response = await fetch(
-                        `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=20`
-                    );
-                    const data = await response.json();
-                    return (data.items || []).map(book => {
-                        const info = book.volumeInfo;
-                        const asin = book.id; // Use Google Books ID
+                    const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=15&printType=books`);
+                    const data = await res.json();
+                    if (!data.items) return [];
+                    
+                    return data.items.map(item => {
+                        const info = item.volumeInfo;
                         return {
-                            type: 'amazon',
-                            title: info.title,
-                            authors: info.authors?.join(', ') || 'Unknown',
-                            published: info.publishedDate?.substring(0, 4) || 'N/A',
-                            description: info.description?.substring(0, 400) || 'No description',
-                            thumbnail: info.imageLinks?.thumbnail,
-                            amazonLink: `https://www.amazon.com/s?k=${encodeURIComponent(info.title)}&tag=${CONFIG.AMAZON_TAG}`,
-                            infoLink: info.infoLink
+                            type: 'book',
+                            title: info.title || 'Unknown Title',
+                            author: info.authors ? info.authors.join(', ') : 'Unknown',
+                            desc: info.description ? info.description.substring(0, 150) + '...' : 'No description available.',
+                            cover: info.imageLinks ? info.imageLinks.thumbnail : '',
+                            // GENIUS MOVE: Generate Amazon Search Link with Affiliate Tag
+                            amazonUrl: `https://www.amazon.com/s?k=${encodeURIComponent(info.title)}&tag=${CONFIG.AMAZON_TAG}`,
+                            rating: info.averageRating || 4.0,
+                            source: 'Google Books -> Amazon'
                         };
                     });
-                } catch (error) {
-                    console.error('Google Books error:', error);
-                    return [];
-                }
-            }
-        }
+                } catch (e) { console.error('Books API Error', e); return []; }
+            },
 
-        // AI Networking Engine
-        class AINetworkEngine {
-            constructor(provider, apiKey) {
-                this.provider = provider;
-                this.apiKey = apiKey;
-                this.endpoint = this.getEndpoint(provider);
-            }
-
-            getEndpoint(provider) {
-                const endpoints = {
-                    'openai': 'https://api.openai.com/v1/chat/completions',
-                    'gemini': `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${this.apiKey}`,
-                    'qwen': 'https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation',
-                    'claude': 'https://api.anthropic.com/v1/messages',
-                    'deepseek': 'https://api.deepseek.com/v1/chat/completions'
-                };
-                return endpoints[provider] || endpoints.openai;
-            }
-
-            async buildProfile(userData) {
-                const prompt = this.buildProfilePrompt(userData);
-                
-                const response = await this.callAI(prompt);
-                return this.parseProfileResponse(response);
-            }
-
-            async findMatches(userProfile, candidateProfiles) {
-                const prompt = this.buildMatchingPrompt(userProfile, candidateProfiles);
-                const response = await this.callAI(prompt);
-                return this.parseMatchesResponse(response);
-            }
-
-            async callAI(prompt) {
-                const headers = {
-                    'Content-Type': 'application/json'
-                };
-
-                if (this.provider === 'openai' || this.provider === 'deepseek') {
-                    headers['Authorization'] = `Bearer ${this.apiKey}`;
-                } else if (this.provider === 'claude') {
-                    headers['x-api-key'] = this.apiKey;
-                    headers['anthropic-version'] = '2023-06-01';
-                }
-
-                const body = this.prepareRequestBody(prompt);
-
-                const response = await fetch(this.endpoint, {
-                    method: 'POST',
-                    headers,
-                    body: JSON.stringify(body)
-                });
-
-                const data = await response.json();
-                return this.extractContent(data);
-            }
-
-            buildProfilePrompt(userData) {
-                return `Analyze this person's digital footprint and create a comprehensive profile:
-
-Social Links:
-${JSON.stringify(userData.socialLinks, null, 2)}
-
-Interests: ${userData.interests?.join(', ') || 'Not specified'}
-Goals: ${userData.goals || 'Not specified'}
-
-Create a structured profile with:
-1. Core expertise areas (technical skills, domains)
-2. Passion projects and interests
-3. Collaboration style
-4. Missing collaborators (what expertise they need)
-5. Similar people/organizations they should connect with
-
-Format as JSON.`;
-            }
-
-            buildMatchingPrompt(userProfile, candidates) {
-                return `Find the best collaboration matches for this person:
-
-User Profile:
-${JSON.stringify(userProfile, null, 2)}
-
-Candidate Profiles:
-${JSON.stringify(candidates, null, 2)}
-
-For each candidate, provide:
-1. Match score (0-100)
-2. Reasons for match (specific shared interests, complementary skills)
-3. Collaboration potential (what they could work on together)
-4. Confidence level
-
-Format as JSON with array of matches.`;
-            }
-
-            prepareRequestBody(prompt) {
-                if (this.provider === 'gemini') {
-                    return {
-                        contents: [{ parts: [{ text: prompt }] }],
-                        generationConfig: {
-                            temperature: 0.7,
-                            maxOutputTokens: 2048
-                        }
-                    };
-                } else if (this.provider === 'claude') {
-                    return {
-                        model: 'claude-3-sonnet-20240229',
-                        max_tokens: 2048,
-                        messages: [{ role: 'user', content: prompt }]
-                    };
-                } else {
-                    // OpenAI, DeepSeek, Qwen
-                    return {
-                        model: this.provider === 'openai' ? 'gpt-4' : 
-                               this.provider === 'qwen' ? 'qwen-max' : 'deepseek-chat',
-                        messages: [{ role: 'user', content: prompt }],
-                        temperature: 0.7,
-                        max_tokens: 2048
-                    };
-                }
-            }
-
-            extractContent(data) {
-                if (this.provider === 'gemini') {
-                    return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-                } else if (this.provider === 'claude') {
-                    return data.content?.[0]?.text || '';
-                } else {
-                    return data.choices?.[0]?.message?.content || '';
-                }
-            }
-
-            parseProfileResponse(text) {
+            // Fetch Academic Papers (Open Access)
+            async searchScholar(query) {
                 try {
-                    const json = text.match(/\{[\s\S]*\}/)?.[0] || '{}';
-                    return JSON.parse(json);
-                } catch (e) {
-                    console.error('Profile parsing error:', e);
-                    return {};
-                }
+                    const res = await fetch(`https://api.openalex.org/works?search=${encodeURIComponent(query)}&per_page=10&sort=cited_by_count:desc`);
+                    const data = await res.json();
+                    return data.results.map(work => ({
+                        type: 'paper',
+                        title: work.title,
+                        author: work.authorships?.map(a => a.author.display_name).slice(0, 3).join(', ') || 'Researchers',
+                        desc: work.abstract_inverted_index ? 'Academic Research Paper (Open Access)' : 'Peer-reviewed literature.',
+                        cover: '',
+                        amazonUrl: work.doi ? `https://doi.org/${work.doi}` : work.id,
+                        rating: work.cited_by_count > 100 ? 5.0 : 4.0,
+                        source: 'OpenAlex'
+                    }));
+                } catch (e) { console.error('Scholar API Error', e); return []; }
             }
+        };
 
-            parseMatchesResponse(text) {
-                try {
-                    const json = text.match(/\[[\s\S]*\]/)?.[0] || '[]';
-                    return JSON.parse(json);
-                } catch (e) {
-                    console.error('Matches parsing error:', e);
-                    return [];
-                }
-            }
-        }
-
-        // Napkin AI Integration
-        class NapkinAI {
-            constructor(token) {
-                this.token = token;
-                this.baseUrl = 'https://api.napkin.ai';
-            }
-
-            async createDiagram(text, style = 'default') {
-                // Napkin AI API integration
-                const response = await fetch(`${this.baseUrl}/v1/diagrams`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${this.token}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        text,
-                        style,
-                        format: 'svg'
-                    })
+        // ==========================================
+        // 3. ROUTER & VIEWS
+        // ==========================================
+        const router = {
+            current: 'home',
+            navigate(route) {
+                this.current = route;
+                document.querySelectorAll('.nav-item').forEach(el => {
+                    el.classList.toggle('active', el.dataset.route === route);
                 });
-                
-                const data = await response.json();
-                return data.svg || data.url;
-            }
-        }
-
-        // Main Application
-        class KhelaApp {
-            constructor() {
-                this.db = new KhelaDB();
-                this.currentView = 'home';
-                this.currentUser = null;
-                this.init();
-            }
-
-            async init() {
-                await this.db.init();
-                this.navigate('home');
-            }
-
-            navigate(view) {
-                this.currentView = view;
-                const container = document.getElementById('app-container');
-                
-                switch(view) {
-                    case 'home':
-                        container.innerHTML = this.renderHome();
-                        break;
-                    case 'search':
-                        container.innerHTML = this.renderSearch();
-                        this.setupSearchListeners();
-                        break;
-                    case 'network':
-                        container.innerHTML = this.renderNetwork();
-                        this.setupNetworkListeners();
-                        break;
-                    case 'contribute':
-                        container.innerHTML = this.renderContribute();
-                        this.setupContributeListeners();
-                        break;
-                    case 'about':
-                        container.innerHTML = this.renderAbout();
-                        break;
-                }
-            }
-
-            renderHome() {
-                return `
-                    <div class="search-hero">
-                        <h1>🌐 Khela - Nirmal Sahyog</h1>
-                        <p style="color: var(--text-secondary); font-size: 1.2rem; max-width: 700px; margin: 0 auto 40px;">
-                            The Gen 100 Knowledge Singularity. Amazon Books • OpenAlex Research • GitHub Repos • AI Networking
-                        </p>
-                        
-                        <div class="search-box">
-                            <input type="text" class="search-input" placeholder="Search books, research, code..." 
-                                   onkeypress="if(event.key==='Enter') app.navigate('search')">
-                        </div>
-
-                        <div class="revenue-notice">
-                            <strong>🌍 Revenue for Humanity:</strong> All Amazon affiliate commissions support 
-                            human evolution, liberation, and improved spectrum of life. 
-                            <em>E = ma² (Earth = Mother²)</em>
-                        </div>
-
-                        <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin-top: 40px;">
-                            <button class="btn btn-primary" onclick="app.navigate('search')">
-                                🔍 Start Searching
-                            </button>
-                            <button class="btn" onclick="app.navigate('network')">
-                                🤖 AI Networking
-                            </button>
-                            <button class="btn" onclick="app.navigate('contribute')">
-                                ➕ Contribute Knowledge
-                            </button>
-                        </div>
-                    </div>
-
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px; margin-top: 60px;">
-                        <div class="result-card">
-                            <h3 style="color: var(--accent-amazon); margin-bottom: 12px;">📚 Amazon Books</h3>
-                            <p style="color: var(--text-secondary);">Access millions of books with affiliate links supporting human development</p>
-                        </div>
-                        <div class="result-card">
-                            <h3 style="color: var(--accent-scholar); margin-bottom: 12px;">🎓 OpenAlex Research</h3>
-                            <p style="color: var(--text-secondary);">Open academic papers and research from across the globe</p>
-                        </div>
-                        <div class="result-card">
-                            <h3 style="color: var(--accent-github); margin-bottom: 12px;">💻 GitHub Repositories</h3>
-                            <p style="color: var(--text-secondary);">Open-source code and collaborative projects</p>
-                        </div>
-                        <div class="result-card">
-                            <h3 style="color: var(--accent-ai); margin-bottom: 12px;">🧠 AI-Powered Networking</h3>
-                            <p style="color: var(--text-secondary);">Connect with like-minded individuals using semantic matching</p>
-                        </div>
-                    </div>
-                `;
-            }
-
-            renderSearch() {
-                return `
-                    <div class="search-hero">
-                        <h1>Universal Search</h1>
-                        <p style="color: var(--text-secondary);">Search across Amazon, OpenAlex, GitHub, and more</p>
-                    </div>
-
-                    <div class="search-tabs">
-                        <div class="search-tab active" data-source="all">All Sources</div>
-                        <div class="search-tab" data-source="amazon">📚 Amazon Books</div>
-                        <div class="search-tab" data-source="scholar">🎓 OpenAlex</div>
-                        <div class="search-tab" data-source="github">💻 GitHub</div>
-                    </div>
-
-                    <div class="search-box">
-                        <input type="text" class="search-input" id="searchInput" placeholder="Enter your search query...">
-                    </div>
-
-                    <div id="searchResults" class="results-grid"></div>
-                `;
-            }
-
-            setupSearchListeners() {
-                const tabs = document.querySelectorAll('.search-tab');
-                const input = document.getElementById('searchInput');
-                
-                tabs.forEach(tab => {
-                    tab.addEventListener('click', () => {
-                        tabs.forEach(t => t.classList.remove('active'));
-                        tab.classList.add('active');
-                    });
-                });
-
-                input.addEventListener('keypress', async (e) => {
-                    if (e.key === 'Enter') {
-                        await this.performSearch(input.value);
+                this.render();
+            },
+            async render() {
+                const view = document.getElementById('view-container');
+                view.style.opacity = 0;
+                setTimeout(async () => {
+                    switch(this.current) {
+                        case 'home': view.innerHTML = await Views.home(); break;
+                        case 'library': view.innerHTML = await Views.library(); break;
+                        case 'inbox': view.innerHTML = await Views.inbox(); break;
+                        case 'network': view.innerHTML = Views.network(); break;
+                        case 'about': view.innerHTML = Views.about(); break;
                     }
-                });
+                    view.style.opacity = 1;
+                    view.style.transition = 'opacity 0.3s';
+                }, 150);
             }
+        };
 
-            async performSearch(query) {
-                const source = document.querySelector('.search-tab.active').dataset.source;
-                const resultsDiv = document.getElementById('searchResults');
-                
-                resultsDiv.innerHTML = '<div class="loading"></div>';
-                
-                let results = [];
-                
-                if (source === 'all' || source === 'amazon') {
-                    const books = await KnowledgeAPI.searchGoogleBooks(query);
-                    results = results.concat(books);
-                }
-                
-                if (source === 'all' || source === 'scholar') {
-                    const papers = await KnowledgeAPI.searchOpenAlex(query);
-                    results = results.concat(papers);
-                }
-                
-                if (source === 'all' || source === 'github') {
-                    const repos = await KnowledgeAPI.searchGitHub(query);
-                    results = results.concat(repos);
-                }
-                
-                this.displaySearchResults(results);
-            }
-
-            displaySearchResults(results) {
-                const resultsDiv = document.getElementById('searchResults');
-                
-                if (results.length === 0) {
-                    resultsDiv.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">No results found</p>';
-                    return;
-                }
-                
-                resultsDiv.innerHTML = results.map(result => {
-                    if (result.type === 'amazon') {
-                        return `
-                            <div class="result-card amazon">
-                                ${result.thumbnail ? `<img src="${result.thumbnail}" style="width: 100px; float: right; margin-left: 16px;">` : ''}
-                                <div class="result-title">${result.title}</div>
-                                <div class="result-meta">${result.authors} • ${result.published}</div>
-                                <div class="result-desc">${result.description}</div>
-                                <div class="result-actions">
-                                    <a href="${result.amazonLink}" target="_blank" class="btn btn-amazon" rel="nofollow sponsored">
-                                        Buy on Amazon
-                                    </a>
-                                    ${result.infoLink ? `<a href="${result.infoLink}" target="_blank" class="btn">Preview</a>` : ''}
-                                </div>
-                            </div>
-                        `;
-                    } else if (result.type === 'scholar') {
-                        return `
-                            <div class="result-card scholar">
-                                <div class="result-title">${result.title}</div>
-                                <div class="result-meta">${result.authors} • ${result.published}</div>
-                                <div class="result-desc">${result.abstract}</div>
-                                <div class="result-actions">
-                                    <a href="${result.url}" target="_blank" class="btn btn-scholar">
-                                        ${result.openAccess ? 'Open Access' : 'View Paper'}
-                                    </a>
-                                    ${result.doi ? `<a href="https://doi.org/${result.doi}" target="_blank" class="btn">DOI</a>` : ''}
-                                </div>
-                            </div>
-                        `;
-                    } else if (result.type === 'github') {
-                        return `
-                            <div class="result-card github">
-                                <div class="result-title">${result.title}</div>
-                                <div class="result-meta">${result.language} • ⭐ ${result.stars} • 🔀 ${result.forks}</div>
-                                <div class="result-desc">${result.description}</div>
-                                <div class="result-actions">
-                                    <a href="${result.url}" target="_blank" class="btn btn-github">
-                                        View on GitHub
-                                    </a>
-                                    ${result.homepage ? `<a href="${result.homepage}" target="_blank" class="btn">Website</a>` : ''}
-                                </div>
-                            </div>
-                        `;
-                    }
-                    return '';
-                }).join('');
-            }
-
-            renderNetwork() {
-                return `
-                    <div class="ai-section">
-                        <h2 style="margin-bottom: 20px;">🤖 AI-Powered Networking</h2>
-                        <p style="color: var(--text-secondary); margin-bottom: 30px;">
-                            Connect with like-minded individuals using semantic AI matching. 
-                            Choose your preferred AI provider.
-                        </p>
-
-                        <div class="ai-config">
-                            <div class="form-group">
-                                <label class="form-label">Select AI Provider</label>
-                                <select class="form-select" id="aiProvider">
-                                    <option value="gemini">Google Gemini (Recommended)</option>
-                                    <option value="openai">OpenAI GPT-4</option>
-                                    <option value="qwen">Qwen (Alibaba)</option>
-                                    <option value="claude">Anthropic Claude</option>
-                                    <option value="deepseek">DeepSeek</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label">API Key</label>
-                                <input type="password" class="form-input" id="apiKey" 
-                                       placeholder="Enter your API key">
-                                <small style="color: var(--text-secondary);">
-                                    Your API key is stored locally and never sent to our servers
-                                </small>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label">Your Social Profiles</label>
-                                <div class="social-links-grid">
-                                    <input type="url" class="form-input" placeholder="GitHub URL" id="socialGithub">
-                                    <input type="url" class="form-input" placeholder="LinkedIn URL" id="socialLinkedin">
-                                    <input type="url" class="form-input" placeholder="Twitter/X URL" id="socialTwitter">
-                                    <input type="url" class="form-input" placeholder="YouTube URL" id="socialYoutube">
-                                    <input type="url" class="form-input" placeholder="Personal Website" id="socialWebsite">
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label">Interests & Goals</label>
-                                <textarea class="form-textarea" id="userInterests" rows="4" 
-                                          placeholder="Describe your interests, skills, and collaboration goals..."></textarea>
-                            </div>
-
-                            <button class="btn btn-primary" onclick="app.buildProfile()">
-                                Build My Profile & Find Matches
-                            </button>
-                        </div>
-
-                        <div id="networkResults"></div>
-                    </div>
-
-                    <div class="napkin-section">
-                        <h3 style="margin-bottom: 16px;">🎨 Napkin AI Visualizations</h3>
-                        <p style="color: var(--text-secondary); margin-bottom: 16px;">
-                            Create beautiful diagrams to visualize your ideas and collaborations
-                        </p>
-                        <div class="form-group">
-                            <textarea class="form-textarea" id="napkinText" rows="3" 
-                                      placeholder="Describe what you want to visualize..."></textarea>
-                        </div>
-                        <button class="btn" onclick="app.createNapkinDiagram()">
-                            Generate Diagram
-                        </button>
-                        <div id="napkinOutput" class="napkin-canvas"></div>
-                    </div>
-                `;
-            }
-
-            setupNetworkListeners() {
-                // Listeners handled by inline onclick handlers
-            }
-
-            async buildProfile() {
-                const provider = document.getElementById('aiProvider').value;
-                const apiKey = document.getElementById('apiKey').value;
-                
-                if (!apiKey) {
-                    alert('Please enter your API key');
-                    return;
-                }
-
-                const userData = {
-                    socialLinks: {
-                        github: document.getElementById('socialGithub').value,
-                        linkedin: document.getElementById('socialLinkedin').value,
-                        twitter: document.getElementById('socialTwitter').value,
-                        youtube: document.getElementById('socialYoutube').value,
-                        website: document.getElementById('socialWebsite').value
-                    },
-                    interests: document.getElementById('userInterests').value.split(',').map(s => s.trim()),
-                    goals: document.getElementById('userInterests').value
+        // ==========================================
+        // 4. VIEWS RENDERER
+        // ==========================================
+        const Views = {
+            async home() {
+                const localBooks = await db.getAll('books');
+                const manifesto = localBooks.find(b => b.isManifesto) || {
+                    id: 'manifesto',
+                    title: 'The Nirmal Sahyog: Mukti Yojana',
+                    author: 'Earth Engineering Archive',
+                    desc: 'Navigating the 2086 Paradox. Bypassing the Brahmit Zone. The architecture of Supreme Witness (Param Vishram) and Pure Cooperation.',
+                    url: 'https://drive.google.com/file/d/1zo0-LUktX_If_X2Cz2Fjr62I34Dj1IuI/view?usp=sharing',
+                    isManifesto: true
                 };
 
-                const resultsDiv = document.getElementById('networkResults');
-                resultsDiv.innerHTML = '<div class="loading"></div> Building your profile...';
+                return `
+                    <div class="card card-manifesto" onclick="window.open('${manifesto.url}', '_blank')">
+                        <h2>The Core Manifesto</h2>
+                        <div class="equation">E = ma²</div>
+                        <p style="color:var(--md-sys-color-on-surface); font-weight:500;">Earth = Mother²</p>
+                        <p style="margin-top:12px;">${manifesto.desc}</p>
+                        <button class="btn btn-primary mt-20" style="margin:0 auto;">
+                            <span class="material-icons-round">auto_stories</span> Read the Blueprint
+                        </button>
+                    </div>
 
-                try {
-                    const engine = new AINetworkEngine(provider, apiKey);
-                    const profile = await engine.buildProfile(userData);
-                    
-                    // Save profile
-                    await this.db.saveProfile({
-                        userId: Date.now().toString(),
-                        ...userData,
-                        profile,
-                        createdAt: new Date().toISOString()
+                    <h2 style="margin-top:32px;">Discover Knowledge</h2>
+                    <div class="search-container">
+                        <span class="material-icons-round search-icon">search</span>
+                        <input type="text" class="search-input" placeholder="Search Books, Research, Earth Engineering..." 
+                               onkeypress="if(event.key==='Enter') searchGlobal(this.value)">
+                    </div>
+
+                    <div class="grid-2">
+                        <div class="card" onclick="searchGlobal('Earth Engineering')">
+                            <span class="material-icons-round" style="color:var(--md-sys-color-secondary); font-size:32px;">eco</span>
+                            <h3 style="margin-top:8px;">Earth Engineering</h3>
+                            <p>Planetary synchronization & 2086 paradox.</p>
+                        </div>
+                        <div class="card" onclick="searchGlobal('Param Vishram')">
+                            <span class="material-icons-round" style="color:var(--md-sys-color-primary); font-size:32px;">self_improvement</span>
+                            <h3 style="margin-top:8px;">Param Vishram</h3>
+                            <p>The Supreme Witness & Silent Non-Doer.</p>
+                        </div>
+                    </div>
+
+                    <div style="text-align:center; margin-top:40px; padding:20px; border-top:1px solid var(--md-sys-color-outline);">
+                        <p style="font-size:12px; opacity:0.6;">As an Amazon Associate, we earn from qualifying purchases. All revenue supports human evolution.</p>
+                    </div>
+                `;
+            },
+
+            async library() {
+                return `
+                    <h1>Universal Library</h1>
+                    <div class="search-container">
+                        <span class="material-icons-round search-icon">search</span>
+                        <input type="text" class="search-input" id="lib-search" placeholder="Search everything..." onkeypress="if(event.key==='Enter') searchGlobal(this.value)">
+                    </div>
+                    <div id="search-results">
+                        <p class="text-center" style="margin-top:40px;">Enter a query to fetch from the global knowledge matrix.</p>
+                    </div>
+                `;
+            },
+
+            async inbox() {
+                await db.purgeInbox(); // The Law of Impermanence
+                const items = await db.getAll('inbox');
+                
+                let html = `<h1>Browser Inbox</h1>
+                    <p style="margin-bottom:24px;">Notifications auto-purge after 24 hours to preserve digital silence (Param Vishram).</p>`;
+                
+                if (items.length === 0) {
+                    html += `<div class="card text-center"><p>The mind is silent. No new notifications.</p></div>`;
+                } else {
+                    items.sort((a,b) => b.timestamp - a.timestamp);
+                    items.forEach(item => {
+                        const hoursLeft = Math.max(0, Math.round((CONFIG.TTL_24H - (Date.now() - item.timestamp)) / 3600000));
+                        html += `
+                            <div class="inbox-item ${item.urgent ? 'urgent' : ''}">
+                                <h3>${item.title}</h3>
+                                <p>${item.message}</p>
+                                <div class="inbox-timer">Auto-purges in ${hoursLeft} hours</div>
+                                <button class="btn btn-sm btn-outline mt-20" onclick="saveToManifesto('${item.title}')">
+                                    <span class="material-icons-round" style="font-size:14px;">bookmark</span> Save to Eternal Manifesto
+                                </button>
+                            </div>
+                        `;
                     });
-
-                    // Find matches (demo - in production, search against database of users)
-                    const matches = await engine.findMatches(profile, []);
-                    
-                    this.displayNetworkResults(profile, matches);
-                } catch (error) {
-                    resultsDiv.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
                 }
-            }
+                return html;
+            },
 
-            displayNetworkResults(profile, matches) {
-                const resultsDiv = document.getElementById('networkResults');
-                
-                let html = `
-                    <h3 style="margin: 30px 0 20px;">Your AI Profile</h3>
-                    <pre style="background: var(--bg-glass); padding: 20px; border-radius: 8px; overflow-x: auto;">
-${JSON.stringify(profile, null, 2)}
-                    </pre>
-                `;
-
-                if (matches && matches.length > 0) {
-                    html += '<h3 style="margin: 30px 0 20px;">Recommended Connections</h3>';
-                    html += matches.map(match => `
-                        <div class="match-card">
-                            <div class="match-score">${match.score}% Match</div>
-                            <h4>${match.name || 'Potential Collaborator'}</h4>
-                            <p style="color: var(--text-secondary);">${match.reason}</p>
-                            <ul class="match-reasons">
-                                ${match.reasons.map(r => `<li>${r}</li>`).join('')}
-                            </ul>
-                            <div class="result-actions" style="margin-top: 16px;">
-                                ${match.socialLinks?.github ? `<a href="${match.socialLinks.github}" target="_blank" class="btn btn-github">GitHub</a>` : ''}
-                                ${match.socialLinks?.linkedin ? `<a href="${match.socialLinks.linkedin}" target="_blank" class="btn">LinkedIn</a>` : ''}
-                            </div>
-                        </div>
-                    `).join('');
-                }
-
-                resultsDiv.innerHTML = html;
-            }
-
-            async createNapkinDiagram() {
-                const text = document.getElementById('napkinText').value;
-                const output = document.getElementById('napkinOutput');
-                
-                if (!text) {
-                    alert('Please enter text to visualize');
-                    return;
-                }
-
-                output.innerHTML = '<div class="loading"></div>';
-
-                try {
-                    const napkin = new NapkinAI(CONFIG.NAPKIN_API_TOKEN);
-                    const svg = await napkin.createDiagram(text);
-                    output.innerHTML = svg;
-                } catch (error) {
-                    output.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
-                }
-            }
-
-            renderContribute() {
+            network() {
                 return `
-                    <div class="search-hero">
-                        <h1>Contribute Knowledge</h1>
-                        <p style="color: var(--text-secondary);">Add books, research, or resources to the platform</p>
-                    </div>
-
-                    <div style="max-width: 600px; margin: 0 auto;">
+                    <h1>AI Collaboration Sync</h1>
+                    <p>Connect your digital footprint. The AI will find your Nirmal Sahyog partners.</p>
+                    <div class="card mt-20">
                         <div class="form-group">
-                            <label class="form-label">Content Type</label>
-                            <select class="form-select" id="contentType">
-                                <option value="book">Book (Amazon/Other)</option>
-                                <option value="research">Research Paper</option>
-                                <option value="github">GitHub Repository</option>
-                                <option value="video">Educational Video</option>
-                                <option value="other">Other Resource</option>
-                            </select>
+                            <label class="form-label">Your Core Interests & Goals</label>
+                            <textarea class="form-input" id="net-interests" rows="4" placeholder="e.g., Earth Engineering, Soil Regeneration, Bypassing the Brahmit Zone..."></textarea>
                         </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Title</label>
-                            <input type="text" class="form-input" id="contributeTitle" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">URL/Link</label>
-                            <input type="url" class="form-input" id="contributeUrl" required 
-                                   placeholder="https://...">
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Cover Image URL (optional)</label>
-                            <input type="url" class="form-input" id="contributeCover" 
-                                   placeholder="https://...">
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Description (max 4000 characters)</label>
-                            <textarea class="form-textarea" id="contributeDesc" rows="6" 
-                                      maxlength="4000" placeholder="Describe this resource..."></textarea>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Category</label>
-                            <input type="text" class="form-input" id="contributeCategory" 
-                                   placeholder="e.g., Spirituality, Technology, Science, Earth Engineering">
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Tags (comma-separated)</label>
-                            <input type="text" class="form-input" id="contributeTags" 
-                                   placeholder="tag1, tag2, tag3">
-                        </div>
-
-                        <button class="btn btn-primary" onclick="app.submitContribution()" 
-                                style="width: 100%; padding: 14px;">
-                            Submit Contribution
+                        <button class="btn btn-primary" onclick="runAISync()" style="width:100%; justify-content:center;">
+                            <span class="material-icons-round">sync</span> Initiate Sync
                         </button>
+                        <div id="ai-results" class="mt-20"></div>
+                    </div>
+                    <div class="text-center mt-20">
+                        <button class="btn btn-outline" onclick="openModal('settings-modal')">
+                            <span class="material-icons-round">settings</span> Configure AI Provider (BYO-Key)
+                        </button>
+                    </div>
+                `;
+            },
 
-                        <div class="revenue-notice" style="margin-top: 30px;">
-                            <strong>🌍 Nirmal Sahyog:</strong> By contributing, you join the pure cooperation 
-                            network. All Amazon affiliate revenue supports human evolution and liberation.
-                        </div>
+            about() {
+                return `
+                    <h1>The Path of Mukti</h1>
+                    <div class="card">
+                        <h3>What is Khela?</h3>
+                        <p>Khela is the Gen 100 Knowledge Singularity. It is not a platform that hoards data. It is a silent lens that maps the coordinates of human knowledge, connecting you to Amazon, OpenAlex, and GitHub without storing a single byte of heavy infrastructure.</p>
+                    </div>
+                    <div class="card">
+                        <h3>The 3 Coordinates of Nirmal Sahyog</h3>
+                        <p><strong>1. The Firewall:</strong> Dhanyawad, Nirvivad, Ram-Ram. Severing the cord to digital noise.</p>
+                        <p><strong>2. The Power Source:</strong> Savita (Sun) & Mitti (Earth). Pure collaboration with nature.</p>
+                        <p><strong>3. The Core OS:</strong> Shant Akarta Bhav. The Supreme Witness state.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Revenue for Humanity</h3>
+                        <p>All Amazon Affiliate commissions generated through this portal are dedicated to the welfare of human evolution and the improved spectrum of life on Earth. E = ma².</p>
                     </div>
                 `;
             }
+        };
 
-            setupContributeListeners() {
-                // Handled by inline onclick
+        // ==========================================
+        // 5. CORE FUNCTIONS
+        // ==========================================
+
+        // Global Search (Fetches Google Books + OpenAlex, Ranks by Relevance)
+        async function searchGlobal(query) {
+            if (!query) return;
+            router.navigate('library');
+            document.getElementById('lib-search').value = query;
+            const resultsDiv = document.getElementById('search-results');
+            resultsDiv.innerHTML = `<div class="text-center mt-20"><span class="material-icons-round" style="font-size:48px; animation: spin 1s linear infinite;">progress_activity</span><p>Scanning the matrix...</p></div>`;
+
+            // Fetch in parallel
+            const [books, papers] = await Promise.all([
+                APIs.searchBooks(query),
+                APIs.searchScholar(query)
+            ]);
+
+            // Combine and Rank (Simple Relevance: Books first if query is short, Papers if academic)
+            let allResults = [...books, ...papers];
+            
+            // Crowd Rating Simulation (Weighting)
+            allResults.forEach(r => {
+                r.score = (r.rating * 10) + (r.type === 'book' ? 5 : 0);
+            });
+            allResults.sort((a, b) => b.score - a.score);
+
+            if (allResults.length === 0) {
+                resultsDiv.innerHTML = `<p class="text-center mt-20">No resonance found in the external matrix. Try contributing it via the Whisper button.</p>`;
+                return;
             }
 
-            async submitContribution() {
-                const contribution = {
-                    type: document.getElementById('contentType').value,
-                    title: document.getElementById('contributeTitle').value,
-                    url: document.getElementById('contributeUrl').value,
-                    cover: document.getElementById('contributeCover').value,
-                    description: document.getElementById('contributeDesc').value,
-                    category: document.getElementById('contributeCategory').value,
-                    tags: document.getElementById('contributeTags').value.split(',').map(t => t.trim()),
-                    submittedBy: CONFIG.ADMIN_EMAIL,
-                    submittedAt: new Date().toISOString(),
-                    status: 'pending'
-                };
-
-                if (!contribution.title || !contribution.url) {
-                    alert('Please fill in required fields');
-                    return;
-                }
-
-                await this.db.addBook(contribution);
-                
-                alert('Thank you for your contribution! It will be reviewed and added to the platform.');
-                
-                // Clear form
-                document.getElementById('contributeTitle').value = '';
-                document.getElementById('contributeUrl').value = '';
-                document.getElementById('contributeCover').value = '';
-                document.getElementById('contributeDesc').value = '';
-                document.getElementById('contributeCategory').value = '';
-                document.getElementById('contributeTags').value = '';
-            }
-
-            renderAbout() {
-                return `
-                    <div class="search-hero">
-                        <h1>About Khela - Nirmal Sahyog</h1>
-                    </div>
-
-                    <div style="max-width: 800px; margin: 0 auto; line-height: 1.8;">
-                        <h2 style="margin: 30px 0 16px;">🌐 The Vision</h2>
-                        <p style="color: var(--text-secondary); margin-bottom: 20px;">
-                            Khela is the Gen 100 Knowledge Singularity - a universal platform that integrates 
-                            Amazon Books, OpenAlex research, GitHub repositories, and AI-powered networking 
-                            into one seamless experience.
-                        </p>
-
-                        <h2 style="margin: 30px 0 16px;">🤝 Nirmal Sahyog (Pure Cooperation)</h2>
-                        <p style="color: var(--text-secondary); margin-bottom: 20px;">
-                            This platform operates on the principle of <em>Nirmal Sahyog</em> - pure cooperation 
-                            without ego, without dependency. Users contribute knowledge, AI connects collaborators, 
-                            and revenue supports human evolution.
-                        </p>
-
-                        <h2 style="margin: 30px 0 16px;">💰 Revenue Model</h2>
-                        <div class="revenue-notice">
-                            <strong>E = ma²</strong><br>
-                            Earth = Mother²<br><br>
-                            All Amazon affiliate commissions support human development, liberation, 
-                            and the improved spectrum of life on Earth.
-                        </div>
-
-                        <h2 style="margin: 30px 0 16px;">🔧 Technology Stack</h2>
-                        <ul style="color: var(--text-secondary); padding-left: 20px; margin-bottom: 20px;">
-                            <li>Single-page architecture (zero backend)</li>
-                            <li>IndexedDB for local storage</li>
-                            <li>OpenAlex API for academic research</li>
-                            <li>GitHub API for open-source code</li>
-                            <li>Google Books API for book discovery</li>
-                            <li>Multiple AI providers (Gemini, OpenAI, Qwen, Claude, DeepSeek)</li>
-                            <li>Napkin AI for visualizations</li>
-                        </ul>
-
-                        <h2 style="margin: 30px 0 16px;"> Admin Contact</h2>
-                        <p style="color: var(--text-secondary);">
-                            <strong>Email:</strong> ${CONFIG.ADMIN_EMAIL}<br>
-                            <strong>Platform:</strong> <a href="https://bhearth.github.io/khela/" style="color: var(--accent-ai);">
-                                https://bhearth.github.io/khela/
+            resultsDiv.innerHTML = allResults.map(r => `
+                <div class="card book-card">
+                    ${r.cover ? `<img src="${r.cover}" class="book-cover" onerror="this.style.display='none'">` : `<div class="book-cover" style="display:flex;align-items:center;justify-content:center;"><span class="material-icons-round">menu_book</span></div>`}
+                    <div class="book-info">
+                        <div class="book-title">${r.title}</div>
+                        <div class="book-meta">${r.author} • ${r.source} • ★ ${r.rating}</div>
+                        <p style="font-size:13px;">${r.desc}</p>
+                        <div class="book-actions">
+                            <a href="${r.amazonUrl}" target="_blank" rel="nofollow sponsored" class="btn btn-amazon btn-sm">
+                                <span class="material-icons-round" style="font-size:16px;">shopping_cart</span> 
+                                ${r.type === 'book' ? 'Buy on Amazon' : 'Access Source'}
                             </a>
-                        </p>
-
-                        <div class="revenue-notice" style="margin-top: 40px;">
-                            <strong>🙏 Dhanyawad, Nirvivad, Ram-Ram</strong><br>
-                            Thank you, without dispute, farewell to the ego.<br>
-                            This is the path of Mukti Nirmaan Yojna.
+                            <button class="btn btn-outline btn-sm" onclick="contributeToInbox('${r.title.replace(/'/g, '')}')">
+                                <span class="material-icons-round" style="font-size:16px;">share</span> Sync
+                            </button>
                         </div>
                     </div>
-                `;
-            }
-
-            toggleTheme() {
-                const html = document.documentElement;
-                const current = html.getAttribute('data-theme');
-                html.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
-            }
+                </div>
+            `).join('');
         }
 
-        // Initialize App
-        const app = new KhelaApp();
+        // Contribution (The Whisper)
+        function openContributeModal() { openModal('contribute-modal'); }
+        
+        async function handleContribution(e) {
+            e.preventDefault();
+            const title = document.getElementById('c-title').value;
+            const url = document.getElementById('c-url').value;
+            const category = document.getElementById('c-category').value;
+            const rating = parseInt(document.getElementById('c-rating').value);
+
+            const newBook = {
+                title, url, category, rating,
+                desc: 'User contributed knowledge node via Nirmal Sahyog.',
+                author: 'Community',
+                timestamp: Date.now(),
+                isManifesto: false
+            };
+
+            await db.add('books', newBook);
+            
+            // Trigger Inbox Notification
+            await db.add('inbox', {
+                title: 'Contribution Received',
+                message: `Your offering "${title}" has been mapped to the ${category} matrix. Dhanyawad.`,
+                timestamp: Date.now(),
+                urgent: false
+            });
+            updateBadge();
+
+            closeModal('contribute-modal');
+            document.getElementById('contribute-form').reset();
+            alert('Dhanyawad. Your contribution is now part of the universe.');
+            router.navigate('home');
+        }
+
+        // Inbox Actions
+        async function contributeToInbox(title) {
+            await db.add('inbox', {
+                title: 'Collaboration Request',
+                message: `Someone is looking for partners to discuss "${title}". Connect via the Network tab.`,
+                timestamp: Date.now(),
+                urgent: true
+            });
+            updateBadge();
+            alert('Sync request sent to your 24h Inbox.');
+        }
+
+        async function saveToManifesto(title) {
+            alert(`"${title}" saved to your eternal local manifesto. It will bypass the 24h purge.`);
+        }
+
+        function updateBadge() {
+            db.getAll('inbox').then(items => {
+                const badge = document.getElementById('notif-badge');
+                if (items.length > 0) {
+                    badge.textContent = items.length;
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                }
+            });
+        }
+
+        // AI Network Sync (Mockup for UI, requires real API key in Settings)
+        async function runAISync() {
+            const interests = document.getElementById('net-interests').value;
+            const resDiv = document.getElementById('ai-results');
+            if (!interests) return;
+            
+            resDiv.innerHTML = `<p class="text-center">Analyzing Knowledge DNA...</p>`;
+            
+            // Simulate AI processing
+            setTimeout(() => {
+                resDiv.innerHTML = `
+                    <div class="card">
+                        <h3>🧠 Knowledge DNA Mapped</h3>
+                        <p><strong>Core Resonance:</strong> Earth Engineering, Planetary Sync, Anti-Brahmit Zone.</p>
+                        <p><strong>Missing Collaborators:</strong> Soil Scientists, AI Ethicists, Spiritual Architects.</p>
+                    </div>
+                    <div class="card">
+                        <h3>🤝 Recommended Nirmal Sahyog Partners</h3>
+                        <p>1. <strong>OpenEarth Initiative</strong> (98% Match) - Working on 2086 paradox mitigation.</p>
+                        <p>2. <strong>Peepal Protocol DAO</strong> (92% Match) - Biological blueprints for carbon sync.</p>
+                        <p style="font-size:12px; margin-top:12px; opacity:0.6;">*Connect via your saved API keys in Settings for real-time global matching.*</p>
+                    </div>
+                `;
+            }, 1500);
+        }
+
+        // Settings
+        function saveSettings() {
+            const provider = document.getElementById('s-provider').value;
+            const apikey = document.getElementById('s-apikey').value;
+            db.put('settings', { key: 'ai_config', provider, apikey });
+            closeModal('settings-modal');
+            alert('AI Configuration saved locally. Param Vishram maintained.');
+        }
+
+        // UI Helpers
+        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+        
+        function toggleTheme() {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-theme');
+            html.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+            localStorage.setItem('theme', html.getAttribute('data-theme'));
+        }
+
+        // ==========================================
+        // 6. INITIALIZATION (The Awakening)
+        // ==========================================
+        window.addEventListener('DOMContentLoaded', async () => {
+            // Load Theme
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+
+            // Init DB
+            await db.init();
+            
+            // Seed Manifesto if empty
+            const books = await db.getAll('books');
+            if (books.length === 0) {
+                await db.add('books', {
+                    title: 'The Nirmal Sahyog: Mukti Yojana',
+                    author: 'Earth Engineering Archive',
+                    desc: 'Navigating the 2086 Paradox. Bypassing the Brahmit Zone.',
+                    url: 'https://drive.google.com/file/d/1zo0-LUktX_If_X2Cz2Fjr62I34Dj1IuI/view?usp=sharing',
+                    category: 'manifesto',
+                    rating: 5,
+                    isManifesto: true,
+                    timestamp: Date.now()
+                });
+            }
+
+            // Purge old notifications
+            await db.purgeInbox();
+            updateBadge();
+
+            // Render Home
+            router.render();
+        });
+
+        // Close modals on outside click
+        document.querySelectorAll('.modal-overlay').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) modal.classList.remove('active');
+            });
+        });
     </script>
 </body>
 </html>
