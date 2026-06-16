@@ -3,13 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Khela | Nirmal Sahyog Matrix</title>
-    <meta name="description" content="The Knowledge. Pure Cooperation.">
+    <title>Khela | Nirmal Sahyog Matrix (Neo4j Edition)</title>
+    <meta name="description" content="The Knowledge Singularity. Pure Cooperation.">
     
     <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     
+    <!-- Neo4j Browser Driver -->
+    <script src="https://cdn.jsdelivr.net/npm/neo4j-driver@5.12.0/lib/browser/neo4j-web.min.js"></script>
+
     <style>
         /* =========================================
            CORE THEME & VARIABLES (Glass/Dark/Zen)
@@ -78,6 +81,22 @@
             font-size: 1.3rem;
             color: var(--primary);
             letter-spacing: 0.5px;
+        }
+
+        .db-status {
+            font-size: 0.75rem;
+            padding: 4px 8px;
+            border-radius: 12px;
+            background: rgba(255,0,0,0.1);
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: 500;
+        }
+        .db-status.connected {
+            background: rgba(129,201,149,0.1);
+            color: var(--secondary);
         }
 
         /* Main Container */
@@ -509,7 +528,10 @@
             <span class="material-symbols-outlined">all_inclusive</span>
             Khela <span style="font-size:0.85rem; font-weight:400; color:var(--text-muted); margin-left:4px;">| Matrix</span>
         </div>
-        <div style="display:flex; gap:8px;">
+        <div style="display:flex; gap:12px; align-items: center;">
+            <div id="db-status-indicator" class="db-status">
+                <span class="material-symbols-outlined" style="font-size: 14px;">cloud_off</span> Disconnected
+            </div>
             <button class="btn" style="border:none; padding:6px; background: transparent;" onclick="toggleTheme()" title="Toggle Theme">
                 <span class="material-symbols-outlined">contrast</span>
             </button>
@@ -554,10 +576,10 @@
             </div>
         </section>
 
-        <!-- View: LOCAL LIBRARY -->
+        <!-- View: GLOBAL LIBRARY (Neo4j) -->
         <section id="view-library" class="view-section">
             <div class="results-header">
-                <h2>Library & Prototypes</h2>
+                <h2>Global Database (Neo4j)</h2>
                 <button class="btn" style="padding: 4px 12px; font-size: 0.75rem;" onclick="loadLibrary()">
                     <span class="material-symbols-outlined" style="font-size: 14px;">refresh</span> Sync
                 </button>
@@ -636,7 +658,7 @@
             <div style="line-height: 1.8;">
                 <h3 style="margin: 20px 0 10px; color: var(--primary);">The Vision</h3>
                 <p style="color: var(--text-muted); margin-bottom: 20px;">
-                    Khela is the Gen 100 Knowledge  - a universal platform that integrates 
+                    Khela is the Gen 100 Knowledge Singularity - a universal platform that integrates 
                     Amazon Commercial Products, OpenAlex research, GitHub repositories, Prototyping synchronization, and AI-powered networking 
                     into one seamless experience.
                 </p>
@@ -656,8 +678,8 @@
 
                 <h3 style="margin: 30px 0 10px; color: var(--primary);">Technology Stack</h3>
                 <ul style="color: var(--text-muted); padding-left: 20px; margin-bottom: 20px;">
-                    <li>Single-page architecture (Zero Backend - Runs anywhere, e.g. GitHub Pages)</li>
-                    <li>IndexedDB for robust, crash-free Local DB storage</li>
+                    <li>Single-page architecture (Runs anywhere, e.g. GitHub Pages)</li>
+                    <li>Neo4j Graph Database Integration (Real-time Global Sync)</li>
                     <li>Amazon Affiliate Prototyping Routing</li>
                     <li>OpenAlex API for global academic research</li>
                     <li>Integrated AI Synthesizer (Gemini Matrix Oracle)</li>
@@ -689,8 +711,8 @@
             <span>Research</span>
         </button>
         <button class="nav-item" onclick="loadLibrary(); switchView('library', this)">
-            <span class="material-symbols-outlined">local_library</span>
-            <span>Library</span>
+            <span class="material-symbols-outlined">public</span>
+            <span>Global DB</span>
         </button>
         <button class="nav-item" onclick="switchView('network', this)">
             <span class="material-symbols-outlined">hub</span>
@@ -741,7 +763,7 @@
                 <input type="text" id="c-tags" placeholder="e.g., #prototype, #design, #shoes">
                 <div id="c-tags-hint" class="hint">Comma or space separated tags. Critical for indexing.</div>
             </div>
-            <button type="submit" class="btn btn-primary btn-full" style="margin-top:12px;">Save to Local Library</button>
+            <button type="submit" class="btn btn-primary btn-full" style="margin-top:12px;">Save to Global Neo4j DB</button>
         </form>
     </div>
 
@@ -761,68 +783,198 @@
         </div>
     </div>
 
-    <!-- Application Logic (IndexedDB Vanilla JS) -->
+    <!-- Application Logic -->
     <script>
         // ==========================================
         // 1. CONFIGURATION & STATE
         // ==========================================
         const CONFIG = {
             AMAZON_TAG: 'amazon0339f-21', 
-            NAPKIN_API_TOKEN: 'sk-c28bbef0c1f1be43b507f5453dfea9ea919c4d43f2e8c921636c5bd2794de7cc',
-            DB_NAME: 'KhelaMatrixDB',
-            DB_VERSION: 4 // Upgraded for pure local execution
+            NAPKIN_API_TOKEN: 'sk-c28bbef0c1f1be43b507f5453dfea9ea919c4d43f2e8c921636c5bd2794de7cc'
+        };
+
+        // WARNING: Putting credentials in frontend JavaScript is inherently insecure. 
+        // Anyone inspecting the website code can see these.
+        // For production, always route database queries through a backend server.
+        const NEO4J_CONFIG = {
+            // REPLACE THIS URI with the one from your Neo4j console (e.g. neo4j+s://<id>.databases.neo4j.io)
+            uri: 'neo4j+s://613c286a.databases.neo4j.io', 
+            user: '613c286a', // Usually 'neo4j'
+            password: 'vkKL9AvmRjeV3Y71iTvAmVzMr96t7zI1-7gxU_Ueius' 
         };
 
         window.STATE = {
-            currentQuery: ""
+            currentQuery: "",
+            dbConnected: false
         };
 
         // ==========================================
-        // 2. NATIVE INDEXED DB (Zero-Crash Local DB)
+        // 2. NEO4J GRAPH DB INTEGRATION
         // ==========================================
-        const dbPromise = new Promise((resolve, reject) => {
-            const req = window.indexedDB.open(CONFIG.DB_NAME, CONFIG.DB_VERSION);
-            req.onupgradeneeded = (e) => {
-                const db = e.target.result;
-                if (!db.objectStoreNames.contains('library')) {
-                    db.createObjectStore('library', { keyPath: 'id', autoIncrement: true });
-                }
-                if (!db.objectStoreNames.contains('profiles')) {
-                    db.createObjectStore('profiles', { keyPath: 'userId' });
-                }
-            };
-            req.onsuccess = () => resolve(req.result);
-            req.onerror = () => reject(req.error);
-        });
+        let driver = null;
 
-        async function dbAdd(storeName, data) {
-            const db = await dbPromise;
-            return new Promise((resolve, reject) => {
-                const tx = db.transaction(storeName, 'readwrite');
-                const req = tx.objectStore(storeName).add(data);
-                req.onsuccess = () => resolve(req.result);
-                req.onerror = () => reject(req.error);
-            });
+        async function initNeo4j() {
+            try {
+                // Initialize the driver
+                driver = neo4j.driver(
+                    NEO4J_CONFIG.uri, 
+                    neo4j.auth.basic(NEO4J_CONFIG.user, NEO4J_CONFIG.password)
+                );
+                
+                // Test the connection
+                await driver.getServerInfo();
+                STATE.dbConnected = true;
+                
+                const statusIndicator = document.getElementById('db-status-indicator');
+                statusIndicator.classList.add('connected');
+                statusIndicator.innerHTML = `<span class="material-symbols-outlined" style="font-size: 14px;">cloud_done</span> Neo4j Connected`;
+                
+                console.log("Successfully connected to Neo4j AuraDB!");
+                await seedDatabase();
+
+            } catch (error) {
+                console.error("Failed to connect to Neo4j. Check your URI and credentials in NEO4J_CONFIG.", error);
+                STATE.dbConnected = false;
+                const statusIndicator = document.getElementById('db-status-indicator');
+                statusIndicator.classList.remove('connected');
+                statusIndicator.innerHTML = `<span class="material-symbols-outlined" style="font-size: 14px;">cloud_off</span> DB Offline`;
+            }
         }
 
-        async function dbPutPrivate(storeName, data) {
-            const db = await dbPromise;
-            return new Promise((resolve, reject) => {
-                const tx = db.transaction(storeName, 'readwrite');
-                const req = tx.objectStore(storeName).put(data);
-                req.onsuccess = () => resolve(req.result);
-                req.onerror = () => reject(req.error);
-            });
+        async function dbAddArtifact(data) {
+            if (!STATE.dbConnected || !driver) {
+                alert("Database is not connected. Check Neo4j configuration.");
+                return;
+            }
+            const session = driver.session();
+            try {
+                // Cypher query to create an Artifact node and link it to Tag nodes
+                const query = `
+                    CREATE (a:Artifact {
+                        id: randomUUID(),
+                        title: $title,
+                        author: $author,
+                        url: $url,
+                        type: $type,
+                        source: $source,
+                        isManifesto: $isManifesto,
+                        timestamp: timestamp()
+                    })
+                    WITH a
+                    UNWIND $tags AS tagName
+                    MERGE (t:Tag {name: tagName})
+                    MERGE (a)-[:HAS_TAG]->(t)
+                    RETURN a
+                `;
+                
+                const params = {
+                    title: data.title || 'Untitled',
+                    author: data.author || 'Anonymous',
+                    url: data.url || '',
+                    type: data.type || 'library',
+                    source: data.source || 'library',
+                    tags: data.tags || [],
+                    isManifesto: data.isManifesto || false
+                };
+
+                await session.run(query, params);
+            } catch (error) {
+                console.error("Error writing to Neo4j:", error);
+                throw error;
+            } finally {
+                await session.close();
+            }
         }
 
-        async function dbGetAll(storeName) {
-            const db = await dbPromise;
-            return new Promise((resolve, reject) => {
-                const tx = db.transaction(storeName, 'readonly');
-                const req = tx.objectStore(storeName).getAll();
-                req.onsuccess = () => resolve(req.result);
-                req.onerror = () => reject(req.error);
-            });
+        async function dbSaveProfile(profileData) {
+            if (!STATE.dbConnected || !driver) return;
+            const session = driver.session();
+            try {
+                const query = `
+                    MERGE (u:UserProfile {userId: $userId})
+                    SET u.interests = $interests,
+                        u.core_expertise = $core_expertise,
+                        u.passion_projects = $passion_projects,
+                        u.github = $github,
+                        u.linkedin = $linkedin,
+                        u.updatedAt = timestamp()
+                    RETURN u
+                `;
+                const params = {
+                    userId: 'local-user', // In a real app with auth, use actual user ID
+                    interests: profileData.data.interests || [],
+                    core_expertise: profileData.profileData.core_expertise || '',
+                    passion_projects: profileData.profileData.passion_projects || '',
+                    github: profileData.data.socialLinks.github || '',
+                    linkedin: profileData.data.socialLinks.linkedin || ''
+                };
+                await session.run(query, params);
+            } finally {
+                await session.close();
+            }
+        }
+
+        async function dbGetAllArtifacts() {
+            if (!STATE.dbConnected || !driver) return [];
+            const session = driver.session();
+            try {
+                const query = `
+                    MATCH (a:Artifact)
+                    OPTIONAL MATCH (a)-[:HAS_TAG]->(t:Tag)
+                    RETURN a, collect(t.name) as tags
+                    ORDER BY a.timestamp DESC
+                `;
+                const result = await session.run(query);
+                
+                return result.records.map(record => {
+                    const node = record.get('a').properties;
+                    const tags = record.get('tags') || [];
+                    return {
+                        ...node,
+                        tags: tags,
+                        // Neo4j integers need to be converted to standard JS numbers
+                        timestamp: node.timestamp ? node.timestamp.toNumber() : 0 
+                    };
+                });
+            } catch (error) {
+                console.error("Error reading from Neo4j:", error);
+                return [];
+            } finally {
+                await session.close();
+            }
+        }
+
+        async function searchLocalDb(searchQuery) {
+            if (!STATE.dbConnected || !driver) return [];
+            const session = driver.session();
+            try {
+                // Case-insensitive search on title, author, or tags
+                const query = `
+                    MATCH (a:Artifact)
+                    OPTIONAL MATCH (a)-[:HAS_TAG]->(t:Tag)
+                    WITH a, collect(t.name) as tags
+                    WHERE toLower(a.title) CONTAINS toLower($searchQuery)
+                       OR toLower(a.author) CONTAINS toLower($searchQuery)
+                       OR any(tag IN tags WHERE toLower(tag) CONTAINS toLower($searchQuery))
+                    RETURN a, tags
+                    ORDER BY a.timestamp DESC
+                `;
+                const result = await session.run(query, { searchQuery: searchQuery });
+                
+                return result.records.map(record => {
+                    const node = record.get('a').properties;
+                    return {
+                        ...node,
+                        tags: record.get('tags') || [],
+                        type: node.type === 'prototype' ? 'prototype_local' : 'library'
+                    };
+                });
+            } catch (error) {
+                console.error("Error searching Neo4j:", error);
+                return [];
+            } finally {
+                await session.close();
+            }
         }
 
         const CORE_MANIFESTO = {
@@ -832,9 +984,25 @@
             tags: ['#manifesto', '#mukti', '#earth'],
             source: 'library',
             isManifesto: true,
-            timestamp: 9999999999999, // Always sorts to top
             type: 'library'
         };
+
+        async function seedDatabase() {
+            if (!STATE.dbConnected || !driver) return;
+            const session = driver.session();
+            try {
+                // Check if manifesto exists
+                const result = await session.run(`MATCH (a:Artifact {isManifesto: true}) RETURN count(a) as count`);
+                const count = result.records[0].get('count').toNumber();
+                
+                if (count === 0) {
+                    await dbAddArtifact(CORE_MANIFESTO);
+                    console.log("Seeded Core Manifesto to Neo4j");
+                }
+            } finally {
+                await session.close();
+            }
+        }
 
         // ==========================================
         // 3. THEME & UTILS
@@ -890,7 +1058,7 @@
             };
 
             try {
-                if(!apiKey) return null; // Safe fallback for GitHub Pages without key
+                if(!apiKey) return null; // Safe fallback
                 const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -931,7 +1099,7 @@
             if (tags) {
                 tagsInput.value = tags.replace(/,/g, '').replace(/\n/g, ' ').trim();
             } else {
-                tagsInput.value = "#design #prototype #research"; // Fallback if API fails
+                tagsInput.value = "#design #prototype #research"; 
             }
             tagsInput.placeholder = originalPlaceholder;
         }
@@ -946,7 +1114,7 @@
             grid.innerHTML = `
                 <div class="center-msg" style="grid-column: 1/-1;">
                     <span class="material-symbols-outlined spinner" style="font-size: 48px;">data_usage</span>
-                    <p>Calculating resonance across Prototyping Nodes, APIs & Local Library...</p>
+                    <p>Calculating resonance across Prototyping Nodes, APIs & Neo4j Graph...</p>
                 </div>
             `;
 
@@ -954,11 +1122,11 @@
 
             try {
                 const [local, books, scholar, youtubeNode, prototypeNodes] = await Promise.all([
-                    searchLocal(query),
+                    searchLocalDb(query),
                     fetchGoogleBooks(query),
                     fetchOpenAlex(query),
                     generateYouTubeNode(query),
-                    generatePrototypeNodes(query) // New Prototyping Synchronization Nodes
+                    generatePrototypeNodes(query) 
                 ]);
 
                 let combined = [...local, ...books, ...scholar, ...prototypeNodes];
@@ -975,10 +1143,10 @@
                         score = 600 + Math.min(citations * 2, 800);
                     } 
                     else if (item.type === 'amazon' || item.type === 'amazon_product') {
-                        score = 850 + ((item.rating || 3) * 50); // High score for products/books
+                        score = 850 + ((item.rating || 3) * 50); 
                     }
                     else if (item.type === 'prototype_web') {
-                        score = 900; // High score for design prototypes
+                        score = 900; 
                     }
                     else if (item.type === 'youtube') {
                         score = 750;
@@ -1013,23 +1181,6 @@
                     aiContent.innerHTML = "<span style='color:var(--text-muted);'>AI Synthesis requires a valid API configuration. Fallback complete. Proceeding with database findings.</span>";
                 }
             });
-        }
-
-        async function searchLocal(query) {
-            const q = query.toLowerCase();
-            let all = await dbGetAll('library');
-            all.push(CORE_MANIFESTO);
-
-            return all.filter(item => {
-                const titleMatch = item.title.toLowerCase().includes(q);
-                const authorMatch = item.author && item.author.toLowerCase().includes(q);
-                const tagsMatch = item.tags && item.tags.some(tag => tag.toLowerCase().includes(q));
-                return titleMatch || authorMatch || tagsMatch;
-            }).map(item => ({
-                ...item, 
-                // Re-map type for styling if it was saved as a prototype
-                type: item.type === 'prototype' ? 'prototype_local' : 'library'
-            }));
         }
 
         async function fetchGoogleBooks(query) {
@@ -1077,13 +1228,11 @@
             };
         }
 
-        // --- NEW: Prototyping Synchronization Nodes ---
         async function generatePrototypeNodes(query) {
             return [
                 {
                     title: `Commercial Products & References: ${query}`,
                     author: 'Amazon Retail Matrix',
-                    // Crucial: Correctly applies affiliate tag for physical prototypes/products
                     url: `https://www.amazon.com/s?k=${encodeURIComponent(query)}&tag=${CONFIG.AMAZON_TAG}`,
                     type: 'amazon_product',
                     isExternal: true
@@ -1103,7 +1252,7 @@
         // ==========================================
         function renderCards(items, container) {
             if (items.length === 0) {
-                container.innerHTML = `<div class="center-msg" style="grid-column: 1/-1;"><p>No resonance found. Please contribute knowledge to the Library.</p></div>`;
+                container.innerHTML = `<div class="center-msg" style="grid-column: 1/-1;"><p>No resonance found. Please contribute knowledge to the Neo4j Graph.</p></div>`;
                 return;
             }
 
@@ -1114,11 +1263,10 @@
                 else if (item.type === 'youtube') { badgeClass = 'source-youtube'; badgeText = 'TEDx / YouTube'; icon = 'smart_display'; }
                 else if (item.type === 'network') { badgeClass = 'source-network'; badgeText = 'AI Match'; icon = 'hub'; }
                 else if (item.type === 'prototype_web' || item.type === 'prototype_local') { badgeClass = 'source-prototype'; badgeText = 'Design Prototype'; icon = 'architecture'; }
-                else { badgeClass = 'source-library'; badgeText = 'Local Library'; icon = 'database'; }
+                else { badgeClass = 'source-library'; badgeText = 'Neo4j Graph'; icon = 'database'; }
 
                 const isManifesto = item.isManifesto ? 'card-manifesto' : '';
                 
-                // Using pure HTML anchor tags for external links ensures they work on all browsers and aren't blocked
                 const cardHtmlStart = item.isExternal 
                     ? `<a href="${item.url}" target="_blank" rel="noopener noreferrer" class="card ${isManifesto}">`
                     : `<div class="card ${isManifesto}" onclick="openViewer('${item.url.replace(/'/g, "\\'")}', '${item.title.replace(/'/g, "\\'")}')">`;
@@ -1161,14 +1309,24 @@
 
         window.loadLibrary = async function() {
             const grid = document.getElementById('library-grid');
-            let items = await dbGetAll('library');
-            items.push(CORE_MANIFESTO);
+            if(!STATE.dbConnected) {
+                grid.innerHTML = `<div class="center-msg" style="grid-column: 1/-1;"><p style="color:var(--accent)">Neo4j Database is disconnected. Check configuration.</p></div>`;
+                return;
+            }
+            
+            let items = await dbGetAllArtifacts();
+            
+            // If manifesto isn't in DB yet, manually push it for UI
+            if(!items.some(i => i.isManifesto)) {
+                items.push(CORE_MANIFESTO);
+            }
+            
             items.sort((a, b) => {
                 if (a.isManifesto) return -1;
                 if (b.isManifesto) return 1;
                 return b.timestamp - a.timestamp;
             });
-            renderCards(items.map(i => ({...i, type: i.type || 'library'})), grid);
+            renderCards(items, grid);
         }
 
         // ==========================================
@@ -1223,18 +1381,17 @@
                 const profile = JSON.parse(cleanJson(profileStr));
                 const matches = JSON.parse(cleanJson(matchesStr));
 
-                await dbPutPrivate('profiles', {
-                    userId: 'local-user',
+                // Save to Neo4j
+                await dbSaveProfile({
                     data: userData,
-                    profileData: profile,
-                    timestamp: Date.now()
+                    profileData: profile
                 });
 
                 renderNetworkResults(profile, matches);
                 
             } catch (error) {
                 console.error(error);
-                resultsDiv.innerHTML = `<div class="center-msg"><p style="color:var(--text-muted);">AI Networking requires a valid API configuration. Local profiles saved.</p></div>`;
+                resultsDiv.innerHTML = `<div class="center-msg"><p style="color:var(--text-muted);">AI Networking requires a valid API configuration. Processing failed.</p></div>`;
             }
         }
 
@@ -1357,7 +1514,7 @@
         }
 
         // ==========================================
-        // 9. CONTRIBUTE LOGIC (IndexedDB Saving)
+        // 9. CONTRIBUTE LOGIC (Neo4j Saving)
         // ==========================================
         window.handleContribute = async function(e) {
             e.preventDefault();
@@ -1371,11 +1528,10 @@
                 return t.startsWith('#') ? t.toLowerCase() : `#${t.toLowerCase()}`;
             });
 
-            await dbAdd('library', {
-                type, // 'library', 'prototype', or 'research'
+            await dbAddArtifact({
+                type,
                 title, author, url, tags,
-                source: 'library',
-                timestamp: Date.now()
+                source: 'library'
             });
 
             e.target.reset();
@@ -1390,8 +1546,8 @@
         // 10. INITIALIZATION
         // ==========================================
         window.addEventListener('DOMContentLoaded', async () => {
-            // Wait for DB to be ready
-            await dbPromise;
+            // Initialize Neo4j Driver Connection
+            await initNeo4j();
             
             document.addEventListener('keydown', (e) => {
                 if(e.key === 'Escape') {
