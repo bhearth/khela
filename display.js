@@ -1,419 +1,144 @@
-/*!
- * Khel.o Dis-play Universe 2086 - Embeddable Widget
- * A universal sensory bridge for 8.25 billion souls.
- * Material Design 3, Voice-Enabled, Screen-Reader Optimized.
- */
 (function() {
-    'use strict';
-
-    // Extract configuration from script tag
-    const scriptTag = document.currentScript;
-    const upiID = scriptTag.getAttribute('data-upi') || 'krishna.bh.earth@upi';
-    const qrURL = 'https://raw.githubusercontent.com/krishnabhearth-svg/Kraizen-Journal/main/upi%20pay%20qr%20code.jpeg';
-
-    // ==========================================
-    // 1. MATERIAL DESIGN 3 CSS INJECTION
-    // ==========================================
-    const css = `
-        #kp-root { font-family: 'Roboto', system-ui, -apple-system, sans-serif; color: #e6e1e5; --kp-primary: #fbbf24; --kp-surface: #141218; --kp-surface-container: #1D1B20; --kp-outline: #49454F; }
-        #kp-root * { box-sizing: border-box; margin: 0; padding: 0; }
+    // 1. Inject CSS for Animations and Layout
+    const style = document.createElement('style');
+    style.innerHTML = `
+        #khela-universe-hub {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 150px;
+            height: 150px;
+            z-index: 999999;
+            font-family: sans-serif;
+            pointer-events: none; /* Let clicks pass through empty space */
+        }
+        .khela-node {
+            pointer-events: auto;
+            position: absolute;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            fill: #d4af37;
+        }
+        /* The Center Golden Ratio */
+        #khela-center-core {
+            top: 50%;
+            left: 50%;
+            width: 60px;
+            height: 60px;
+            margin-top: -30px;
+            margin-left: -30px;
+            transform-origin: center center;
+            animation: breathe-spin 8s infinite cubic-bezier(0.4, 0, 0.2, 1);
+            filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.5));
+        }
+        #khela-center-core:hover {
+            animation: fast-spin 2s infinite linear;
+            filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.8));
+        }
+        /* Surrounding Icons */
+        .khela-orbit-icon {
+            width: 24px;
+            height: 24px;
+            fill: #fff;
+            background: rgba(10, 10, 10, 0.8);
+            border: 1px solid #d4af37;
+            border-radius: 50%;
+            padding: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+        .khela-orbit-icon:hover {
+            background: #d4af37;
+            fill: #000;
+            transform: scale(1.1);
+        }
         
-        /* The Pentagon Trigger (Fixed Click Area) */
-        .kp-trigger {
-            position: fixed; bottom: 24px; right: 24px; z-index: 999998;
-            width: 80px; height: 80px; cursor: pointer;
-            transition: transform 0.4s cubic-bezier(0.2, 0, 0, 1);
-            filter: drop-shadow(0 8px 16px rgba(251, 191, 36, 0.4));
-            outline: none; border-radius: 50%;
+        /* Keyframes for the Golden Ratio */
+        @keyframes breathe-spin {
+            0% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.2) rotate(180deg); }
+            100% { transform: scale(1) rotate(360deg); }
         }
-        .kp-trigger:hover, .kp-trigger:focus { transform: scale(1.1) rotate(15deg); }
-        .kp-trigger:active { transform: scale(0.95); }
-        .kp-trigger svg { width: 100%; height: 100%; pointer-events: none; } /* Fixes the partial click issue */
-
-        /* M3 Overlay Backdrop */
-        .kp-overlay {
-            position: fixed; inset: 0; z-index: 999999;
-            background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            display: flex; align-items: center; justify-content: center;
-            opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+        @keyframes fast-spin {
+            0% { transform: scale(1.3) rotate(0deg); }
+            100% { transform: scale(1.3) rotate(360deg); }
         }
-        .kp-overlay.active { opacity: 1; pointer-events: auto; }
-
-        /* M3 Modal Card */
-        .kp-modal {
-            background: var(--kp-surface); border: 1px solid var(--kp-outline);
-            border-radius: 28px; padding: 24px; width: 90%; max-width: 420px;
-            max-height: 85vh; overflow-y: auto; position: relative;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
-            transform: scale(0.9) translateY(20px); transition: transform 0.4s cubic-bezier(0.2, 0, 0, 1);
-        }
-        .kp-overlay.active .kp-modal { transform: scale(1) translateY(0); }
-
-        /* Typography & Jumbler */
-        .kp-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-        .kp-logo { font-size: 1.8rem; font-weight: 700; background: linear-gradient(90deg, #fbbf24, #14b8a6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-family: 'Space Grotesk', sans-serif; min-width: 120px; }
-        .kp-close { background: var(--kp-surface-container); border: 1px solid var(--kp-outline); color: #e6e1e5; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 20px; transition: 0.2s; }
-        .kp-close:hover { background: rgba(255,255,255,0.1); }
-
-        /* Location & Status */
-        .kp-loc { font-size: 0.85rem; color: #14b8a6; background: rgba(20, 184, 166, 0.1); padding: 6px 14px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 24px; border: 1px solid rgba(20, 184, 166, 0.2); }
-
-        /* Action Grid */
-        .kp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
-        .kp-btn {
-            background: var(--kp-surface-container); border: 1px solid var(--kp-outline);
-            border-radius: 16px; padding: 20px 12px; text-align: center; cursor: pointer;
-            transition: 0.2s; display: flex; flex-direction: column; align-items: center; gap: 8px;
-            color: #e6e1e5; font-size: 0.9rem; font-weight: 500;
-        }
-        .kp-btn:hover, .kp-btn:focus { background: rgba(251, 191, 36, 0.1); border-color: var(--kp-primary); outline: none; }
-        .kp-btn .icon { font-size: 2rem; }
-        .kp-btn.voice { grid-column: 1 / -1; background: rgba(251, 191, 36, 0.05); border-color: var(--kp-primary); color: var(--kp-primary); flex-direction: row; justify-content: center; font-weight: 700; }
-        .kp-btn.voice.listening { animation: kp-pulse 1s infinite; background: rgba(251, 191, 36, 0.2); }
-        @keyframes kp-pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.4); } 50% { box-shadow: 0 0 0 10px rgba(251, 191, 36, 0); } }
-
-        /* Dice Result Area */
-        .kp-result { background: var(--kp-surface-container); border-radius: 16px; padding: 20px; text-align: center; min-height: 100px; display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 24px; border: 1px solid var(--kp-outline); }
-        .kp-result .emoji { font-size: 3rem; margin-bottom: 12px; }
-        .kp-result .text { font-size: 1.1rem; color: #e6e1e5; line-height: 1.4; }
-
-        /* UPI Contribution */
-        .kp-upi { display: none; text-align: center; background: rgba(20, 184, 166, 0.05); border: 1px solid rgba(20, 184, 166, 0.2); border-radius: 16px; padding: 20px; }
-        .kp-upi img { width: 180px; border-radius: 12px; margin-bottom: 12px; border: 1px solid var(--kp-outline); }
-        .kp-upi .id { font-size: 0.8rem; color: #14b8a6; font-family: monospace; }
-
-        /* Screen Reader Only */
-        .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
     `;
-    const styleEl = document.createElement('style');
-    styleEl.textContent = css;
-    document.head.appendChild(styleEl);
+    document.head.appendChild(style);
 
-    // ==========================================
-    // 2. HTML INJECTION
-    // ==========================================
-    const root = document.createElement('div');
-    root.id = 'kp-root';
-    root.innerHTML = `
-        <!-- The Pentagon Trigger -->
-        <div class="kp-trigger" id="kp-trigger" role="button" tabindex="0" aria-label="Open Khel.o Dis-play menu. Tap to explore, roll the dice, or use voice commands.">
-            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                    <linearGradient id="kp-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" style="stop-color:#fbbf24"/>
-                        <stop offset="100%" style="stop-color:#f59e0b"/>
-                    </linearGradient>
-                </defs>
-                <polygon points="50,5 95,38 77,90 23,90 5,38" fill="url(#kp-grad)" stroke="#fff" stroke-width="2"/>
-                <circle cx="50" cy="35" r="5" fill="#fff" opacity="0.9"/>
-                <circle cx="35" cy="55" r="5" fill="#fff" opacity="0.9"/>
-                <circle cx="65" cy="55" r="5" fill="#fff" opacity="0.9"/>
-                <circle cx="40" cy="75" r="5" fill="#fff" opacity="0.9"/>
-                <circle cx="60" cy="75" r="5" fill="#fff" opacity="0.9"/>
-            </svg>
-        </div>
+    // 2. Create the Hub Container
+    const hub = document.createElement('div');
+    hub.id = 'khela-universe-hub';
 
-        <!-- The M3 Overlay -->
-        <div class="kp-overlay" id="kp-overlay" role="dialog" aria-modal="true" aria-labelledby="kp-logo-text">
-            <div class="kp-modal">
-                <div class="kp-header">
-                    <div class="kp-logo" id="kp-logo-text">khel.o</div>
-                    <button class="kp-close" id="kp-close" aria-label="Close menu">&times;</button>
-                </div>
-                
-                <div class="kp-loc" id="kp-loc">📍 Detecting your coordinates...</div>
+    // 3. The Golden Ratio SVG (Center)
+    const goldenRatioSVG = `
+        <svg id="khela-center-core" class="khela-node" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <path d="M50 10 a40 40 0 0 1 40 40 a40 40 0 0 1 -40 40 a40 40 0 0 1 -40 -40 a40 40 0 0 1 40 -40" fill="none" stroke="#d4af37" stroke-width="2"/>
+            <path d="M50 10 A40 40 0 0 1 90 50 A24 24 0 0 1 66 74 A14.4 14.4 0 0 1 51.6 59.6 A8.64 8.64 0 0 1 60.24 50.96 A5.18 5.18 0 0 1 65.42 56.14" fill="none" stroke="#d4af37" stroke-width="4" stroke-linecap="round"/>
+        </svg>
+    `;
 
-                <!-- Action Grid -->
-                <div class="kp-grid">
-                    <button class="kp-btn" id="btn-dice" aria-label="Roll the 5W1H Singularity Dice">
-                        <span class="icon">🎲</span>
-                        <span>Roll Dice</span>
-                    </button>
-                    <button class="kp-btn" id="btn-wiki" aria-label="Open a random Kids Wiki page">
-                        <span class="icon">📚</span>
-                        <span>Kids Wiki</span>
-                    </button>
-                    <button class="kp-btn" id="btn-upi" aria-label="Support the Earth Mesh via UPI">
-                        <span class="icon">🌱</span>
-                        <span>Contribute</span>
-                    </button>
-                    <button class="kp-btn" id="btn-map" aria-label="Find local gathering points on OpenStreetMap">
-                        <span class="icon">🗺️</span>
-                        <span>Local Map</span>
-                    </button>
-                    
-                    <!-- Voice Command Button -->
-                    <button class="kp-btn voice" id="btn-voice" aria-label="Activate voice commands. Say: Roll dice, Open wiki, or Contribute.">
-                        <span class="icon">🎙️</span>
-                        <span>Speak Command (Try: "Roll Dice")</span>
-                    </button>
-                </div>
+    // 4. The 5 Orbiting Nodes (Map, Wiki, Science, Code, Ear)
+    // Angles for a perfect pentagon layout: -90 (top), -18, 54, 126, 198
+    const radius = 55;
+    const angles = [-90, -18, 54, 126, 198];
+    
+    // SVGs for the 5 elements
+    const icons = [
+        // Map (Overpass)
+        `<svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>`,
+        // Wiki (Knowledge)
+        `<svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>`,
+        // Atom (OpenAlex/Science)
+        `<svg viewBox="0 0 24 24"><path d="M12 10.5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5zm0-4.5c-3.1 0-5.8 1.4-7.5 3.5 1.7 2.1 4.4 3.5 7.5 3.5s5.8-1.4 7.5-3.5c-1.7-2.1-4.4-3.5-7.5-3.5zm0 12c-3.1 0-5.8-1.4-7.5-3.5 1.7-2.1 4.4-3.5 7.5-3.5s5.8 1.4 7.5 3.5c-1.7 2.1-4.4 3.5-7.5 3.5z"/></svg>`,
+        // Code (GitHub/Talent)
+        `<svg viewBox="0 0 24 24"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>`,
+        // Ear (OpenWhispr/Voice)
+        `<svg viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9v7c0 1.1.9 2 2 2h4v-8H5v-1c0-3.87 3.13-7 7-7s7 3.13 7 7v1h-4v8h4c1.1 0 2-.9 2-2v-7c0-4.97-4.03-9-9-9z"/></svg>`
+    ];
 
-                <!-- Result Display -->
-                <div class="kp-result" id="kp-result" aria-live="polite">
-                    <div class="emoji">✨</div>
-                    <div class="text">Tap the dice or speak a command to begin your Dis-play.</div>
-                </div>
+    const actions = [
+        "loadLocalRoots()", // Overpass
+        "plantSeed()",      // Wiki
+        "fetchScience()",   // OpenAlex
+        "syncTalent()",     // GitHub
+        "activateWhispr()"  // Ear / Voice
+    ];
 
-                <!-- UPI Section -->
-                <div class="kp-upi" id="kp-upi">
-                    <p style="color:#14b8a6; font-weight:600; margin-bottom:12px;">Scan to nourish the Earth Mesh</p>
-                    <img src="${qrURL}" alt="UPI QR Code">
-                    <div class="id">${upiID}</div>
-                </div>
+    let orbitHTML = '';
+    for(let i=0; i<5; i++) {
+        // Calculate coordinates for the circular orbit
+        const rad = angles[i] * (Math.PI / 180);
+        const x = 75 + radius * Math.cos(rad) - 20; // 75 is center of 150px box, 20 is half of 40px icon
+        const y = 75 + radius * Math.sin(rad) - 20;
+        
+        orbitHTML += `
+            <div class="khela-node khela-orbit-icon" style="top: ${y}px; left: ${x}px;" onclick="window.khelaAPI.${actions[i].replace('()','')}()">
+                ${icons[i]}
             </div>
-        </div>
-    `;
-    document.body.appendChild(root);
+        `;
+    }
 
-    // ==========================================
-    // 3. CORE ENGINE
-    // ==========================================
-    const app = {
-        els: {},
-        location: 'Earth',
-        recognition: null,
-        synth: window.speechSynthesis,
-        audioCtx: null,
+    // 5. Assemble and Inject
+    hub.innerHTML = orbitHTML + goldenRatioSVG;
+    document.body.appendChild(hub);
 
-        init() {
-            this.cacheDOM();
-            this.bindEvents();
-            this.startJumbler();
-            this.detectLocation();
-            this.initVoice();
+    // 6. Define the Global Khela API for the 6 Codes
+    window.khelaAPI = {
+        activateWhispr: function() {
+            console.log("Listening via OpenWhispr protocols...");
+            // Initialize Web Speech API or OpenWhispr hooks here
         },
-
-        cacheDOM() {
-            this.els = {
-                trigger: document.getElementById('kp-trigger'),
-                overlay: document.getElementById('kp-overlay'),
-                close: document.getElementById('kp-close'),
-                loc: document.getElementById('kp-loc'),
-                dice: document.getElementById('btn-dice'),
-                wiki: document.getElementById('btn-wiki'),
-                upi: document.getElementById('btn-upi'),
-                map: document.getElementById('btn-map'),
-                voice: document.getElementById('btn-voice'),
-                result: document.getElementById('kp-result'),
-                upiBox: document.getElementById('kp-upi'),
-                logo: document.getElementById('kp-logo-text')
-            };
-        },
-
-        bindEvents() {
-            // Trigger Click & Keyboard (Accessibility)
-            this.els.trigger.addEventListener('click', () => this.openOverlay());
-            this.els.trigger.addEventListener('keydown', (e) => { if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.openOverlay(); } });
-            
-            // Close
-            this.els.close.addEventListener('click', () => this.closeOverlay());
-            this.els.overlay.addEventListener('click', (e) => { if(e.target === this.els.overlay) this.closeOverlay(); });
-            document.addEventListener('keydown', (e) => { if(e.key === 'Escape' && this.els.overlay.classList.contains('active')) this.closeOverlay(); });
-
-            // Actions
-            this.els.dice.addEventListener('click', () => this.rollDice());
-            this.els.wiki.addEventListener('click', () => this.openWiki());
-            this.els.upi.addEventListener('click', () => this.toggleUPI());
-            this.els.map.addEventListener('click', () => this.openMap());
-            this.els.voice.addEventListener('click', () => this.toggleVoice());
-        },
-
-        // --- Audio & Haptics ---
-        playTone(freq, duration, type = 'sine') {
-            try {
-                if(!this.audioCtx) this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                const osc = this.audioCtx.createOscillator();
-                const gain = this.audioCtx.createGain();
-                osc.type = type;
-                osc.frequency.value = freq;
-                gain.gain.setValueAtTime(0.1, this.audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, this.audioCtx.currentTime + duration);
-                osc.connect(gain);
-                gain.connect(this.audioCtx.destination);
-                osc.start();
-                osc.stop(this.audioCtx.currentTime + duration);
-            } catch(e) {}
-        },
-
-        speak(text) {
-            if(this.synth) {
-                this.synth.cancel();
-                const utter = new SpeechSynthesisUtterance(text);
-                utter.rate = 0.9;
-                utter.pitch = 1;
-                this.synth.speak(utter);
-            }
-        },
-
-        // --- Overlay Management ---
-        openOverlay() {
-            this.els.overlay.classList.add('active');
-            this.playTone(600, 0.2, 'triangle');
-            if(navigator.vibrate) navigator.vibrate(30);
-            // Trap focus for screen readers
-            this.els.close.focus(); 
-        },
-
-        closeOverlay() {
-            this.els.overlay.classList.remove('active');
-            this.els.upiBox.style.display = 'none';
-            this.playTone(400, 0.2, 'triangle');
-            this.els.trigger.focus(); // Return focus to trigger
-        },
-
-        // --- Jumbler Engine ---
-        startJumbler() {
-            const words = ['ApI', 'Dis-play', 'khel.o', 'ba.che', 'e/arth'];
-            const chars = '!<>-_\\/[]{}—=+*^?#~';
-            let idx = 0;
-            
-            const run = () => {
-                const target = words[idx];
-                idx = (idx + 1) % words.length;
-                let frame = 0;
-                const interval = setInterval(() => {
-                    let out = '';
-                    for(let i=0; i<target.length; i++) {
-                        if(i < frame) out += target[i];
-                        else out += chars[Math.floor(Math.random() * chars.length)];
-                    }
-                    this.els.logo.textContent = out;
-                    frame += 0.5;
-                    if(frame >= target.length) {
-                        this.els.logo.textContent = target;
-                        clearInterval(interval);
-                        setTimeout(run, 3000);
-                    }
-                }, 60);
-            };
-            run();
-        },
-
-        // --- Location ---
-        async detectLocation() {
-            try {
-                const res = await fetch('https://ipapi.co/json/');
-                const data = await res.json();
-                this.location = `${data.city}, ${data.country_name}`;
-                this.els.loc.innerHTML = `📍 ${this.location}`;
-            } catch(e) {
-                this.els.loc.innerHTML = '📍 Earth Network';
-            }
-        },
-
-        // --- Actions ---
-        rollDice() {
-            const questions = [
-                { icon: '🌱', text: 'Plant a seed where you stand today.' },
-                { icon: '🎵', text: 'Sing one song for the earth.' },
-                { icon: '🤝', text: 'Help one person in your pincode.' },
-                { icon: '💧', text: 'Save a glass of water today.' },
-                { icon: '📚', text: 'Teach one word to a child.' },
-                { icon: '🧘', text: 'Sit in silence for 2 minutes.' }
-            ];
-            const q = questions[Math.floor(Math.random() * questions.length)];
-            
-            this.els.result.innerHTML = `<div class="emoji">${q.icon}</div><div class="text">${q.text}</div>`;
-            this.playTone(800, 0.3, 'square');
-            if(navigator.vibrate) navigator.vibrate([50, 50, 100]);
-            
-            // Speak for the blind
-            this.speak(`Your action for today: ${q.text}`);
-        },
-
-        openWiki() {
-            this.els.result.innerHTML = `<div class="emoji">📚</div><div class="text">Opening a random page from the Kids Wiki...</div>`;
-            this.playTone(1000, 0.2);
-            this.speak('Opening the Kids Wiki knowledge mesh.');
-            
-            const terms = ['ecology', 'technology', 'art', 'space', 'history', 'agriculture'];
-            const term = terms[Math.floor(Math.random() * terms.length)];
-            const url = `https://kids.miraheze.org/w/api.php?action=query&list=search&srsearch=${term}&format=json&origin=*`;
-            
-            fetch(url).then(r => r.json()).then(data => {
-                if(data.query?.search?.length > 0) {
-                    const r = data.query.search[Math.floor(Math.random() * data.query.search.length)];
-                    window.open(`https://kids.miraheze.org/wiki/${encodeURIComponent(r.title.replace(/ /g, '_'))}`, '_blank');
-                }
-            }).catch(() => window.open('https://kids.miraheze.org', '_blank'));
-        },
-
-        toggleUPI() {
-            const isHidden = this.els.upiBox.style.display === 'none' || !this.els.upiBox.style.display;
-            this.els.upiBox.style.display = isHidden ? 'block' : 'none';
-            if(isHidden) {
-                this.playTone(500, 0.2);
-                this.speak('Opening contribution QR code.');
-            }
-        },
-
-        openMap() {
-            this.els.result.innerHTML = `<div class="emoji">🗺️</div><div class="text">Finding gathering points near ${this.location}...</div>`;
-            this.playTone(700, 0.2);
-            this.speak(`Searching OpenStreetMap for community spaces in ${this.location}.`);
-            window.open(`https://www.openstreetmap.org/search?query=community%20center%20${encodeURIComponent(this.location)}`, '_blank');
-        },
-
-        // --- Voice Engine (Web Speech API) ---
-        initVoice() {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) {
-                this.els.voice.style.display = 'none'; // Hide if not supported
-                return;
-            }
-            this.recognition = new SpeechRecognition();
-            this.recognition.lang = 'en-US';
-            this.recognition.continuous = false;
-            this.recognition.interimResults = false;
-
-            this.recognition.onresult = (event) => {
-                const command = event.results[0][0].transcript.toLowerCase();
-                this.els.voice.classList.remove('listening');
-                this.els.voice.innerHTML = '<span class="icon">🎙️</span><span>Speak Command</span>';
-                
-                this.playTone(1200, 0.2);
-                
-                if (command.includes('roll') || command.includes('dice')) this.rollDice();
-                else if (command.includes('wiki') || command.includes('read')) this.openWiki();
-                else if (command.includes('map') || command.includes('find')) this.openMap();
-                else if (command.includes('give') || command.includes('upi') || command.includes('contribute')) this.toggleUPI();
-                else {
-                    this.els.result.innerHTML = `<div class="emoji">🤔</div><div class="text">I heard: "${command}". Try saying "Roll dice" or "Open wiki".</div>`;
-                    this.speak(`I heard ${command}. Please try saying Roll dice or Open wiki.`);
-                }
-            };
-
-            this.recognition.onerror = () => {
-                this.els.voice.classList.remove('listening');
-                this.els.voice.innerHTML = '<span class="icon">🎙️</span><span>Speak Command</span>';
-            };
-            
-            this.recognition.onend = () => {
-                this.els.voice.classList.remove('listening');
-                this.els.voice.innerHTML = '<span class="icon">🎙️</span><span>Speak Command</span>';
-            };
-        },
-
-        toggleVoice() {
-            if (!this.recognition) return;
-            
-            if (this.els.voice.classList.contains('listening')) {
-                this.recognition.stop();
-            } else {
-                this.els.voice.classList.add('listening');
-                this.els.voice.innerHTML = '<span class="icon">🎙️</span><span>Listening...</span>';
-                this.playTone(600, 0.1);
-                this.speak('Listening for your command.');
-                this.recognition.start();
-            }
+        loadLocalRoots: function() { console.log("Fetching Overpass OpenStreetMap data..."); },
+        plantSeed: function() { console.log("Accessing Wiki Seed Data..."); },
+        fetchScience: function() { console.log("Fetching OpenAlex Research..."); },
+        syncTalent: function() { console.log("Syncing GitHub Repositories..."); },
+        triggerCenter: function() {
+            console.log("Golden Ratio Activated. Spinning up universal mesh.");
+            // Action to occur when the center breathing spiral is clicked
         }
     };
 
-    // Boot when DOM is ready
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => app.init());
-    } else {
-        app.init();
-    }
+    // Attach click to center
+    document.getElementById('khela-center-core').onclick = window.khelaAPI.triggerCenter;
+
 })();
