@@ -1,246 +1,219 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Khel.o - Baby Step 2: Jumbler & Display Bar</title>
-    <style>
-        /* 1. Core Universe Styling */
-        body { 
-            margin: 0; background: #030406; color: #fff; 
-            font-family: system-ui, -apple-system, sans-serif; overflow: hidden; 
-            height: 100vh; display: flex; align-items: center; justify-content: center; 
-        }
-        
-        /* 2. The Seed (The Dot) */
-        #seed {
-            width: 12px; height: 12px; background: #fbbf24; border-radius: 50%;
-            box-shadow: 0 0 20px 5px rgba(251, 191, 36, 0.6);
-            cursor: pointer; transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
-            animation: pulse 2s infinite;
-            position: absolute; z-index: 10;
-        }
-        #seed.exploded { transform: scale(0); opacity: 0; pointer-events: none; }
-        @keyframes pulse {
-            0%, 100% { box-shadow: 0 0 20px 5px rgba(251, 191, 36, 0.6); }
-            50% { box-shadow: 0 0 30px 10px rgba(251, 191, 36, 0.9); }
-        }
+/**
+ * THE MAPPING ENGINE (The Bridge)
+ * Connects the 3D Physics of v4.html to the Zetta-Byte JSON Mesh.
+ * Pure Math. Pure Fetch. Zero Hardcoded Strings.
+ */
+const MeshMapper = (function() {
+    'use strict';
 
-        /* 3. The Universe Container */
-        #universe {
-            position: absolute; width: 100%; height: 100%;
-            display: flex; align-items: center; justify-content: center;
-            opacity: 0; transition: opacity 1s ease; pointer-events: none;
-        }
-        #universe.active { opacity: 1; pointer-events: auto; }
+    const GITHUB_BASE = 'https://bhearth.github.io/khela/';
+    const FIB_SEQ = [1, 2, 3, 5, 8, 13, 21, 34, 55, 89];
+    const FIB_SCALE = 46;
 
-        /* 4. The Center (Sun/Core) */
-        #core {
-            width: 60px; height: 60px; 
-            background: radial-gradient(circle, #fff 0%, #fbbf24 40%, #d97706 100%);
-            border-radius: 50%; box-shadow: 0 0 40px 15px rgba(251, 191, 36, 0.4);
-            display: flex; align-items: center; justify-content: center; font-size: 24px;
-        }
+    let scene, camera, renderer, controls, bodies = [], labels = [];
+    let meshData = { domains: {}, symbols: {}, stories: {} };
 
-        /* 5. The 9 Root Nodes */
-        .root-node {
-            position: absolute; width: 80px; height: 80px;
-            background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 50%; display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            transform: scale(0); transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.3s, background 0.3s;
-            cursor: pointer; backdrop-filter: blur(5px);
-        }
-        .root-node:hover { border-color: #fbbf24; background: rgba(251, 191, 36, 0.1); transform: scale(1.15) !important; }
-        .root-node .icon { font-size: 28px; margin-bottom: 4px; }
-        .root-node .label { font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: #94a3b8; }
-        .root-node.pop { transform: scale(1); }
-
-        /* ========================================== */
-        /* BABY STEP 2 ADDITIONS: JUMBLER & DISPLAY   */
-        /* ========================================== */
-
-        /* 6. The Jumbler (Left Side Subconscious) */
-        #jumbler {
-            position: fixed; left: 24px; top: 50%; transform: translateY(-50%);
-            display: flex; flex-direction: column; gap: 16px;
-            font-family: 'Courier New', monospace; font-size: 14px; font-weight: bold;
-            color: #14b8a6; letter-spacing: 2px;
-            opacity: 0; transition: opacity 1s ease 0.5s; pointer-events: none;
-            text-shadow: 0 0 10px rgba(20, 184, 166, 0.5);
-        }
-        #universe.active ~ #jumbler { opacity: 0.6; }
-        #jumbler:hover { opacity: 1; }
-
-        /* 7. The Display Bar (Bottom Singularity Card) */
-        #display-bar {
-            position: fixed; bottom: -100%; left: 50%; transform: translateX(-50%);
-            width: 90%; max-width: 500px; 
-            background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.1); border-radius: 24px;
-            padding: 24px; z-index: 100;
-            transition: bottom 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-            box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
-        }
-        #display-bar.active { bottom: 24px; }
-        
-        .db-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-        .db-title { font-size: 1.2rem; font-weight: 600; color: #fbbf24; display: flex; align-items: center; gap: 10px; }
-        .db-close { background: none; border: none; color: #94a3b8; font-size: 24px; cursor: pointer; }
-        
-        .db-story { font-size: 0.95rem; line-height: 1.6; color: #e2e8f0; margin-bottom: 20px; font-style: italic; border-left: 2px solid #14b8a6; padding-left: 12px; }
-        
-        .db-komute {
-            display: block; width: 100%; padding: 14px; 
-            background: #14b8a6; color: #030406; border: none; border-radius: 12px;
-            font-size: 1rem; font-weight: 700; cursor: pointer; text-align: center;
-            transition: 0.2s; text-decoration: none;
-        }
-        .db-komute:hover { background: #2dd4bf; transform: translateY(-2px); }
-
-        /* Mobile adjustments */
-        @media (max-width: 600px) {
-            #jumbler { left: 10px; font-size: 10px; gap: 10px; }
-            .root-node { width: 65px; height: 65px; }
-            .root-node .icon { font-size: 22px; }
-            .root-node .label { font-size: 7px; }
-        }
-    </style>
-</head>
-<body>
-
-    <!-- The Seed -->
-    <div id="seed" title="Touch the Seed to Awaken"></div>
-
-    <!-- The Universe -->
-    <div id="universe">
-        <div id="core">☀️</div>
-    </div>
-
-    <!-- The Jumbler (Left Side) -->
-    <div id="jumbler">
-        <div class="j-word" data-target="khel.o"></div>
-        <div class="j-word" data-target="sa.hyog"></div>
-        <div class="j-word" data-target="ba.ej"></div>
-        <div class="j-word" data-target="dis-play"></div>
-        <div class="j-word" data-target="ko.mute"></div>
-    </div>
-
-    <!-- The Display Bar (Bottom Sheet) -->
-    <div id="display-bar">
-        <div class="db-header">
-            <div class="db-title" id="db-title">🤝 Sahyog</div>
-            <button class="db-close" onclick="closeDisplayBar()">×</button>
-        </div>
-        <div class="db-story" id="db-story">
-            Strangers arrive at a park, carrying the heavy weight of their digital lives. Someone begins to clap a simple rhythm. Another joins. Within minutes, fifty people are moving as one organism. The ego dissolves; the village is born.
-        </div>
-        <a href="#" class="db-komute" id="db-komute">🚶 Walk to Assembly (KOMUTE)</a>
-    </div>
-
-    <script>
-        // ==========================================
-        // 1. DATA (Simulating 1.json and y.json)
-        // ==========================================
-        const ROOT_DOMAINS = [
-            { code: "0.1", name: "Individual", icon: "🧠", story: "An elder sits with a child, not to teach, but to wonder aloud about the stars. The child asks a question that has no answer, and together they build a telescope from scrap. This is the first spark of the new yug." },
-            { code: "0.2", name: "Samajh", icon: "🤝", story: "A grandmother weaves a basket while singing a song that contains the exact migratory patterns of birds. A teenager records the song, not for digital views, but to ensure the birds are never lost to the forest." },
-            { code: "0.3", name: "Econology", icon: "🌍", story: "A coffee shop gives its spent grounds to a mushroom farmer. The farmer gives the spent substrate to a community garden. The garden feeds the coffee shop's customers. The circle closes; the earth breathes." },
-            { code: "0.4", name: "Earth Eng", icon: "🏗️", story: "A community needs to decide where to route a new water channel. They do not vote for a representative; they walk the land together, feel the slope of the earth, and reach a consensus that mirrors the gravity of the water itself." },
-            { code: "0.5", name: "Discovery", icon: "🔭", story: "Two strangers meet at a community garden. One knows how to graft fruit trees; the other knows how to code irrigation sensors. By sunset, they have taught each other, and the garden's yield is forever changed." },
-            { code: "0.6", name: "Innovation", icon: "💡", story: "A farmer 3D prints a replacement gear for a 50-year-old tractor using a design shared by a mechanic in another continent. The tractor roars to life. The global supply chain is bypassed; the local community is empowered." },
-            { code: "0.8", name: "Sahyog", icon: "🌱", story: "Strangers arrive at a park, carrying the heavy weight of their digital lives. Someone begins to clap a simple rhythm. Another joins. Within minutes, fifty people are moving as one organism. The ego dissolves; the village is born." },
-            { code: "0.9", name: "Mukti", icon: "🕊️", story: "A young man, restless and disconnected, learns to forge iron. He spends his frustration shaping a complex, beautiful gate for the local school. Every time the children walk through it, they touch his healed mind." }
-        ];
-
-        const seed = document.getElementById('seed');
-        const universe = document.getElementById('universe');
-        const displayBar = document.getElementById('display-bar');
-
-        // ==========================================
-        // 2. INJECTING THE 9 ROOTS
-        // ==========================================
-        ROOT_DOMAINS.forEach((domain, index) => {
-            const node = document.createElement('div');
-            node.className = 'root-node';
-            node.innerHTML = `<span class="icon">${domain.icon}</span><span class="label">${domain.name}</span>`;
+    // ==========================================
+    // 1. THE FETCHER (Loading the Soul)
+    // ==========================================
+    async function loadMesh() {
+        console.log("[MeshMapper] Awakening the Mesh...");
+        try {
+            const [res1, res2, res3] = await Promise.all([
+                fetch(`${GITHUB_BASE}1.json`).then(r => r.json()),
+                fetch(`${GITHUB_BASE}symbol1.json`).then(r => r.json()),
+                fetch(`${GITHUB_BASE}y.json`).then(r => r.json())
+            ]);
             
-            const angle = (index / ROOT_DOMAINS.length) * Math.PI * 2;
-            const radius = Math.min(window.innerWidth, window.innerHeight) * 0.3; 
-            const x = Math.cos(angle) * radius;
-            const y = Math.sin(angle) * radius;
+            meshData.domains = res1.domains;
+            meshData.symbols = flattenSymbols(res2); // Flatten for O(1) lookup
+            meshData.stories = res3;
             
-            node.style.left = `calc(50% + ${x}px - 40px)`;
-            node.style.top = `calc(50% + ${y}px - 40px)`;
-            node.style.transitionDelay = `${index * 0.1}s`; 
-            
-            // CLICK EVENT: Opens the Display Bar with y.json data
-            node.addEventListener('click', () => openDisplayBar(domain));
+            console.log("[MeshMapper] Soul Loaded. Generating Physics...");
+            generateUniverse();
+        } catch (e) {
+            console.error("[MeshMapper] Mesh connection failed.", e);
+        }
+    }
 
-            universe.appendChild(node);
+    // Flatten symbol1.json categories into a single searchable map
+    function flattenSymbols(symbolJSON) {
+        const map = {};
+        Object.values(symbolJSON.categories).forEach(cat => {
+            cat.symbols.forEach(sym => {
+                map[sym.name] = sym.icon;
+                sym.tags.forEach(tag => { if(!map[tag]) map[tag] = sym.icon; });
+            });
+        });
+        return map;
+    }
+
+    // ==========================================
+    // 2. THE MATH (Vector -> 3D Physics)
+    // ==========================================
+    /**
+     * Maps the 10D Dharma Vector from 1.json to Three.js Visuals.
+     * Vector: [Ahimsa, Satya, Aparigraha, Prakriti, Rta, Vinaya, Shaurya, Viveka, Mukti, Seva]
+     */
+    function vectorToVisuals(vector) {
+        // 1. COLOR: Map first 3 vectors (Ahimsa, Satya, Aparigraha) to RGB (0-255)
+        // Formula: Normalize (-1 to 1) -> (0 to 255)
+        const r = Math.floor(((vector[0] + 1) / 2) * 255);
+        const g = Math.floor(((vector[1] + 1) / 2) * 255);
+        const b = Math.floor(((vector[2] + 1) / 2) * 255);
+        const color = new THREE.Color(`rgb(${r},${g},${b})`);
+
+        // 2. SIZE: Map 'Prakriti' (Nature - index 3) and 'Seva' (Service - index 9) to mass/size
+        const mass = Math.abs(vector[3]) + Math.abs(vector[9]); 
+        const size = 1.5 + (mass * 1.5); // Radius between 1.5 and 4.5
+
+        // 3. ORBIT SPEED: Map 'Mukti' (Liberation - index 8) to speed (Higher mukti = faster orbit)
+        const speed = 0.05 + (Math.abs(vector[8]) * 0.15);
+
+        return { color, size, speed };
+    }
+
+    // ==========================================
+    // 3. THE GENERATOR (Building the 3D Cosmos)
+    // ==========================================
+    function generateUniverse() {
+        const domainKeys = Object.keys(meshData.domains);
+        
+        domainKeys.forEach((key, index) => {
+            const domain = meshData.domains[key];
+            const visuals = vectorToVisuals(domain.vector);
+            
+            // Calculate Fibonacci Orbit (from v4.html logic)
+            const fibIdx = index + 1;
+            const orbitRadius = FIB_SEQ[fibIdx] * FIB_SCALE;
+            const angle = Math.random() * Math.PI * 2; // Random starting position
+
+            // Create 3D Sphere (The Planet)
+            const geometry = new THREE.SphereGeometry(visuals.size, 32, 32);
+            const material = new THREE.MeshStandardMaterial({ 
+                color: visuals.color, 
+                roughness: 0.6, 
+                metalness: 0.3 
+            });
+            const planet = new THREE.Mesh(geometry, material);
+            
+            planet.position.set(
+                orbitRadius * Math.cos(angle),
+                0,
+                orbitRadius * Math.sin(angle)
+            );
+
+            // Attach Metadata for Interaction
+            planet.userData = {
+                code: key,
+                name: domain.name,
+                orbitRadius: orbitRadius,
+                angle: angle,
+                speed: visuals.speed,
+                vector: domain.vector
+            };
+
+            scene.add(planet);
+            bodies.push(planet);
+
+            // Create HTML Label (Using symbol1.json for O(1) Icon Fetch)
+            // We match the domain name to the closest symbol tag
+            const icon = findBestIcon(domain.name, domain.description);
+            createLabel(planet, icon, domain.languages.en);
         });
 
-        // ==========================================
-        // 3. THE BIG BANG TRIGGER
-        // ==========================================
-        seed.addEventListener('click', () => {
-            seed.classList.add('exploded');
-            setTimeout(() => {
-                universe.classList.add('active');
-                document.querySelectorAll('.root-node').forEach(node => node.classList.add('pop'));
-                startJumbler(); // Start the left-side subconscious engine
-            }, 400);
+        // Start the Physics Loop
+        animate();
+    }
+
+    // O(1) Semantic Icon Matcher
+    function findBestIcon(name, desc) {
+        const keywords = `${name} ${desc}`.toLowerCase().split(/\s+/);
+        for (let kw of keywords) {
+            if (meshData.symbols[kw]) return meshData.symbols[kw];
+        }
+        return '🪐'; // Fallback
+    }
+
+    // ==========================================
+    // 4. THE PHYSICS LOOP (v4.html Animation)
+    // ==========================================
+    function animate() {
+        requestAnimationFrame(animate);
+        
+        bodies.forEach(planet => {
+            const d = planet.userData;
+            d.angle += d.speed * 0.005; // Orbital velocity
+            planet.position.x = d.orbitRadius * Math.cos(d.angle);
+            planet.position.z = d.orbitRadius * Math.sin(d.angle);
+            planet.rotation.y += 0.005; // Axial rotation
         });
 
-        // ==========================================
-        // 4. DISPLAY BAR LOGIC (Singularity Card)
-        // ==========================================
-        function openDisplayBar(domain) {
-            document.getElementById('db-title').innerHTML = `${domain.icon} ${domain.name} <span style="font-size:0.8rem; color:#94a3b8; font-weight:400;">(${domain.code})</span>`;
-            document.getElementById('db-story').innerText = domain.story;
-            
-            // Simulate KOMUTE link generation (from event.js)
-            document.getElementById('db-komute').href = `https://www.google.com/maps/search/${domain.name}+community+center`;
-            document.getElementById('db-komute').innerText = `🚶 Walk to ${domain.name} Assembly`;
-            
-            displayBar.classList.add('active');
-            if(navigator.vibrate) navigator.vibrate(30); // Haptic feedback
-        }
+        updateLabels();
+        controls.update();
+        renderer.render(scene, camera);
+    }
 
-        function closeDisplayBar() {
-            displayBar.classList.remove('active');
-        }
-
-        // ==========================================
-        // 5. THE JUMBLER ENGINE (From structure.json)
-        // ==========================================
-        function startJumbler() {
-            const chars = '!<>-_\\/[]{}—=+*^?#~';
-            const words = document.querySelectorAll('.j-word');
+    // ==========================================
+    // 5. THE INTERACTION BRIDGE (Calling event.js & y.json)
+    // ==========================================
+    function onPlanetClick(intersects) {
+        if (intersects.length > 0) {
+            const planet = intersects[0].object;
+            const data = planet.userData;
             
-            words.forEach(wordEl => {
-                const target = wordEl.getAttribute('data-target');
-                let frame = 0;
-                
-                const interval = setInterval(() => {
-                    let out = '';
-                    for(let i = 0; i < target.length; i++) {
-                        if(i < frame) out += target[i];
-                        else out += chars[Math.floor(Math.random() * chars.length)];
-                    }
-                    wordEl.textContent = out;
-                    frame += 0.5;
-                    
-                    if(frame >= target.length) {
-                        wordEl.textContent = target;
-                        clearInterval(interval);
-                    }
-                }, 60);
+            console.log(`[MeshMapper] Singularity Locked: ${data.name} (${data.code})`);
+            
+            // 1. Trigger Camera Zoom (v4.html physics)
+            flyToPlanet(planet);
+
+            // 2. Fetch Story from y.json (The Narrative)
+            // We map the domain code to the closest Y-coordinate story
+            const storyKey = findStoryKey(data.code); 
+            const story = meshData.stories[storyKey] || meshData.stories['Y.8881']; // Fallback to Raga Yaman
+            
+            // 3. Dispatch Event to event.js (The Physical KOMUTE)
+            window.dispatchEvent(new CustomEvent('khela:planet:focus', { 
+                detail: { 
+                    code: data.code, 
+                    name: data.name,
+                    story: story.s, // The Story
+                    why: story.y    // The Purpose
+                } 
+            }));
+        }
+    }
+
+    function findStoryKey(domainCode) {
+        // Simple mapping logic: 0.8 (sahyog) -> Y.8881, 0.1 (individual) -> Y.1111
+        const map = { '0.8': 'Y.8881', '0.1': 'Y.1111', '0.3': 'Y.3111' };
+        return map[domainCode] || 'Y.8882';
+    }
+
+    // ==========================================
+    // 6. INITIALIZATION (The Big Bang)
+    // ==========================================
+    return {
+        init: function(threeScene, threeCamera, threeRenderer, threeControls) {
+            scene = threeScene;
+            camera = threeCamera;
+            renderer = threeRenderer;
+            controls = threeControls;
+
+            // Raycaster for Click Detection
+            const raycaster = new THREE.Raycaster();
+            const mouse = new THREE.Vector2();
+
+            window.addEventListener('click', (event) => {
+                mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+                mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+                raycaster.setFromCamera(mouse, camera);
+                const intersects = raycaster.intersectObjects(bodies);
+                onPlanetClick(intersects);
             });
 
-            // Loop the jumbler every 4 seconds
-            setInterval(startJumbler, 4000);
+            // Trigger the Fetch & Build
+            loadMesh();
         }
-    </script>
-</body>
-</html>
+    };
+})();
