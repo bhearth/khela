@@ -1,276 +1,333 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Khel.o Direct Evolution · JSON Driven</title>
+<title>Khel.o | The Dot & The Mesh (Neo4j Edition)</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+<script src="https://cdn.jsdelivr.net/npm/neo4j-driver@5.12.0/lib/browser/neo4j-web.min.js"></script>
 <style>
-body{margin:0;background:#030406;color:#e2e8f0;font-family:system-ui;overflow:hidden;touch-action:none;user-select:none}
-#guide{position:absolute;top:40px;width:100%;text-align:center;color:#10b981;letter-spacing:3px;text-transform:uppercase;font-size:13px;pointer-events:none;z-index:10;transition:0.5s;padding:0 20px;}
-#hub{position:absolute;top:50vh;left:50vw;transform-style:preserve-3d;will-change:transform}
-svg{position:absolute;top:-600px;left:-600px;width:1200px;height:1200px;pointer-events:none;transition:opacity 0.5s ease}
-.node{position:absolute;display:flex;align-items:center;justify-content:center;border-radius:50%;border:solid;cursor:pointer;transition:transform .4s cubic-bezier(.34,1.56,.64,1), filter .4s, background .4s, opacity .4s;transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),var(--z));animation:pop .6s both}
-.node.collapse{transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),var(--z)) scale(0) !important;opacity:0 !important;pointer-events:none}
-@keyframes pop{0%{transform:translate3d(-50%,-50%,0) scale(0);opacity:0}}
-.node:hover{transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),calc(var(--z) + 30px)) scale(1.6);filter:drop-shadow(0 0 20px currentColor);z-index:100;background:currentColor;color:#000!important}
+:root { --bg-color: #050507; --surface-color: #121318; --surface-variant: #1a1c23; --primary: #8AB4F8; --secondary: #81C995; --accent: #F28B82; --text-main: #E8EAED; --text-muted: #9AA0A6; --border-color: rgba(255, 255, 255, 0.1); --radius-lg: 24px; --radius-md: 16px; --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); --shadow-resonance: 0 8px 32px rgba(0, 0, 0, 0.5); }
+[data-theme="light"] { --bg-color: #ffffff; --surface-color: #f9fafb; --surface-variant: #f3f4f6; --primary: #0B57D0; --secondary: #0D652D; --text-main: #111827; --text-muted: #4b5563; --border-color: rgba(0, 0, 0, 0.1); }
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-main); height: 100vh; display: flex; flex-direction: column; overflow: hidden; transition: background-color 0.3s, color 0.3s; }
+header { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; background: rgba(var(--bg-color), 0.8); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border-color); z-index: 10; }
+.logo { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 1.3rem; color: var(--primary); }
+main { flex: 1; overflow-y: auto; position: relative; padding-bottom: 90px; }
+.view-section { display: none; padding: 24px; max-width: 900px; margin: 0 auto; animation: fadeIn 0.4s ease forwards; }
+.view-section.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-/* The Invisible Hit-Area for the 10px Golden Seed */
-.seed{width:60px!important;height:60px!important;border:none!important;background:transparent!important;box-shadow:none!important;}
-.seed::after{content:'';position:absolute;width:10px;height:10px;background:#d4af37;border-radius:50%;box-shadow:0 0 20px 8px rgba(212,175,55,0.7);transition:0.3s;}
-.seed:hover::after{transform:scale(1.5);}
+/* =========================================
+THE DOT & BIG BANG (NEW PARADIGM)
+========================================= */
+#dot-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 75vh; text-align: center; }
+#golden-dot { width: 28px; height: 28px; background: #fbbf24; border-radius: 50%; box-shadow: 0 0 40px 15px rgba(251,191,36,0.6); cursor: pointer; animation: pulse 2.5s infinite ease-in-out; transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); margin: 24px 0; }
+#golden-dot.bloom { transform: scale(0); opacity: 0; pointer-events: none; }
+@keyframes pulse { 0%, 100% { box-shadow: 0 0 40px 15px rgba(251,191,36,0.6); transform: scale(1); } 50% { box-shadow: 0 0 60px 25px rgba(251,191,36,0.9); transform: scale(1.2); } }
 
-path{stroke-dasharray:4000;stroke-dashoffset:4000;animation:draw 2.5s ease-out forwards}
-@keyframes draw{to{stroke-dashoffset:0}}
-</style></head><body>
+/* Mandala Overlay (Integral.js Engine) */
+#mandala-overlay { position: fixed; inset: 0; z-index: 9998; background: rgba(5,5,7,0.95); backdrop-filter: blur(16px); display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+#mandala-overlay.active { display: flex; animation: fadeIn 0.4s ease; }
+.int-mandala { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; max-width: 500px; width: 100%; margin-bottom: 24px; }
+.int-pod { background: rgba(30, 41, 59, 0.8); border: 2px solid rgba(255,255,255,0.1); border-radius: 24px; padding: 20px 16px; text-align: center; cursor: pointer; transition: 0.3s; }
+.int-pod:hover { border-color: rgba(255,255,255,0.3); transform: translateY(-4px); }
+.int-pod.locked { opacity: 0.5; pointer-events: none; border-color: var(--pod-color); background: rgba(255,255,255,0.05); }
+.int-pod .icon { font-size: 28px; display: block; margin-bottom: 8px; }
+.int-pod .label { font-size: 0.85rem; font-weight: 600; color: #fff; }
+.int-pod .selection { font-size: 0.7rem; color: var(--pod-color); margin-top: 6px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; min-height: 16px; }
 
-<div id="guide"></div>
-<div id="hub"></div>
+/* Singularity Card (Event.js Engine) */
+#singularity-card { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px); border-top: 1px solid rgba(251,191,36,0.3); border-radius: 32px 32px 0 0; padding: 24px; transform: translateY(100%); transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1); z-index: 9999; text-align: center; box-shadow: 0 -10px 40px rgba(0,0,0,0.8); }
+#singularity-card.active { transform: translateY(0); }
+.komute-btn { display: inline-block; background: #fbbf24; color: #000; padding: 14px 28px; border-radius: 16px; font-weight: 700; text-decoration: none; margin-top: 16px; font-size: 1rem; transition: 0.2s; }
+.komute-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(251,191,36,0.3); }
+
+/* =========================================
+CARDS, BUTTONS & NAV (OLD CODE FOUNDATION)
+========================================= */
+.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+.card { background: var(--surface-color); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; transition: var(--transition); display: flex; flex-direction: column; gap: 12px; text-decoration: none; color: inherit; cursor: pointer; }
+.card:hover { border-color: var(--primary); transform: translateY(-3px); box-shadow: var(--shadow-resonance); }
+.card-title { font-size: 1.15rem; font-weight: 600; line-height: 1.4; }
+.card-meta { font-size: 0.85rem; color: var(--text-muted); }
+.btn { padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border-color); background: var(--surface-variant); color: var(--text-main); font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; justify-content: center; gap: 6px; text-decoration: none; }
+.btn-primary { background: var(--primary); color: #000; border: none; font-weight: 600; }
+.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(var(--bg-color), 0.95); backdrop-filter: blur(10px); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; padding: 12px 0; padding-bottom: calc(12px + env(safe-area-inset-bottom)); z-index: 100; }
+.nav-item { background: none; border: none; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 0.75rem; cursor: pointer; width: 70px; }
+.nav-item.active { color: var(--primary); }
+.viewer-overlay { position: fixed; inset: 0; background: #000; z-index: 300; display: none; flex-direction: column; }
+.viewer-overlay.active { display: flex; }
+.viewer-body { flex: 1; display: flex; align-items: center; justify-content: center; padding: 16px; }
+.viewer-body iframe { width: 100%; height: 100%; border: none; background: #fff; border-radius: 8px; }
+</style>
+</head>
+<body>
+
+<header>
+    <div class="logo"><span class="material-symbols-outlined">all_inclusive</span> Khel.o <span style="font-size:0.85rem; font-weight:400; color:var(--text-muted); margin-left:4px;">| Mesh</span></div>
+    <div style="display:flex; gap:12px; align-items: center;">
+        <div id="db-status-indicator" style="font-size: 0.75rem; padding: 4px 8px; border-radius: 12px; background: rgba(255,0,0,0.1); color: var(--accent); display: flex; align-items: center; gap: 4px;">
+            <span class="material-symbols-outlined" style="font-size: 14px;">cloud_off</span> Offline
+        </div>
+        <button class="btn" style="border:none; padding:6px; background: transparent;" onclick="toggleTheme()"><span class="material-symbols-outlined">contrast</span></button>
+    </div>
+</header>
+
+<main>
+    <!-- 1. THE DOT (NEW ENTRY POINT) -->
+    <section id="view-dot" class="view-section active">
+        <div id="dot-container">
+            <p style="color: var(--text-muted); letter-spacing: 3px; text-transform: uppercase; font-size: 0.9rem;">Touch the Seed to Awaken</p>
+            <div id="golden-dot" onclick="triggerBigBang()"></div>
+            <p style="color: var(--text-muted); font-size: 0.85rem; max-width: 400px; text-align: center; line-height: 1.6;">The 5W1H Mandala will unfold. Select your intent to resolve the physical Singularity or search the Global Knowledge Mesh.</p>
+        </div>
+    </section>
+
+    <!-- 2. SEARCH RESULTS (OLD CODE LOGIC) -->
+    <section id="view-results" class="view-section">
+        <div style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center;">
+            <h2 style="font-weight: 400; color: var(--text-muted); font-size: 1.2rem;">Mesh Resonance for: <strong id="results-query-text" style="color: var(--text-main);">...</strong></h2>
+            <button class="btn" onclick="switchView('dot', document.querySelectorAll('.nav-item')[0])" style="font-size: 0.75rem;"><span class="material-symbols-outlined" style="font-size: 14px;">arrow_back</span> Return to Seed</button>
+        </div>
+        <div id="results-grid" class="card-grid"></div>
+    </section>
+
+    <!-- 3. GLOBAL LIBRARY (NEO4J) -->
+    <section id="view-library" class="view-section">
+        <div style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center;">
+            <h2 style="font-weight: 400; color: var(--text-muted); font-size: 1.2rem;">Global Graph DB (Neo4j)</h2>
+            <button class="btn" onclick="loadLibrary()"><span class="material-symbols-outlined" style="font-size: 14px;">refresh</span> Sync</button>
+        </div>
+        <div id="library-grid" class="card-grid"></div>
+    </section>
+
+    <!-- 4. ABOUT -->
+    <section id="view-about" class="view-section">
+        <h2 style="color: var(--primary); margin-bottom: 20px;">The Nirmal Sahyog Matrix</h2>
+        <p style="color: var(--text-muted); line-height: 1.8; margin-bottom: 20px;">Khel.o is the Gen 100 Knowledge Singularity. It bridges the physical world (KOMUTE) with the digital mesh (Neo4j, OpenAlex, Amazon). Every tap is a seed. Every question is a sunbeam.</p>
+        <div style="background: var(--surface-color); padding: 20px; border-radius: 16px; border: 1px solid var(--border-color);">
+            <strong style="color: var(--secondary);">E = ma² (Earth = Mother²)</strong><br>
+            <span style="color: var(--text-muted); font-size: 0.9rem;">All engagements support human development, liberation, and the improved spectrum of life on Earth.</span>
+        </div>
+    </section>
+</main>
+
+<!-- MANDALA OVERLAY (Integral.js) -->
+<div id="mandala-overlay">
+    <h2 style="color: #fbbf24; margin-bottom: 24px; letter-spacing: 2px;">THE INTENT LOOM</h2>
+    <div class="int-mandala" id="int-mandala"></div>
+    <button class="btn" onclick="closeMandala()" style="border-color: rgba(255,255,255,0.2); color: #fff;">Close</button>
+</div>
+
+<!-- SINGULARITY CARD (Event.js) -->
+<div id="singularity-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3 style="color: #fbbf24; margin: 0; font-size: 1.1rem;">SINGULARITY RESOLVED</h3>
+        <button class="btn" style="border:none; padding:4px; background: transparent;" onclick="closeSingularity()"><span class="material-symbols-outlined">close</span></button>
+    </div>
+    <p id="singularity-story" style="color: var(--text-muted); font-style: italic; margin-bottom: 16px; line-height: 1.5;">"Strangers arrive at a park... The ego dissolves; the village is born."</p>
+    <div id="singularity-intent" style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 12px; font-size: 0.85rem; margin-bottom: 16px;"></div>
+    <a id="singularity-komute" href="#" target="_blank" class="komute-btn">🚶 Walk to Assembly (KOMUTE)</a>
+    <button class="btn btn-primary" style="width: 100%; margin-top: 16px; padding: 12px;" onclick="searchMeshFromIntent()">🔍 Search Global Mesh for this Intent</button>
+</div>
+
+<!-- UNIVERSAL MEDIA VIEWER -->
+<div class="viewer-overlay" id="viewer">
+    <div style="padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; background: rgba(18,19,24,0.9); border-bottom: 1px solid rgba(255,255,255,0.1);">
+        <button class="btn" style="border:none; color:var(--text-main); background:transparent;" onclick="closeViewer()"><span class="material-symbols-outlined">arrow_back</span></button>
+        <div id="viewer-title" style="flex: 1; margin: 0 16px; font-weight: 500; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Media</div>
+    </div>
+    <div class="viewer-body" id="viewer-body"></div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+    <button class="nav-item active" onclick="switchView('dot', this)"><span class="material-symbols-outlined">trip_origin</span><span>Seed</span></button>
+    <button class="nav-item" onclick="loadLibrary(); switchView('library', this)"><span class="material-symbols-outlined">hub</span><span>Graph</span></button>
+    <button class="nav-item" onclick="switchView('about', this)"><span class="material-symbols-outlined">info</span><span>About</span></button>
+</nav>
 
 <script>
-let h=document.getElementById('hub'), g=document.getElementById('guide');
-let rx=0, ry=0, px=0, py=0, z=1, tz=1, drag=0, lx, ly;
-let isDragging = false, startX, startY;
-let S_state = 0, lastTap = 0, evolveTimer;
-
-// Mobile-first responsive scaling
-const getZoom = () => Math.min(window.innerWidth, window.innerHeight) / 800; 
-
-const C=["#d4af37","#10b981","#38bdf8","#f59e0b","#c084fc","#ec4899","#f43f5e","#a7f3d0"];
-
-// These will now be populated dynamically from 1.json
-let CAT = [];
-let I = [];
-
-const PATTERNS = ['fibonacci', 'golden_spiral', 'square_grid', 'triangle', 'star', 'flower', 'wave', 'galaxy'];
-const FIB_SEQ = [8, 13, 21, 34, 55, 89];
-
 // ==========================================
-// MOCK DATA FETCH (Simulating server-side 1.json)
+// 1. NEO4J & SEARCH FOUNDATION (OLD CODE LOGIC)
 // ==========================================
-async function fetchSemanticMesh() {
-  // In production: const res = await fetch('https://your-server.com/1.json'); return await res.json();
-  return {
-    "domains": {
-      "0.1": { "name": "individual", "languages": { "en": "Individual" } },
-      "0.2": { "name": "samajh", "languages": { "en": "Family" } },
-      "0.3": { "name": "econology", "languages": { "en": "Ecology" } },
-      "0.4": { "name": "earth_engineering", "languages": { "en": "Infrastructure" } },
-      "0.5": { "name": "discovery", "languages": { "en": "Science" } },
-      "0.6": { "name": "innovation", "languages": { "en": "Technology" } },
-      "0.8": { "name": "sahyog", "languages": { "en": "Collaboration" } },
-      "0.888": { "name": "cultural_synthesis", "languages": { "en": "Synthesis" } },
-      "0.9": { "name": "mukti", "languages": { "en": "Liberation" } }
-    }
-  };
+const CONFIG = { AMAZON_TAG: 'amazon0339f-21' };
+const NEO4J_CONFIG = { uri: 'neo4j+s://613c286a.databases.neo4j.io', user: '613c286a', password: 'vkKL9AvmRjeV3Y71iTvAmVzMr96t7zI1-7gxU_Ueius' };
+let driver = null;
+window.STATE = { currentQuery: "", dbConnected: false };
+
+async function initNeo4j() {
+    try {
+        driver = neo4j.driver(NEO4J_CONFIG.uri, neo4j.auth.basic(NEO4J_CONFIG.user, NEO4J_CONFIG.password));
+        await driver.getServerInfo();
+        STATE.dbConnected = true;
+        const el = document.getElementById('db-status-indicator');
+        el.style.background = 'rgba(129,201,149,0.1)'; el.style.color = 'var(--secondary)';
+        el.innerHTML = `<span class="material-symbols-outlined" style="font-size: 14px;">cloud_done</span> Neo4j`;
+    } catch (e) { console.error("Neo4j Offline", e); }
 }
 
-async function bootstrap() {
-  try {
-    const meshData = await fetchSemanticMesh();
-    const domainKeys = Object.keys(meshData.domains);
+async function searchLocalDb(query) {
+    if (!STATE.dbConnected) return [];
+    const session = driver.session();
+    try {
+        const result = await session.run(`MATCH (a:Artifact) WHERE toLower(a.title) CONTAINS toLower($q) RETURN a LIMIT 10`, { q: query });
+        return result.records.map(r => r.get('a').properties);
+    } catch (e) { return []; } finally { await session.close(); }
+}
+
+async function loadLibrary() {
+    if (!STATE.dbConnected) return;
+    const session = driver.session();
+    try {
+        const result = await session.run(`MATCH (a:Artifact) RETURN a ORDER BY a.timestamp DESC LIMIT 20`);
+        const items = result.records.map(r => r.get('a').properties);
+        renderCards(items, document.getElementById('library-grid'));
+    } catch (e) { console.error(e); } finally { await session.close(); }
+}
+
+async function triggerSearch(query) {
+    STATE.currentQuery = query;
+    document.getElementById('results-query-text').innerText = query;
+    switchView('results', document.querySelectorAll('.nav-item')[0]);
+    const grid = document.getElementById('results-grid');
+    grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted);"><span class="material-symbols-outlined" style="font-size: 48px; animation: spin 1s linear infinite;">data_usage</span><p>Calculating resonance across Mesh...</p></div>`;
     
-    // Deterministic icons for top-level domains
-    const fallbackIcons = ["👤", "👪", "🌱", "⚙️", "🔬", "💡", "🤝", "🌀", "🕊️"];
-    
-    CAT = domainKeys.map((key, index) => {
-      const d = meshData.domains[key];
-      return {
-        id: key,
-        i: fallbackIcons[index % fallbackIcons.length],
-        n: d.languages?.en || d.name
-      };
+    // Fetch from multiple sources (Simulated for speed, keeping old code logic)
+    const [local, books, scholar] = await Promise.all([
+        searchLocalDb(query),
+        fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=3`).then(r=>r.json()).catch(()=>({items:[]})),
+        fetch(`https://api.openalex.org/works?search=${encodeURIComponent(query)}&per_page=3`).then(r=>r.json()).catch(()=>({results:[]}))
+    ]);
+
+    let combined = [...local];
+    if(books.items) combined.push(...books.items.map(b => ({ title: b.volumeInfo.title, author: b.volumeInfo.authors?.join(', '), url: `https://www.amazon.com/s?k=${encodeURIComponent(b.volumeInfo.title)}&tag=${CONFIG.AMAZON_TAG}`, type: 'amazon' })));
+    if(scholar.results) combined.push(...scholar.results.map(p => ({ title: p.title, author: p.authorships?.map(a=>a.author.display_name).join(', '), url: p.doi ? `https://doi.org/${p.doi}` : p.id, type: 'scholar', citations: p.cited_by_count })));
+
+    renderCards(combined, grid);
+}
+
+function renderCards(items, container) {
+    if (items.length === 0) { container.innerHTML = `<p style="grid-column:1/-1; text-align:center; color:var(--text-muted);">No resonance found. Plant a seed in the Graph DB.</p>`; return; }
+    container.innerHTML = items.map(item => `
+        <div class="card" onclick="${item.url ? (item.url.startsWith('http') ? `window.open('${item.url}', '_blank')` : `openViewer('${item.url}', '${item.title}')`) : ''}">
+            <div class="card-title">${item.title || 'Untitled'}</div>
+            <div class="card-meta">${item.author || 'Anonymous'} ${item.citations ? `• ${item.citations} citations` : ''}</div>
+            <div style="margin-top: auto; display: flex; gap: 8px;">
+                <span class="btn" style="font-size: 0.7rem; padding: 4px 8px;">${item.type === 'amazon' ? '🛒 Amazon' : item.type === 'scholar' ? '🎓 Scholar' : '🧬 Graph DB'}</span>
+            </div>
+        </div>
+    `).join('');
+}
+
+// ==========================================
+// 2. THE DOT & BIG BANG (NEW PARADIGM)
+// ==========================================
+const INTENT_TREE = {
+    what: { label: "What", icon: "🎯", color: "#fbbf24" },
+    who: { label: "Who", icon: "🤝", color: "#10b981" },
+    where: { label: "Where", icon: "🗺️", color: "#3b82f6" },
+    how: { label: "How", icon: "⚙️", color: "#8b5cf6" },
+    why: { label: "Why", icon: "💡", color: "#f43f5e" },
+    when: { label: "When", icon: "⏳", color: "#0ea5e9" }
+};
+let intentSelections = {};
+
+function triggerBigBang() {
+    document.getElementById('golden-dot').classList.add('bloom');
+    if(navigator.vibrate) navigator.vibrate([50, 30, 100]);
+    setTimeout(() => {
+        document.getElementById('mandala-overlay').classList.add('active');
+        renderMandala();
+    }, 400);
+}
+
+function renderMandala() {
+    const container = document.getElementById('int-mandala');
+    container.innerHTML = '';
+    Object.keys(INTENT_TREE).forEach(key => {
+        const pod = INTENT_TREE[key];
+        const isSelected = !!intentSelections[key];
+        const el = document.createElement('div');
+        el.className = `int-pod ${isSelected ? 'locked' : ''}`;
+        el.style.setProperty('--pod-color', pod.color);
+        el.innerHTML = `<span class="icon">${pod.icon}</span><div class="label">${pod.label}</div><div class="selection">${isSelected ? intentSelections[key] : 'Select...'}</div>`;
+        el.onclick = () => selectIntentPod(key);
+        container.appendChild(el);
     });
-    
-    I = [...CAT]; // Reuse dynamic data for evolution icons
-    
-    build(0); // Start the engine once data is loaded
-  } catch(e) {
-    console.error("Mesh load failed", e);
-  }
 }
 
-function selectPattern(input) {
-  let hash = 0;
-  for(let i=0; i<input.selectedMeaning.length; i++) hash += input.selectedMeaning.charCodeAt(i);
-  return PATTERNS[(hash + input.randomSeed + input.clickNumber) % PATTERNS.length];
+function selectIntentPod(key) {
+    // Simulated drill-down (In production, this fetches from 5W1H1.json)
+    const options = {
+        what: ['Ecology', 'Code', 'Art', 'Soil', 'Water'],
+        who: ['Elders', 'Kids', 'Farmers', 'Seekers'],
+        where: ['Park', 'Temple', 'Forest', 'Village'],
+        how: ['Walk', 'Sing', 'Plant', 'Build'],
+        why: ['Healing', 'Joy', 'Truth', 'Freedom'],
+        when: ['Dawn', 'Dusk', 'Now', 'Season']
+    };
+    intentSelections[key] = options[key][Math.floor(Math.random() * options[key].length)];
+    renderMandala();
+    
+    if(Object.keys(intentSelections).length >= 3) setTimeout(resolveSingularity, 600);
 }
 
-function calculatePosition(pattern, i, total) {
-  let x=0, y=0, z3d=0, a=0, r=0;
-  switch(pattern) {
-    case 'star': r = 60 + (i%2)*60 + i*2; a = i * (Math.PI*2/5) + i*0.05; x=r*Math.cos(a); y=r*Math.sin(a); break;
-    case 'flower': r = 140 * Math.sin(i * 0.4); a = i * 0.4; x=r*Math.cos(a); y=r*Math.sin(a); break;
-    case 'triangle': let row = Math.floor((-1+Math.sqrt(1+8*i))/2); let col = i - (row*(row+1))/2; x = (col - row/2)*40; y = row*35 - 100; break;
-    case 'square_grid': let s = Math.ceil(Math.sqrt(total)); x = (i%s)*50 - (s*25); y = Math.floor(i/s)*50 - (s*25); break;
-    case 'wave': x = (i - total/2)*30; y = Math.sin(i*0.5)*80; break;
-    case 'galaxy': r = 4*i; a = i*0.3; x = r*Math.cos(a); y = r*Math.sin(a); z3d = Math.sin(i*0.5)*40; break;
-    case 'golden_spiral': r = 5*Math.exp(0.08*i); a = i*0.8; x=r*Math.cos(a); y=r*Math.sin(a); break;
-    case 'fibonacci':
-    default: a = i*0.18; r = 5*Math.exp((Math.log(1.618)/(Math.PI/2))*a); x=r*Math.cos(a); y=-r*Math.sin(a); break;
-  }
-  return {x, y, z: z3d};
+function closeMandala() {
+    document.getElementById('mandala-overlay').classList.remove('active');
+    document.getElementById('golden-dot').classList.remove('bloom');
+    intentSelections = {};
 }
 
-function generateNodes(pattern, input) {
-  let maxNodes = FIB_SEQ[Math.min(input.clickNumber-1, FIB_SEQ.length-1)];
-  let nodes = [];
-  for(let i=1; i<=maxNodes; i++) {
-    let pos = calculatePosition(pattern, i, maxNodes);
-    let col = C[(i + input.clickNumber) % C.length];
-    let icon = I[i % I.length].i; 
-    nodes.push({i, ...pos, col, icon, sz: 35+Math.random()*15});
-  }
-  return nodes;
+function resolveSingularity() {
+    closeMandala();
+    const card = document.getElementById('singularity-card');
+    document.getElementById('singularity-intent').innerHTML = Object.entries(intentSelections).map(([k, v]) => `<strong>${k.toUpperCase()}:</strong> ${v}`).join(' &nbsp;|&nbsp; ');
+    
+    // Event.js KOMUTE Logic
+    const where = intentSelections.where || 'Park';
+    document.getElementById('singularity-komute').href = `https://www.google.com/maps/search/${encodeURIComponent(where)}`;
+    
+    card.classList.add('active');
+    if(navigator.vibrate) navigator.vibrate([100, 50, 100]);
 }
 
-function connectNodes(nodes) {
-  let pth = "";
-  nodes.forEach((nd, i) => { pth += `${i===0?'M':'L'}${nd.x+600},${nd.y+600} `; });
-  return pth;
+function closeSingularity() {
+    document.getElementById('singularity-card').classList.remove('active');
+    document.getElementById('golden-dot').classList.remove('bloom');
+    intentSelections = {};
 }
 
-function animateNodes(nodesData, parentInput) {
-  nodesData.forEach((nd, idx) => {
-    let d = document.createElement('div'); d.className='node'; 
-    d.style.cssText=`--x:${nd.x}px;--y:${nd.y}px;--z:${nd.z}px;color:${nd.col};width:${nd.sz}px;height:${nd.sz}px;font-size:${nd.sz*.5}px;border-width:2px;background:#0f172a;animation-delay:${idx*60}ms`;
-    d.innerText = nd.icon;
-    
-    d.dataset.maj = "true";
-    d.dataset.icon = nd.icon;
-    d.dataset.meaning = parentInput.selectedMeaning + " > " + nd.icon;
-    d.dataset.clickNum = parentInput.clickNumber + 1;
-    
-    h.appendChild(d);
-  });
+// THE BRIDGE: Feeds the 5W1H intent into the old Zen Search logic
+function searchMeshFromIntent() {
+    const query = Object.values(intentSelections).join(' ');
+    closeSingularity();
+    triggerSearch(query);
 }
-
-function renderUniverse(svgPath, nodesData, input) {
-  h.innerHTML=`<svg><path id="l" stroke="rgba(16,185,129,0.4)" stroke-width="1.5" fill="none" d="${svgPath}"/></svg>`;
-  
-  let center = document.createElement('div'); center.className='node';
-  center.style.cssText=`--x:0px;--y:0px;--z:0px;color:#d4af37;width:60px;height:60px;font-size:30px;border-width:0px;background:transparent;`;
-  center.innerText = "☀️";
-  center.dataset.isc = "true"; 
-  h.appendChild(center);
-  
-  animateNodes(nodesData, input);
-}
-
-function generateDesign(input) {
-  g.innerHTML = `✨ Evolving Pattern [Step ${input.clickNumber}] • Double tap to collapse`;
-  S_state = input.clickNumber;
-  
-  let currentNodes = document.querySelectorAll('.node');
-  currentNodes.forEach(n => n.classList.add('collapse'));
-  let svgEl = document.querySelector('svg');
-  if(svgEl) svgEl.style.opacity = 0;
-
-  clearTimeout(evolveTimer);
-  evolveTimer = setTimeout(() => {
-    let pattern = selectPattern(input);
-    let nodesData = generateNodes(pattern, input);
-    let path = connectNodes(nodesData);
-    renderUniverse(path, nodesData, input);
-  }, 500);
-}
-
-window.build = S => {
-  clearTimeout(evolveTimer);
-  S_state = S;
-  
-  if(S === 0) {
-    z = 1; tz = 1; rx = 0; ry = 0; 
-    h.innerHTML = `<div class="node seed" data-isc="true" style="--x:0px;--y:0px;--z:0px;"></div>`;
-    g.innerHTML = "✨ Touch the Golden Seed to Awaken";
-    return;
-  }
-
-  h.innerHTML='<svg><path id="l" stroke="rgba(16,185,129,0.4)" stroke-width="1.5" fill="none"/></svg>';
-  let pth="";
-  
-  // Dynamically calculate max bounds based on JSON data length
-  let totalNodes = 150 + CAT.length;
-  
-  for(let i=0; i<=totalNodes; i++){
-    let isC=!i, out=i>150, idx=out?i-151:i;
-    // Perfect radial spacing based on number of dynamic categories
-    let a = out ? idx * (Math.PI * 2 / CAT.length) : i * 137.508 * Math.PI / 180; 
-    let r = isC ? 0 : (out ? 280 : 16*Math.sqrt(i));
-    let x = r*Math.cos(a), y = r*Math.sin(a), z3d = out ? 0 : Math.sin(r/40)*60;
-    
-    if(!isC) pth+=`${i==1?'M':'L'}${x+600},${y+600} `;
-
-    let sz = isC ? 55 : (out ? 45 : 8);
-    let col = C[idx % 8];
-    let ring = out || isC; 
-    
-    let d = document.createElement('div'); d.className='node'; 
-    d.style.cssText=`--x:${x}px;--y:${y}px;--z:${z3d}px;color:${col};width:${sz}px;height:${sz}px;font-size:${sz*.5}px;border-width:${ring?2:0}px;background:${ring?'#0f172a':col};`;
-    
-    d.innerText = isC ? "🌍" : (out ? CAT[idx].i : "");
-    
-    d.dataset.isc = isC;
-    d.dataset.out = out;
-    d.dataset.idx = idx;
-    
-    h.appendChild(d);
-  } 
-  h.querySelector('#l').setAttribute('d',pth);
-  g.innerHTML = "✨ Step 1: Earth Matrix • Click an outer node to evolve";
-};
 
 // ==========================================
-// ROBUST GLOBAL EVENT DELEGATION & DOUBLE TAP
+// 3. UTILS & INIT
 // ==========================================
-window.onpointerdown = e => {
-  let now = Date.now();
-  if(now - lastTap < 350) {
-    if(S_state > 0) build(0); // Double Tap Collapse
-    lastTap = 0;
-    return;
-  }
-  lastTap = now;
-  
-  drag = 1; isDragging = false;
-  lx = e.clientX; ly = e.clientY;
-  startX = lx; startY = ly;
+window.toggleTheme = () => document.documentElement.setAttribute('data-theme', document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+window.switchView = (viewId, navElement) => {
+    if (navElement) { document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active')); navElement.classList.add('active'); }
+    document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+    document.getElementById(`view-${viewId}`).classList.add('active');
 };
-
-window.onpointermove = e => {
-  if(!drag) return;
-  let dx = e.clientX - lx, dy = e.clientY - ly;
-  
-  if(Math.abs(e.clientX - startX) > 5 || Math.abs(e.clientY - startY) > 5) isDragging = true;
-  
-  if(S_state === 0 || e.shiftKey) { px += dx; py += dy; } 
-  else { ry += dx * .4; rx -= dy * .4; }
-  
-  lx = e.clientX; ly = e.clientY;
-  upd();
+window.openViewer = (url, title) => {
+    document.getElementById('viewer-title').innerText = title;
+    const body = document.getElementById('viewer-body');
+    if (url.match(/\.(mp4|webm)$/i)) body.innerHTML = `<video src="${url}" controls autoplay style="max-width:100%; max-height:100%;"></video>`;
+    else body.innerHTML = `<iframe src="${url}"></iframe>`;
+    document.getElementById('viewer').classList.add('active');
 };
+window.closeViewer = () => { document.getElementById('viewer').classList.remove('active'); document.getElementById('viewer-body').innerHTML = ''; };
 
-window.onpointerup = e => {
-  drag = 0;
-  if(!isDragging) {
-    let n = e.target.closest('.node');
-    if(n) {
-      if(n.dataset.isc === "true") {
-         if(S_state === 0) { tz = getZoom(); build(1); } 
-         else { build(0); } 
-      } 
-      else if(n.dataset.out === "true") {
-         let idx = parseInt(n.dataset.idx);
-         // Dynamically pass the 1.json semantic meaning
-         generateDesign({ selectedIcon: CAT[idx].i, selectedMeaning: CAT[idx].n, clickNumber: 1, randomSeed: Math.floor(Math.random() * 1000) });
-      }
-      else if(n.dataset.maj === "true") {
-         generateDesign({ selectedIcon: n.dataset.icon, selectedMeaning: n.dataset.meaning, clickNumber: parseInt(n.dataset.clickNum), randomSeed: Math.floor(Math.random() * 1000) });
-      }
-    }
-  }
-};
-
-const upd = ()=>h.style.transform=`translate(${px}px,${py}px) scale(${z}) rotateX(${rx}deg) rotateY(${ry}deg)`;
-window.onwheel = e => { tz = Math.max(0.1, tz - e.deltaY * .002); upd(); };
-setInterval(() => { if(!drag && S_state > 0){ry+=0.15; rx+=0.05;} z+=(tz-z)*0.1; upd(); }, 16);
-
-// Start the sequence by fetching data
-bootstrap();
-</script></body></html>
+window.addEventListener('DOMContentLoaded', async () => {
+    await initNeo4j();
+});
+</script>
+</body>
+</html>
