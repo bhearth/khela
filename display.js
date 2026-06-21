@@ -176,5 +176,43 @@
         window.open(`upi://pay?pa=${CONFIG.upiID}&pn=EarthOrg&cu=INR`, '_blank');
     });
 
+// ==========================================
+// THE CONDUCTOR (Inside display.js)
+// ==========================================
+document.addEventListener('khela:bigbang:init', async () => {
+    // 1. Wake up the Math Engine (mesh.js)
+    const rootDomains = await KhelaMesh.initBigBang(); 
+    renderSolarSystem(rootDomains); // Uses symbol1.json for icons
+});
+
+// When user clicks a planet (e.g., 0.8 Sahyog)
+function onPlanetClick(domainCode) {
+    // 2. Wake up the Intent Loom (integral.js) & Math Engine
+    KhelaMesh.drillDown(domainCode).then(children => {
+        IntegralEngine.openLoom(children); // Shows the 5W1H Mandala
+    });
+}
+
+// When user finishes the 5W1H Mandala
+window.addEventListener('khela:intent:woven', async (e) => {
+    const intent = e.detail; // { where: 'varanasi', when: 'dawn', how: 'flute' }
+    
+    // 3. Fetch the Story (y.json) & Check Friction (u.json)
+    const story = await KhelaMesh.getNarrative(intent.code); // Calls y.json
+    
+    // 4. Wake up the Physical Router (event.js)
+    EventEngine.resolveSingularity(intent, story).then(card => {
+        renderSingularityCard(card); // Slides up the bottom sheet
+    });
+});
+
+// When user taps the Wiki button on the Singularity Card
+window.addEventListener('khela:wiki:summon', (e) => {
+    // 5. Wake up the Harvester (wiki.js)
+    const resources = WikiExtractor.fetchRelated(e.detail.code);
+    renderResourceOrbit(resources); // Shows Amazon Books / Wiki Links
+});
+
+    
     // Voice Engine
     const SpeechRecognition = window.SpeechRecognition || window.webkit
