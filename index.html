@@ -2,314 +2,288 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Khel.o | Pure UI/UX Prototype</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Khel.o | 1.json -> 3D Cosmos</title>
 <style>
-    /* 1. THE VOID (Mobile-First Canvas) */
-    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
-    body { 
-        background: #030406; color: #fff; font-family: system-ui, -apple-system, sans-serif; 
-        overflow: hidden; height: 100vh; width: 100vw; 
-    }
-    #void { position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
-
-    /* 2. THE SEED (State 0: The Dot) */
-    #dot {
-        width: 14px; height: 14px; background: #fbbf24; border-radius: 50%;
-        box-shadow: 0 0 30px 10px rgba(251,191,36,0.6);
-        position: absolute; z-index: 10; cursor: pointer;
-        animation: pulse 2.5s infinite ease-in-out;
-        transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    #dot.bloom { transform: scale(0); opacity: 0; pointer-events: none; }
-    @keyframes pulse {
-        0%, 100% { box-shadow: 0 0 30px 10px rgba(251,191,36,0.6); transform: scale(1); }
-        50% { box-shadow: 0 0 50px 20px rgba(251,191,36,0.9); transform: scale(1.2); }
-    }
-
-    /* 3. THE MANDALA (State 1: The Bloom) */
-    #mandala { position: absolute; width: 0; height: 0; opacity: 0; transition: opacity 1s ease; }
-    #mandala.active { opacity: 1; }
+    body { margin: 0; overflow: hidden; background: #030406; font-family: system-ui, sans-serif; color: #fff; }
+    #canvas-container { position: absolute; inset: 0; }
+    #labels-container { position: absolute; inset: 0; pointer-events: none; }
     
-    .node {
-        position: absolute; width: 75px; height: 75px;
-        background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(251,191,36,0.2);
-        border-radius: 50%; display: flex; flex-direction: column;
-        align-items: center; justify-content: center;
-        transform: translate(-50%, -50%) scale(0); /* Start at center, invisible */
-        transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s, border-color 0.3s, background 0.3s;
-        cursor: pointer; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-    }
-    .node.bloom { transform: translate(var(--x), var(--y)) scale(1); } /* Bloom to polar coordinates */
-    .node:active { background: rgba(251,191,36,0.2); border-color: #fbbf24; }
-    .node.dim { opacity: 0.2; pointer-events: none; transform: translate(var(--x), var(--y)) scale(0.8); }
+    /* HUD */
+    #hud { position: absolute; top: 20px; left: 20px; z-index: 10; pointer-events: none; }
+    #hud h1 { font-size: 1.2rem; letter-spacing: 2px; color: #fbbf24; margin: 0; }
+    #hud p { font-size: 0.7rem; color: #94a3b8; margin: 4px 0 0; letter-spacing: 1px; }
     
-    .node-icon { font-size: 28px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5)); }
-    .node-word { font-size: 8px; letter-spacing: 1.5px; color: rgba(251,191,36,0.8); font-weight: 600; margin-top: 4px; text-transform: uppercase;}
-
-    /* 4. THE JUMBLER (The Subconscious Left Edge) */
-    #jumbler {
-        position: fixed; left: 16px; top: 50%; transform: translateY(-50%) rotate(-90deg);
-        transform-origin: left center;
-        font-family: monospace; font-size: 12px; letter-spacing: 4px; color: rgba(20, 184, 166, 0.4);
-        opacity: 0; transition: opacity 1s ease 0.5s; pointer-events: none; white-space: nowrap;
+    /* 3D Labels */
+    .node-label {
+        position: absolute; pointer-events: auto; cursor: pointer;
+        transform: translate(-50%, -50%); text-align: center;
+        transition: transform 0.2s, opacity 0.3s;
+        text-shadow: 0 0 10px rgba(0,0,0,0.8);
     }
-    #jumbler.active { opacity: 1; }
-
-    /* 5. THE SINGULARITY SHEET (State 2: The Action Hub) */
-    #sheet {
-        position: fixed; bottom: 0; left: 0; right: 0;
-        background: rgba(15, 23, 42, 0.92); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
-        border-top: 1px solid rgba(251,191,36,0.2);
-        border-radius: 32px 32px 0 0; padding: 24px 24px 40px;
-        transform: translateY(100%); transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-        z-index: 100; text-align: center;
-        box-shadow: 0 -15px 50px rgba(0,0,0,0.8);
-    }
-    #sheet.active { transform: translateY(0); }
+    .node-label:hover { transform: translate(-50%, -50%) scale(1.2); }
+    .node-label .icon { font-size: 24px; display: block; }
+    .node-label .name { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #e2e8f0; font-weight: 600; }
+    .node-label .code { font-size: 8px; color: #fbbf24; font-family: monospace; }
     
-    .sheet-handle { width: 40px; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; margin: 0 auto 20px; }
-    
-    .sheet-header { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 16px; }
-    .sheet-icon { font-size: 36px; }
-    .sheet-title { font-size: 1.2rem; font-weight: 700; color: #fbbf24; font-family: monospace; letter-spacing: 2px; min-width: 120px; text-align: left;}
-    
-    .sheet-story { font-size: 0.95rem; color: #94a3b8; line-height: 1.6; margin-bottom: 24px; font-style: italic; min-height: 50px; padding: 0 10px;}
-
-    .sheet-actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; max-width: 400px; margin: 0 auto; }
-    .action-btn {
-        aspect-ratio: 1; border-radius: 20px;
-        background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
-        font-size: 28px; display: flex; flex-direction: column; align-items: center; justify-content: center;
-        cursor: pointer; transition: 0.2s; gap: 6px;
-    }
-    .action-btn span { font-size: 9px; color: #64748b; letter-spacing: 1px; font-weight: 600; }
-    .action-btn:active { transform: scale(0.9); background: rgba(251,191,36,0.15); border-color: #fbbf24; }
+    /* Loading State */
+    #loader { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: #030406; z-index: 100; transition: opacity 1s; }
+    #loader.hidden { opacity: 0; pointer-events: none; }
 </style>
 </head>
 <body>
 
-<div id="void">
-    <!-- The Seed -->
-    <div id="dot"></div>
+<div id="canvas-container"></div>
+<div id="labels-container"></div>
 
-    <!-- The Mandala -->
-    <div id="mandala"></div>
-
-    <!-- The Jumbler -->
-    <div id="jumbler">khel.o • sa.hyog • ba.ej • dis-play • ko.mute</div>
-
-    <!-- The Singularity Sheet -->
-    <div id="sheet">
-        <div class="sheet-handle"></div>
-        <div class="sheet-header">
-            <div class="sheet-icon" id="sheet-icon">🌱</div>
-            <div class="sheet-title" id="sheet-title">SAHYOG</div>
-        </div>
-        <div class="sheet-story" id="sheet-story">Strangers arrive at a park, carrying the heavy weight of their digital lives. Someone begins to clap a simple rhythm. Another joins. Within minutes, fifty people are moving as one organism. The ego dissolves; the village is born.</div>
-        <div class="sheet-actions">
-            <button class="action-btn" id="act-dice">🎲<span>Dice</span></button>
-            <button class="action-btn" id="act-wiki">📚<span>Wiki</span></button>
-            <button class="action-btn" id="act-map">🗺️<span>Komute</span></button>
-            <button class="action-btn" id="act-seed">🌱<span>Seed</span></button>
-        </div>
-    </div>
+<div id="hud">
+    <h1>🌌 KHEL.O / APHELION</h1>
+    <p>Fetching 1.json... Mapping 10D Vectors to 3D Physics...</p>
 </div>
 
+<div id="loader">
+    <p style="color: #fbbf24; letter-spacing: 4px;">AWAKENING THE MESH...</p>
+</div>
+
+<!-- Three.js & OrbitControls -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
 <script>
-    // ==========================================
-    // 1. DUMMY DATA (The 8 Root Domains)
-    // ==========================================
-    const DOMAINS = [
-        { id: '0.1', name: 'Individual', icon: '🧠', story: 'An elder sits with a child, not to teach, but to wonder aloud about the stars. The child asks a question that has no answer, and together they build a telescope from scrap.' },
-        { id: '0.2', name: 'Samajh', icon: '🤝', story: 'A grandmother weaves a basket while singing a song that contains the exact migratory patterns of birds. A teenager records the song, not for digital views, but to ensure the birds are never lost.' },
-        { id: '0.3', name: 'Econology', icon: '🌍', story: 'A coffee shop gives its spent grounds to a mushroom farmer. The farmer gives the spent substrate to a community garden. The garden feeds the shop. The circle closes; the earth breathes.' },
-        { id: '0.4', name: 'Earth Eng', icon: '🏗️', story: 'A community needs to route a new water channel. They do not vote; they walk the land together, feel the slope of the earth, and reach a consensus that mirrors the gravity of the water.' },
-        { id: '0.5', name: 'Discovery', icon: '🔭', story: 'Two strangers meet at a garden. One knows how to graft fruit trees; the other knows how to code irrigation sensors. By sunset, they have taught each other, and the yield is forever changed.' },
-        { id: '0.6', name: 'Innovation', icon: '💡', story: 'A farmer 3D prints a replacement gear for a 50-year-old tractor using a design shared by a mechanic in another continent. The global supply chain is bypassed; the local community is empowered.' },
-        { id: '0.8', name: 'Sahyog', icon: '🌱', story: 'Strangers arrive at a park, carrying the heavy weight of their digital lives. Someone begins to clap a simple rhythm. Another joins. Within minutes, fifty people are moving as one organism. The ego dissolves.' },
-        { id: '0.9', name: 'Mukti', icon: '🕊️', story: 'A young man, restless and disconnected, learns to forge iron. He spends his frustration shaping a complex, beautiful gate for the local school. Every time the children walk through it, they touch his healed mind.' }
-    ];
+/**
+ * THE BRIDGE: 1.json -> Three.js Physics
+ * Zero Hardcoded Data. Pure Mathematical Mapping.
+ */
+const FIB_SEQ = [1, 2, 3, 5, 8, 13, 21, 34];
+const FIB_SCALE = 45;
+const ICONS = ['🧠', '🤝', '🌍', '🏗️', '🔭', '💡', '🌱', '🕊️']; // Map to 0.1 -> 0.9
 
-    // ==========================================
-    // 2. AUDIO & HAPTIC ENGINE (The Physical Feel)
-    // ==========================================
-    const AudioHaptic = {
-        ctx: null,
-        init() { if(!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); },
-        playTone(freq, duration, type = 'sine') {
-            try {
-                this.init();
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                osc.type = type; osc.frequency.value = freq;
-                gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
-                osc.connect(gain); gain.connect(this.ctx.destination);
-                osc.start(); osc.stop(this.ctx.currentTime + duration);
-            } catch(e) {}
-        },
-        vibrate(pattern) { if(navigator.vibrate) navigator.vibrate(pattern); }
-    };
+let scene, camera, renderer, controls;
+let bodies = []; // Stores { mesh, label, data }
+let raycaster, mouse;
 
-    // ==========================================
-    // 3. UI STATE MACHINE
-    // ==========================================
-    const dot = document.getElementById('dot');
-    const mandala = document.getElementById('mandala');
-    const jumbler = document.getElementById('jumbler');
-    const sheet = document.getElementById('sheet');
-    let isBloomed = false;
+// ==========================================
+// 1. THE MATH ENGINE (Vector -> Visuals)
+// ==========================================
+function vectorToColor(v) {
+    // v[3]=Prakriti(Nature/Green), v[6]=Shaurya(Courage/Red), v[7]=Viveka(Wisdom/Blue)
+    const r = Math.floor(((v[6] + 1) / 2) * 255);
+    const g = Math.floor(((v[3] + 1) / 2) * 255);
+    const b = Math.floor(((v[7] + 1) / 2) * 255);
+    return new THREE.Color(`rgb(${r},${g},${b})`);
+}
 
-    // --- STATE 0: THE DOT ---
-    dot.addEventListener('click', () => {
-        if (isBloomed) return;
-        isBloomed = true;
+function vectorToSize(v) {
+    // v[9]=Seva(Service) determines mass/size
+    return 1.5 + Math.abs(v[9]) * 2.5; 
+}
+
+function vectorToSpeed(v) {
+    // v[8]=Mukti(Liberation) determines orbital velocity
+    return 0.002 + Math.abs(v[8]) * 0.008;
+}
+
+// ==========================================
+// 2. INITIALIZATION & FETCH
+// ==========================================
+async function init() {
+    // Setup Three.js
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, 0.1, 10000);
+    camera.position.set(0, 150, 250);
+    
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(innerWidth, innerHeight);
+    document.getElementById('canvas-container').appendChild(renderer.domElement);
+    
+    controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.minDistance = 50;
+    controls.maxDistance = 800;
+    
+    // Lighting
+    scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+    const sunLight = new THREE.PointLight(0xffaa33, 2, 1000);
+    scene.add(sunLight);
+    
+    // Center Core (The Sun / 100 Day Launcher)
+    const coreGeo = new THREE.SphereGeometry(8, 32, 32);
+    const coreMat = new THREE.MeshBasicMaterial({ color: 0xffaa33 });
+    const core = new THREE.Mesh(coreGeo, coreMat);
+    scene.add(core);
+
+    // Raycaster for Clicks
+    raycaster = new THREE.Raycaster();
+    mouse = new THREE.Vector2();
+    renderer.domElement.addEventListener('click', onClick);
+    window.addEventListener('resize', onResize);
+
+    // FETCH 1.json
+    try {
+        const response = await fetch('1.json');
+        const json = await response.json();
+        generateCosmos(json.domains);
+        document.getElementById('loader').classList.add('hidden');
+        animate();
+    } catch (e) {
+        console.error("Failed to load 1.json. Ensure it's in the same directory.", e);
+        document.getElementById('loader').innerHTML = '<p style="color:red;">Error loading 1.json</p>';
+    }
+}
+
+// ==========================================
+// 3. GENERATE THE 3D COSMOS
+// ==========================================
+function generateCosmos(domains) {
+    const keys = Object.keys(domains);
+    const userLang = navigator.language.split('-')[0]; // e.g., 'hi', 'zh', 'en'
+
+    keys.forEach((key, index) => {
+        const d = domains[key];
+        const fibIdx = index; 
+        const radius = FIB_SEQ[fibIdx] * FIB_SCALE;
         
-        AudioHaptic.vibrate([50, 30, 100]);
-        AudioHaptic.playTone(400, 0.6, 'sine');
+        // Math Mapping
+        const size = vectorToSize(d.vector);
+        const color = vectorToColor(d.vector);
+        const speed = vectorToSpeed(d.vector);
+        const angle = Math.random() * Math.PI * 2; // Random starting position
 
-        dot.classList.add('bloom');
+        // Create 3D Planet
+        const geo = new THREE.SphereGeometry(size, 32, 32);
+        const mat = new THREE.MeshStandardMaterial({ 
+            color: color, 
+            roughness: 0.6, 
+            metalness: 0.3,
+            emissive: color,
+            emissiveIntensity: 0.2
+        });
+        const mesh = new THREE.Mesh(geo, mat);
         
-        setTimeout(() => {
-            mandala.classList.add('active');
-            jumbler.classList.add('active');
-            bloomNodes();
-            startJumbler();
-        }, 300);
+        // Orbit Ring (Visual guide)
+        const ringGeo = new THREE.RingGeometry(radius - 0.2, radius + 0.2, 128);
+        const ringMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.05, side: THREE.DoubleSide });
+        const ring = new THREE.Mesh(ringGeo, ringMat);
+        ring.rotation.x = Math.PI / 2;
+        scene.add(ring);
+
+        // Position
+        mesh.position.set(radius * Math.cos(angle), 0, radius * Math.sin(angle));
+        scene.add(mesh);
+
+        // Create HTML Label (Multi-lingual)
+        const labelName = d.languages[userLang] || d.languages['en'] || d.name;
+        const label = document.createElement('div');
+        label.className = 'node-label';
+        label.innerHTML = `
+            <span class="icon">${ICONS[index] || '✨'}</span>
+            <span class="name">${labelName}</span>
+            <span class="code">${key}</span>
+        `;
+        label.addEventListener('click', () => triggerSingularity(d, key));
+        document.getElementById('labels-container').appendChild(label);
+
+        // Store Data
+        mesh.userData = { domainData: d, code: key };
+        bodies.push({
+            mesh, label, data: d, code: key,
+            radius, angle, speed, size
+        });
     });
+}
 
-    // --- STATE 1: THE BLOOM ---
-    function bloomNodes() {
-        const radius = Math.min(window.innerWidth, window.innerHeight) * 0.32;
+// ==========================================
+// 4. ANIMATION LOOP & LABEL PROJECTION
+// ==========================================
+function animate() {
+    requestAnimationFrame(animate);
+    
+    const v = new THREE.Vector3();
+
+    bodies.forEach(b => {
+        // Orbital Physics
+        b.angle += b.speed;
+        b.mesh.position.x = b.radius * Math.cos(b.angle);
+        b.mesh.position.z = b.radius * Math.sin(b.angle);
+        b.mesh.rotation.y += 0.005;
+
+        // Project 3D to 2D for HTML Labels
+        v.setFromMatrixPosition(b.mesh.matrixWorld);
+        v.project(camera);
         
-        DOMAINS.forEach((domain, index) => {
-            const angle = (index / DOMAINS.length) * Math.PI * 2 - (Math.PI / 2); // Start from top
-            const x = Math.cos(angle) * radius;
-            const y = Math.sin(angle) * radius;
-
-            const node = document.createElement('div');
-            node.className = 'node';
-            node.style.setProperty('--x', `${x}px`);
-            node.style.setProperty('--y', `${y}px`);
-            node.style.transitionDelay = `${index * 0.06}s`; // Staggered organic bloom
-            
-            node.innerHTML = `
-                <div class="node-icon">${domain.icon}</div>
-                <div class="node-word">${domain.name}</div>
-            `;
-
-            node.addEventListener('click', () => selectDomain(domain, node));
-            mandala.appendChild(node);
-            
-            // Trigger animation
-            setTimeout(() => node.classList.add('bloom'), 50);
-        });
-    }
-
-    // --- STATE 2: THE SINGULARITY SHEET ---
-    function selectDomain(domain, selectedNode) {
-        AudioHaptic.vibrate(30);
-        AudioHaptic.playTone(600, 0.2, 'triangle');
-
-        // Dim other nodes
-        document.querySelectorAll('.node').forEach(n => {
-            if (n !== selectedNode) n.classList.add('dim');
-        });
-
-        // Update Sheet Content
-        document.getElementById('sheet-icon').innerText = domain.icon;
-        document.getElementById('sheet-story').innerText = domain.story;
+        const x = (v.x * 0.5 + 0.5) * innerWidth;
+        const y = (v.y * -0.5 + 0.5) * innerHeight;
         
-        // Jumbler effect on the title
-        const titleEl = document.getElementById('sheet-title');
-        const target = domain.name.toUpperCase();
-        let frame = 0;
-        const chars = '!<>-_\\/[]{}—=+*^?#~';
-        const interval = setInterval(() => {
-            let out = '';
-            for(let i=0; i<target.length; i++) {
-                if(i < frame) out += target[i];
-                else out += chars[Math.floor(Math.random() * chars.length)];
-            }
-            titleEl.textContent = out;
-            frame += 0.8;
-            if(frame >= target.length) { titleEl.textContent = target; clearInterval(interval); }
-        }, 40);
-
-        // Slide up sheet
-        sheet.classList.add('active');
-    }
-
-    // Close sheet on background tap
-    document.getElementById('void').addEventListener('click', (e) => {
-        if (sheet.classList.contains('active') && !e.target.closest('#sheet') && !e.target.closest('.node') && !e.target.closest('#dot')) {
-            closeSheet();
+        // Hide if behind camera
+        if (v.z > 1) {
+            b.label.style.opacity = '0';
+        } else {
+            b.label.style.opacity = '1';
+            b.label.style.transform = `translate(-50%, -50%) translate(${x}px, ${y - (b.size * 15 + 20)}px)`;
         }
     });
 
-    function closeSheet() {
-        AudioHaptic.playTone(400, 0.2, 'triangle');
-        sheet.classList.remove('active');
-        document.querySelectorAll('.node.dim').forEach(n => n.classList.remove('dim'));
+    controls.update();
+    renderer.render(scene, camera);
+}
+
+// ==========================================
+// 5. INTERACTION (The Bridge to event.js)
+// ==========================================
+function onClick(event) {
+    mouse.x = (event.clientX / innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / innerHeight) * 2 + 1;
+    raycaster.setFromCamera(mouse, camera);
+    
+    const meshes = bodies.map(b => b.mesh);
+    const intersects = raycaster.intersectObjects(meshes);
+    
+    if (intersects.length > 0) {
+        const data = intersects[0].object.userData.domainData;
+        const code = intersects[0].object.userData.code;
+        triggerSingularity(data, code);
     }
+}
 
-    // ==========================================
-    // 4. THE JUMBLER ENGINE (Subconscious)
-    // ==========================================
-    function startJumbler() {
-        const words = ['khel.o', 'sa.hyog', 'ba.ej', 'dis-play', 'ko.mute'];
-        const chars = '!<>-_\\/[]{}—=+*^?#~';
-        let idx = 0;
-        
-        const run = () => {
-            const target = words[idx];
-            idx = (idx + 1) % words.length;
-            let frame = 0;
-            
-            const interval = setInterval(() => {
-                let out = '';
-                for(let i=0; i<target.length; i++) {
-                    if(i < frame) out += target[i];
-                    else out += chars[Math.floor(Math.random() * chars.length)];
-                }
-                jumbler.textContent = out;
-                frame += 0.6;
-                
-                if(frame >= target.length) {
-                    jumbler.textContent = target;
-                    clearInterval(interval);
-                    setTimeout(run, 2500);
-                }
-            }, 50);
-        };
-        run();
+function triggerSingularity(domainData, code) {
+    console.log(`[Khela] Singularity Locked: ${code} -> ${domainData.name}`);
+    
+    // Fire the Event Bus for integral.js / event.js to catch
+    window.dispatchEvent(new CustomEvent('khela:planet:focus', { 
+        detail: { 
+            code: code, 
+            name: domainData.name,
+            vector: domainData.vector,
+            languages: domainData.languages
+        } 
+    }));
+
+    // Visual Feedback (Camera Fly-in)
+    const target = bodies.find(b => b.code === code);
+    if(target) {
+        const pos = target.mesh.position;
+        const offset = target.size * 6;
+        // Simple smooth transition
+        const startPos = camera.position.clone();
+        const endPos = new THREE.Vector3(pos.x + offset, pos.y + offset, pos.z + offset);
+        let t = 0;
+        const flyInterval = setInterval(() => {
+            t += 0.02;
+            if(t >= 1) { clearInterval(flyInterval); return; }
+            camera.position.lerpVectors(startPos, endPos, t);
+            controls.target.lerp(pos, t);
+        }, 16);
     }
+}
 
-    // ==========================================
-    // 5. ACTION BUTTONS (Dummy Flow)
-    // ==========================================
-    document.getElementById('act-dice').addEventListener('click', () => {
-        AudioHaptic.vibrate([50, 50, 100]);
-        AudioHaptic.playTone(800, 0.3, 'square');
-        document.getElementById('sheet-story').innerText = '🎲 "Plant a seed where you stand today. The soil is waiting."';
-    });
+function onResize() {
+    camera.aspect = innerWidth / innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(innerWidth, innerHeight);
+}
 
-    document.getElementById('act-wiki').addEventListener('click', () => {
-        AudioHaptic.playTone(1000, 0.2);
-        document.getElementById('sheet-story').innerText = '📚 Opening the Kids Wiki knowledge mesh...';
-    });
-
-    document.getElementById('act-map').addEventListener('click', () => {
-        AudioHaptic.playTone(700, 0.2);
-        document.getElementById('sheet-story').innerText = '🗺️ Calculating KOMUTE route to nearest assembly point...';
-    });
-
-    document.getElementById('act-seed').addEventListener('click', () => {
-        AudioHaptic.playTone(500, 0.4, 'sine');
-        document.getElementById('sheet-story').innerText = '🌱 Seed planted. Your intention is now part of the mesh.';
-    });
-
+// BOOT
+init();
 </script>
 </body>
 </html>
