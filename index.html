@@ -1,219 +1,125 @@
-/**
- * THE MAPPING ENGINE (The Bridge)
- * Connects the 3D Physics of v4.html to the Zetta-Byte JSON Mesh.
- * Pure Math. Pure Fetch. Zero Hardcoded Strings.
- */
-const MeshMapper = (function() {
-    'use strict';
-
-    const GITHUB_BASE = 'https://bhearth.github.io/khela/';
-    const FIB_SEQ = [1, 2, 3, 5, 8, 13, 21, 34, 55, 89];
-    const FIB_SCALE = 46;
-
-    let scene, camera, renderer, controls, bodies = [], labels = [];
-    let meshData = { domains: {}, symbols: {}, stories: {} };
-
-    // ==========================================
-    // 1. THE FETCHER (Loading the Soul)
-    // ==========================================
-    async function loadMesh() {
-        console.log("[MeshMapper] Awakening the Mesh...");
-        try {
-            const [res1, res2, res3] = await Promise.all([
-                fetch(`${GITHUB_BASE}1.json`).then(r => r.json()),
-                fetch(`${GITHUB_BASE}symbol1.json`).then(r => r.json()),
-                fetch(`${GITHUB_BASE}y.json`).then(r => r.json())
-            ]);
-            
-            meshData.domains = res1.domains;
-            meshData.symbols = flattenSymbols(res2); // Flatten for O(1) lookup
-            meshData.stories = res3;
-            
-            console.log("[MeshMapper] Soul Loaded. Generating Physics...");
-            generateUniverse();
-        } catch (e) {
-            console.error("[MeshMapper] Mesh connection failed.", e);
-        }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Khel.o | The Dot</title>
+<style>
+    /* 1. THE VOID (Mobile-First Canvas) */
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
+    body { 
+        background: #030406; color: #fff; font-family: system-ui, -apple-system, sans-serif; 
+        overflow: hidden; height: 100vh; width: 100vw; touch-action: none;
     }
 
-    // Flatten symbol1.json categories into a single searchable map
-    function flattenSymbols(symbolJSON) {
-        const map = {};
-        Object.values(symbolJSON.categories).forEach(cat => {
-            cat.symbols.forEach(sym => {
-                map[sym.name] = sym.icon;
-                sym.tags.forEach(tag => { if(!map[tag]) map[tag] = sym.icon; });
-            });
-        });
-        return map;
+    /* 2. THE SEED (State 0: The 10px Golden Dot) */
+    #seed {
+        position: absolute; top: 50%; left: 50%; width: 14px; height: 14px;
+        background: #fbbf24; border-radius: 50%;
+        box-shadow: 0 0 20px 8px rgba(251,191,36,0.6);
+        transform: translate(-50%, -50%);
+        transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+        z-index: 100; cursor: pointer;
+        animation: seedPulse 3s infinite;
+    }
+    #seed.bloom { transform: translate(-50%, -50%) scale(0); opacity: 0; pointer-events: none; }
+    @keyframes seedPulse {
+        0%, 100% { box-shadow: 0 0 20px 8px rgba(251,191,36,0.6); }
+        50% { box-shadow: 0 0 40px 15px rgba(251,191,36,0.9); }
     }
 
-    // ==========================================
-    // 2. THE MATH (Vector -> 3D Physics)
-    // ==========================================
-    /**
-     * Maps the 10D Dharma Vector from 1.json to Three.js Visuals.
-     * Vector: [Ahimsa, Satya, Aparigraha, Prakriti, Rta, Vinaya, Shaurya, Viveka, Mukti, Seva]
-     */
-    function vectorToVisuals(vector) {
-        // 1. COLOR: Map first 3 vectors (Ahimsa, Satya, Aparigraha) to RGB (0-255)
-        // Formula: Normalize (-1 to 1) -> (0 to 255)
-        const r = Math.floor(((vector[0] + 1) / 2) * 255);
-        const g = Math.floor(((vector[1] + 1) / 2) * 255);
-        const b = Math.floor(((vector[2] + 1) / 2) * 255);
-        const color = new THREE.Color(`rgb(${r},${g},${b})`);
-
-        // 2. SIZE: Map 'Prakriti' (Nature - index 3) and 'Seva' (Service - index 9) to mass/size
-        const mass = Math.abs(vector[3]) + Math.abs(vector[9]); 
-        const size = 1.5 + (mass * 1.5); // Radius between 1.5 and 4.5
-
-        // 3. ORBIT SPEED: Map 'Mukti' (Liberation - index 8) to speed (Higher mukti = faster orbit)
-        const speed = 0.05 + (Math.abs(vector[8]) * 0.15);
-
-        return { color, size, speed };
+    /* 3. THE UNIVERSE (State 1: The Golden Angle Bloom) */
+    #universe {
+        position: absolute; top: 50%; left: 50%; width: 0; height: 0;
+        opacity: 0; transition: opacity 1.5s ease;
     }
+    #universe.active { opacity: 1; }
 
-    // ==========================================
-    // 3. THE GENERATOR (Building the 3D Cosmos)
-    // ==========================================
-    function generateUniverse() {
-        const domainKeys = Object.keys(meshData.domains);
-        
-        domainKeys.forEach((key, index) => {
-            const domain = meshData.domains[key];
-            const visuals = vectorToVisuals(domain.vector);
-            
-            // Calculate Fibonacci Orbit (from v4.html logic)
-            const fibIdx = index + 1;
-            const orbitRadius = FIB_SEQ[fibIdx] * FIB_SCALE;
-            const angle = Math.random() * Math.PI * 2; // Random starting position
-
-            // Create 3D Sphere (The Planet)
-            const geometry = new THREE.SphereGeometry(visuals.size, 32, 32);
-            const material = new THREE.MeshStandardMaterial({ 
-                color: visuals.color, 
-                roughness: 0.6, 
-                metalness: 0.3 
-            });
-            const planet = new THREE.Mesh(geometry, material);
-            
-            planet.position.set(
-                orbitRadius * Math.cos(angle),
-                0,
-                orbitRadius * Math.sin(angle)
-            );
-
-            // Attach Metadata for Interaction
-            planet.userData = {
-                code: key,
-                name: domain.name,
-                orbitRadius: orbitRadius,
-                angle: angle,
-                speed: visuals.speed,
-                vector: domain.vector
-            };
-
-            scene.add(planet);
-            bodies.push(planet);
-
-            // Create HTML Label (Using symbol1.json for O(1) Icon Fetch)
-            // We match the domain name to the closest symbol tag
-            const icon = findBestIcon(domain.name, domain.description);
-            createLabel(planet, icon, domain.languages.en);
-        });
-
-        // Start the Physics Loop
-        animate();
+    .node {
+        position: absolute; width: 70px; height: 70px;
+        background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(251,191,36,0.3);
+        border-radius: 50%; display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        transform: translate(-50%, -50%) scale(0);
+        transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s;
+        cursor: pointer; backdrop-filter: blur(8px);
     }
+    .node.bloom { transform: translate(var(--x), var(--y)) scale(1); }
+    .node:active { box-shadow: 0 0 30px rgba(251,191,36,0.8); border-color: #fbbf24; }
+    
+    .node-icon { font-size: 28px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+    .node-word { font-size: 8px; letter-spacing: 1px; color: rgba(251,191,36,0.8); font-weight: 600; margin-top: 2px; text-transform: uppercase;}
 
-    // O(1) Semantic Icon Matcher
-    function findBestIcon(name, desc) {
-        const keywords = `${name} ${desc}`.toLowerCase().split(/\s+/);
-        for (let kw of keywords) {
-            if (meshData.symbols[kw]) return meshData.symbols[kw];
-        }
-        return '🪐'; // Fallback
+    /* 4. THE SINGULARITY SHEET (State 2: The Action Hub) */
+    #sheet {
+        position: fixed; bottom: 0; left: 0; right: 0;
+        background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px);
+        border-top: 1px solid rgba(251,191,36,0.2);
+        border-radius: 32px 32px 0 0; padding: 24px 24px 40px;
+        transform: translateY(100%); transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        z-index: 200; text-align: center;
+        box-shadow: 0 -10px 40px rgba(0,0,0,0.8);
     }
+    #sheet.active { transform: translateY(0); }
+    
+    .sheet-header { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 20px; }
+    .sheet-icon { font-size: 36px; }
+    .sheet-title { font-size: 1.2rem; font-weight: 700; background: linear-gradient(90deg,#fbbf24,#14b8a6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-family: monospace; letter-spacing: 2px; min-width: 120px;}
+    
+    .sheet-story { font-size: 0.9rem; color: #94a3b8; line-height: 1.5; margin-bottom: 24px; font-style: italic; min-height: 40px;}
 
-    // ==========================================
-    // 4. THE PHYSICS LOOP (v4.html Animation)
-    // ==========================================
-    function animate() {
-        requestAnimationFrame(animate);
-        
-        bodies.forEach(planet => {
-            const d = planet.userData;
-            d.angle += d.speed * 0.005; // Orbital velocity
-            planet.position.x = d.orbitRadius * Math.cos(d.angle);
-            planet.position.z = d.orbitRadius * Math.sin(d.angle);
-            planet.rotation.y += 0.005; // Axial rotation
-        });
-
-        updateLabels();
-        controls.update();
-        renderer.render(scene, camera);
+    .sheet-actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; max-width: 400px; margin: 0 auto; }
+    .action-btn {
+        width: 100%; aspect-ratio: 1; border-radius: 20px;
+        background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+        font-size: 28px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+        cursor: pointer; transition: 0.2s; gap: 4px;
     }
+    .action-btn span { font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
+    .action-btn:active { transform: scale(0.9); background: rgba(251,191,36,0.2); border-color: #fbbf24; }
 
-    // ==========================================
-    // 5. THE INTERACTION BRIDGE (Calling event.js & y.json)
-    // ==========================================
-    function onPlanetClick(intersects) {
-        if (intersects.length > 0) {
-            const planet = intersects[0].object;
-            const data = planet.userData;
-            
-            console.log(`[MeshMapper] Singularity Locked: ${data.name} (${data.code})`);
-            
-            // 1. Trigger Camera Zoom (v4.html physics)
-            flyToPlanet(planet);
-
-            // 2. Fetch Story from y.json (The Narrative)
-            // We map the domain code to the closest Y-coordinate story
-            const storyKey = findStoryKey(data.code); 
-            const story = meshData.stories[storyKey] || meshData.stories['Y.8881']; // Fallback to Raga Yaman
-            
-            // 3. Dispatch Event to event.js (The Physical KOMUTE)
-            window.dispatchEvent(new CustomEvent('khela:planet:focus', { 
-                detail: { 
-                    code: data.code, 
-                    name: data.name,
-                    story: story.s, // The Story
-                    why: story.y    // The Purpose
-                } 
-            }));
-        }
+    /* 5. UPI OVERLAY */
+    #upi-overlay {
+        position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 300;
+        display: none; align-items: center; justify-content: center; flex-direction: column; gap: 20px;
     }
+    #upi-overlay.active { display: flex; }
+    #upi-overlay img { width: 200px; border-radius: 16px; border: 2px solid #14b8a6; }
+    #upi-overlay p { color: #14b8a6; font-family: monospace; }
+    #upi-overlay button { background: none; border: 1px solid #fff; color: #fff; padding: 10px 20px; border-radius: 20px; cursor: pointer;}
+</style>
+</head>
+<body>
 
-    function findStoryKey(domainCode) {
-        // Simple mapping logic: 0.8 (sahyog) -> Y.8881, 0.1 (individual) -> Y.1111
-        const map = { '0.8': 'Y.8881', '0.1': 'Y.1111', '0.3': 'Y.3111' };
-        return map[domainCode] || 'Y.8882';
-    }
+<!-- The Seed -->
+<div id="seed" role="button" aria-label="Awaken the Universe"></div>
 
-    // ==========================================
-    // 6. INITIALIZATION (The Big Bang)
-    // ==========================================
-    return {
-        init: function(threeScene, threeCamera, threeRenderer, threeControls) {
-            scene = threeScene;
-            camera = threeCamera;
-            renderer = threeRenderer;
-            controls = threeControls;
+<!-- The Universe -->
+<div id="universe"></div>
 
-            // Raycaster for Click Detection
-            const raycaster = new THREE.Raycaster();
-            const mouse = new THREE.Vector2();
+<!-- The Singularity Sheet -->
+<div id="sheet">
+    <div class="sheet-header">
+        <div class="sheet-icon" id="sheet-icon">✨</div>
+        <div class="sheet-title" id="sheet-title">KHEL.O</div>
+    </div>
+    <div class="sheet-story" id="sheet-story">Tap a node to discover its resonance.</div>
+    <div class="sheet-actions">
+        <button class="action-btn" id="act-dice" aria-label="Roll Dice">🎲<span>Dice</span></button>
+        <button class="action-btn" id="act-wiki" aria-label="Wiki Dive">📚<span>Wiki</span></button>
+        <button class="action-btn" id="act-map" aria-label="Komute Map">🗺️<span>Komute</span></button>
+        <button class="action-btn" id="act-seed" aria-label="Contribute">🌱<span>Seed</span></button>
+    </div>
+</div>
 
-            window.addEventListener('click', (event) => {
-                mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-                mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
-                raycaster.setFromCamera(mouse, camera);
-                const intersects = raycaster.intersectObjects(bodies);
-                onPlanetClick(intersects);
-            });
+<!-- UPI Overlay -->
+<div id="upi-overlay">
+    <img src="https://raw.githubusercontent.com/krishnabhearth-svg/Kraizen-Journal/main/upi%20pay%20qr%20code.jpeg" alt="UPI QR">
+    <p>krishna.bh.earth@upi</p>
+    <button onclick="document.getElementById('upi-overlay').classList.remove('active')">Close</button>
+</div>
 
-            // Trigger the Fetch & Build
-            loadMesh();
-        }
-    };
-})();
+<!-- The Genesis Engine -->
+<script src="display.js"></script>
+</body>
+</html>
