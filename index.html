@@ -3,263 +3,244 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Khel.o · Earth 00 OS</title>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <title>Khel.o - Baby Step 2: Jumbler & Display Bar</title>
     <style>
-        :root {
-            --bg: #030406;
-            --gold: #fbbf24;
-            --teal: #14b8a6;
-            --text: #e2e8f0;
-            --muted: #64748b;
+        /* 1. Core Universe Styling */
+        body { 
+            margin: 0; background: #030406; color: #fff; 
+            font-family: system-ui, -apple-system, sans-serif; overflow: hidden; 
+            height: 100vh; display: flex; align-items: center; justify-content: center; 
         }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
         
-        body {
-            background: var(--bg);
-            color: var(--text);
-            font-family: 'Inter', system-ui, sans-serif;
-            height: 100vh;
-            width: 100vw;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            touch-action: none;
+        /* 2. The Seed (The Dot) */
+        #seed {
+            width: 12px; height: 12px; background: #fbbf24; border-radius: 50%;
+            box-shadow: 0 0 20px 5px rgba(251, 191, 36, 0.6);
+            cursor: pointer; transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            animation: pulse 2s infinite;
+            position: absolute; z-index: 10;
+        }
+        #seed.exploded { transform: scale(0); opacity: 0; pointer-events: none; }
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 20px 5px rgba(251, 191, 36, 0.6); }
+            50% { box-shadow: 0 0 30px 10px rgba(251, 191, 36, 0.9); }
         }
 
-        /* The Central Sun (Hidden until Big Bang) */
-        #sun {
-            position: absolute;
-            width: 80px; height: 80px;
-            background: radial-gradient(circle, #fff 0%, var(--gold) 40%, #d97706 100%);
-            border-radius: 50%;
-            box-shadow: 0 0 60px 20px rgba(251, 191, 36, 0.3);
-            opacity: 0;
-            transform: scale(0);
-            transition: all 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-            z-index: 5;
+        /* 3. The Universe Container */
+        #universe {
+            position: absolute; width: 100%; height: 100%;
             display: flex; align-items: center; justify-content: center;
-            font-size: 32px;
+            opacity: 0; transition: opacity 1s ease; pointer-events: none;
         }
-        #sun.active { opacity: 1; transform: scale(1); }
+        #universe.active { opacity: 1; pointer-events: auto; }
 
-        /* The Orbiting Domain Nodes */
-        .domain-node {
-            position: absolute;
-            width: 90px; height: 90px;
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(8px);
-            border-radius: 50%;
-            display: flex; flex-direction: column;
+        /* 4. The Center (Sun/Core) */
+        #core {
+            width: 60px; height: 60px; 
+            background: radial-gradient(circle, #fff 0%, #fbbf24 40%, #d97706 100%);
+            border-radius: 50%; box-shadow: 0 0 40px 15px rgba(251, 191, 36, 0.4);
+            display: flex; align-items: center; justify-content: center; font-size: 24px;
+        }
+
+        /* 5. The 9 Root Nodes */
+        .root-node {
+            position: absolute; width: 80px; height: 80px;
+            background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 50%; display: flex; flex-direction: column;
             align-items: center; justify-content: center;
-            cursor: pointer;
-            opacity: 0;
-            transform: scale(0);
-            transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
-            z-index: 10;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            transform: scale(0); transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.3s, background 0.3s;
+            cursor: pointer; backdrop-filter: blur(5px);
         }
+        .root-node:hover { border-color: #fbbf24; background: rgba(251, 191, 36, 0.1); transform: scale(1.15) !important; }
+        .root-node .icon { font-size: 28px; margin-bottom: 4px; }
+        .root-node .label { font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: #94a3b8; }
+        .root-node.pop { transform: scale(1); }
+
+        /* ========================================== */
+        /* BABY STEP 2 ADDITIONS: JUMBLER & DISPLAY   */
+        /* ========================================== */
+
+        /* 6. The Jumbler (Left Side Subconscious) */
+        #jumbler {
+            position: fixed; left: 24px; top: 50%; transform: translateY(-50%);
+            display: flex; flex-direction: column; gap: 16px;
+            font-family: 'Courier New', monospace; font-size: 14px; font-weight: bold;
+            color: #14b8a6; letter-spacing: 2px;
+            opacity: 0; transition: opacity 1s ease 0.5s; pointer-events: none;
+            text-shadow: 0 0 10px rgba(20, 184, 166, 0.5);
+        }
+        #universe.active ~ #jumbler { opacity: 0.6; }
+        #jumbler:hover { opacity: 1; }
+
+        /* 7. The Display Bar (Bottom Singularity Card) */
+        #display-bar {
+            position: fixed; bottom: -100%; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 500px; 
+            background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 24px;
+            padding: 24px; z-index: 100;
+            transition: bottom 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+        }
+        #display-bar.active { bottom: 24px; }
         
-        .domain-node.active { opacity: 1; transform: scale(1); }
+        .db-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .db-title { font-size: 1.2rem; font-weight: 600; color: #fbbf24; display: flex; align-items: center; gap: 10px; }
+        .db-close { background: none; border: none; color: #94a3b8; font-size: 24px; cursor: pointer; }
         
-        .domain-node:hover {
-            border-color: var(--gold);
-            background: rgba(251, 191, 36, 0.1);
-            box-shadow: 0 0 30px rgba(251, 191, 36, 0.4);
-            transform: scale(1.15) !important;
+        .db-story { font-size: 0.95rem; line-height: 1.6; color: #e2e8f0; margin-bottom: 20px; font-style: italic; border-left: 2px solid #14b8a6; padding-left: 12px; }
+        
+        .db-komute {
+            display: block; width: 100%; padding: 14px; 
+            background: #14b8a6; color: #030406; border: none; border-radius: 12px;
+            font-size: 1rem; font-weight: 700; cursor: pointer; text-align: center;
+            transition: 0.2s; text-decoration: none;
         }
+        .db-komute:hover { background: #2dd4bf; transform: translateY(-2px); }
 
-        .domain-icon { font-size: 28px; margin-bottom: 4px; filter: drop-shadow(0 0 5px rgba(255,255,255,0.3)); }
-        .domain-name { 
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 10px; 
-            font-weight: 700;
-            letter-spacing: 1px; 
-            text-transform: uppercase; 
-            color: var(--text); 
-            text-align: center;
-            line-height: 1.2;
-        }
-        .domain-code {
-            font-size: 8px;
-            color: var(--teal);
-            margin-top: 2px;
-            font-family: monospace;
-        }
-
-        /* Orbital Rings (Visual flair) */
-        .orbit-ring {
-            position: absolute;
-            border: 1px dashed rgba(255, 255, 255, 0.05);
-            border-radius: 50%;
-            opacity: 0;
-            transition: opacity 2s ease;
-        }
-        .orbit-ring.active { opacity: 1; }
-
-        /* Status Text */
-        #status-text {
-            position: absolute;
-            top: 40px;
-            width: 100%;
-            text-align: center;
-            font-family: 'Space Grotesk', monospace;
-            font-size: 12px;
-            letter-spacing: 3px;
-            color: var(--muted);
-            text-transform: uppercase;
-            pointer-events: none;
-            transition: opacity 0.5s;
+        /* Mobile adjustments */
+        @media (max-width: 600px) {
+            #jumbler { left: 10px; font-size: 10px; gap: 10px; }
+            .root-node { width: 65px; height: 65px; }
+            .root-node .icon { font-size: 22px; }
+            .root-node .label { font-size: 7px; }
         }
     </style>
 </head>
 <body>
 
-    <div id="status-text">Awaiting the Seed...</div>
-    
-    <!-- The Central Sun -->
-    <div id="sun">☀️</div>
+    <!-- The Seed -->
+    <div id="seed" title="Touch the Seed to Awaken"></div>
 
-    <!-- Orbital Rings (Generated by JS) -->
-    <div id="rings-container"></div>
+    <!-- The Universe -->
+    <div id="universe">
+        <div id="core">☀️</div>
+    </div>
 
-    <!-- The Universe Container (Domains will be injected here) -->
-    <div id="universe"></div>
+    <!-- The Jumbler (Left Side) -->
+    <div id="jumbler">
+        <div class="j-word" data-target="khel.o"></div>
+        <div class="j-word" data-target="sa.hyog"></div>
+        <div class="j-word" data-target="ba.ej"></div>
+        <div class="j-word" data-target="dis-play"></div>
+        <div class="j-word" data-target="ko.mute"></div>
+    </div>
 
-    <!-- Load the Big Bang Trigger & JSON Bridge -->
-    <!-- Note: When testing locally, ensure display.js is in the same folder, or point to your GitHub URL -->
-    <script src="display.js"></script>
+    <!-- The Display Bar (Bottom Sheet) -->
+    <div id="display-bar">
+        <div class="db-header">
+            <div class="db-title" id="db-title">🤝 Sahyog</div>
+            <button class="db-close" onclick="closeDisplayBar()">×</button>
+        </div>
+        <div class="db-story" id="db-story">
+            Strangers arrive at a park, carrying the heavy weight of their digital lives. Someone begins to clap a simple rhythm. Another joins. Within minutes, fifty people are moving as one organism. The ego dissolves; the village is born.
+        </div>
+        <a href="#" class="db-komute" id="db-komute">🚶 Walk to Assembly (KOMUTE)</a>
+    </div>
 
     <script>
         // ==========================================
-        // BABY STEP 2: THE BIG BANG RENDERER
+        // 1. DATA (Simulating 1.json and y.json)
         // ==========================================
+        const ROOT_DOMAINS = [
+            { code: "0.1", name: "Individual", icon: "🧠", story: "An elder sits with a child, not to teach, but to wonder aloud about the stars. The child asks a question that has no answer, and together they build a telescope from scrap. This is the first spark of the new yug." },
+            { code: "0.2", name: "Samajh", icon: "🤝", story: "A grandmother weaves a basket while singing a song that contains the exact migratory patterns of birds. A teenager records the song, not for digital views, but to ensure the birds are never lost to the forest." },
+            { code: "0.3", name: "Econology", icon: "🌍", story: "A coffee shop gives its spent grounds to a mushroom farmer. The farmer gives the spent substrate to a community garden. The garden feeds the coffee shop's customers. The circle closes; the earth breathes." },
+            { code: "0.4", name: "Earth Eng", icon: "🏗️", story: "A community needs to decide where to route a new water channel. They do not vote for a representative; they walk the land together, feel the slope of the earth, and reach a consensus that mirrors the gravity of the water itself." },
+            { code: "0.5", name: "Discovery", icon: "🔭", story: "Two strangers meet at a community garden. One knows how to graft fruit trees; the other knows how to code irrigation sensors. By sunset, they have taught each other, and the garden's yield is forever changed." },
+            { code: "0.6", name: "Innovation", icon: "💡", story: "A farmer 3D prints a replacement gear for a 50-year-old tractor using a design shared by a mechanic in another continent. The tractor roars to life. The global supply chain is bypassed; the local community is empowered." },
+            { code: "0.8", name: "Sahyog", icon: "🌱", story: "Strangers arrive at a park, carrying the heavy weight of their digital lives. Someone begins to clap a simple rhythm. Another joins. Within minutes, fifty people are moving as one organism. The ego dissolves; the village is born." },
+            { code: "0.9", name: "Mukti", icon: "🕊️", story: "A young man, restless and disconnected, learns to forge iron. He spends his frustration shaping a complex, beautiful gate for the local school. Every time the children walk through it, they touch his healed mind." }
+        ];
 
-        const sun = document.getElementById('sun');
+        const seed = document.getElementById('seed');
         const universe = document.getElementById('universe');
-        const ringsContainer = document.getElementById('rings-container');
-        const statusText = document.getElementById('status-text');
+        const displayBar = document.getElementById('display-bar');
 
-        // 1. Listen for the Big Bang Trigger (Fired when user clicks the Golden Dot)
-        window.addEventListener('khela:bigbang:init', () => {
-            statusText.innerText = 'Initiating Big Bang... Fetching Mesh...';
-            statusText.style.color = 'var(--teal)';
+        // ==========================================
+        // 2. INJECTING THE 9 ROOTS
+        // ==========================================
+        ROOT_DOMAINS.forEach((domain, index) => {
+            const node = document.createElement('div');
+            node.className = 'root-node';
+            node.innerHTML = `<span class="icon">${domain.icon}</span><span class="label">${domain.name}</span>`;
+            
+            const angle = (index / ROOT_DOMAINS.length) * Math.PI * 2;
+            const radius = Math.min(window.innerWidth, window.innerHeight) * 0.3; 
+            const x = Math.cos(angle) * radius;
+            const y = Math.sin(angle) * radius;
+            
+            node.style.left = `calc(50% + ${x}px - 40px)`;
+            node.style.top = `calc(50% + ${y}px - 40px)`;
+            node.style.transitionDelay = `${index * 0.1}s`; 
+            
+            // CLICK EVENT: Opens the Display Bar with y.json data
+            node.addEventListener('click', () => openDisplayBar(domain));
+
+            universe.appendChild(node);
         });
 
-        // 2. Listen for the Mesh Ready Event (Fired when 1.json & symbol1.json are loaded)
-        window.addEventListener('khela:mesh:ready', () => {
-            statusText.innerText = 'Mesh Synchronized. The 9 Roots Awaken.';
-            statusText.style.color = 'var(--gold)';
-            
-            // Trigger the visual explosion
-            igniteSun();
-            
-            // Render the domains from the fetched JSON
-            const domains = window.KhelaMesh.rootDomains;
-            const symbols = window.KhelaMesh.symbols;
-            
-            if (domains && domains.length > 0) {
-                renderOrbitingDomains(domains, symbols);
-            } else {
-                statusText.innerText = 'Error: Root Domains not found in 1.json';
-            }
-        });
-
-        function igniteSun() {
+        // ==========================================
+        // 3. THE BIG BANG TRIGGER
+        // ==========================================
+        seed.addEventListener('click', () => {
+            seed.classList.add('exploded');
             setTimeout(() => {
-                sun.classList.add('active');
-            }, 300);
-        }
-
-        function renderOrbitingDomains(domains, symbols) {
-            const count = domains.length;
-            
-            // Calculate responsive radius based on screen size
-            const minDim = Math.min(window.innerWidth, window.innerHeight);
-            const radius = minDim * 0.35; // 35% of the smallest screen dimension
-
-            // Create the visual orbital ring
-            const ring = document.createElement('div');
-            ring.className = 'orbit-ring';
-            ring.style.width = `${radius * 2}px`;
-            ring.style.height = `${radius * 2}px`;
-            ringsContainer.appendChild(ring);
-            setTimeout(() => ring.classList.add('active'), 500);
-
-            // Map 1.json domains to visual nodes
-            domains.forEach((domain, index) => {
-                const node = document.createElement('div');
-                node.className = 'domain-node';
-                
-                // Try to find a matching icon from symbol1.json based on the domain name, 
-                // fallback to a planetary emoji if not found.
-                let icon = '🪐'; 
-                const nameLower = domain.name.toLowerCase();
-                if (nameLower.includes('individual')) icon = '🧠';
-                else if (nameLower.includes('samajh') || nameLower.includes('community')) icon = '🤝';
-                else if (nameLower.includes('econology') || nameLower.includes('earth')) icon = '🌍';
-                else if (nameLower.includes('discovery')) icon = '🔭';
-                else if (nameLower.includes('innovation')) icon = '💡';
-                else if (nameLower.includes('sahyog')) icon = '🌱';
-                else if (nameLower.includes('mukti')) icon = '🕊️';
-
-                node.innerHTML = `
-                    <span class="domain-icon">${icon}</span>
-                    <span class="domain-name">${domain.name}</span>
-                    <span class="domain-code">${domain.code}</span>
-                `;
-
-                // Mathematical positioning (Perfect Circle)
-                // Offset by -Math.PI/2 so the first node starts at the top (12 o'clock)
-                const angle = (index / count) * Math.PI * 2 - (Math.PI / 2); 
-                const x = Math.cos(angle) * radius;
-                const y = Math.sin(angle) * radius;
-
-                node.style.left = `calc(50% + ${x}px - 45px)`;
-                node.style.top = `calc(50% + ${y}px - 45px)`;
-                
-                // Stagger the pop-in animation
-                node.style.transitionDelay = `${0.8 + (index * 0.1)}s`;
-
-                // Add interaction for the NEXT baby step (Drill Down)
-                node.addEventListener('click', () => {
-                    handleDomainSelection(domain);
-                });
-
-                universe.appendChild(node);
-                
-                // Trigger animation
-                setTimeout(() => node.classList.add('active'), 100);
-            });
-        }
-
-        // 3. The Bridge to the Next Layer (Integral.js / 5W1H)
-        function handleDomainSelection(domain) {
-            console.log(`[Earth 00 OS] Selected Domain: ${domain.name} (${domain.code})`);
-            statusText.innerText = `Focusing on ${domain.name}...`;
-            
-            // Haptic feedback
-            if (navigator.vibrate) navigator.vibrate(30);
-
-            // Fire event for the next engine (e.g., Integral.js Mandala)
-            window.dispatchEvent(new CustomEvent('khela:domain:focus', { 
-                detail: domain 
-            }));
-            
-            // Visual feedback on the node
-            document.querySelectorAll('.domain-node').forEach(n => n.style.opacity = '0.3');
-            event.currentTarget.style.opacity = '1';
-            event.currentTarget.style.transform = 'scale(1.3)';
-        }
-
-        // Handle window resize to keep orbit perfect
-        window.addEventListener('resize', () => {
-            // In a production app, we would recalculate X/Y here. 
-            // For Baby Step 2, a simple reload or CSS recalc handles it.
+                universe.classList.add('active');
+                document.querySelectorAll('.root-node').forEach(node => node.classList.add('pop'));
+                startJumbler(); // Start the left-side subconscious engine
+            }, 400);
         });
+
+        // ==========================================
+        // 4. DISPLAY BAR LOGIC (Singularity Card)
+        // ==========================================
+        function openDisplayBar(domain) {
+            document.getElementById('db-title').innerHTML = `${domain.icon} ${domain.name} <span style="font-size:0.8rem; color:#94a3b8; font-weight:400;">(${domain.code})</span>`;
+            document.getElementById('db-story').innerText = domain.story;
+            
+            // Simulate KOMUTE link generation (from event.js)
+            document.getElementById('db-komute').href = `https://www.google.com/maps/search/${domain.name}+community+center`;
+            document.getElementById('db-komute').innerText = `🚶 Walk to ${domain.name} Assembly`;
+            
+            displayBar.classList.add('active');
+            if(navigator.vibrate) navigator.vibrate(30); // Haptic feedback
+        }
+
+        function closeDisplayBar() {
+            displayBar.classList.remove('active');
+        }
+
+        // ==========================================
+        // 5. THE JUMBLER ENGINE (From structure.json)
+        // ==========================================
+        function startJumbler() {
+            const chars = '!<>-_\\/[]{}—=+*^?#~';
+            const words = document.querySelectorAll('.j-word');
+            
+            words.forEach(wordEl => {
+                const target = wordEl.getAttribute('data-target');
+                let frame = 0;
+                
+                const interval = setInterval(() => {
+                    let out = '';
+                    for(let i = 0; i < target.length; i++) {
+                        if(i < frame) out += target[i];
+                        else out += chars[Math.floor(Math.random() * chars.length)];
+                    }
+                    wordEl.textContent = out;
+                    frame += 0.5;
+                    
+                    if(frame >= target.length) {
+                        wordEl.textContent = target;
+                        clearInterval(interval);
+                    }
+                }, 60);
+            });
+
+            // Loop the jumbler every 4 seconds
+            setInterval(startJumbler, 4000);
+        }
     </script>
 </body>
 </html>
