@@ -1,0 +1,68 @@
+<!DOCTYPE html><html lang="en"><head><title>Khel.o · Radial Widget</title>
+<style>
+  body{margin:0;background:#030508;overflow:hidden;font-family:system-ui;height:100vh;touch-action:none}
+  #hub{position:absolute;top:50%;left:50%;width:0;height:0;z-index:999}
+  .node{position:absolute;width:56px;height:56px;margin:-28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;cursor:pointer;transition:all .5s cubic-bezier(.4,2,.4,1);box-shadow:0 0 20px currentColor;z-index:2}
+  .node:hover{transform:scale(1.2) var(--t)!important;z-index:10;filter:brightness(1.3)}
+  #core{width:70px;height:70px;margin:-35px;z-index:3;color:#fde047;background:#0f172a;border:2px solid;font-size:32px;box-shadow:0 0 30px #fde04755}
+  .item{color:var(--c);background:#0f172a;border:2px solid;--t:translate(var(--x),var(--y));transform:scale(0);opacity:0}
+  #hub.open .item{transform:var(--t) scale(1);opacity:1}
+  #hub.open #core{transform:rotate(135deg) scale(0.9);background:#fde047;color:#000}
+  svg{position:absolute;top:-500px;left:-500px;width:1000px;height:1000px;z-index:1;pointer-events:none}
+  path{stroke:#10b981;stroke-width:2;fill:none;transition:1s ease-in-out;stroke-dasharray:2000;stroke-dashoffset:2000;opacity:0.4}
+  #hub.open path{stroke-dashoffset:0}
+  
+  /* --- 5W1H Popup & Kaizen Mantras --- */
+  #pop{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);background:rgba(15,23,42,.95);border:1px solid;padding:32px;border-radius:24px;backdrop-filter:blur(12px);z-index:9999;text-align:center;box-shadow:0 20px 60px #0009;width:280px;transition:.4s cubic-bezier(.4,2,.4,1);opacity:0;pointer-events:none}
+  #pop.show{transform:translate(-50%,-50%) scale(1);opacity:1;pointer-events:auto}
+  .btn{background:transparent;border:1px solid;color:inherit;padding:14px 24px;border-radius:30px;font-weight:bold;margin-top:20px;cursor:pointer;transition:.2s;width:100%;font-size:14px;text-transform:uppercase;letter-spacing:1px}
+  .btn:hover{background:currentColor;color:#000;box-shadow:0 0 20px currentColor}
+  .mantra{position:absolute;color:#94a3b8;font-size:11px;letter-spacing:2px;text-transform:uppercase;white-space:nowrap;pointer-events:none;opacity:0;transition:1s}
+  #hub.open .mantra{opacity:0.6;animation:spin var(--dur) linear infinite}
+  @keyframes spin{ 100%{transform:rotate(360deg)} }
+</style></head><body>
+
+<div id="hub">
+  <svg><path id="l"/></svg><div id="n"></div>
+  <div class="node" id="core">☀️</div>
+</div>
+<div id="pop"></div>
+
+<script>
+  let h=document.getElementById('hub'), n=document.getElementById('n'), p=document.getElementById('pop'), d=0, m=0, lx, ly, px=0, py=0, pth="M500,500 ";
+  const I=[{i:'🌿',c:'#10b981',t:'Ecology'},{i:'💧',c:'#38bdf8',t:'Water'},{i:'🤸',c:'#f43f5e',t:'Action'},{i:'🍎',c:'#f59e0b',t:'Nourish'},{i:'🤝',c:'#c084fc',t:'Sync'},{i:'📚',c:'#a7f3d0',t:'Learn'}];
+  const Q=["How to prototype","Why explore","What is the essence of","Where to find","Who is building"];
+  const A=["Explore Wiki","Get Gear","Read Concept","Find Event","Join Network"];
+  const M=["Save a little 💧", "Hop a little 🤸", "Stay fit 🧘", "Eat fresh 🍎"];
+  
+  // Mathematical Spiral & Mantras Injection
+  I.forEach((x,i)=>{
+    let r=100+i*20, a=(i+1)*137.508*Math.PI/180, X=r*Math.cos(a), Y=r*Math.sin(a); pth+=`L${500+X},${500+Y} `;
+    n.innerHTML+=`<div class="node item" style="--x:${X}px;--y:${Y}px;--c:${x.c}" onclick="openNode(${i})">${x.i}</div>`;
+  });
+  document.getElementById('l').setAttribute('d',pth);
+
+  M.forEach((str,i)=>{
+    n.innerHTML+=`<div class="mantra" style="--dur:${20+i*5}s"><div style="transform:translate(${150+i*30}px)">${str}</div></div>`;
+  });
+
+  // Quantum 5W1H Game Engine
+  window.openNode = i => {
+    let q = Q[Math.floor(Math.random()*Q.length)], a = A[Math.floor(Math.random()*A.length)], dt = I[i];
+    p.style.cssText=`color:${dt.c}; border-color:${dt.c}`;
+    p.innerHTML = `<div style="font-size:48px;margin-bottom:15px;filter:drop-shadow(0 0 15px ${dt.c})">${dt.i}</div>
+    <h3 style="margin:0 0 10px;color:#fff;font-size:18px">${q} ${dt.t}?</h3>
+    <p style="color:#94a3b8;font-size:13px;margin:0 0 20px;line-height:1.5">Singularity roll complete. Navigate the mesh to evolve.</p>
+    <button class="btn" onclick="p.classList.remove('show'); h.classList.remove('open');">${a} →</button>`;
+    p.classList.add('show');
+  };
+
+  // Global Drag & Click Engine
+  window.onpointerdown=e=>{ if(!e.target.closest('#pop')) {d=1; m=0; lx=e.clientX; ly=e.clientY;} };
+  window.onpointerup=e=>{ d=0; if(!m && e.target.id==='core') h.classList.toggle('open'); };
+  window.onpointermove=e=>{
+    if(!d)return; let dx=e.clientX-lx, dy=e.clientY-ly;
+    if(Math.abs(dx)>2 || Math.abs(dy)>2) m=1; // Differentiate click from drag
+    if(m){ px+=dx; py+=dy; h.style.transform=`translate(${px}px,${py}px)`; lx=e.clientX; ly=e.clientY; }
+  };
+</script></body></html>

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Khel.o - Baby Step 1: The Seed & The 9 Roots</title>
+    <style>
+        /* 1. Core Universe Styling */
+        body { 
+            margin: 0; background: #030406; color: #fff; 
+            font-family: system-ui, sans-serif; overflow: hidden; 
+            height: 100vh; display: flex; align-items: center; justify-content: center; 
+        }
+        
+        /* 2. The Seed (The Dot) */
+        #seed {
+            width: 12px; height: 12px; background: #fbbf24; border-radius: 50%;
+            box-shadow: 0 0 20px 5px rgba(251, 191, 36, 0.6);
+            cursor: pointer; transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            animation: pulse 2s infinite;
+            position: absolute; z-index: 10;
+        }
+        #seed.exploded { transform: scale(0); opacity: 0; pointer-events: none; }
+        
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 20px 5px rgba(251, 191, 36, 0.6); }
+            50% { box-shadow: 0 0 30px 10px rgba(251, 191, 36, 0.9); }
+        }
+
+        /* 3. The Universe Container */
+        #universe {
+            position: absolute; width: 100%; height: 100%;
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 1s ease; pointer-events: none;
+        }
+        #universe.active { opacity: 1; pointer-events: auto; }
+
+        /* 4. The Center (Sun/Core) */
+        #core {
+            width: 60px; height: 60px; 
+            background: radial-gradient(circle, #fff 0%, #fbbf24 40%, #d97706 100%);
+            border-radius: 50%; box-shadow: 0 0 40px 15px rgba(251, 191, 36, 0.4);
+            display: flex; align-items: center; justify-content: center; font-size: 24px;
+        }
+
+        /* 5. The 9 Root Nodes (from 1.json) */
+        .root-node {
+            position: absolute; width: 80px; height: 80px;
+            background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 50%; display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            transform: scale(0); transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            cursor: pointer; backdrop-filter: blur(5px);
+        }
+        .root-node:hover { border-color: #fbbf24; background: rgba(251, 191, 36, 0.1); transform: scale(1.1) !important; }
+        .root-node .icon { font-size: 28px; margin-bottom: 4px; }
+        .root-node .label { font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: #94a3b8; }
+        
+        /* The Pop-in Animation Class */
+        .root-node.pop { transform: scale(1); }
+    </style>
+</head>
+<body>
+
+    <!-- The Seed (Starts here) -->
+    <div id="seed" title="Touch the Seed to Awaken"></div>
+
+    <!-- The Universe (Expands here) -->
+    <div id="universe">
+        <div id="core">☀️</div>
+        <!-- 9 Root Nodes will be injected here by JS -->
+    </div>
+
+    <script>
+        // ==========================================
+        // BABY STEP 1: INJECTING THE 9 ROOTS (from 1.json)
+        // ==========================================
+        const ROOT_DOMAINS = [
+            { code: "0.1", name: "Individual", icon: "🧠" },
+            { code: "0.2", name: "Samajh", icon: "🤝" },
+            { code: "0.3", name: "Econology", icon: "🌍" },
+            { code: "0.4", name: "Earth Eng", icon: "🏗️" },
+            { code: "0.5", name: "Discovery", icon: "🔭" },
+            { code: "0.6", name: "Innovation", icon: "💡" },
+            { code: "0.8", name: "Sahyog", icon: "🌱" },
+            { code: "0.9", name: "Mukti", icon: "🕊️" }
+        ];
+
+        const seed = document.getElementById('seed');
+        const universe = document.getElementById('universe');
+
+        // Calculate Orbit & Inject Nodes
+        ROOT_DOMAINS.forEach((domain, index) => {
+            const node = document.createElement('div');
+            node.className = 'root-node';
+            node.innerHTML = `<span class="icon">${domain.icon}</span><span class="label">${domain.name}</span>`;
+            
+            // Math: Place them in a perfect circle around the center
+            const angle = (index / ROOT_DOMAINS.length) * Math.PI * 2;
+            const radius = Math.min(window.innerWidth, window.innerHeight) * 0.3; // 30% of screen size
+            const x = Math.cos(angle) * radius;
+            const y = Math.sin(angle) * radius;
+            
+            // Position the node
+            node.style.left = `calc(50% + ${x}px - 40px)`;
+            node.style.top = `calc(50% + ${y}px - 40px)`;
+            
+            // Stagger the animation so they pop in one by one
+            node.style.transitionDelay = `${index * 0.1}s`; 
+            
+            // Add click event for the next baby step
+            node.addEventListener('click', () => {
+                console.log(`Zooming into Domain: ${domain.name} (${domain.code})`);
+                // TODO: Baby Step 2 will happen here!
+            });
+
+            universe.appendChild(node);
+        });
+
+        // ==========================================
+        // THE BIG BANG TRIGGER
+        // ==========================================
+        seed.addEventListener('click', () => {
+            // 1. Collapse the Seed
+            seed.classList.add('exploded');
+            
+            // 2. Awaken the Universe
+            setTimeout(() => {
+                universe.classList.add('active');
+                document.querySelectorAll('.root-node').forEach(node => node.classList.add('pop'));
+            }, 400);
+        });
+    </script>
+</body>
+</html>

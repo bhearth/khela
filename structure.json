@@ -1,0 +1,290 @@
+{
+  "meta": {
+    "version": "2.0",
+    "name": "CAIGx Dis-play Universe",
+    "vision": "Liberate 8.25B beings through pull-based, dharma-aligned, conscience-driven AI where every tap is a seed, every question is a sunbeam, every contribution is a flower",
+    "license": "CC0 – Public Domain",
+    "mantra": "Ram-Ram, Dhanyawad, Nirvivad",
+    "scale": "Planetary coordination protocol for physical atoms, not digital noise"
+  },
+
+  "semantic_tree": {
+    "2.0": "void",
+    "2.1": "individual",
+    "2.2": "samajh",
+    "2.3": "econology",
+    "2.4": "krishi",
+    "2.5": "dis-play",
+    "2.6": "khel.o",
+    "2.7": "khel.i",
+    "2.8": "sahyog",
+    "2.81": "collaboration",
+    "2.82": "synthesis",
+    "2.83": "ba.ej",
+    "2.84": "beej",
+    "2.85": "bazi",
+    "2.9": "mukti",
+    "1.0": "earth-org"
+  },
+
+  "jumble_engine": {
+    "description": "Phonetic vectorizer that cycles through playful Sanskrit/Hinglish roots",
+    "roots": [
+      "khel.o", "khel.i", "khel.a",
+      "ba.che", "ba.cha", "ba.ej",
+      "be.zo", "be.cho",
+      "ba.ji", "ba.zi",
+      "ka.li", "ka.la",
+      "khe.li", "khe.lo",
+      "kri.shi", "kru.shi",
+      "mu.kti", "sa.hyog"
+    ],
+    "animation": "Text scrambles through random characters before resolving to target word",
+    "frequency": "Every 4-6 seconds on logo, every dice roll on intent"
+  },
+
+  "mantras": {
+    "pull ko/mute": {
+      "action": "show('park-work')",
+      "vector": [2.82, -2.41, 2.67, 2.93, -2.22, 2.78, 2.55, -2.61, 2.34, 2.89],
+      "ipv6": "4.sahyogi",
+      "baej": [
+        "🌱 Beej: Need for connection",
+        "🍚 Bhojy: Your time for attention",
+        "🔥 Bhaji: Algorithms control visibility",
+        "👑 Bazi: Tech profits; you get distraction",
+        "🌸 Flower: Join park work →"
+      ]
+    },
+    "dis-play": {
+      "action": "activate('universal-sensory-bridge')",
+      "vector": [2.95, 2.12, 2.78, 2.89, 2.34, 2.67, 2.91, -2.23, 2.56, 2.78],
+      "ipv6": "5.display",
+      "baej": [
+        "🎭 Dis: The interface for the 3B disabled souls",
+        "🎨 Play: Where learning becomes neurological pathway formation",
+        "🌍 Universal: No login, no password, no tracking",
+        "🔊 Haptic: Vibrations guide the blind",
+        "🎵 Sonic: Spatial audio for navigation",
+        "✨ Visual: Breathing icons for the illiterate"
+      ]
+    },
+    "khel.o": {
+      "action": "roll('5w1h-dice')",
+      "vector": [2.88, 2.45, 2.67, 2.92, 2.23, 2.78, 2.89, -2.34, 2.56, 2.91],
+      "ipv6": "6.khelo",
+      "baej": [
+        "🎲 The Golden Dice: Rolls through What/Why/Where/When/Who/How",
+        "🧒 Child's Play: Bypasses ego, enters flow of pure resonance",
+        "🌱 Seed State: Every tap is a seed planted in the digital forest",
+        "🔥 8-Minute Cooldown: The mind rests, returns to physical world",
+        "🌸 Flower: New nodes spawn with particle burst"
+      ]
+    },
+    "krishi": {
+      "action": "sync('soil-sun-intention')",
+      "vector": [2.76, 2.89, 2.45, 2.98, 2.67, 2.34, 2.91, 2.23, 2.56, 2.78],
+      "ipv6": "7.krishi",
+      "baej": [
+        "🌾 Agriculture: Not just farming, but synchronization of soil, sun, human intention",
+        "🌱 Permaculture: Design systems that mimic nature's patterns",
+        "💧 Water: Rainwater harvesting, greywater reuse, watershed mapping",
+        "🪱 Compost: Turning waste into wealth, closing the loop",
+        "🌳 Food Forest: Multi-layered ecosystems that feed communities"
+      ]
+    },
+    "ba.ej": {
+      "action": "plant('seed-of-intention')",
+      "vector": [2.92, 2.67, 2.89, 2.78, 2.45, 2.91, 2.34, 2.56, 2.78, 2.23],
+      "ipv6": "8.baej",
+      "baej": [
+        "🌰 The Seed: Contains the entire forest in potential",
+        "🌱 Germination: When intention meets soil and sunlight",
+        "🌿 Growth: Organic expansion following natural patterns",
+        "🌳 Maturity: Bearing fruit for the community",
+        "🍂 Decomposition: Returning to earth, feeding the next cycle"
+      ]
+    },
+    "bazi": {
+      "action": "transform('distraction-into-purpose')",
+      "vector": [2.67, 2.89, 2.45, 2.78, 2.91, 2.34, 2.56, 2.23, 2.78, 2.92],
+      "ipv6": "9.bazi",
+      "baej": [
+        "🎰 The Game: Tech profits from your attention",
+        "🔄 The Flip: Redirect attention to physical manifestation",
+        "🌱 The Seed: Plant intention instead of consuming distraction",
+        "🌸 The Flower: Contribution becomes the new currency",
+        "🌍 The Forest: Collective action creates planetary change"
+      ]
+    }
+  },
+
+  "vectors": {
+    "dimensions": [
+      "Ahimsa", "Satya", "Aparigraha", "Prakriti", "Rta",
+      "Vinaya", "Shaurya", "Viveka", "Mukti", "Seva",
+      "Clarity", "Connection", "Contribution", "Cooldown", "Conscience"
+    ],
+    "weights": {
+      "clarity_over_prestige": 2.95,
+      "physical_over_digital": 2.88,
+      "pull_over_push": 2.92,
+      "resonance_over_reach": 2.87
+    }
+  },
+
+  "resource_pulse": {
+    "types": ["seed", "soil", "manure", "time", "skill", "space", "water", "sunlight", "intention", "attention"],
+    "flows": {
+      "seed_to_forest": "Individual contribution → Community network → Planetary coordination",
+      "attention_to_action": "Digital input → Physical manifestation → Ecological impact",
+      "distraction_to_purpose": "Bazi (game) → Beej (seed) → Ba.ej (growth) → Mukti (liberation)"
+    }
+  },
+
+  "earthocity": {
+    "formula": "E = MA²",
+    "M": "Mental Mania + Mass of Humanity",
+    "A": "Acceleration in Asia/Africa",
+    "threshold": "When 6.5B (lazy + disabled) are activated through dis-play, not debate",
+    "catalyst": "Chinese-scale infrastructure thinking applied to human coordination"
+  },
+
+  "rrr": {
+    "release": "Let go of outdated systems (login walls, tracking, ego-driven prestige)",
+    "reform": "Reshape with dharma (clarity over complexity, physical over digital)",
+    "rewire": "Change neural + social circuits (from consumption to contribution)"
+  },
+
+  "notable_people": {
+    "source": "https://tjukanovt.github.io/notable-people",
+    "integration": "Local guides auto-appear by location via OpenStreetMap Overpass API",
+    "expansion": "Connect to GitHub talent finder, LinkedIn professionals, academic researchers"
+  },
+
+  "knowledge_mesh": {
+    "sources": [
+      {"name": "kids.miraheze.org", "type": "wiki", "api": "MediaWiki", "purpose": "Curated aggregators for children"},
+      {"name": "OpenAlex", "type": "research", "api": "REST", "purpose": "Open academic papers"},
+      {"name": "GitHub", "type": "talent", "api": "REST", "purpose": "Open source developers"},
+      {"name": "OpenStreetMap", "type": "location", "api": "Overpass", "purpose": "Physical gathering points"},
+      {"name": "Amazon Affiliate", "type": "commerce", "api": "Product API", "purpose": "Physical tools & books", "tag": "amazon0339f-21"},
+      {"name": "Neo4j", "type": "graph", "api": "Bolt", "purpose": "Semantic knowledge graph"},
+      {"name": "Pollinations AI", "type": "generation", "api": "REST", "purpose": "Free image & text generation"},
+      {"name": "Meetup", "type": "events", "api": "REST", "purpose": "Local community gatherings"},
+      {"name": "Idealist", "type": "ngo", "api": "REST", "purpose": "Social impact organizations"},
+      {"name": "Google Patents", "type": "ip", "api": "REST", "purpose": "Engineering blueprints"}
+    ],
+    "fetch_strategy": "Lazy loading, stale-while-revalidate, max 2 results per source to save compute",
+    "priority": "User contributions → Books → Research → Products → Community → Events"
+  },
+
+  "immune_system": {
+    "anti_spam": {
+      "mechanism": "Proof-of-Connection",
+      "description": "Node must link to 3 existing high-clarity nodes within local geography",
+      "effect": "Bots cannot easily generate semantic connections"
+    },
+    "anti_copycat": {
+      "mechanism": "Content Hashing (SHA-256)",
+      "description": "First timestamped hash gets Origin Credit, copies become Mirrors",
+      "effect": "Social reward on discovering connection first, not copying content"
+    },
+    "anti_ego": {
+      "mechanism": "Semantic Clarity Score + Dynamic Prestige Decay",
+      "description": "Dense jargon scores low, simple connections score high; nodes decay without new connections",
+      "effect": "Experts must become teachers and translators or fade into background"
+    },
+    "anti_addiction": {
+      "mechanism": "8-Minute Cooldown + Physical Manifestation Focus",
+      "description": "After dice roll, app locks and says 'Return to physical world'",
+      "effect": "Prevents mindless scrolling, encourages real-world action"
+    }
+  },
+
+  "accessibility": {
+    "blind": {
+      "interface": "Spatial Audio + Haptic Feedback",
+      "description": "Audio cues intensify as user approaches gathering point, vibrations guide navigation",
+      "api": "Web Audio API + navigator.vibrate()"
+    },
+    "deaf": {
+      "interface": "Visual Rhythms + Universal Pictograms",
+      "description": "Screen pulses in time with visual rhythm, no audio required",
+      "api": "CSS animations + Material Symbols"
+    },
+    "illiterate": {
+      "interface": "Massive Breathing Icons",
+      "description": "🌱 for soil, 🌊 for water, 🎭 for dance, 🎵 for music",
+      "api": "SVG sprites with scale animations"
+    },
+    "physically_challenged": {
+      "interface": "Accessible Terrain Filter",
+      "description": "Algorithm filters OpenStreetMap for wheelchair-accessible locations",
+      "api": "Overpass API with accessibility tags"
+    }
+  },
+
+  "execution": {
+    "platform": "Any phone, offline, <50KB for core widget",
+    "ai_engine": "Qwen + CAC — chi-aligned, with TinyLlama/Phi-3 running in browser via WebGPU",
+    "governance": "None — only resonance and pull",
+    "deployment": {
+      "widget": "Single <script> tag embeddable on any website",
+      "url": "https://bhearth.github.io/khela/display.js",
+      "size": "100x100px floating pentagon with 5W1H dice",
+      "features": ["Voice commands", "Location detection", "Random wiki dive", "UPI contribution"]
+    },
+    "sync": {
+      "mechanism": "Torrent for Thought (Merkle Trees)",
+      "description": "Every node hashed, community state is hash tree, diff-based merges like Git",
+      "conflict_resolution": "Geographic proximity + temporal weight + peer sanction"
+    }
+  },
+
+  "100_day_launcher": {
+    "phase_1": {
+      "days": "1-10",
+      "action": "Embed widget on 100 websites",
+      "goal": "10K users roll dice, generate physical actions"
+    },
+    "phase_2": {
+      "days": "11-30",
+      "action": "Kindness Pay flows begin",
+      "goal": "$2.25 × 2.5B = $625M potential"
+    },
+    "phase_3": {
+      "days": "31-60",
+      "action": "Connect to 100K+ international orgs via kids.miraheze.org",
+      "goal": "Planetary coordination network active"
+    },
+    "phase_4": {
+      "days": "61-100",
+      "action": "Earth Funding from UN SDG, Gates Foundation, Tata Trusts, Alibaba",
+      "goal": "Earth Engineering coordination layer funded"
+    }
+  },
+
+  "kaizen_micro_habits": [
+    {"icon": "💧", "action": "Save a little", "description": "Conserve energy, water, resources"},
+    {"icon": "🦘", "action": "Hop a little", "description": "Physical movement, play, dance"},
+    {"icon": "❤️", "action": "Stay fit a little", "description": "Nourish the body, breathe"},
+    {"icon": "🥗", "action": "Eat fresh a little", "description": "Connect with soil, organic food"},
+    {"icon": "📚", "action": "Learn a little", "description": "Read, explore, question"},
+    {"icon": "🤝", "action": "Connect a little", "description": "Sync with community, listen"}
+  ],
+
+  "upi_integration": {
+    "qr_url": "https://raw.githubusercontent.com/krishnabhearth-svg/Kraizen-Journal/main/upi%20pay%20qr%20code.jpeg",
+    "id": "krishna.bh.earth@upi",
+    "purpose": "Kindness Pay micro-transactions to nourish the Earth Mesh"
+  },
+
+  "philosophy": {
+    "core_truth": "Every tap is a seed. Every question is a sunbeam. Every contribution is a flower.",
+    "paradigm_shift": "From social media (ego-driven) to semantic mesh (clarity-driven)",
+    "ultimate_success": "User forgets app exists, puts phone in pocket, joins physical dance of 8.25B",
+    "chinese_wisdom": "Practice is sole criterion for testing truth. Build physical prototype first, code writes itself.",
+    "indian_context": "Cannot force clarity, must seduce through haptic/visual, zero-friction design"
+  }
+}

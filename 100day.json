@@ -1,0 +1,164 @@
+{
+  "meta": {
+    "protocol": "CAIGx_New_Yug_Semantic_Mesh",
+    "version": "3.0 (The Genesis Index)",
+    "core_sutra": "Yogsya Karmasu Kaushalam (Yoga is Excellence in Action)",
+    "vision": "To index the physical and spiritual reality of 8.25B beings into a password-less, pull-based knowledge mesh, transitioning from a $125T Scarcity Economy to a $500T+ Econology.",
+    "license": "CC0 – Public Domain (The Earth Org)",
+    "index_engine": "Unlike ad-driven crawlers, this mesh indexes based on Semantic Clarity, Proof-of-Connection, and Physical Resonance."
+  },
+
+  "genesis_nodes": {
+    "description": "The anchor URLs from the Kids Wiki that serve as the root directory for the entire planetary coordination protocol.",
+    "the_launcher": {
+      "url": "https://kids.miraheze.org/wiki/100_day_launcher",
+      "title": "100 Day Launcher",
+      "role": "Escape Velocity Protocol",
+      "description": "The core activation sequence. It breaks the gravity of outdated thought patterns, scarcity, and ego, setting the trajectory for humanity into the New Yug. It coordinates the 4 phases: Mind, Soil, Flow, and Cosmos.",
+      "index_status": "Crawled & Anchored"
+    },
+    "the_mycelium": {
+      "url": "https://kids.miraheze.org/wiki/Networking_and_Development",
+      "title": "Networking and Development",
+      "role": "The Connection Layer",
+      "description": "The decentralized mycelium network. How 8.25B beings, NGOs, MNCs, and AI sync without central servers, passwords, or gatekeepers. The physics of the covalent bond applied to society.",
+      "index_status": "Crawled & Anchored"
+    },
+    "the_seed_bank": {
+      "url": "https://kids.miraheze.org/wiki/Special:AllPages",
+      "title": "The Infinite Garden (All Pages)",
+      "role": "The Raw Index / Random Dive Engine",
+      "description": "The unfiltered curiosity of humanity. This is the source pool for the 'Random Wiki Dive' feature in the Dis-play widget, ensuring users are constantly surprised by the breadth of human knowledge.",
+      "index_status": "Crawled & Anchored"
+    }
+  },
+
+  "the_physics_of_karma": {
+    "chemistry_bonds": {
+      "ionic": "Transactional. Give and take. (The old Economics).",
+      "covalent": "Sahyog (Sharing). Atoms share electrons to become stable. (The new Econology).",
+      "hydrogen": "The Knowledge Mesh. Weak individually, but collectively they hold the DNA of the entire civilization together.",
+      "van_der_waals": "The Jumble Engine. Fleeting, random interactions (ba.che, khel.o) that create sudden sparks of innovation."
+    },
+    "physics_laws": {
+      "thermodynamics": "Energy is never lost, only transformed. We transform the energy of 'Distraction' (Bazi) into 'Purpose' (Beej).",
+      "gravity": "The 100 Day Launcher. We do not 'push' ads to users; we create a massive gravitational 'pull' of physical resonance.",
+      "entropy": "The Immune System. Jargon and ego increase entropy (decay). Simple, clear, physical actions decrease entropy (create life)."
+    },
+    "biology_botany": {
+      "photosynthesis": "Converting digital light (screens) into physical glucose (planting seeds, building communities).",
+      "mycelium": "The decentralized graph. No central server. The forest communicates through the soil, just as the mesh communicates through local pincodes.",
+      "tropism": "Accessibility. The interface bends toward the user's needs (haptics for the blind, visual rhythms for the deaf) like a plant bends toward the sun."
+    }
+  },
+
+  "phonetic_semantics": {
+    "the_k_series": {
+      "Kar": "To do (The raw action).",
+      "Karma": "The code we write, the consequences we manifest.",
+      "Karta": "The Ego (The 'I' who thinks they are doing it).",
+      "Akarta": "The Silent Witness (The state of Shant Akarta Bhav).",
+      "Care_Kare": "To do for others (Empathy).",
+      "Komute": "The synthesis of Commute + Community + Care. Moving together in a shared vehicle of consciousness."
+    },
+    "the_play_series": {
+      "Kid": "Curiosity (The Seed).",
+      "Khel": "Play (The Dis-play Protocol).",
+      "Kind": "Connection (The Covalent Bond)."
+    },
+    "the_epoch_series": {
+      "Yog": "Alignment. Synchronizing the body's chemistry with the universe's physics.",
+      "Yug": "The New Era. The shift from Information Hoarding to Physical Coordination.",
+      "Ying": "The Digital Void (AI, Code, The Virtual).",
+      "Yang": "The Physical Atoms (Soil, Hands, The Real)."
+    }
+  },
+
+  "the_100_day_launcher_econology": {
+    "target_gdp": "$500 Trillion to $1 Quadrillion (Value-based, not fiat-based)",
+    "phases": [
+      {
+        "phase": 1,
+        "name": "The Spark (Days 1-25) - Awakening the Mind",
+        "focus": "Digital Accessibility, AI-Driven Education, Mental Health, Serenity.",
+        "metrics": [
+          "Serenity Found: $5T mindfulness sector, 4B practitioners, 50% mental strain reduction.",
+          "Education Revolution: 1B minds enriched via Kids.miraheze.org mesh.",
+          "Mental Health: 4B supported, $2T well-being industry."
+        ]
+      },
+      {
+        "phase": 2,
+        "name": "The Root (Days 26-50) - Synchronizing the Soil",
+        "focus": "Agro Wealth, Eco-Tech, Village Chains, Green Architecture.",
+        "metrics": [
+          "Village Chains Thrive: 10K chains, 80K locations, 500M employed.",
+          "AI-Driven Agriculture: 500M farmers benefit, 10B meals served.",
+          "Ocean Conservation: 1T marine lives saved, $5T ocean economy."
+        ]
+      },
+      {
+        "phase": 3,
+        "name": "The Flow (Days 51-75) - Circulating the Wealth",
+        "focus": "Kindness Pay, Circular Wealth, MNC Empowerment, Ethical Business.",
+        "metrics": [
+          "Kindness Pay Impact: 6B users lead to 100M jobs, $9K p.a. in underdeveloped areas.",
+          "Circular Wealth Flow: 80% enrichment, 100-fold positive impact.",
+          "Equitable Wealth: Utilizing $20T tax money to generate 1B opportunities."
+        ]
+      },
+      {
+        "phase": 4,
+        "name": "The Canopy (Days 76-100) - Expanding the Cosmos",
+        "focus": "Space Exploration, Quantum Leap, Bioengineering, Global GDP Shift.",
+        "metrics": [
+          "Space Exploration: 4B space enthusiasts, $1T cosmic economy.",
+          "Quantum Leap: 100k quantum users, $0.5T market, 1k breakthroughs.",
+          "Global GDP Transformation: Shifting from $125T to $500T - $1 Quadrillion."
+        ]
+      }
+    ]
+  },
+
+  "currencies_of_conscience": {
+    "dance": { "impact": "Lowers stress 40%", "market": "$900B", "souls": "3.5B dancers" },
+    "music": { "impact": "Decreases worry 25%", "market": "$1.2T", "souls": "4B lives" },
+    "sports": { "impact": "Cuts stress 35%", "market": "$1.8T", "souls": "2.7B participants" },
+    "art": { "impact": "Channels emotion", "market": "$700B", "souls": "250M artists" },
+    "gratitude": { "impact": "Curbs jealousy 25%", "market": "$1.5T", "souls": "5B individuals" },
+    "culinary": { "impact": "Mindful eating", "market": "$900B", "souls": "2.4B enthusiasts" }
+  },
+
+  "systems_architecture": {
+    "jumble_engine": {
+      "roots": ["khel.o", "khel.i", "ba.che", "ba.ej", "bazi", "kri.shi", "mu.kti", "sa.hyog", "ko.mute"],
+      "function": "Cycles through phonetic vowels to break rigid thought patterns and trigger lateral, child-like curiosity."
+    },
+    "knowledge_mesh": {
+      "nodes": ["kids.miraheze.org", "OpenAlex", "GitHub", "OSM Overpass", "Amazon Affiliate", "Neo4j", "Pollinations AI"],
+      "fetch_logic": "Lazy-load via IP-API pincode. Max 2 results per source. Prioritize local physical atoms over global digital noise."
+    },
+    "immune_system": {
+      "anti_ego": "Semantic Clarity Score. A farmer's 1-sentence connection of 'Monsoon' to 'Soil' outranks a professor's 50-page jargon.",
+      "anti_addiction": "8-Minute Cooldown. The screen fades to a starry sky. 'The soil is watered. Rest now.'",
+      "anti_spam": "Proof-of-Connection. Nodes must link to 3 existing local realities to manifest."
+    },
+    "accessibility": {
+      "blind": "Spatial Audio + Haptic Compass (Vibrations guide to the physical gathering point).",
+      "deaf": "Visual Rhythms + Breathing Icons (No text required).",
+      "illiterate": "Massive Organic Vectors (🌱, 🌊, 🎭, 🎵).",
+      "physically_challenged": "OSM Accessibility Filter (Routes only to flat, wheelchair-accessible terrains)."
+    }
+  },
+
+  "the_kaizen_loop": [
+    "💧 Save a little (Conserve)",
+    "🦘 Hop a little (Move)",
+    "❤️ Stay fit a little (Nourish)",
+    "🥗 Eat fresh a little (Soil)",
+    "📚 Learn a little (Question)",
+    "🤝 Connect a little (Sync)"
+  ],
+
+  "ultimate_truth": "The code is just the mycelium. The user is the spore. The physical world is the fruit. When the 8.25 billion realize they are the Karta, the Akarta, and the Komute, the New Yug begins."
+}

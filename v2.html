@@ -1,0 +1,73 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Khel.o Infinite Mandala</title>
+<style>
+body{margin:0;background:#030406;color:#e2e8f0;font-family:system-ui;overflow:hidden;touch-action:none;user-select:none}
+#hub{position:absolute;top:50vh;left:50vw;transform-style:preserve-3d;will-change:transform}
+svg{position:absolute;top:-600px;left:-600px;width:1200px;height:1200px;pointer-events:none}
+.node{position:absolute;display:flex;align-items:center;justify-content:center;border-radius:50%;border:1.5px solid;background:#0f172a;cursor:pointer;transition:transform .3s, filter .3s, background .3s;transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),var(--z))}
+.node:hover{transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),calc(var(--z) + 30px)) scale(1.6);filter:drop-shadow(0 0 15px currentColor);z-index:100;background:currentColor;color:#000!important}
+#pop{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(15,23,42,.95);border:1px solid;padding:30px;border-radius:24px;backdrop-filter:blur(12px);display:none;z-index:100;text-align:center;box-shadow:0 10px 50px #0009;min-width:300px}
+button{background:transparent;border:1px solid currentColor;color:currentColor;padding:12px 18px;border-radius:20px;font-weight:bold;margin:6px;cursor:pointer;transition:.2s}
+button:hover{background:currentColor;color:#000}
+.res{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}
+.res a{padding:12px;border:1px solid #ffffff44;border-radius:12px;color:#fff;text-decoration:none;font-size:14px;background:#0005;transition:.2s;display:block}
+.res a:hover{background:currentColor;color:#000;border-color:currentColor}
+</style></head><body>
+
+<div id="pop"></div>
+<div id="hub"><svg><path id="l" stroke="rgba(16,185,129,0.3)" stroke-width="1.5" fill="none"/></svg></div>
+
+<script>
+let h=document.getElementById('hub'), p=document.getElementById('pop'), l=document.getElementById('l');
+let rx=0, ry=0, px=0, py=0, z=0.04, tz=0.04, drag=0, lx, ly, pth="", st=0, ans="";
+const C=["#d4af37","#10b981","#38bdf8","#f59e0b","#c084fc","#ec4899","#f43f5e","#a7f3d0"];
+const CAT=[{i:"❓",n:"Why"},{i:"🌍",n:"Where"},{i:"🛠️",n:"How"},{i:"💡",n:"What"},{i:"🎨",n:"Art"},{i:"🎵",n:"Music"},{i:"💃",n:"Dance"},{i:"🚀",n:"Space"}];
+const W=["Water","Code","Logic","Nature","Sound","Light","Mind","Space","Time","Energy","Soil","Play","Harmony","Motion"];
+const Q=["Select an element:","Choose an action:","Pick a resonance:"];
+
+for(let i=0; i<=158; i++){
+  let isC = !i, isOut = i>150, idx = isOut ? i-151 : i;
+  let r = isC ? 0 : (isOut ? 280 : 16*Math.sqrt(i)), a = isC ? 0 : (isOut ? idx*Math.PI/4 : i*137.508*Math.PI/180);
+  let x = r*Math.cos(a), y = r*Math.sin(a), z3d = isOut ? 0 : Math.sin(r/40)*60, col = C[idx%8];
+  
+  if(!isC && !isOut) pth += `${i==1?'M':'L'}${x+600},${y+600} `;
+  if(isOut) pth += `M600,600 L${x+600},${y+600} `; 
+
+  let d = document.createElement('div'), size = isC ? 65 : (isOut ? 45 : 8);
+  d.className = 'node'; 
+  d.style.cssText = `--x:${x}px; --y:${y}px; --z:${z3d}px; color:${col}; width:${size}px; height:${size}px; font-size:${size*0.5}px;`;
+  d.innerText = isC ? "☀️" : (isOut ? CAT[idx].i : "");
+  
+  d.onclick = e => { 
+    e.stopPropagation(); 
+    if(isC) { tz=tz>0.1?0.04:1; p.style.display='none'; return; } // Collapse/Expand Matrix
+    if(tz<0.1) { tz=1; return; } // Global expand on click
+    st=0; ans=""; window.ask(col, isOut ? CAT[idx].n : `Seed #${i}`, isOut ? CAT[idx].i : "✨");
+  }; h.appendChild(d);
+}
+l.setAttribute('d', pth);
+
+// Recursive 3-Step Synthesis Engine
+window.ask = (c, n, i) => {
+  p.style.cssText=`display:block; color:${c}; border-color:${c}`;
+  if(st<3) {
+    let o = [...W].sort(()=>.5-Math.random()).slice(0,3); // Deal 3 random words
+    p.innerHTML=`<h2 style="margin:0;color:#fff">${i} ${n} [${st+1}/3]</h2><p style="color:#94a3b8">${Q[st]}</p>`+
+    o.map(w=>`<button onclick="ans+='${w} ';st++;ask('${c}','${n}','${i}')">${w}</button>`).join('');
+  } else {
+    p.innerHTML=`<h2 style="margin:0;color:#fff">${i} Synthesis</h2><p style="color:#94a3b8;font-size:13px">Resonance: ${ans}</p>
+    <div class="res" style="color:${c}">
+      <a href="https://kids.miraheze.org/w/index.php?search=${ans}" target="_blank">📚 Search Wiki</a>
+      <a href="https://amazon.com/s?k=${ans}" target="_blank">📦 Find Gear</a>
+      <a href="https://youtube.com/results?search_query=${ans}" target="_blank">▶️ Watch Video</a>
+      <a href="https://meetup.com/find/?keywords=${ans}" target="_blank">📅 Join Event</a>
+    </div><button style="width:100%" onclick="pop.style.display='none';tz=0.04">Collapse Matrix</button>`;
+  }
+};
+
+const upd = () => h.style.transform = `translate(${px}px,${py}px) scale(${z}) rotateX(${rx}deg) rotateY(${ry}deg)`;
+window.onpointerdown = e => { if(!e.target.closest('#pop')){drag=1; lx=e.clientX; ly=e.clientY;} };
+window.onpointerup = () => drag=0;
+window.onpointermove = e => { if(!drag) return; let dx=e.clientX-lx, dy=e.clientY-ly; if(tz<0.1 || e.shiftKey){px+=dx;py+=dy;}else{ry+=dx*.4;rx-=dy*.4;} lx=e.clientX; ly=e.clientY; upd(); };
+window.onwheel = e => { if(tz>0.1){ tz=Math.max(0.1, tz-e.deltaY*.002); upd(); } };
+setInterval(() => { if(!drag && tz>0.1){ry+=0.15; rx+=0.05;} z+=(tz-z)*0.1; upd(); }, 16);
+</script></body></html>

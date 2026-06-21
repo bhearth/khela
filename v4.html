@@ -1,0 +1,221 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Khel.o Direct Evolution</title>
+<style>
+body{margin:0;background:#030406;color:#e2e8f0;font-family:system-ui;overflow:hidden;touch-action:none;user-select:none}
+#guide{position:absolute;top:40px;width:100%;text-align:center;color:#10b981;letter-spacing:3px;text-transform:uppercase;font-size:13px;pointer-events:none;z-index:10;transition:0.5s;padding:0 20px;}
+#hub{position:absolute;top:50vh;left:50vw;transform-style:preserve-3d;will-change:transform}
+svg{position:absolute;top:-600px;left:-600px;width:1200px;height:1200px;pointer-events:none;transition:opacity 0.5s ease}
+.node{position:absolute;display:flex;align-items:center;justify-content:center;border-radius:50%;border:solid;cursor:pointer;transition:transform .4s cubic-bezier(.34,1.56,.64,1), filter .4s, background .4s, opacity .4s;transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),var(--z));animation:pop .6s both}
+.node.collapse{transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),var(--z)) scale(0) !important;opacity:0 !important;pointer-events:none}
+@keyframes pop{0%{transform:translate3d(-50%,-50%,0) scale(0);opacity:0}}
+.node:hover{transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),calc(var(--z) + 30px)) scale(1.6);filter:drop-shadow(0 0 20px currentColor);z-index:100;background:currentColor;color:#000!important}
+
+/* The Invisible Hit-Area for the 10px Golden Seed */
+.seed{width:60px!important;height:60px!important;border:none!important;background:transparent!important;box-shadow:none!important;}
+.seed::after{content:'';position:absolute;width:10px;height:10px;background:#d4af37;border-radius:50%;box-shadow:0 0 20px 8px rgba(212,175,55,0.7);transition:0.3s;}
+.seed:hover::after{transform:scale(1.5);}
+
+path{stroke-dasharray:4000;stroke-dashoffset:4000;animation:draw 2.5s ease-out forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+</style></head><body>
+
+<div id="guide"></div>
+<div id="hub"></div>
+
+<script>
+let h=document.getElementById('hub'), g=document.getElementById('guide');
+let rx=0, ry=0, px=0, py=0, z=1, tz=1, drag=0, lx, ly;
+let isDragging = false, startX, startY;
+let S_state = 0, lastTap = 0, evolveTimer;
+
+// Mobile-first responsive scaling
+const getZoom = () => Math.min(window.innerWidth, window.innerHeight) / 800; 
+
+const C=["#d4af37","#10b981","#38bdf8","#f59e0b","#c084fc","#ec4899","#f43f5e","#a7f3d0"];
+const CAT=[{i:"❓",n:"Why"},{i:"🌍",n:"Where"},{i:"🛠️",n:"How"},{i:"💡",n:"What"},{i:"🎨",n:"Art"},{i:"🎵",n:"Music"},{i:"💃",n:"Dance"},{i:"🚀",n:"Space"}];
+const I=[{i:'🌌',n:'Cosmos'},{i:'🧬',n:'Life'},{i:'💻',n:'Tech'},{i:'🧠',n:'Mind'},{i:'🎨',n:'Art'},{i:'📜',n:'History'}];
+
+const PATTERNS = ['fibonacci', 'golden_spiral', 'square_grid', 'triangle', 'star', 'flower', 'wave', 'galaxy'];
+const FIB_SEQ = [8, 13, 21, 34, 55, 89];
+
+function selectPattern(input) {
+  let hash = 0;
+  for(let i=0; i<input.selectedMeaning.length; i++) hash += input.selectedMeaning.charCodeAt(i);
+  return PATTERNS[(hash + input.randomSeed + input.clickNumber) % PATTERNS.length];
+}
+
+function calculatePosition(pattern, i, total) {
+  let x=0, y=0, z3d=0, a=0, r=0;
+  switch(pattern) {
+    case 'star': r = 60 + (i%2)*60 + i*2; a = i * (Math.PI*2/5) + i*0.05; x=r*Math.cos(a); y=r*Math.sin(a); break;
+    case 'flower': r = 140 * Math.sin(i * 0.4); a = i * 0.4; x=r*Math.cos(a); y=r*Math.sin(a); break;
+    case 'triangle': let row = Math.floor((-1+Math.sqrt(1+8*i))/2); let col = i - (row*(row+1))/2; x = (col - row/2)*40; y = row*35 - 100; break;
+    case 'square_grid': let s = Math.ceil(Math.sqrt(total)); x = (i%s)*50 - (s*25); y = Math.floor(i/s)*50 - (s*25); break;
+    case 'wave': x = (i - total/2)*30; y = Math.sin(i*0.5)*80; break;
+    case 'galaxy': r = 4*i; a = i*0.3; x = r*Math.cos(a); y = r*Math.sin(a); z3d = Math.sin(i*0.5)*40; break;
+    case 'golden_spiral': r = 5*Math.exp(0.08*i); a = i*0.8; x=r*Math.cos(a); y=r*Math.sin(a); break;
+    case 'fibonacci':
+    default: a = i*0.18; r = 5*Math.exp((Math.log(1.618)/(Math.PI/2))*a); x=r*Math.cos(a); y=-r*Math.sin(a); break;
+  }
+  return {x, y, z: z3d};
+}
+
+function generateNodes(pattern, input) {
+  let maxNodes = FIB_SEQ[Math.min(input.clickNumber-1, FIB_SEQ.length-1)];
+  let nodes = [];
+  for(let i=1; i<=maxNodes; i++) {
+    let pos = calculatePosition(pattern, i, maxNodes);
+    let col = C[(i + input.clickNumber) % C.length];
+    let icon = I[i % I.length].i; 
+    nodes.push({i, ...pos, col, icon, sz: 35+Math.random()*15});
+  }
+  return nodes;
+}
+
+function connectNodes(nodes) {
+  let pth = "";
+  nodes.forEach((nd, i) => { pth += `${i===0?'M':'L'}${nd.x+600},${nd.y+600} `; });
+  return pth;
+}
+
+function animateNodes(nodesData, parentInput) {
+  nodesData.forEach((nd, idx) => {
+    let d = document.createElement('div'); d.className='node'; 
+    d.style.cssText=`--x:${nd.x}px;--y:${nd.y}px;--z:${nd.z}px;color:${nd.col};width:${nd.sz}px;height:${nd.sz}px;font-size:${nd.sz*.5}px;border-width:2px;background:#0f172a;animation-delay:${idx*60}ms`;
+    d.innerText = nd.icon;
+    
+    // Attaching strict data points for the reliable global click handler
+    d.dataset.maj = "true";
+    d.dataset.icon = nd.icon;
+    d.dataset.meaning = parentInput.selectedMeaning + " > " + nd.icon;
+    d.dataset.clickNum = parentInput.clickNumber + 1;
+    
+    h.appendChild(d);
+  });
+}
+
+function renderUniverse(svgPath, nodesData, input) {
+  h.innerHTML=`<svg><path id="l" stroke="rgba(16,185,129,0.4)" stroke-width="1.5" fill="none" d="${svgPath}"/></svg>`;
+  
+  let center = document.createElement('div'); center.className='node';
+  center.style.cssText=`--x:0px;--y:0px;--z:0px;color:#d4af37;width:60px;height:60px;font-size:30px;border-width:0px;background:transparent;`;
+  center.innerText = "☀️";
+  center.dataset.isc = "true"; 
+  h.appendChild(center);
+  
+  animateNodes(nodesData, input);
+}
+
+function generateDesign(input) {
+  g.innerHTML = `✨ Evolving Pattern [Step ${input.clickNumber}] • Double tap to collapse`;
+  S_state = input.clickNumber;
+  
+  let currentNodes = document.querySelectorAll('.node');
+  currentNodes.forEach(n => n.classList.add('collapse'));
+  let svgEl = document.querySelector('svg');
+  if(svgEl) svgEl.style.opacity = 0;
+
+  clearTimeout(evolveTimer);
+  evolveTimer = setTimeout(() => {
+    let pattern = selectPattern(input);
+    let nodesData = generateNodes(pattern, input);
+    let path = connectNodes(nodesData);
+    renderUniverse(path, nodesData, input);
+  }, 500);
+}
+
+window.build = S => {
+  clearTimeout(evolveTimer);
+  S_state = S;
+  
+  if(S === 0) {
+    z = 1; tz = 1; rx = 0; ry = 0; 
+    h.innerHTML = `<div class="node seed" data-isc="true" style="--x:0px;--y:0px;--z:0px;"></div>`;
+    g.innerHTML = "✨ Touch the Golden Seed to Awaken";
+    return;
+  }
+
+  h.innerHTML='<svg><path id="l" stroke="rgba(16,185,129,0.4)" stroke-width="1.5" fill="none"/></svg>';
+  let pth="";
+  
+  for(let i=0; i<=158; i++){
+    let isC=!i, out=i>150, idx=out?i-151:i;
+    let a = out?idx*Math.PI/4 : i*137.508*Math.PI/180; 
+    let r = isC?0 : (out?280 : 16*Math.sqrt(i));
+    let x = r*Math.cos(a), y = r*Math.sin(a), z3d = out?0:Math.sin(r/40)*60;
+    
+    if(!isC) pth+=`${i==1?'M':'L'}${x+600},${y+600} `;
+
+    let sz = isC?55:(out?45:8), col = C[idx%8], ring = out||isC; 
+    let d = document.createElement('div'); d.className='node'; 
+    d.style.cssText=`--x:${x}px;--y:${y}px;--z:${z3d}px;color:${col};width:${sz}px;height:${sz}px;font-size:${sz*.5}px;border-width:${ring?2:0}px;background:${ring?'#0f172a':col};`;
+    d.innerText = isC?"🌍":(out?CAT[idx].i:"");
+    
+    d.dataset.isc = isC;
+    d.dataset.out = out;
+    d.dataset.idx = idx;
+    
+    h.appendChild(d);
+  } 
+  h.querySelector('#l').setAttribute('d',pth);
+  g.innerHTML = "✨ Step 1: Earth Matrix • Click an outer node to evolve";
+};
+
+// ==========================================
+// ROBUST GLOBAL EVENT DELEGATION & DOUBLE TAP
+// ==========================================
+window.onpointerdown = e => {
+  let now = Date.now();
+  if(now - lastTap < 350) {
+    if(S_state > 0) build(0); // Double Tap Collapse
+    lastTap = 0;
+    return;
+  }
+  lastTap = now;
+  
+  drag = 1; isDragging = false;
+  lx = e.clientX; ly = e.clientY;
+  startX = lx; startY = ly;
+};
+
+window.onpointermove = e => {
+  if(!drag) return;
+  let dx = e.clientX - lx, dy = e.clientY - ly;
+  
+  if(Math.abs(e.clientX - startX) > 5 || Math.abs(e.clientY - startY) > 5) isDragging = true;
+  
+  if(S_state === 0 || e.shiftKey) { px += dx; py += dy; } 
+  else { ry += dx * .4; rx -= dy * .4; }
+  
+  lx = e.clientX; ly = e.clientY;
+  upd();
+};
+
+window.onpointerup = e => {
+  drag = 0;
+  if(!isDragging) {
+    let n = e.target.closest('.node');
+    if(n) {
+      if(n.dataset.isc === "true") {
+         if(S_state === 0) { tz = getZoom(); build(1); } 
+         else { build(0); } 
+      } 
+      else if(n.dataset.out === "true") {
+         let idx = parseInt(n.dataset.idx);
+         generateDesign({ selectedIcon: CAT[idx].i, selectedMeaning: CAT[idx].n, clickNumber: 1, randomSeed: Math.floor(Math.random() * 1000) });
+      }
+      else if(n.dataset.maj === "true") {
+         generateDesign({ selectedIcon: n.dataset.icon, selectedMeaning: n.dataset.meaning, clickNumber: parseInt(n.dataset.clickNum), randomSeed: Math.floor(Math.random() * 1000) });
+      }
+    }
+  }
+};
+
+const upd = ()=>h.style.transform=`translate(${px}px,${py}px) scale(${z}) rotateX(${rx}deg) rotateY(${ry}deg)`;
+window.onwheel = e => { tz = Math.max(0.1, tz - e.deltaY * .002); upd(); };
+setInterval(() => { if(!drag && S_state > 0){ry+=0.15; rx+=0.05;} z+=(tz-z)*0.1; upd(); }, 16);
+
+// Start at S=0 (Glowing Golden Seed)
+build(0);
+</script></body></html>

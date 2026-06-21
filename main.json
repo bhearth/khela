@@ -1,0 +1,128 @@
+{
+  "meta": {
+    "version": "1.0",
+    "name": "CAIGx Semantic Coordinate Schema",
+    "description": "Immutable blueprint for all nodes in the CAIG+ BA·EJ knowledge universe",
+    "license": "CC0 – Public Domain"
+  },
+
+  "node_template": {
+    "code": "0.888111",
+    "name": "devotional_flute_at_dawn",
+    "type": "concept",
+    "root_language": "sa",
+    "culture_weight": "high",
+    "vector": [0.91, -0.88, 0.95, -0.77, 0.89, -0.66, 0.82, -0.55, 0.77, -0.44],
+    "languages": {
+      "en": "Devotional flute at dawn",
+      "hi": "भोर की बांसुरी",
+      "zh": "黎明虔诚笛声",
+      "ar": "ناي التأمل عند الفجر",
+      "es": "Flauta devocional al amanecer",
+      "fr": "Flûte dévotionnelle à l’aube",
+      "sw": "Firimbi ya kujitoa asubuhi",
+      "ta": "பக்தி புல்லாங்குழல் வைகறையில்"
+    },
+    "children": ["0.8881111", "0.8881112", "0.8881113"],
+    "graph": {
+      "enables": ["0.913427"],
+      "requires": ["0.1"],
+      "conflicts_with": [],
+      "evolves_to": ["0.888112"]
+    },
+    "ipv6_hint": "4.sahyogi.in.up.varanasi",
+    "resource_mapping": {
+      "event": "Raga Yaman workshop",
+      "location": "Varanasi, India",
+      "availability": "Daily, 5–6 AM"
+    },
+    "baej_layers": [
+      "🌱 Beej: Inner longing for connection",
+      "🍚 Bhojy: Time sacrificed for practice",
+      "🔥 Bhaji: Tradition as living discipline",
+      "👑 Bazi: Commercialization risks",
+      "🌸 Flower: Share music with strangers"
+    ],
+    "w3_mantra": "pull raga-yaman"
+  },
+
+  "fields": {
+    "code": {
+      "type": "string",
+      "format": "decimal_hierarchy",
+      "description": "Semantic coordinate (e.g., 0.888111). Immutable. Hierarchical."
+    },
+    "name": {
+      "type": "string",
+      "description": "Machine-readable slug (snake_case)"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["concept", "resource", "person", "event", "skill"]
+    },
+    "root_language": {
+      "type": "string",
+      "description": "Language of conceptual origin (e.g., 'sa' = Sanskrit, 'zh' = Chinese)"
+    },
+    "culture_weight": {
+      "type": "string",
+      "enum": ["low", "medium", "high"],
+      "description": "Depth of lived wisdom (not dictionary definition)"
+    },
+    "vector": {
+      "type": "array",
+      "items": { "type": "number", "minimum": -1.0, "maximum": 1.0 },
+      "minItems": 10,
+      "maxItems": 10,
+      "description": "10D dharma vector: [Ahimsa, Satya, Aparigraha, Prakriti, Rta, Vinaya, Shaurya, Viveka, Mukti, Seva]"
+    },
+    "languages": {
+      "type": "object",
+      "description": "Root-resonant translations (not literal)",
+      "additionalProperties": { "type": "string" }
+    },
+    "children": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Direct child codes (e.g., ['0.8881111', ...])"
+    },
+    "graph": {
+      "type": "object",
+      "properties": {
+        "enables": { "type": "array", "items": { "type": "string" } },
+        "requires": { "type": "array", "items": { "type": "string" } },
+        "conflicts_with": { "type": "array", "items": { "type": "string" } },
+        "evolves_to": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "ipv6_hint": {
+      "type": "string",
+      "description": "Suggested IPv6 conscience address fragment"
+    },
+    "resource_mapping": {
+      "type": "object",
+      "properties": {
+        "event": { "type": "string" },
+        "location": { "type": "string" },
+        "availability": { "type": "string" }
+      }
+    },
+    "baej_layers": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 5,
+      "maxItems": 5
+    },
+    "w3_mantra": {
+      "type": "string",
+      "description": "3-word executable command (e.g., 'pull raga-yaman')"
+    }
+  },
+
+  "validation_rules": {
+    "decimal_format": "^[0-9]+(\\.[0-9]+)*$",
+    "max_depth": 20,
+    "vector_must_be_10d": true,
+    "languages_must_include_en_hi_zh": true
+  }
+}

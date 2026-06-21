@@ -1,0 +1,106 @@
+{
+  "meta": {
+    "series": "U_Series_The_Subjective_Universe",
+    "theme": "The Labyrinth of the Self - Why 8.25B souls are lost in their own worlds, and why diversity feels like friction.",
+    "purpose": "To map the invisible walls of psychology, sociology, environment, culture, and desire that prevent true Nirmal Sahyog (pure cooperation).",
+    "resolution": "3-tier decimal expansion (u.x -> u.xx -> u.xxx)"
+  },
+
+  "u.1_psychology": {
+    "description": "The Inner Labyrinth. The cognitive and emotional filters that distort reality.",
+    "u.11": "cognitive_distortions",
+    "u.12": "emotional_baggage",
+    "u.13": "ego_attachments",
+    "u.14": "attention_trance",
+    "u.15": "fear_unknown",
+    "u.111": "confirmation_bias",
+    "u.112": "imposter_syndrome",
+    "u.113": "unresolved_grief",
+    "u.114": "dopamine_loop",
+    "u.115": "analysis_paralysis"
+  },
+
+  "u.2_sociology": {
+    "description": "The Tribal Gravity. The invisible forces of group identity and social hierarchy.",
+    "u.21": "social_conditioning",
+    "u.22": "status_anxiety",
+    "u.23": "in_group_bias",
+    "u.24": "generational_trauma",
+    "u.25": "peer_validation",
+    "u.211": "class_divide",
+    "u.212": "caste_systems",
+    "u.213": "gender_roles",
+    "u.214": "echo_chambers",
+    "u.215": "cancel_fear"
+  },
+
+  "u.3_environment": {
+    "description": "The Physical Bubble. How the immediate sensory and geographic context shapes the mind.",
+    "u.31": "sensory_overload",
+    "u.32": "nature_deficit",
+    "u.33": "climate_anxiety",
+    "u.34": "urban_isolation",
+    "u.35": "scarcity_mindset",
+    "u.311": "screen_fatigue",
+    "u.312": "concrete_alienation",
+    "u.313": "seasonal_shift",
+    "u.314": "noise_stress",
+    "u.315": "toxic_burden"
+  },
+
+  "u.4_culture": {
+    "description": "The Invisible Script. The inherited dogmas, languages, and rituals that define 'us' vs 'them'.",
+    "u.41": "dogmatic_beliefs",
+    "u.42": "linguistic_barriers",
+    "u.43": "ancestral_karma",
+    "u.44": "ritual_attachment",
+    "u.45": "cultural_defensiveness",
+    "u.411": "religious_orthodoxy",
+    "u.412": "political_polarization",
+    "u.413": "tradition_clash",
+    "u.414": "language_loss",
+    "u.415": "myth_literalism"
+  },
+
+  "u.5_desires": {
+    "description": "The Hunger. The cravings and goals that drive behavior, often unconsciously.",
+    "u.51": "material_craving",
+    "u.52": "validation_seeking",
+    "u.53": "purpose_void",
+    "u.54": "legacy_anxiety",
+    "u.55": "comfort_trap",
+    "u.511": "wealth_hoarding",
+    "u.512": "fame_chasing",
+    "u.513": "productivity_toxicity",
+    "u.514": "spiritual_bypassing",
+    "u.515": "hedonic_treadmill"
+  },
+
+  "u.6_friction": {
+    "description": "The Diversity Gap. The exact points where misunderstanding and conflict ignite.",
+    "u.61": "empathy_deficit",
+    "u.62": "narrative_clash",
+    "u.63": "trust_eroded",
+    "u.64": "meaning_crisis",
+    "u.65": "shadow_projection",
+    "u.611": "attribution_error",
+    "u.612": "appropriation_fear",
+    "u.613": "zero_sum_thinking",
+    "u.614": "identity_trap",
+    "u.615": "compassion_fatigue"
+  },
+
+  "u.7_awakening": {
+    "description": "The Bridge. The mechanisms by which the subjective bubble is pierced and true connection occurs.",
+    "u.71": "perspective_shift",
+    "u.72": "radical_acceptance",
+    "u.73": "deep_listening",
+    "u.74": "shadow_integration",
+    "u.75": "collective_breath",
+    "u.711": "cognitive_flexibility",
+    "u.712": "emotional_regulation",
+    "u.713": "systemic_awareness",
+    "u.714": "intercultural_competence",
+    "u.715": "purpose_alignment"
+  }
+}

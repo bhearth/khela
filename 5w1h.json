@@ -1,0 +1,77 @@
+{
+  "session": {
+    "id": "sess_5w1h_matrix",
+    "version": "3.1000000000",
+    "status": "weaving",
+    "engine": "Singularity_Query_Engine"
+  },
+
+  "5w1h_framework": {
+    "description": "The physical and semantic coordinate system for the Khel.o Dis-play Universe. Maps human intent to physical action.",
+    
+    "axes": {
+      "w1": {
+        "question": "What",
+        "action": "domain",
+        "intent": "Identify the core subject, knowledge domain, or physical material.",
+        "state": "pending",
+        "selection": null,
+        "potential_nodes": ["Ecology", "Open Source", "Permaculture", "Art", "Skill Dev", "Water"]
+      },
+      
+      "y": {
+        "question": "Why",
+        "action": "solve",
+        "intent": "Define the purpose, the impact, or the specific problem to resolve.",
+        "state": "pending",
+        "selection": null,
+        "potential_nodes": ["Earth Repair", "Community Bonding", "Personal Growth", "Wealth Circulation", "Joy"]
+      },
+      
+      "w2": {
+        "question": "Where",
+        "action": "locate",
+        "intent": "Pinpoint the physical or digital coordinate (Pincode, OSM Node, or Wiki Page).",
+        "state": "pending",
+        "selection": null,
+        "potential_nodes": ["Local Park", "Neighborhood", "Kids Wiki Mesh", "City Hub", "In Nature"]
+      },
+      
+      "w3": {
+        "question": "When",
+        "action": "sync",
+        "intent": "Establish the temporal rhythm, planning window, or Earth Culture sync time.",
+        "state": "pending",
+        "selection": null,
+        "potential_nodes": ["Dawn Sync (06:00)", "24h Planning Window", "Zenith Sync (12:00)", "Lifetime Practice"]
+      },
+      
+      "p": {
+        "question": "Who",
+        "action": "connect",
+        "intent": "Identify the souls, talent, or community archetype involved in the resonance.",
+        "state": "pending",
+        "selection": null,
+        "potential_nodes": ["Mentors", "Peers", "Solo Journey", "Elders", "Kids", "Cross-Generation"]
+      },
+      
+      "h1": {
+        "question": "How",
+        "action": "meet",
+        "intent": "Determine the method of assembly, the Komute (commute) protocol, or execution style.",
+        "state": "pending",
+        "selection": null,
+        "potential_nodes": ["Walk (<=5km)", "Public Transit", "Drop-in Assembly", "Project-Based", "Silent Witness"]
+      }
+    }
+  },
+
+  "execution_logic": {
+    "trigger": "When all 6 axes reach 'locked' state, dispatch 'khela:intent:woven' event.",
+    "output_format": {
+      "query_string": "How to [h1] with [p] at [w2] during [w3] to [y] in the domain of [w1].",
+      "example": "How to meet with mentors at local park during dawn sync to solve earth repair in the domain of ecology."
+    },
+    "fallback": "If any axis is null, default to 'Random Wiki Dive' or 'Seed State (Void)'."
+  }
+}
