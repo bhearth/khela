@@ -3,123 +3,313 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Khel.o | The Dot</title>
+<title>Khel.o | Pure UI/UX Prototype</title>
 <style>
     /* 1. THE VOID (Mobile-First Canvas) */
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
     body { 
         background: #030406; color: #fff; font-family: system-ui, -apple-system, sans-serif; 
-        overflow: hidden; height: 100vh; width: 100vw; touch-action: none;
+        overflow: hidden; height: 100vh; width: 100vw; 
+    }
+    #void { position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+
+    /* 2. THE SEED (State 0: The Dot) */
+    #dot {
+        width: 14px; height: 14px; background: #fbbf24; border-radius: 50%;
+        box-shadow: 0 0 30px 10px rgba(251,191,36,0.6);
+        position: absolute; z-index: 10; cursor: pointer;
+        animation: pulse 2.5s infinite ease-in-out;
+        transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    #dot.bloom { transform: scale(0); opacity: 0; pointer-events: none; }
+    @keyframes pulse {
+        0%, 100% { box-shadow: 0 0 30px 10px rgba(251,191,36,0.6); transform: scale(1); }
+        50% { box-shadow: 0 0 50px 20px rgba(251,191,36,0.9); transform: scale(1.2); }
     }
 
-    /* 2. THE SEED (State 0: The 10px Golden Dot) */
-    #seed {
-        position: absolute; top: 50%; left: 50%; width: 14px; height: 14px;
-        background: #fbbf24; border-radius: 50%;
-        box-shadow: 0 0 20px 8px rgba(251,191,36,0.6);
-        transform: translate(-50%, -50%);
-        transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
-        z-index: 100; cursor: pointer;
-        animation: seedPulse 3s infinite;
-    }
-    #seed.bloom { transform: translate(-50%, -50%) scale(0); opacity: 0; pointer-events: none; }
-    @keyframes seedPulse {
-        0%, 100% { box-shadow: 0 0 20px 8px rgba(251,191,36,0.6); }
-        50% { box-shadow: 0 0 40px 15px rgba(251,191,36,0.9); }
-    }
-
-    /* 3. THE UNIVERSE (State 1: The Golden Angle Bloom) */
-    #universe {
-        position: absolute; top: 50%; left: 50%; width: 0; height: 0;
-        opacity: 0; transition: opacity 1.5s ease;
-    }
-    #universe.active { opacity: 1; }
-
+    /* 3. THE MANDALA (State 1: The Bloom) */
+    #mandala { position: absolute; width: 0; height: 0; opacity: 0; transition: opacity 1s ease; }
+    #mandala.active { opacity: 1; }
+    
     .node {
-        position: absolute; width: 70px; height: 70px;
-        background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(251,191,36,0.3);
+        position: absolute; width: 75px; height: 75px;
+        background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(251,191,36,0.2);
         border-radius: 50%; display: flex; flex-direction: column;
         align-items: center; justify-content: center;
-        transform: translate(-50%, -50%) scale(0);
-        transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s;
-        cursor: pointer; backdrop-filter: blur(8px);
+        transform: translate(-50%, -50%) scale(0); /* Start at center, invisible */
+        transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s, border-color 0.3s, background 0.3s;
+        cursor: pointer; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
     }
-    .node.bloom { transform: translate(var(--x), var(--y)) scale(1); }
-    .node:active { box-shadow: 0 0 30px rgba(251,191,36,0.8); border-color: #fbbf24; }
+    .node.bloom { transform: translate(var(--x), var(--y)) scale(1); } /* Bloom to polar coordinates */
+    .node:active { background: rgba(251,191,36,0.2); border-color: #fbbf24; }
+    .node.dim { opacity: 0.2; pointer-events: none; transform: translate(var(--x), var(--y)) scale(0.8); }
     
-    .node-icon { font-size: 28px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
-    .node-word { font-size: 8px; letter-spacing: 1px; color: rgba(251,191,36,0.8); font-weight: 600; margin-top: 2px; text-transform: uppercase;}
+    .node-icon { font-size: 28px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5)); }
+    .node-word { font-size: 8px; letter-spacing: 1.5px; color: rgba(251,191,36,0.8); font-weight: 600; margin-top: 4px; text-transform: uppercase;}
 
-    /* 4. THE SINGULARITY SHEET (State 2: The Action Hub) */
+    /* 4. THE JUMBLER (The Subconscious Left Edge) */
+    #jumbler {
+        position: fixed; left: 16px; top: 50%; transform: translateY(-50%) rotate(-90deg);
+        transform-origin: left center;
+        font-family: monospace; font-size: 12px; letter-spacing: 4px; color: rgba(20, 184, 166, 0.4);
+        opacity: 0; transition: opacity 1s ease 0.5s; pointer-events: none; white-space: nowrap;
+    }
+    #jumbler.active { opacity: 1; }
+
+    /* 5. THE SINGULARITY SHEET (State 2: The Action Hub) */
     #sheet {
         position: fixed; bottom: 0; left: 0; right: 0;
-        background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px);
+        background: rgba(15, 23, 42, 0.92); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
         border-top: 1px solid rgba(251,191,36,0.2);
         border-radius: 32px 32px 0 0; padding: 24px 24px 40px;
         transform: translateY(100%); transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-        z-index: 200; text-align: center;
-        box-shadow: 0 -10px 40px rgba(0,0,0,0.8);
+        z-index: 100; text-align: center;
+        box-shadow: 0 -15px 50px rgba(0,0,0,0.8);
     }
     #sheet.active { transform: translateY(0); }
     
-    .sheet-header { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 20px; }
-    .sheet-icon { font-size: 36px; }
-    .sheet-title { font-size: 1.2rem; font-weight: 700; background: linear-gradient(90deg,#fbbf24,#14b8a6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-family: monospace; letter-spacing: 2px; min-width: 120px;}
+    .sheet-handle { width: 40px; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; margin: 0 auto 20px; }
     
-    .sheet-story { font-size: 0.9rem; color: #94a3b8; line-height: 1.5; margin-bottom: 24px; font-style: italic; min-height: 40px;}
+    .sheet-header { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 16px; }
+    .sheet-icon { font-size: 36px; }
+    .sheet-title { font-size: 1.2rem; font-weight: 700; color: #fbbf24; font-family: monospace; letter-spacing: 2px; min-width: 120px; text-align: left;}
+    
+    .sheet-story { font-size: 0.95rem; color: #94a3b8; line-height: 1.6; margin-bottom: 24px; font-style: italic; min-height: 50px; padding: 0 10px;}
 
-    .sheet-actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; max-width: 400px; margin: 0 auto; }
+    .sheet-actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; max-width: 400px; margin: 0 auto; }
     .action-btn {
-        width: 100%; aspect-ratio: 1; border-radius: 20px;
-        background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+        aspect-ratio: 1; border-radius: 20px;
+        background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
         font-size: 28px; display: flex; flex-direction: column; align-items: center; justify-content: center;
-        cursor: pointer; transition: 0.2s; gap: 4px;
+        cursor: pointer; transition: 0.2s; gap: 6px;
     }
-    .action-btn span { font-size: 9px; color: #94a3b8; letter-spacing: 1px; }
-    .action-btn:active { transform: scale(0.9); background: rgba(251,191,36,0.2); border-color: #fbbf24; }
-
-    /* 5. UPI OVERLAY */
-    #upi-overlay {
-        position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 300;
-        display: none; align-items: center; justify-content: center; flex-direction: column; gap: 20px;
-    }
-    #upi-overlay.active { display: flex; }
-    #upi-overlay img { width: 200px; border-radius: 16px; border: 2px solid #14b8a6; }
-    #upi-overlay p { color: #14b8a6; font-family: monospace; }
-    #upi-overlay button { background: none; border: 1px solid #fff; color: #fff; padding: 10px 20px; border-radius: 20px; cursor: pointer;}
+    .action-btn span { font-size: 9px; color: #64748b; letter-spacing: 1px; font-weight: 600; }
+    .action-btn:active { transform: scale(0.9); background: rgba(251,191,36,0.15); border-color: #fbbf24; }
 </style>
 </head>
 <body>
 
-<!-- The Seed -->
-<div id="seed" role="button" aria-label="Awaken the Universe"></div>
+<div id="void">
+    <!-- The Seed -->
+    <div id="dot"></div>
 
-<!-- The Universe -->
-<div id="universe"></div>
+    <!-- The Mandala -->
+    <div id="mandala"></div>
 
-<!-- The Singularity Sheet -->
-<div id="sheet">
-    <div class="sheet-header">
-        <div class="sheet-icon" id="sheet-icon">✨</div>
-        <div class="sheet-title" id="sheet-title">KHEL.O</div>
-    </div>
-    <div class="sheet-story" id="sheet-story">Tap a node to discover its resonance.</div>
-    <div class="sheet-actions">
-        <button class="action-btn" id="act-dice" aria-label="Roll Dice">🎲<span>Dice</span></button>
-        <button class="action-btn" id="act-wiki" aria-label="Wiki Dive">📚<span>Wiki</span></button>
-        <button class="action-btn" id="act-map" aria-label="Komute Map">🗺️<span>Komute</span></button>
-        <button class="action-btn" id="act-seed" aria-label="Contribute">🌱<span>Seed</span></button>
+    <!-- The Jumbler -->
+    <div id="jumbler">khel.o • sa.hyog • ba.ej • dis-play • ko.mute</div>
+
+    <!-- The Singularity Sheet -->
+    <div id="sheet">
+        <div class="sheet-handle"></div>
+        <div class="sheet-header">
+            <div class="sheet-icon" id="sheet-icon">🌱</div>
+            <div class="sheet-title" id="sheet-title">SAHYOG</div>
+        </div>
+        <div class="sheet-story" id="sheet-story">Strangers arrive at a park, carrying the heavy weight of their digital lives. Someone begins to clap a simple rhythm. Another joins. Within minutes, fifty people are moving as one organism. The ego dissolves; the village is born.</div>
+        <div class="sheet-actions">
+            <button class="action-btn" id="act-dice">🎲<span>Dice</span></button>
+            <button class="action-btn" id="act-wiki">📚<span>Wiki</span></button>
+            <button class="action-btn" id="act-map">🗺️<span>Komute</span></button>
+            <button class="action-btn" id="act-seed">🌱<span>Seed</span></button>
+        </div>
     </div>
 </div>
 
-<!-- UPI Overlay -->
-<div id="upi-overlay">
-    <img src="https://raw.githubusercontent.com/krishnabhearth-svg/Kraizen-Journal/main/upi%20pay%20qr%20code.jpeg" alt="UPI QR">
-    <p>krishna.bh.earth@upi</p>
-    <button onclick="document.getElementById('upi-overlay').classList.remove('active')">Close</button>
-</div>
+<script>
+    // ==========================================
+    // 1. DUMMY DATA (The 8 Root Domains)
+    // ==========================================
+    const DOMAINS = [
+        { id: '0.1', name: 'Individual', icon: '🧠', story: 'An elder sits with a child, not to teach, but to wonder aloud about the stars. The child asks a question that has no answer, and together they build a telescope from scrap.' },
+        { id: '0.2', name: 'Samajh', icon: '🤝', story: 'A grandmother weaves a basket while singing a song that contains the exact migratory patterns of birds. A teenager records the song, not for digital views, but to ensure the birds are never lost.' },
+        { id: '0.3', name: 'Econology', icon: '🌍', story: 'A coffee shop gives its spent grounds to a mushroom farmer. The farmer gives the spent substrate to a community garden. The garden feeds the shop. The circle closes; the earth breathes.' },
+        { id: '0.4', name: 'Earth Eng', icon: '🏗️', story: 'A community needs to route a new water channel. They do not vote; they walk the land together, feel the slope of the earth, and reach a consensus that mirrors the gravity of the water.' },
+        { id: '0.5', name: 'Discovery', icon: '🔭', story: 'Two strangers meet at a garden. One knows how to graft fruit trees; the other knows how to code irrigation sensors. By sunset, they have taught each other, and the yield is forever changed.' },
+        { id: '0.6', name: 'Innovation', icon: '💡', story: 'A farmer 3D prints a replacement gear for a 50-year-old tractor using a design shared by a mechanic in another continent. The global supply chain is bypassed; the local community is empowered.' },
+        { id: '0.8', name: 'Sahyog', icon: '🌱', story: 'Strangers arrive at a park, carrying the heavy weight of their digital lives. Someone begins to clap a simple rhythm. Another joins. Within minutes, fifty people are moving as one organism. The ego dissolves.' },
+        { id: '0.9', name: 'Mukti', icon: '🕊️', story: 'A young man, restless and disconnected, learns to forge iron. He spends his frustration shaping a complex, beautiful gate for the local school. Every time the children walk through it, they touch his healed mind.' }
+    ];
 
-<!-- The Genesis Engine -->
-<script src="display.js"></script>
+    // ==========================================
+    // 2. AUDIO & HAPTIC ENGINE (The Physical Feel)
+    // ==========================================
+    const AudioHaptic = {
+        ctx: null,
+        init() { if(!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); },
+        playTone(freq, duration, type = 'sine') {
+            try {
+                this.init();
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = type; osc.frequency.value = freq;
+                gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
+                osc.connect(gain); gain.connect(this.ctx.destination);
+                osc.start(); osc.stop(this.ctx.currentTime + duration);
+            } catch(e) {}
+        },
+        vibrate(pattern) { if(navigator.vibrate) navigator.vibrate(pattern); }
+    };
+
+    // ==========================================
+    // 3. UI STATE MACHINE
+    // ==========================================
+    const dot = document.getElementById('dot');
+    const mandala = document.getElementById('mandala');
+    const jumbler = document.getElementById('jumbler');
+    const sheet = document.getElementById('sheet');
+    let isBloomed = false;
+
+    // --- STATE 0: THE DOT ---
+    dot.addEventListener('click', () => {
+        if (isBloomed) return;
+        isBloomed = true;
+        
+        AudioHaptic.vibrate([50, 30, 100]);
+        AudioHaptic.playTone(400, 0.6, 'sine');
+
+        dot.classList.add('bloom');
+        
+        setTimeout(() => {
+            mandala.classList.add('active');
+            jumbler.classList.add('active');
+            bloomNodes();
+            startJumbler();
+        }, 300);
+    });
+
+    // --- STATE 1: THE BLOOM ---
+    function bloomNodes() {
+        const radius = Math.min(window.innerWidth, window.innerHeight) * 0.32;
+        
+        DOMAINS.forEach((domain, index) => {
+            const angle = (index / DOMAINS.length) * Math.PI * 2 - (Math.PI / 2); // Start from top
+            const x = Math.cos(angle) * radius;
+            const y = Math.sin(angle) * radius;
+
+            const node = document.createElement('div');
+            node.className = 'node';
+            node.style.setProperty('--x', `${x}px`);
+            node.style.setProperty('--y', `${y}px`);
+            node.style.transitionDelay = `${index * 0.06}s`; // Staggered organic bloom
+            
+            node.innerHTML = `
+                <div class="node-icon">${domain.icon}</div>
+                <div class="node-word">${domain.name}</div>
+            `;
+
+            node.addEventListener('click', () => selectDomain(domain, node));
+            mandala.appendChild(node);
+            
+            // Trigger animation
+            setTimeout(() => node.classList.add('bloom'), 50);
+        });
+    }
+
+    // --- STATE 2: THE SINGULARITY SHEET ---
+    function selectDomain(domain, selectedNode) {
+        AudioHaptic.vibrate(30);
+        AudioHaptic.playTone(600, 0.2, 'triangle');
+
+        // Dim other nodes
+        document.querySelectorAll('.node').forEach(n => {
+            if (n !== selectedNode) n.classList.add('dim');
+        });
+
+        // Update Sheet Content
+        document.getElementById('sheet-icon').innerText = domain.icon;
+        document.getElementById('sheet-story').innerText = domain.story;
+        
+        // Jumbler effect on the title
+        const titleEl = document.getElementById('sheet-title');
+        const target = domain.name.toUpperCase();
+        let frame = 0;
+        const chars = '!<>-_\\/[]{}—=+*^?#~';
+        const interval = setInterval(() => {
+            let out = '';
+            for(let i=0; i<target.length; i++) {
+                if(i < frame) out += target[i];
+                else out += chars[Math.floor(Math.random() * chars.length)];
+            }
+            titleEl.textContent = out;
+            frame += 0.8;
+            if(frame >= target.length) { titleEl.textContent = target; clearInterval(interval); }
+        }, 40);
+
+        // Slide up sheet
+        sheet.classList.add('active');
+    }
+
+    // Close sheet on background tap
+    document.getElementById('void').addEventListener('click', (e) => {
+        if (sheet.classList.contains('active') && !e.target.closest('#sheet') && !e.target.closest('.node') && !e.target.closest('#dot')) {
+            closeSheet();
+        }
+    });
+
+    function closeSheet() {
+        AudioHaptic.playTone(400, 0.2, 'triangle');
+        sheet.classList.remove('active');
+        document.querySelectorAll('.node.dim').forEach(n => n.classList.remove('dim'));
+    }
+
+    // ==========================================
+    // 4. THE JUMBLER ENGINE (Subconscious)
+    // ==========================================
+    function startJumbler() {
+        const words = ['khel.o', 'sa.hyog', 'ba.ej', 'dis-play', 'ko.mute'];
+        const chars = '!<>-_\\/[]{}—=+*^?#~';
+        let idx = 0;
+        
+        const run = () => {
+            const target = words[idx];
+            idx = (idx + 1) % words.length;
+            let frame = 0;
+            
+            const interval = setInterval(() => {
+                let out = '';
+                for(let i=0; i<target.length; i++) {
+                    if(i < frame) out += target[i];
+                    else out += chars[Math.floor(Math.random() * chars.length)];
+                }
+                jumbler.textContent = out;
+                frame += 0.6;
+                
+                if(frame >= target.length) {
+                    jumbler.textContent = target;
+                    clearInterval(interval);
+                    setTimeout(run, 2500);
+                }
+            }, 50);
+        };
+        run();
+    }
+
+    // ==========================================
+    // 5. ACTION BUTTONS (Dummy Flow)
+    // ==========================================
+    document.getElementById('act-dice').addEventListener('click', () => {
+        AudioHaptic.vibrate([50, 50, 100]);
+        AudioHaptic.playTone(800, 0.3, 'square');
+        document.getElementById('sheet-story').innerText = '🎲 "Plant a seed where you stand today. The soil is waiting."';
+    });
+
+    document.getElementById('act-wiki').addEventListener('click', () => {
+        AudioHaptic.playTone(1000, 0.2);
+        document.getElementById('sheet-story').innerText = '📚 Opening the Kids Wiki knowledge mesh...';
+    });
+
+    document.getElementById('act-map').addEventListener('click', () => {
+        AudioHaptic.playTone(700, 0.2);
+        document.getElementById('sheet-story').innerText = '🗺️ Calculating KOMUTE route to nearest assembly point...';
+    });
+
+    document.getElementById('act-seed').addEventListener('click', () => {
+        AudioHaptic.playTone(500, 0.4, 'sine');
+        document.getElementById('sheet-story').innerText = '🌱 Seed planted. Your intention is now part of the mesh.';
+    });
+
+</script>
 </body>
 </html>
