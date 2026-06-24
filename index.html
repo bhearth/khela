@@ -1,333 +1,1759 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Khel.o | The Dot & The Mesh (Neo4j Edition)</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-<script src="https://cdn.jsdelivr.net/npm/neo4j-driver@5.12.0/lib/browser/neo4j-web.min.js"></script>
-<style>
-:root { --bg-color: #050507; --surface-color: #121318; --surface-variant: #1a1c23; --primary: #8AB4F8; --secondary: #81C995; --accent: #F28B82; --text-main: #E8EAED; --text-muted: #9AA0A6; --border-color: rgba(255, 255, 255, 0.1); --radius-lg: 24px; --radius-md: 16px; --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); --shadow-resonance: 0 8px 32px rgba(0, 0, 0, 0.5); }
-[data-theme="light"] { --bg-color: #ffffff; --surface-color: #f9fafb; --surface-variant: #f3f4f6; --primary: #0B57D0; --secondary: #0D652D; --text-main: #111827; --text-muted: #4b5563; --border-color: rgba(0, 0, 0, 0.1); }
-* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-main); height: 100vh; display: flex; flex-direction: column; overflow: hidden; transition: background-color 0.3s, color 0.3s; }
-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; background: rgba(var(--bg-color), 0.8); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border-color); z-index: 10; }
-.logo { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 1.3rem; color: var(--primary); }
-main { flex: 1; overflow-y: auto; position: relative; padding-bottom: 90px; }
-.view-section { display: none; padding: 24px; max-width: 900px; margin: 0 auto; animation: fadeIn 0.4s ease forwards; }
-.view-section.active { display: block; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Khela | Nirmal Sahyog Matrix (Neo4j Edition)</title>
+    <meta name="description" content="The Knowledge Singularity. Pure Cooperation.">
+    
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    
+    <!-- Neo4j Browser Driver -->
+    <script src="https://cdn.jsdelivr.net/npm/neo4j-driver@5.12.0/lib/browser/neo4j-web.min.js"></script>
 
-/* =========================================
-THE DOT & BIG BANG (NEW PARADIGM)
-========================================= */
-#dot-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 75vh; text-align: center; }
-#golden-dot { width: 28px; height: 28px; background: #fbbf24; border-radius: 50%; box-shadow: 0 0 40px 15px rgba(251,191,36,0.6); cursor: pointer; animation: pulse 2.5s infinite ease-in-out; transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); margin: 24px 0; }
-#golden-dot.bloom { transform: scale(0); opacity: 0; pointer-events: none; }
-@keyframes pulse { 0%, 100% { box-shadow: 0 0 40px 15px rgba(251,191,36,0.6); transform: scale(1); } 50% { box-shadow: 0 0 60px 25px rgba(251,191,36,0.9); transform: scale(1.2); } }
+    <title>Khel.o · Earth 00 OS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        /* =========================================
+           CORE THEME & VARIABLES (Glass/Dark/Zen)
+           ========================================= */
+        :root {
+            --bg-color: #050507;
+            --surface-color: #121318;
+            --surface-variant: #1a1c23;
+            --primary: #8AB4F8;
+            --secondary: #81C995;
+            --accent: #F28B82;
+            --youtube: #FF0000;
+            --prototype: #F6AD55;
+            --text-main: #E8EAED;
+            --text-muted: #9AA0A6;
+            --border-color: rgba(255, 255, 255, 0.1);
+            
+            --radius-lg: 24px;
+            --radius-md: 16px;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --shadow-resonance: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
 
-/* Mandala Overlay (Integral.js Engine) */
-#mandala-overlay { position: fixed; inset: 0; z-index: 9998; background: rgba(5,5,7,0.95); backdrop-filter: blur(16px); display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
-#mandala-overlay.active { display: flex; animation: fadeIn 0.4s ease; }
-.int-mandala { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; max-width: 500px; width: 100%; margin-bottom: 24px; }
-.int-pod { background: rgba(30, 41, 59, 0.8); border: 2px solid rgba(255,255,255,0.1); border-radius: 24px; padding: 20px 16px; text-align: center; cursor: pointer; transition: 0.3s; }
-.int-pod:hover { border-color: rgba(255,255,255,0.3); transform: translateY(-4px); }
-.int-pod.locked { opacity: 0.5; pointer-events: none; border-color: var(--pod-color); background: rgba(255,255,255,0.05); }
-.int-pod .icon { font-size: 28px; display: block; margin-bottom: 8px; }
-.int-pod .label { font-size: 0.85rem; font-weight: 600; color: #fff; }
-.int-pod .selection { font-size: 0.7rem; color: var(--pod-color); margin-top: 6px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; min-height: 16px; }
+        [data-theme="light"] {
+            --bg-color: #ffffff;
+            --surface-color: #f9fafb;
+            --surface-variant: #f3f4f6;
+            --primary: #0B57D0;
+            --secondary: #0D652D;
+            --text-main: #111827;
+            --text-muted: #4b5563;
+            --border-color: rgba(0, 0, 0, 0.1);
+            --shadow-resonance: 0 8px 32px rgba(0, 0, 0, 0.08);
+            --bg: #030406;
+            --gold: #fbbf24;
+            --teal: #14b8a6;
+            --text: #e2e8f0;
+            --muted: #64748b;
+        }
 
-/* Singularity Card (Event.js Engine) */
-#singularity-card { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px); border-top: 1px solid rgba(251,191,36,0.3); border-radius: 32px 32px 0 0; padding: 24px; transform: translateY(100%); transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1); z-index: 9999; text-align: center; box-shadow: 0 -10px 40px rgba(0,0,0,0.8); }
-#singularity-card.active { transform: translateY(0); }
-.komute-btn { display: inline-block; background: #fbbf24; color: #000; padding: 14px 28px; border-radius: 16px; font-weight: 700; text-decoration: none; margin-top: 16px; font-size: 1rem; transition: 0.2s; }
-.komute-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(251,191,36,0.3); }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-/* =========================================
-CARDS, BUTTONS & NAV (OLD CODE FOUNDATION)
-========================================= */
-.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
-.card { background: var(--surface-color); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; transition: var(--transition); display: flex; flex-direction: column; gap: 12px; text-decoration: none; color: inherit; cursor: pointer; }
-.card:hover { border-color: var(--primary); transform: translateY(-3px); box-shadow: var(--shadow-resonance); }
-.card-title { font-size: 1.15rem; font-weight: 600; line-height: 1.4; }
-.card-meta { font-size: 0.85rem; color: var(--text-muted); }
-.btn { padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border-color); background: var(--surface-variant); color: var(--text-main); font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; justify-content: center; gap: 6px; text-decoration: none; }
-.btn-primary { background: var(--primary); color: #000; border: none; font-weight: 600; }
-.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(var(--bg-color), 0.95); backdrop-filter: blur(10px); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; padding: 12px 0; padding-bottom: calc(12px + env(safe-area-inset-bottom)); z-index: 100; }
-.nav-item { background: none; border: none; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 0.75rem; cursor: pointer; width: 70px; }
-.nav-item.active { color: var(--primary); }
-.viewer-overlay { position: fixed; inset: 0; background: #000; z-index: 300; display: none; flex-direction: column; }
-.viewer-overlay.active { display: flex; }
-.viewer-body { flex: 1; display: flex; align-items: center; justify-content: center; padding: 16px; }
-.viewer-body iframe { width: 100%; height: 100%; border: none; background: #fff; border-radius: 8px; }
-</style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', system-ui, sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            width: 100vw;
+            overflow: hidden;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* App Bar */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            background: rgba(var(--bg-color), 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 10;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+            font-size: 1.3rem;
+            color: var(--primary);
+            letter-spacing: 0.5px;
+        }
+
+        .db-status {
+            font-size: 0.75rem;
+            padding: 4px 8px;
+            border-radius: 12px;
+            background: rgba(255,0,0,0.1);
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: 500;
+        }
+        .db-status.connected {
+            background: rgba(129,201,149,0.1);
+            color: var(--secondary);
+        }
+
+        /* Main Container */
+        main {
+            flex: 1;
+            overflow-y: auto;
+            position: relative;
+            padding-bottom: 90px; /* Space for bottom nav */
+        }
+
+        .view-section {
+            display: none;
+            padding: 24px;
+            max-width: 900px;
+            margin: 0 auto;
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        .view-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* =========================================
+           ZEN FLOW (Research Input)
+           ========================================= */
+        .zen-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 70vh;
+            text-align: center;
+        }
+
+        .zen-prompt {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 24px;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .zen-input {
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid var(--border-color);
+            color: var(--text-main);
+            font-size: 2.5rem;
+            font-weight: 300;
+            text-align: center;
+            width: 100%;
+            max-width: 600px;
+            outline: none;
+            padding: 12px 0;
+            transition: var(--transition);
+        }
+
+        .zen-input:focus {
+            border-bottom-color: var(--primary);
+        }
+
+        /* =========================================
+           CARDS & RESULTS
+           ========================================= */
+        .results-header {
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .results-header h2 {
+            font-weight: 400;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+        }
+
+        .results-header strong {
+            color: var(--text-main);
+            font-weight: 600;
+            touch-action: none;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 16px;
+        }
+
+        .card {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            position: relative;
+            overflow: hidden;
+            text-decoration: none; 
+            color: inherit;
+        }
+
+        .card:hover {
+            border-color: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-resonance);
+        /* The Central Sun (Hidden until Big Bang) */
+        #sun {
+            position: absolute;
+            width: 80px; height: 80px;
+            background: radial-gradient(circle, #fff 0%, var(--gold) 40%, #d97706 100%);
+            border-radius: 50%;
+            box-shadow: 0 0 60px 20px rgba(251, 191, 36, 0.3);
+            opacity: 0;
+            transform: scale(0);
+            transition: all 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 5;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 32px;
+        }
+        #sun.active { opacity: 1; transform: scale(1); }
+
+        .card-manifesto {
+            background: linear-gradient(145deg, rgba(138,180,248,0.08), rgba(129,201,149,0.04));
+            border-color: var(--primary);
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 32px 20px;
+        /* The Orbiting Domain Nodes */
+        .domain-node {
+            position: absolute;
+            width: 90px; height: 90px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            border-radius: 50%;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 10;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+
+        .card-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        
+        .domain-node.active { opacity: 1; transform: scale(1); }
+        
+        .domain-node:hover {
+            border-color: var(--gold);
+            background: rgba(251, 191, 36, 0.1);
+            box-shadow: 0 0 30px rgba(251, 191, 36, 0.4);
+            transform: scale(1.15) !important;
+        }
+
+        .card-source {
+            font-size: 0.7rem;
+        .domain-icon { font-size: 28px; margin-bottom: 4px; filter: drop-shadow(0 0 5px rgba(255,255,255,0.3)); }
+        .domain-name { 
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 10px; 
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            letter-spacing: 1px; 
+            text-transform: uppercase; 
+            color: var(--text); 
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .source-amazon { background: rgba(242, 139, 130, 0.1); color: var(--accent); }
+        .source-scholar { background: rgba(138, 180, 248, 0.1); color: var(--primary); }
+        .source-library { background: rgba(129, 201, 149, 0.1); color: var(--secondary); }
+        .source-youtube { background: rgba(255, 0, 0, 0.1); color: var(--youtube); }
+        .source-network { background: rgba(139, 92, 246, 0.1); color: #8b5cf6; }
+        .source-prototype { background: rgba(246, 173, 85, 0.1); color: var(--prototype); }
+
+        .khela-score {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            background: var(--surface-variant);
+            padding: 2px 6px;
+            border-radius: 4px;
+        .domain-code {
+            font-size: 8px;
+            color: var(--teal);
+            margin-top: 2px;
+            font-family: monospace;
+        }
+
+        .card-title {
+            font-size: 1.15rem;
+            font-weight: 600;
+            line-height: 1.4;
+            color: var(--text-main);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .card-meta {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* Hash Tags */
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 4px;
+        }
+        .hashtag {
+            font-size: 0.7rem;
+            color: var(--primary);
+            background: rgba(138, 180, 248, 0.1);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: auto;
+            padding-top: 12px;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            background: var(--surface-variant);
+            color: var(--text-main);
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            text-decoration: none;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn:hover { background: rgba(138, 180, 248, 0.1); border-color: var(--primary); color: var(--primary); }
+        .btn-primary { background: var(--primary); color: #000; border: none; font-weight: 600; }
+        .btn-primary:hover { background: #aecbfa; color: #000; border-color: transparent; }
+        .btn-full { width: 100%; padding: 12px; font-size: 1rem; }
+
+        /* =========================================
+           BOTTOM NAVIGATION & FAB
+           ========================================= */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: rgba(var(--bg-color), 0.95);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            padding-bottom: calc(12px + env(safe-area-inset-bottom));
+            z-index: 100;
+        }
+
+        .nav-item {
+            background: none; border: none;
+            color: var(--text-muted);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 70px;
+        }
+
+        .nav-item.active { color: var(--primary); }
+        .nav-item.active .material-symbols-outlined { font-variation-settings: 'FILL' 1; }
+
+        .fab {
+            position: fixed;
+            bottom: 90px;
+            right: 24px;
+            width: 60px; height: 60px;
+        /* Orbital Rings (Visual flair) */
+        .orbit-ring {
+            position: absolute;
+            border: 1px dashed rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            background: var(--secondary);
+            color: #000;
+            border: none;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 16px rgba(129,201,149,0.3);
+            cursor: pointer;
+            z-index: 90;
+            transition: var(--transition);
+            opacity: 0;
+            transition: opacity 2s ease;
+        }
+        .orbit-ring.active { opacity: 1; }
+
+        .fab:hover { transform: scale(1.05); }
+        .fab:active { transform: scale(0.95); }
+
+        /* =========================================
+           MODALS, INPUTS & VIEWER
+           ========================================= */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(6px);
+            z-index: 200;
+            display: none;
+            align-items: center; justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.active { display: flex; }
+
+        .modal-content {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            width: 100%; max-width: 450px;
+            max-height: 90vh;
+            overflow-y: auto;
+            display: flex; flex-direction: column; gap: 16px;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .input-group {
+            display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px;
+        }
+
+        .input-group label { font-size: 0.85rem; color: var(--text-muted); font-weight: 500; }
+        .input-group input, .input-group textarea, .input-group select {
+            background: var(--surface-variant);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px 16px;
+            color: var(--text-main);
+            font-family: inherit;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s;
+        /* Status Text */
+        #status-text {
+            position: absolute;
+            top: 40px;
+            width: 100%;
+        }
+        .input-group input:focus, .input-group textarea:focus { border-color: var(--secondary); }
+        .input-group .hint { font-size: 0.7rem; color: var(--text-muted); margin-top: 2px;}
+
+        /* Network Specific Styles */
+        .social-links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+        .ai-section {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.05), rgba(16, 185, 129, 0.05));
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .revenue-notice {
+            background: linear-gradient(135deg, rgba(255, 153, 0, 0.1), rgba(16, 185, 129, 0.1));
+            border: 1px solid rgba(255, 153, 0, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        .revenue-notice strong { color: var(--accent); }
+        .napkin-canvas {
+            width: 100%; min-height: 300px;
+            border-radius: 8px; margin-top: 16px;
+            background: var(--surface-variant);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .napkin-canvas svg, .napkin-canvas img { width: 100%; height: auto; max-height: 500px;}
+
+        /* Media Viewer Overlay */
+        .viewer-overlay {
+            position: fixed; inset: 0;
+            background: #000;
+            z-index: 300;
+            display: none;
+            flex-direction: column;
+        }
+
+        .viewer-overlay.active { display: flex; }
+
+        .viewer-header {
+            padding: 16px 20px;
+            display: flex; align-items: center; justify-content: space-between;
+            background: rgba(18,19,24,0.9);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .viewer-title {
+            flex: 1; margin: 0 16px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            font-weight: 500;
+            font-size: 1.1rem;
+            color: #fff;
+        }
+
+        .viewer-body {
+            flex: 1; position: relative;
+            display: flex; align-items: center; justify-content: center;
+            background: #050507;
+            padding: 16px;
+        }
+
+        .viewer-body iframe { width: 100%; height: 100%; border: none; background: #fff; border-radius: 8px; }
+        .viewer-body img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 8px; }
+        .viewer-body video { width: 100%; max-height: 100%; border-radius: 8px; outline: none; background: #000; }
+        .viewer-body audio { width: 100%; max-width: 500px; }
+
+        /* Loading Spinner */
+        .spinner { animation: spin 1s linear infinite; color: var(--primary); }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .center-msg { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 48px; color: var(--text-muted); text-align: center; }
+
+        .ai-card {
+            background: linear-gradient(145deg, rgba(138,180,248,0.1), rgba(5,5,7,0.9));
+            border: 1px solid var(--primary);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            margin-bottom: 24px;
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+            box-shadow: 0 4px 20px rgba(138,180,248,0.15);
+        }
+        .ai-card.active { display: flex; animation: fadeIn 0.5s ease; }
+        .ai-header { display: flex; align-items: center; gap: 8px; color: var(--primary); font-weight: 600; font-size: 1.1rem; }
+        .ai-content { font-size: 0.95rem; line-height: 1.6; color: var(--text-main); }
+        .ai-loading {
+            display: inline-block; width: 16px; height: 16px;
+            border: 2px solid var(--primary); border-top-color: transparent;
+            border-radius: 50%; animation: spin 1s linear infinite;
+            font-family: 'Space Grotesk', monospace;
+            font-size: 12px;
+            letter-spacing: 3px;
+            color: var(--muted);
+            text-transform: uppercase;
+            pointer-events: none;
+            transition: opacity 0.5s;
+        }
+
+    </style>
 </head>
 <body>
 
-<header>
-    <div class="logo"><span class="material-symbols-outlined">all_inclusive</span> Khel.o <span style="font-size:0.85rem; font-weight:400; color:var(--text-muted); margin-left:4px;">| Mesh</span></div>
-    <div style="display:flex; gap:12px; align-items: center;">
-        <div id="db-status-indicator" style="font-size: 0.75rem; padding: 4px 8px; border-radius: 12px; background: rgba(255,0,0,0.1); color: var(--accent); display: flex; align-items: center; gap: 4px;">
-            <span class="material-symbols-outlined" style="font-size: 14px;">cloud_off</span> Offline
+    <!-- Header -->
+    <header>
+        <div class="logo">
+            <span class="material-symbols-outlined">all_inclusive</span>
+            Khela <span style="font-size:0.85rem; font-weight:400; color:var(--text-muted); margin-left:4px;">| Matrix</span>
         </div>
-        <button class="btn" style="border:none; padding:6px; background: transparent;" onclick="toggleTheme()"><span class="material-symbols-outlined">contrast</span></button>
-    </div>
-</header>
-
-<main>
-    <!-- 1. THE DOT (NEW ENTRY POINT) -->
-    <section id="view-dot" class="view-section active">
-        <div id="dot-container">
-            <p style="color: var(--text-muted); letter-spacing: 3px; text-transform: uppercase; font-size: 0.9rem;">Touch the Seed to Awaken</p>
-            <div id="golden-dot" onclick="triggerBigBang()"></div>
-            <p style="color: var(--text-muted); font-size: 0.85rem; max-width: 400px; text-align: center; line-height: 1.6;">The 5W1H Mandala will unfold. Select your intent to resolve the physical Singularity or search the Global Knowledge Mesh.</p>
-        </div>
-    </section>
-
-    <!-- 2. SEARCH RESULTS (OLD CODE LOGIC) -->
-    <section id="view-results" class="view-section">
-        <div style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center;">
-            <h2 style="font-weight: 400; color: var(--text-muted); font-size: 1.2rem;">Mesh Resonance for: <strong id="results-query-text" style="color: var(--text-main);">...</strong></h2>
-            <button class="btn" onclick="switchView('dot', document.querySelectorAll('.nav-item')[0])" style="font-size: 0.75rem;"><span class="material-symbols-outlined" style="font-size: 14px;">arrow_back</span> Return to Seed</button>
-        </div>
-        <div id="results-grid" class="card-grid"></div>
-    </section>
-
-    <!-- 3. GLOBAL LIBRARY (NEO4J) -->
-    <section id="view-library" class="view-section">
-        <div style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center;">
-            <h2 style="font-weight: 400; color: var(--text-muted); font-size: 1.2rem;">Global Graph DB (Neo4j)</h2>
-            <button class="btn" onclick="loadLibrary()"><span class="material-symbols-outlined" style="font-size: 14px;">refresh</span> Sync</button>
-        </div>
-        <div id="library-grid" class="card-grid"></div>
-    </section>
-
-    <!-- 4. ABOUT -->
-    <section id="view-about" class="view-section">
-        <h2 style="color: var(--primary); margin-bottom: 20px;">The Nirmal Sahyog Matrix</h2>
-        <p style="color: var(--text-muted); line-height: 1.8; margin-bottom: 20px;">Khel.o is the Gen 100 Knowledge Singularity. It bridges the physical world (KOMUTE) with the digital mesh (Neo4j, OpenAlex, Amazon). Every tap is a seed. Every question is a sunbeam.</p>
-        <div style="background: var(--surface-color); padding: 20px; border-radius: 16px; border: 1px solid var(--border-color);">
-            <strong style="color: var(--secondary);">E = ma² (Earth = Mother²)</strong><br>
-            <span style="color: var(--text-muted); font-size: 0.9rem;">All engagements support human development, liberation, and the improved spectrum of life on Earth.</span>
-        </div>
-    </section>
-</main>
-
-<!-- MANDALA OVERLAY (Integral.js) -->
-<div id="mandala-overlay">
-    <h2 style="color: #fbbf24; margin-bottom: 24px; letter-spacing: 2px;">THE INTENT LOOM</h2>
-    <div class="int-mandala" id="int-mandala"></div>
-    <button class="btn" onclick="closeMandala()" style="border-color: rgba(255,255,255,0.2); color: #fff;">Close</button>
-</div>
-
-<!-- SINGULARITY CARD (Event.js) -->
-<div id="singularity-card">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-        <h3 style="color: #fbbf24; margin: 0; font-size: 1.1rem;">SINGULARITY RESOLVED</h3>
-        <button class="btn" style="border:none; padding:4px; background: transparent;" onclick="closeSingularity()"><span class="material-symbols-outlined">close</span></button>
-    </div>
-    <p id="singularity-story" style="color: var(--text-muted); font-style: italic; margin-bottom: 16px; line-height: 1.5;">"Strangers arrive at a park... The ego dissolves; the village is born."</p>
-    <div id="singularity-intent" style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 12px; font-size: 0.85rem; margin-bottom: 16px;"></div>
-    <a id="singularity-komute" href="#" target="_blank" class="komute-btn">🚶 Walk to Assembly (KOMUTE)</a>
-    <button class="btn btn-primary" style="width: 100%; margin-top: 16px; padding: 12px;" onclick="searchMeshFromIntent()">🔍 Search Global Mesh for this Intent</button>
-</div>
-
-<!-- UNIVERSAL MEDIA VIEWER -->
-<div class="viewer-overlay" id="viewer">
-    <div style="padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; background: rgba(18,19,24,0.9); border-bottom: 1px solid rgba(255,255,255,0.1);">
-        <button class="btn" style="border:none; color:var(--text-main); background:transparent;" onclick="closeViewer()"><span class="material-symbols-outlined">arrow_back</span></button>
-        <div id="viewer-title" style="flex: 1; margin: 0 16px; font-weight: 500; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Media</div>
-    </div>
-    <div class="viewer-body" id="viewer-body"></div>
-</div>
-
-<!-- BOTTOM NAV -->
-<nav class="bottom-nav">
-    <button class="nav-item active" onclick="switchView('dot', this)"><span class="material-symbols-outlined">trip_origin</span><span>Seed</span></button>
-    <button class="nav-item" onclick="loadLibrary(); switchView('library', this)"><span class="material-symbols-outlined">hub</span><span>Graph</span></button>
-    <button class="nav-item" onclick="switchView('about', this)"><span class="material-symbols-outlined">info</span><span>About</span></button>
-</nav>
-
-<script>
-// ==========================================
-// 1. NEO4J & SEARCH FOUNDATION (OLD CODE LOGIC)
-// ==========================================
-const CONFIG = { AMAZON_TAG: 'amazon0339f-21' };
-const NEO4J_CONFIG = { uri: 'neo4j+s://613c286a.databases.neo4j.io', user: '613c286a', password: 'vkKL9AvmRjeV3Y71iTvAmVzMr96t7zI1-7gxU_Ueius' };
-let driver = null;
-window.STATE = { currentQuery: "", dbConnected: false };
-
-async function initNeo4j() {
-    try {
-        driver = neo4j.driver(NEO4J_CONFIG.uri, neo4j.auth.basic(NEO4J_CONFIG.user, NEO4J_CONFIG.password));
-        await driver.getServerInfo();
-        STATE.dbConnected = true;
-        const el = document.getElementById('db-status-indicator');
-        el.style.background = 'rgba(129,201,149,0.1)'; el.style.color = 'var(--secondary)';
-        el.innerHTML = `<span class="material-symbols-outlined" style="font-size: 14px;">cloud_done</span> Neo4j`;
-    } catch (e) { console.error("Neo4j Offline", e); }
-}
-
-async function searchLocalDb(query) {
-    if (!STATE.dbConnected) return [];
-    const session = driver.session();
-    try {
-        const result = await session.run(`MATCH (a:Artifact) WHERE toLower(a.title) CONTAINS toLower($q) RETURN a LIMIT 10`, { q: query });
-        return result.records.map(r => r.get('a').properties);
-    } catch (e) { return []; } finally { await session.close(); }
-}
-
-async function loadLibrary() {
-    if (!STATE.dbConnected) return;
-    const session = driver.session();
-    try {
-        const result = await session.run(`MATCH (a:Artifact) RETURN a ORDER BY a.timestamp DESC LIMIT 20`);
-        const items = result.records.map(r => r.get('a').properties);
-        renderCards(items, document.getElementById('library-grid'));
-    } catch (e) { console.error(e); } finally { await session.close(); }
-}
-
-async function triggerSearch(query) {
-    STATE.currentQuery = query;
-    document.getElementById('results-query-text').innerText = query;
-    switchView('results', document.querySelectorAll('.nav-item')[0]);
-    const grid = document.getElementById('results-grid');
-    grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted);"><span class="material-symbols-outlined" style="font-size: 48px; animation: spin 1s linear infinite;">data_usage</span><p>Calculating resonance across Mesh...</p></div>`;
-    
-    // Fetch from multiple sources (Simulated for speed, keeping old code logic)
-    const [local, books, scholar] = await Promise.all([
-        searchLocalDb(query),
-        fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=3`).then(r=>r.json()).catch(()=>({items:[]})),
-        fetch(`https://api.openalex.org/works?search=${encodeURIComponent(query)}&per_page=3`).then(r=>r.json()).catch(()=>({results:[]}))
-    ]);
-
-    let combined = [...local];
-    if(books.items) combined.push(...books.items.map(b => ({ title: b.volumeInfo.title, author: b.volumeInfo.authors?.join(', '), url: `https://www.amazon.com/s?k=${encodeURIComponent(b.volumeInfo.title)}&tag=${CONFIG.AMAZON_TAG}`, type: 'amazon' })));
-    if(scholar.results) combined.push(...scholar.results.map(p => ({ title: p.title, author: p.authorships?.map(a=>a.author.display_name).join(', '), url: p.doi ? `https://doi.org/${p.doi}` : p.id, type: 'scholar', citations: p.cited_by_count })));
-
-    renderCards(combined, grid);
-}
-
-function renderCards(items, container) {
-    if (items.length === 0) { container.innerHTML = `<p style="grid-column:1/-1; text-align:center; color:var(--text-muted);">No resonance found. Plant a seed in the Graph DB.</p>`; return; }
-    container.innerHTML = items.map(item => `
-        <div class="card" onclick="${item.url ? (item.url.startsWith('http') ? `window.open('${item.url}', '_blank')` : `openViewer('${item.url}', '${item.title}')`) : ''}">
-            <div class="card-title">${item.title || 'Untitled'}</div>
-            <div class="card-meta">${item.author || 'Anonymous'} ${item.citations ? `• ${item.citations} citations` : ''}</div>
-            <div style="margin-top: auto; display: flex; gap: 8px;">
-                <span class="btn" style="font-size: 0.7rem; padding: 4px 8px;">${item.type === 'amazon' ? '🛒 Amazon' : item.type === 'scholar' ? '🎓 Scholar' : '🧬 Graph DB'}</span>
+        <div style="display:flex; gap:12px; align-items: center;">
+            <div id="db-status-indicator" class="db-status">
+                <span class="material-symbols-outlined" style="font-size: 14px;">cloud_off</span> Disconnected
             </div>
+            <button class="btn" style="border:none; padding:6px; background: transparent;" onclick="toggleTheme()" title="Toggle Theme">
+                <span class="material-symbols-outlined">contrast</span>
+            </button>
+            <button class="btn" style="border:none; padding:6px; background: transparent;" onclick="location.reload()" title="Reset Session">
+                <span class="material-symbols-outlined">restart_alt</span>
+            </button>
         </div>
-    `).join('');
-}
+    </header>
 
-// ==========================================
-// 2. THE DOT & BIG BANG (NEW PARADIGM)
-// ==========================================
-const INTENT_TREE = {
-    what: { label: "What", icon: "🎯", color: "#fbbf24" },
-    who: { label: "Who", icon: "🤝", color: "#10b981" },
-    where: { label: "Where", icon: "🗺️", color: "#3b82f6" },
-    how: { label: "How", icon: "⚙️", color: "#8b5cf6" },
-    why: { label: "Why", icon: "💡", color: "#f43f5e" },
-    when: { label: "When", icon: "⏳", color: "#0ea5e9" }
-};
-let intentSelections = {};
+    <!-- Main Content Area -->
+    <main>
+        
+        <!-- View: ZEN RESEARCH FLOW -->
+        <section id="view-zen" class="view-section active">
+            <div class="zen-container">
+                <div class="zen-prompt" id="zen-prompt">What are you exploring or prototyping?</div>
+                <input type="text" id="zen-input" class="zen-input" placeholder="..." autocomplete="off">
+            </div>
+        </section>
 
-function triggerBigBang() {
-    document.getElementById('golden-dot').classList.add('bloom');
-    if(navigator.vibrate) navigator.vibrate([50, 30, 100]);
-    setTimeout(() => {
-        document.getElementById('mandala-overlay').classList.add('active');
-        renderMandala();
-    }, 400);
-}
+        <!-- View: SEARCH RESULTS -->
+        <section id="view-results" class="view-section">
+            <div class="results-header">
+                <h2>Resonance Matrix for: <strong id="results-query-text">...</strong></h2>
+                <button class="btn" style="padding: 4px 12px; font-size: 0.75rem;" onclick="triggerSearch(STATE.currentQuery)">
+                    <span class="material-symbols-outlined" style="font-size: 14px;">refresh</span> Sync
+                </button>
+            </div>
+            
+            <div id="ai-synthesis-card" class="ai-card">
+                <div class="ai-header">
+                    <span class="material-symbols-outlined">auto_awesome</span>
+                    Matrix Oracle Synthesis
+                </div>
+                <div id="ai-synthesis-content" class="ai-content">
+                    <!-- AI Content rendered here -->
+                </div>
+            </div>
 
-function renderMandala() {
-    const container = document.getElementById('int-mandala');
-    container.innerHTML = '';
-    Object.keys(INTENT_TREE).forEach(key => {
-        const pod = INTENT_TREE[key];
-        const isSelected = !!intentSelections[key];
-        const el = document.createElement('div');
-        el.className = `int-pod ${isSelected ? 'locked' : ''}`;
-        el.style.setProperty('--pod-color', pod.color);
-        el.innerHTML = `<span class="icon">${pod.icon}</span><div class="label">${pod.label}</div><div class="selection">${isSelected ? intentSelections[key] : 'Select...'}</div>`;
-        el.onclick = () => selectIntentPod(key);
-        container.appendChild(el);
-    });
-}
+            <div id="results-grid" class="card-grid">
+                <!-- Cards injected here -->
+            </div>
+        </section>
 
-function selectIntentPod(key) {
-    // Simulated drill-down (In production, this fetches from 5W1H1.json)
-    const options = {
-        what: ['Ecology', 'Code', 'Art', 'Soil', 'Water'],
-        who: ['Elders', 'Kids', 'Farmers', 'Seekers'],
-        where: ['Park', 'Temple', 'Forest', 'Village'],
-        how: ['Walk', 'Sing', 'Plant', 'Build'],
-        why: ['Healing', 'Joy', 'Truth', 'Freedom'],
-        when: ['Dawn', 'Dusk', 'Now', 'Season']
-    };
-    intentSelections[key] = options[key][Math.floor(Math.random() * options[key].length)];
-    renderMandala();
+        <!-- View: GLOBAL LIBRARY (Neo4j) -->
+        <section id="view-library" class="view-section">
+            <div class="results-header">
+                <h2>Global Database (Neo4j)</h2>
+                <button class="btn" style="padding: 4px 12px; font-size: 0.75rem;" onclick="loadLibrary()">
+                    <span class="material-symbols-outlined" style="font-size: 14px;">refresh</span> Sync
+                </button>
+            </div>
+            <div id="library-grid" class="card-grid">
+                <!-- Cards injected here -->
+            </div>
+        </section>
+
+        <!-- View: AI NETWORKING -->
+        <section id="view-network" class="view-section">
+            <div class="results-header">
+                <h2>AI Social Network & Prototyping</h2>
+            </div>
+            
+            <div class="ai-section">
+                <h3 style="margin-bottom: 12px; font-weight: 500;">Connect with collaborators using semantic AI matching</h3>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 24px;">Build your AI profile to find researchers, engineers, and philosophers aligning with your goals.</p>
+
+                <div class="input-group">
+                    <label>Select AI Provider</label>
+                    <select id="aiProvider">
+                        <option value="gemini">Google Gemini (Default)</option>
+                        <option value="openai">OpenAI GPT-4</option>
+                        <option value="claude">Anthropic Claude</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label>API Key (Optional for Gemini)</label>
+                    <input type="password" id="apiKey" placeholder="Leave blank to use platform default Gemini">
+                </div>
+
+                <div class="input-group">
+                    <label>Your Social & Project Footprint</label>
+                    <div class="social-links-grid">
+                        <input type="url" placeholder="GitHub URL" id="socialGithub">
+                        <input type="url" placeholder="LinkedIn URL" id="socialLinkedin">
+                        <input type="url" placeholder="Twitter/X URL" id="socialTwitter">
+                        <input type="url" placeholder="Personal Website" id="socialWebsite">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Interests, Goals & Prototyping Focus</label>
+                    <textarea id="userInterests" rows="3" placeholder="e.g., Shoe design, Earth Engineering, bypassing the Brahmit zone, scalable cooperation..."></textarea>
+                </div>
+
+                <button class="btn btn-primary" onclick="buildNetworkProfile()">
+                    Build My Profile & Find Matches
+                </button>
+            </div>
+
+            <div id="networkResults"></div>
+
+            <div class="ai-section" style="margin-top: 24px;">
+                <h3 style="margin-bottom: 12px; font-weight: 500;">Napkin AI Concept Visualization</h3>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 16px;">Create beautiful SVG diagrams to map your concepts and prototypes.</p>
+                
+                <div class="input-group">
+                    <textarea id="napkinText" rows="3" placeholder="Describe a system architecture, shoe design workflow, or abstract concept..."></textarea>
+                </div>
+                <button class="btn" onclick="createNapkinDiagram()">Generate Diagram</button>
+                
+                <div id="napkinOutput" class="napkin-canvas">
+                    <p style="color: var(--text-muted);">Diagram will appear here</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- View: ABOUT -->
+        <section id="view-about" class="view-section">
+            <div class="results-header">
+                <h2>About Khela - Nirmal Sahyog</h2>
+            </div>
+            <div style="line-height: 1.8;">
+                <h3 style="margin: 20px 0 10px; color: var(--primary);">The Vision</h3>
+                <p style="color: var(--text-muted); margin-bottom: 20px;">
+                    Khela is the Gen 100 Knowledge Singularity - a universal platform that integrates 
+                    Amazon Commercial Products, OpenAlex research, GitHub repositories, Prototyping synchronization, and AI-powered networking 
+                    into one seamless experience.
+                </p>
+
+                <h3 style="margin: 20px 0 10px; color: var(--primary);">Nirmal Sahyog (Pure Cooperation)</h3>
+                <p style="color: var(--text-muted); margin-bottom: 20px;">
+                    This platform operates on the principle of <em>Nirmal Sahyog</em> - pure cooperation 
+                    without ego, without dependency. Users contribute knowledge, AI connects collaborators, 
+                    and revenue supports human evolution.
+                </p>
+
+                <div class="revenue-notice">
+                    <strong>E = ma² (Earth = Mother²)</strong><br><br>
+                    All Amazon affiliate commissions and platform engagements support human development, liberation, 
+                    and the improved spectrum of life on Earth.
+                </div>
+
+                <h3 style="margin: 30px 0 10px; color: var(--primary);">Technology Stack</h3>
+                <ul style="color: var(--text-muted); padding-left: 20px; margin-bottom: 20px;">
+                    <li>Single-page architecture (Runs anywhere, e.g. GitHub Pages)</li>
+                    <li>Neo4j Graph Database Integration (Real-time Global Sync)</li>
+                    <li>Amazon Affiliate Prototyping Routing</li>
+                    <li>OpenAlex API for global academic research</li>
+                    <li>Integrated AI Synthesizer (Gemini Matrix Oracle)</li>
+                    <li>Napkin AI for diagram generation</li>
+                </ul>
+
+                <p style="color: var(--text-muted); margin-top: 40px;">
+                    <strong>Admin Contact:</strong> krishna.bh.earth@gmail.com<br>
+                </p>
+
+                <div class="revenue-notice" style="margin-top: 40px; background: transparent; border-color: var(--border-color);">
+                    <strong>🙏 Dhanyawad, Nirvivad, Ram-Ram</strong><br>
+                    Thank you, without dispute, farewell to the ego. This is the path of Mukti Nirmaan Yojna.
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Floating Action Button (Contribute) -->
+    <button class="fab" onclick="openModal('contribute-modal')" title="Offer to the Matrix">
+        <span class="material-symbols-outlined" style="font-size: 28px;">add</span>
+    </button>
+    <div id="status-text">Awaiting the Seed...</div>
     
-    if(Object.keys(intentSelections).length >= 3) setTimeout(resolveSingularity, 600);
-}
+    <!-- The Central Sun -->
+    <div id="sun">☀️</div>
 
-function closeMandala() {
-    document.getElementById('mandala-overlay').classList.remove('active');
-    document.getElementById('golden-dot').classList.remove('bloom');
-    intentSelections = {};
-}
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <button class="nav-item active" onclick="switchView('zen', this)">
+            <span class="material-symbols-outlined">travel_explore</span>
+            <span>Research</span>
+        </button>
+        <button class="nav-item" onclick="loadLibrary(); switchView('library', this)">
+            <span class="material-symbols-outlined">public</span>
+            <span>Global DB</span>
+        </button>
+        <button class="nav-item" onclick="switchView('network', this)">
+            <span class="material-symbols-outlined">hub</span>
+            <span>Network</span>
+        </button>
+        <button class="nav-item" onclick="switchView('about', this)">
+            <span class="material-symbols-outlined">info</span>
+            <span>About</span>
+        </button>
+    </nav>
+    <!-- Orbital Rings (Generated by JS) -->
+    <div id="rings-container"></div>
 
-function resolveSingularity() {
-    closeMandala();
-    const card = document.getElementById('singularity-card');
-    document.getElementById('singularity-intent').innerHTML = Object.entries(intentSelections).map(([k, v]) => `<strong>${k.toUpperCase()}:</strong> ${v}`).join(' &nbsp;|&nbsp; ');
-    
-    // Event.js KOMUTE Logic
-    const where = intentSelections.where || 'Park';
-    document.getElementById('singularity-komute').href = `https://www.google.com/maps/search/${encodeURIComponent(where)}`;
-    
-    card.classList.add('active');
-    if(navigator.vibrate) navigator.vibrate([100, 50, 100]);
-}
+    <!-- Contribution Modal -->
+    <div class="modal-overlay" id="contribute-modal">
+        <form class="modal-content" onsubmit="handleContribute(event)">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3 style="font-size: 1.2rem; font-weight: 600;">Offer Knowledge & Prototypes</h3>
+                <button type="button" class="btn" style="border:none; padding:4px; background: transparent;" onclick="closeModal('contribute-modal')">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="input-group">
+                <label>Content Type</label>
+                <select id="c-type" required>
+                    <option value="library">Book / Article / Video</option>
+                    <option value="prototype">Prototype / Product Design</option>
+                    <option value="research">Research / Theory</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Title</label>
+                <input type="text" id="c-title" required placeholder="e.g., Next-Gen Shoe Prototype">
+            </div>
+            <div class="input-group">
+                <label>Author / Creator</label>
+                <input type="text" id="c-author" required placeholder="e.g., Anonymous">
+            </div>
+            <div class="input-group">
+                <label>Media / Source URL</label>
+                <input type="url" id="c-url" required placeholder="https:// (PDF, MP4, MP3, YT, Drive...)">
+            </div>
+            <div class="input-group">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <label>Hashtags</label>
+                    <button type="button" class="btn" style="padding: 2px 8px; font-size: 0.7rem; border-color: var(--primary); color: var(--primary); background: rgba(138,180,248,0.1);" onclick="autoGenerateTags()">
+                        <span class="material-symbols-outlined" style="font-size: 14px;">auto_awesome</span> Auto-Tag
+                    </button>
+                </div>
+                <input type="text" id="c-tags" placeholder="e.g., #prototype, #design, #shoes">
+                <div id="c-tags-hint" class="hint">Comma or space separated tags. Critical for indexing.</div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-full" style="margin-top:12px;">Save to Global Neo4j DB</button>
+        </form>
+    </div>
+    <!-- The Universe Container (Domains will be injected here) -->
+    <div id="universe"></div>
 
-function closeSingularity() {
-    document.getElementById('singularity-card').classList.remove('active');
-    document.getElementById('golden-dot').classList.remove('bloom');
-    intentSelections = {};
-}
+    <!-- Universal Media Viewer Overlay -->
+    <div class="viewer-overlay" id="viewer">
+        <div class="viewer-header">
+            <button class="btn" style="border:none; color:var(--text-main); background:transparent; padding:6px;" onclick="closeViewer()">
+                <span class="material-symbols-outlined">arrow_back</span>
+            </button>
+            <div class="viewer-title" id="viewer-title">Document Title</div>
+            <a id="viewer-link" href="#" target="_blank" rel="noopener noreferrer" class="btn" style="border:none; color:var(--primary); background:transparent; padding:6px;" title="Open External">
+                <span class="material-symbols-outlined">open_in_new</span>
+            </a>
+        </div>
+        <div class="viewer-body" id="viewer-body">
+            <!-- Media injected here dynamically -->
+        </div>
+    </div>
+    <!-- Load the Big Bang Trigger & JSON Bridge -->
+    <!-- Note: When testing locally, ensure display.js is in the same folder, or point to your GitHub URL -->
+    <script src="display.js"></script>
 
-// THE BRIDGE: Feeds the 5W1H intent into the old Zen Search logic
-function searchMeshFromIntent() {
-    const query = Object.values(intentSelections).join(' ');
-    closeSingularity();
-    triggerSearch(query);
-}
+    <!-- Application Logic -->
+    <script>
+        // ==========================================
+        // 1. CONFIGURATION & STATE
+        // ==========================================
+        const CONFIG = {
+            AMAZON_TAG: 'amazon0339f-21', 
+            NAPKIN_API_TOKEN: 'sk-c28bbef0c1f1be43b507f5453dfea9ea919c4d43f2e8c921636c5bd2794de7cc'
+        };
 
-// ==========================================
-// 3. UTILS & INIT
-// ==========================================
-window.toggleTheme = () => document.documentElement.setAttribute('data-theme', document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
-window.switchView = (viewId, navElement) => {
-    if (navElement) { document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active')); navElement.classList.add('active'); }
-    document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-    document.getElementById(`view-${viewId}`).classList.add('active');
-};
-window.openViewer = (url, title) => {
-    document.getElementById('viewer-title').innerText = title;
-    const body = document.getElementById('viewer-body');
-    if (url.match(/\.(mp4|webm)$/i)) body.innerHTML = `<video src="${url}" controls autoplay style="max-width:100%; max-height:100%;"></video>`;
-    else body.innerHTML = `<iframe src="${url}"></iframe>`;
-    document.getElementById('viewer').classList.add('active');
-};
-window.closeViewer = () => { document.getElementById('viewer').classList.remove('active'); document.getElementById('viewer-body').innerHTML = ''; };
+        // WARNING: Putting credentials in frontend JavaScript is inherently insecure. 
+        // Anyone inspecting the website code can see these.
+        // For production, always route database queries through a backend server.
+        const NEO4J_CONFIG = {
+            // REPLACE THIS URI with the one from your Neo4j console (e.g. neo4j+s://<id>.databases.neo4j.io)
+            uri: 'neo4j+s://613c286a.databases.neo4j.io', 
+            user: '613c286a', // Usually 'neo4j'
+            password: 'vkKL9AvmRjeV3Y71iTvAmVzMr96t7zI1-7gxU_Ueius' 
+        };
 
-window.addEventListener('DOMContentLoaded', async () => {
-    await initNeo4j();
-});
-</script>
+        window.STATE = {
+            currentQuery: "",
+            dbConnected: false
+        };
+
+        // ==========================================
+        // 2. NEO4J GRAPH DB INTEGRATION
+        // ==========================================
+        let driver = null;
+
+        async function initNeo4j() {
+            try {
+                // Initialize the driver
+                driver = neo4j.driver(
+                    NEO4J_CONFIG.uri, 
+                    neo4j.auth.basic(NEO4J_CONFIG.user, NEO4J_CONFIG.password)
+                );
+                
+                // Test the connection
+                await driver.getServerInfo();
+                STATE.dbConnected = true;
+                
+                const statusIndicator = document.getElementById('db-status-indicator');
+                statusIndicator.classList.add('connected');
+                statusIndicator.innerHTML = `<span class="material-symbols-outlined" style="font-size: 14px;">cloud_done</span> YNeo4j`;
+                
+                console.log("Successfully connected to Neo4j AuraDB!");
+                await seedDatabase();
+
+            } catch (error) {
+                console.error("Failed to connect to Neo4j. Check your URI and credentials in NEO4J_CONFIG.", error);
+                STATE.dbConnected = false;
+                const statusIndicator = document.getElementById('db-status-indicator');
+                statusIndicator.classList.remove('connected');
+                statusIndicator.innerHTML = `<span class="material-symbols-outlined" style="font-size: 14px;">cloud_off</span> DB Offline`;
+            }
+        }
+
+        async function dbAddArtifact(data) {
+            if (!STATE.dbConnected || !driver) {
+                alert("Database is not connected. Check Neo4j configuration.");
+                return;
+            }
+            const session = driver.session();
+            try {
+                // Cypher query to create an Artifact node and link it to Tag nodes
+                const query = `
+                    CREATE (a:Artifact {
+                        id: randomUUID(),
+                        title: $title,
+                        author: $author,
+                        url: $url,
+                        type: $type,
+                        source: $source,
+                        isManifesto: $isManifesto,
+                        timestamp: timestamp()
+                    })
+                    WITH a
+                    UNWIND $tags AS tagName
+                    MERGE (t:Tag {name: tagName})
+                    MERGE (a)-[:HAS_TAG]->(t)
+                    RETURN a
+                `;
+                
+                const params = {
+                    title: data.title || 'Untitled',
+                    author: data.author || 'Anonymous',
+                    url: data.url || '',
+                    type: data.type || 'library',
+                    source: data.source || 'library',
+                    tags: data.tags || [],
+                    isManifesto: data.isManifesto || false
+                };
+
+                await session.run(query, params);
+            } catch (error) {
+                console.error("Error writing to Neo4j:", error);
+                throw error;
+            } finally {
+                await session.close();
+            }
+        }
+
+        async function dbSaveProfile(profileData) {
+            if (!STATE.dbConnected || !driver) return;
+            const session = driver.session();
+            try {
+                const query = `
+                    MERGE (u:UserProfile {userId: $userId})
+                    SET u.interests = $interests,
+                        u.core_expertise = $core_expertise,
+                        u.passion_projects = $passion_projects,
+                        u.github = $github,
+                        u.linkedin = $linkedin,
+                        u.updatedAt = timestamp()
+                    RETURN u
+                `;
+                const params = {
+                    userId: 'local-user', // In a real app with auth, use actual user ID
+                    interests: profileData.data.interests || [],
+                    core_expertise: profileData.profileData.core_expertise || '',
+                    passion_projects: profileData.profileData.passion_projects || '',
+                    github: profileData.data.socialLinks.github || '',
+                    linkedin: profileData.data.socialLinks.linkedin || ''
+                };
+                await session.run(query, params);
+            } finally {
+                await session.close();
+            }
+        }
+
+        async function dbGetAllArtifacts() {
+            if (!STATE.dbConnected || !driver) return [];
+            const session = driver.session();
+            try {
+                const query = `
+                    MATCH (a:Artifact)
+                    OPTIONAL MATCH (a)-[:HAS_TAG]->(t:Tag)
+                    RETURN a, collect(t.name) as tags
+                    ORDER BY a.timestamp DESC
+                `;
+                const result = await session.run(query);
+                
+                return result.records.map(record => {
+                    const node = record.get('a').properties;
+                    const tags = record.get('tags') || [];
+                    return {
+                        ...node,
+                        tags: tags,
+                        // Neo4j integers need to be converted to standard JS numbers
+                        timestamp: node.timestamp ? node.timestamp.toNumber() : 0 
+                    };
+                });
+            } catch (error) {
+                console.error("Error reading from Neo4j:", error);
+                return [];
+            } finally {
+                await session.close();
+            }
+        }
+
+        async function searchLocalDb(searchQuery) {
+            if (!STATE.dbConnected || !driver) return [];
+            const session = driver.session();
+            try {
+                // Case-insensitive search on title, author, or tags
+                const query = `
+                    MATCH (a:Artifact)
+                    OPTIONAL MATCH (a)-[:HAS_TAG]->(t:Tag)
+                    WITH a, collect(t.name) as tags
+                    WHERE toLower(a.title) CONTAINS toLower($searchQuery)
+                       OR toLower(a.author) CONTAINS toLower($searchQuery)
+                       OR any(tag IN tags WHERE toLower(tag) CONTAINS toLower($searchQuery))
+                    RETURN a, tags
+                    ORDER BY a.timestamp DESC
+                `;
+                const result = await session.run(query, { searchQuery: searchQuery });
+                
+                return result.records.map(record => {
+                    const node = record.get('a').properties;
+                    return {
+                        ...node,
+                        tags: record.get('tags') || [],
+                        type: node.type === 'prototype' ? 'prototype_local' : 'library'
+                    };
+                });
+            } catch (error) {
+                console.error("Error searching Neo4j:", error);
+                return [];
+            } finally {
+                await session.close();
+            }
+        }
+
+        const CORE_MANIFESTO = {
+            title: 'The Nirmal Sahyog: Mukti Yojana',
+            author: 'Earth Engineering Archive',
+            url: 'https://drive.google.com/file/d/1zo0-LUktX_If_X2Cz2Fjr62I34Dj1IuI/view?usp=sharing',
+            tags: ['#manifesto', '#mukti', '#earth'],
+            source: 'library',
+            isManifesto: true,
+            type: 'library'
+        };
+
+        async function seedDatabase() {
+            if (!STATE.dbConnected || !driver) return;
+            const session = driver.session();
+            try {
+                // Check if manifesto exists
+                const result = await session.run(`MATCH (a:Artifact {isManifesto: true}) RETURN count(a) as count`);
+                const count = result.records[0].get('count').toNumber();
+                
+                if (count === 0) {
+                    await dbAddArtifact(CORE_MANIFESTO);
+                    console.log("Seeded Core Manifesto to Neo4j");
+                }
+            } finally {
+                await session.close();
+            }
+        }
+
+        // ==========================================
+        // 3. THEME & UTILS
+        // BABY STEP 2: THE BIG BANG RENDERER
+        // ==========================================
+        window.toggleTheme = function() {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-theme');
+            html.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+        }
+
+        window.switchView = function(viewId, navElement) {
+            if (navElement) {
+                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+                navElement.classList.add('active');
+            }
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.getElementById(`view-${viewId}`).classList.add('active');
+        const sun = document.getElementById('sun');
+        const universe = document.getElementById('universe');
+        const ringsContainer = document.getElementById('rings-container');
+        const statusText = document.getElementById('status-text');
+
+            if (viewId === 'zen') {
+                setTimeout(() => document.getElementById('zen-input').focus(), 100);
+            }
+        }
+
+        window.openModal = function(id) { document.getElementById(id).classList.add('active'); }
+        window.closeModal = function(id) { document.getElementById(id).classList.remove('active'); }
+
+        // ==========================================
+        // 4. ZEN FLOW LOGIC
+        // ==========================================
+        const zenInput = document.getElementById('zen-input');
+        
+        zenInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const val = zenInput.value.trim();
+                if (val) {
+                    STATE.currentQuery = val;
+                    triggerSearch(val);
+                }
+            }
+        // 1. Listen for the Big Bang Trigger (Fired when user clicks the Golden Dot)
+        window.addEventListener('khela:bigbang:init', () => {
+            statusText.innerText = 'Initiating Big Bang... Fetching Mesh...';
+            statusText.style.color = 'var(--teal)';
+        });
+
+        // ==========================================
+        // 5. THE PERFECT RANKING & SEARCH APIS
+        // ==========================================
+        
+        async function callGeminiAPI(prompt, systemPrompt = "You are a helpful AI assistant.") {
+            const apiKey = ""; // Canvas dynamically injects if run there. On GitHub pages, this will silently fail safely.
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+        // 2. Listen for the Mesh Ready Event (Fired when 1.json & symbol1.json are loaded)
+        window.addEventListener('khela:mesh:ready', () => {
+            statusText.innerText = 'Mesh Synchronized. The 9 Roots Awaken.';
+            statusText.style.color = 'var(--gold)';
+
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] }
+            };
+
+            try {
+                if(!apiKey) return null; // Safe fallback
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+                return result.candidates?.[0]?.content?.parts?.[0]?.text || null;
+            } catch (error) {
+                console.error("Gemini API Error:", error);
+                return null;
+            }
+        }
+
+        window.autoGenerateTags = async function() {
+            const title = document.getElementById('c-title').value.trim();
+            const author = document.getElementById('c-author').value.trim();
+            const hint = document.getElementById('c-tags-hint');
+            // Trigger the visual explosion
+            igniteSun();
+
+            if (!title) {
+                hint.innerText = "⚠️ Please enter a Title first to generate tags.";
+                hint.style.color = "var(--accent)";
+                setTimeout(() => { 
+                    hint.innerText = "Comma or space separated tags. Critical for indexing."; 
+                    hint.style.color = "var(--text-muted)"; 
+                }, 3000);
+                return;
+            }
+            
+            const tagsInput = document.getElementById('c-tags');
+            const originalPlaceholder = tagsInput.placeholder;
+            tagsInput.placeholder = "Oracle is generating tags...";
+            tagsInput.value = "";
+            
+            const prompt = `Generate 4 relevant, single-word hashtags for a document titled "${title}" by "${author}". Return ONLY the hashtags, separated by spaces. Example: #physics #energy #cosmos`;
+            const sysPrompt = "You are a precise librarian AI. Output only requested tags.";
+            // Render the domains from the fetched JSON
+            const domains = window.KhelaMesh.rootDomains;
+            const symbols = window.KhelaMesh.symbols;
+
+            const tags = await callGeminiAPI(prompt, sysPrompt);
+            if (tags) {
+                tagsInput.value = tags.replace(/,/g, '').replace(/\n/g, ' ').trim();
+            if (domains && domains.length > 0) {
+                renderOrbitingDomains(domains, symbols);
+            } else {
+                tagsInput.value = "#design #prototype #research"; 
+                statusText.innerText = 'Error: Root Domains not found in 1.json';
+            }
+            tagsInput.placeholder = originalPlaceholder;
+        }
+
+        window.triggerSearch = async function(query) {
+            if (!query) return;
+            STATE.currentQuery = query;
+            document.getElementById('results-query-text').innerText = query;
+            
+            switchView('results');
+            const grid = document.getElementById('results-grid');
+            grid.innerHTML = `
+                <div class="center-msg" style="grid-column: 1/-1;">
+                    <span class="material-symbols-outlined spinner" style="font-size: 48px;">data_usage</span>
+                    <p>Calculating resonance across Prototyping Nodes, APIs & Neo4j Graph...</p>
+                </div>
+            `;
+
+            renderAISynthesis(query);
+
+            try {
+                const [local, books, scholar, youtubeNode, prototypeNodes] = await Promise.all([
+                    searchLocalDb(query),
+                    fetchGoogleBooks(query),
+                    fetchOpenAlex(query),
+                    generateYouTubeNode(query),
+                    generatePrototypeNodes(query) 
+                ]);
+
+                let combined = [...local, ...books, ...scholar, ...prototypeNodes];
+                if (youtubeNode) combined.push(youtubeNode);
+
+                combined.forEach(item => {
+                    let score = 0;
+                    if (item.type === 'library' || item.type === 'prototype_local') {
+                        score = 1000;
+                        if (item.isManifesto) score = 5000; 
+                    } 
+                    else if (item.type === 'scholar') {
+                        const citations = item.citations || 0;
+                        score = 600 + Math.min(citations * 2, 800);
+                    } 
+                    else if (item.type === 'amazon' || item.type === 'amazon_product') {
+                        score = 850 + ((item.rating || 3) * 50); 
+                    }
+                    else if (item.type === 'prototype_web') {
+                        score = 900; 
+                    }
+                    else if (item.type === 'youtube') {
+                        score = 750;
+                    }
+                    item.khelaScore = score;
+                });
+
+                combined.sort((a, b) => b.khelaScore - a.khelaScore);
+                renderCards(combined, grid);
+        });
+
+            } catch (error) {
+                console.error("Matrix error:", error);
+                grid.innerHTML = `<div class="center-msg" style="grid-column: 1/-1;"><p>Matrix connection interrupted. Ensure you are online.</p></div>`;
+            }
+        function igniteSun() {
+            setTimeout(() => {
+                sun.classList.add('active');
+            }, 300);
+        }
+
+        function renderAISynthesis(query) {
+            const aiCard = document.getElementById('ai-synthesis-card');
+            const aiContent = document.getElementById('ai-synthesis-content');
+            
+            aiCard.classList.add('active');
+            aiContent.innerHTML = `<div style="display:flex; align-items:center; gap:8px;"><div class="ai-loading"></div> <span style="opacity:0.8;">Oracle is synthesizing knowledge vectors...</span></div>`;
+        function renderOrbitingDomains(domains, symbols) {
+            const count = domains.length;
+
+            const prompt = `Synthesize profound, factual, and concise knowledge (3-4 sentences max) about: ${query}. Focus on its relevance to evolution, universal mechanics, product prototyping or cooperation if applicable. Keep it highly insightful.`;
+            const sysPrompt = "You are the Khela Matrix Oracle, an advanced intelligence focused on Earth Engineering, truth, and human evolution. Speak wisely, philosophically, yet factually.";
+            
+            callGeminiAPI(prompt, sysPrompt).then(response => {
+                if (response) {
+                    const formatted = response.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                    aiContent.innerHTML = formatted;
+                } else {
+                    aiContent.innerHTML = "<span style='color:var(--text-muted);'>AI Synthesis requires a valid API configuration. Fallback complete. Proceeding with database findings.</span>";
+                }
+            });
+        }
+
+        async function fetchGoogleBooks(query) {
+            try {
+                const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=5`);
+                const data = await res.json();
+                if (!data.items) return [];
+                return data.items.map(b => {
+                    const info = b.volumeInfo;
+                    return {
+                        title: info.title || 'Unknown Book',
+                        author: info.authors ? info.authors.join(', ') : 'Unknown Author',
+                        url: `https://www.amazon.com/s?k=${encodeURIComponent(info.title)}&tag=${CONFIG.AMAZON_TAG}`,
+                        rating: info.averageRating || 3,
+                        type: 'amazon',
+                        isExternal: true
+                    };
+                });
+            } catch (e) { return []; }
+        }
+
+        async function fetchOpenAlex(query) {
+            try {
+                const res = await fetch(`https://api.openalex.org/works?search=${encodeURIComponent(query)}&per_page=5&sort=cited_by_count:desc`);
+                const data = await res.json();
+                if (!data.results) return [];
+                return data.results.map(p => ({
+                    title: p.title || 'Untitled Research',
+                    author: p.authorships?.slice(0, 2).map(a => a.author.display_name).join(', ') || 'Researchers',
+                    url: p.doi ? `https://doi.org/${p.doi}` : (p.open_access?.oa_url || p.id),
+                    citations: p.cited_by_count || 0,
+                    type: 'scholar',
+                    isExternal: true
+                }));
+            } catch (e) { return []; }
+        }
+
+        async function generateYouTubeNode(query) {
+            return {
+                title: `TEDx & YouTube Findings: ${query}`,
+                author: 'Global Video Matrix',
+                url: `https://www.youtube.com/results?search_query=${encodeURIComponent('TEDx ' + query)}`,
+                type: 'youtube',
+                isExternal: true
+            };
+        }
+
+        async function generatePrototypeNodes(query) {
+            return [
+                {
+                    title: `Commercial Products & References: ${query}`,
+                    author: 'Amazon Retail Matrix',
+                    url: `https://www.amazon.com/s?k=${encodeURIComponent(query)}&tag=${CONFIG.AMAZON_TAG}`,
+                    type: 'amazon_product',
+                    isExternal: true
+                },
+                {
+                    title: `3D Models & Concept Designs: ${query}`,
+                    author: 'Behance / Thingiverse Network',
+                    url: `https://www.behance.net/search/projects?search=${encodeURIComponent(query)}`,
+                    type: 'prototype_web',
+                    isExternal: true
+                }
+            ];
+        }
+
+        // ==========================================
+        // 6. RENDERING CARDS
+        // ==========================================
+        function renderCards(items, container) {
+            if (items.length === 0) {
+                container.innerHTML = `<div class="center-msg" style="grid-column: 1/-1;"><p>No resonance found. Please contribute knowledge to the Neo4j Graph.</p></div>`;
+                return;
+            }
+
+            container.innerHTML = items.map(item => {
+                let badgeClass, badgeText, icon;
+                if (item.type === 'amazon' || item.type === 'amazon_product') { badgeClass = 'source-amazon'; badgeText = 'Amazon Product/Book'; icon = 'shopping_bag'; }
+                else if (item.type === 'scholar') { badgeClass = 'source-scholar'; badgeText = 'Scholar / Paper'; icon = 'school'; }
+                else if (item.type === 'youtube') { badgeClass = 'source-youtube'; badgeText = 'TEDx / YouTube'; icon = 'smart_display'; }
+                else if (item.type === 'network') { badgeClass = 'source-network'; badgeText = 'AI Match'; icon = 'hub'; }
+                else if (item.type === 'prototype_web' || item.type === 'prototype_local') { badgeClass = 'source-prototype'; badgeText = 'Design Prototype'; icon = 'architecture'; }
+                else { badgeClass = 'source-library'; badgeText = 'Neo4j Graph'; icon = 'database'; }
+
+                const isManifesto = item.isManifesto ? 'card-manifesto' : '';
+                
+                const cardHtmlStart = item.isExternal 
+                    ? `<a href="${item.url}" target="_blank" rel="noopener noreferrer" class="card ${isManifesto}">`
+                    : `<div class="card ${isManifesto}" onclick="openViewer('${item.url.replace(/'/g, "\\'")}', '${item.title.replace(/'/g, "\\'")}')">`;
+            // Calculate responsive radius based on screen size
+            const minDim = Math.min(window.innerWidth, window.innerHeight);
+            const radius = minDim * 0.35; // 35% of the smallest screen dimension
+
+            // Create the visual orbital ring
+            const ring = document.createElement('div');
+            ring.className = 'orbit-ring';
+            ring.style.width = `${radius * 2}px`;
+            ring.style.height = `${radius * 2}px`;
+            ringsContainer.appendChild(ring);
+            setTimeout(() => ring.classList.add('active'), 500);
+
+            // Map 1.json domains to visual nodes
+            domains.forEach((domain, index) => {
+                const node = document.createElement('div');
+                node.className = 'domain-node';
+
+                const cardHtmlEnd = item.isExternal ? `</a>` : `</div>`;
+
+                let tagsHtml = '';
+                if (item.tags && item.tags.length > 0) {
+                    tagsHtml = `<div class="tags-container">` + 
+                        item.tags.map(t => `<span class="hashtag">${t}</span>`).join('') + 
+                    `</div>`;
+                }
+
+                return `
+                    ${cardHtmlStart}
+                        ${item.isManifesto ? `<div style="font-size:2rem; font-weight:700; color:var(--secondary); margin-bottom:8px; letter-spacing:2px;">E = ma²</div>` : ''}
+                        
+                        <div class="card-header-row">
+                            <span class="card-source ${badgeClass}">
+                                <span class="material-symbols-outlined" style="font-size:14px;">${icon}</span>
+                                ${badgeText}
+                            </span>
+                            ${item.khelaScore ? `<span class="khela-score">Score: ${item.khelaScore}</span>` : ''}
+                        </div>
+                        
+                        <div class="card-title">${item.title}</div>
+                        <div class="card-meta">${item.author} ${item.citations ? `• ${item.citations} citations` : ''}</div>
+                        ${tagsHtml}
+                        
+                        <div class="card-actions">
+                            ${item.isExternal 
+                                ? `<span class="btn btn-primary">Open External Node</span>`
+                                : `<button class="btn btn-primary" onclick="event.stopPropagation(); openViewer('${item.url.replace(/'/g, "\\'")}', '${item.title.replace(/'/g, "\\'")}')">Open Media</button>`
+                            }
+                        </div>
+                    ${cardHtmlEnd}
+                // Try to find a matching icon from symbol1.json based on the domain name, 
+                // fallback to a planetary emoji if not found.
+                let icon = '🪐'; 
+                const nameLower = domain.name.toLowerCase();
+                if (nameLower.includes('individual')) icon = '🧠';
+                else if (nameLower.includes('samajh') || nameLower.includes('community')) icon = '🤝';
+                else if (nameLower.includes('econology') || nameLower.includes('earth')) icon = '🌍';
+                else if (nameLower.includes('discovery')) icon = '🔭';
+                else if (nameLower.includes('innovation')) icon = '💡';
+                else if (nameLower.includes('sahyog')) icon = '🌱';
+                else if (nameLower.includes('mukti')) icon = '🕊️';
+
+                node.innerHTML = `
+                    <span class="domain-icon">${icon}</span>
+                    <span class="domain-name">${domain.name}</span>
+                    <span class="domain-code">${domain.code}</span>
+                `;
+            }).join('');
+        }
+
+        window.loadLibrary = async function() {
+            const grid = document.getElementById('library-grid');
+            if(!STATE.dbConnected) {
+                grid.innerHTML = `<div class="center-msg" style="grid-column: 1/-1;"><p style="color:var(--accent)">Neo4j Database is disconnected. Check configuration.</p></div>`;
+                return;
+            }
+            
+            let items = await dbGetAllArtifacts();
+            
+            // If manifesto isn't in DB yet, manually push it for UI
+            if(!items.some(i => i.isManifesto)) {
+                items.push(CORE_MANIFESTO);
+            }
+            
+            items.sort((a, b) => {
+                if (a.isManifesto) return -1;
+                if (b.isManifesto) return 1;
+                return b.timestamp - a.timestamp;
+            });
+            renderCards(items, grid);
+        }
+
+        // ==========================================
+        // 7. SOCIAL AI NETWORKING 
+        // ==========================================
+        window.buildNetworkProfile = async function() {
+            const provider = document.getElementById('aiProvider').value;
+            const apiKey = document.getElementById('apiKey').value;
+            
+            if (provider !== 'gemini' && !apiKey) {
+                alert('Please enter your API key for non-Gemini providers.');
+                return;
+            }
+
+            const userData = {
+                socialLinks: {
+                    github: document.getElementById('socialGithub').value,
+                    linkedin: document.getElementById('socialLinkedin').value,
+                    twitter: document.getElementById('socialTwitter').value,
+                    website: document.getElementById('socialWebsite').value
+                },
+                interests: document.getElementById('userInterests').value.split(',').map(s => s.trim())
+            };
+
+            const resultsDiv = document.getElementById('networkResults');
+            resultsDiv.innerHTML = `<div class="center-msg"><span class="material-symbols-outlined spinner" style="font-size: 48px;">hub</span><p>Building your AI profile and finding global matches...</p></div>`;
+                // Mathematical positioning (Perfect Circle)
+                // Offset by -Math.PI/2 so the first node starts at the top (12 o'clock)
+                const angle = (index / count) * Math.PI * 2 - (Math.PI / 2); 
+                const x = Math.cos(angle) * radius;
+                const y = Math.sin(angle) * radius;
+
+            try {
+                let profileStr = '';
+                let matchesStr = '';
+
+                const profilePrompt = `Analyze this digital footprint: ${JSON.stringify(userData)}. Create a structured JSON profile with: 1) core_expertise, 2) passion_projects, 3) missing_collaborators (skills needed). Respond strictly in valid JSON format.`;
+                const matchPrompt = `Based on this user: ${JSON.stringify(userData)}, generate a JSON array of 3 realistic but simulated global collaborators. Fields: name, reason (why they match), score (number 1-100), socialLinks (mock object with github/linkedin). Return strictly valid JSON array.`;
+                node.style.left = `calc(50% + ${x}px - 45px)`;
+                node.style.top = `calc(50% + ${y}px - 45px)`;
+
+                if (provider === 'gemini') {
+                    profileStr = await callGeminiAPI(profilePrompt, "You are a networking AI outputting strictly valid JSON.");
+                    matchesStr = await callGeminiAPI(matchPrompt, "You are a networking AI outputting strictly valid JSON array.");
+                } else {
+                    resultsDiv.innerHTML = `<div class="center-msg"><p>External APIs require specific CORS configurations. Using Default Gemini engine is recommended on this platform.</p></div>`;
+                    return;
+                }
+
+                if(!profileStr || !matchesStr) {
+                    throw new Error("No API key available for AI Networking.");
+                }
+
+                const cleanJson = (str) => {
+                    const match = str.match(/\{[\s\S]*\}|\[[\s\S]*\]/);
+                    return match ? match[0] : '{}';
+                };
+                // Stagger the pop-in animation
+                node.style.transitionDelay = `${0.8 + (index * 0.1)}s`;
+
+                const profile = JSON.parse(cleanJson(profileStr));
+                const matches = JSON.parse(cleanJson(matchesStr));
+
+                // Save to Neo4j
+                await dbSaveProfile({
+                    data: userData,
+                    profileData: profile
+                // Add interaction for the NEXT baby step (Drill Down)
+                node.addEventListener('click', () => {
+                    handleDomainSelection(domain);
+                });
+
+                renderNetworkResults(profile, matches);
+                universe.appendChild(node);
+
+            } catch (error) {
+                console.error(error);
+                resultsDiv.innerHTML = `<div class="center-msg"><p style="color:var(--text-muted);">AI Networking requires a valid API configuration. Processing failed.</p></div>`;
+            }
+        }
+
+        function renderNetworkResults(profile, matches) {
+            const resultsDiv = document.getElementById('networkResults');
+            let html = `
+                <div class="ai-section" style="margin-top: 24px;">
+                    <h3 style="margin-bottom: 16px; color: var(--primary);">Your AI Analysis</h3>
+                    <p><strong>Core Expertise:</strong> ${profile.core_expertise || profile.expertise || 'General'}</p>
+                    <p style="margin-top: 8px;"><strong>Passion Projects:</strong> ${profile.passion_projects || 'Discovery'}</p>
+                    <p style="margin-top: 8px;"><strong>Looking For:</strong> ${profile.missing_collaborators || 'Like-minded souls'}</p>
+                </div>
+                <h3 style="margin: 24px 0 16px;">Semantic Matches Found</h3>
+                <div class="card-grid">
+            `;
+
+            if (Array.isArray(matches)) {
+                matches.forEach(m => {
+                    html += `
+                        <div class="card">
+                            <div class="card-header-row">
+                                <span class="card-source source-network"><span class="material-symbols-outlined" style="font-size:14px;">hub</span> AI Match</span>
+                                <span class="khela-score">Match: ${m.score}%</span>
+                            </div>
+                            <div class="card-title">${m.name || 'Anonymous Creator'}</div>
+                            <div class="card-meta" style="margin-top: 8px;">${m.reason || 'Semantic alignment found.'}</div>
+                            <div class="card-actions">
+                                ${m.socialLinks?.github ? `<a href="${m.socialLinks.github}" target="_blank" rel="noopener noreferrer" class="btn">GitHub</a>` : ''}
+                                ${m.socialLinks?.linkedin ? `<a href="${m.socialLinks.linkedin}" target="_blank" rel="noopener noreferrer" class="btn">LinkedIn</a>` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            html += `</div>`;
+            resultsDiv.innerHTML = html;
+        }
+
+        window.createNapkinDiagram = async function() {
+            const text = document.getElementById('napkinText').value.trim();
+            const output = document.getElementById('napkinOutput');
+            
+            if (!text) {
+                alert('Please describe what you want to visualize.');
+                return;
+            }
+
+            output.innerHTML = `<span class="material-symbols-outlined spinner">sync</span> Generating SVG...`;
+
+            try {
+                const response = await fetch(`https://api.napkin.ai/v1/diagrams`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${CONFIG.NAPKIN_API_TOKEN}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        text: text,
+                        style: 'default',
+                        format: 'svg'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.svg) {
+                    output.innerHTML = data.svg;
+                } else if (data.url) {
+                    output.innerHTML = `<img src="${data.url}" alt="Napkin AI Diagram">`;
+                } else {
+                    throw new Error("No SVG returned.");
+                }
+            } catch (error) {
+                output.innerHTML = `<p style="color: var(--accent);">Visualization Error: Invalid Token or API limits reached. Wait and try again.</p>`;
+            }
+        }
+
+        // ==========================================
+        // 8. UNIVERSAL MEDIA VIEWER 
+        // ==========================================
+        window.openViewer = function(url, title) {
+            document.getElementById('viewer-title').innerText = title || 'Media Viewer';
+            document.getElementById('viewer-link').href = url;
+            
+            const viewerBody = document.getElementById('viewer-body');
+            let html = '';
+            const lowerUrl = url.toLowerCase();
+
+            if (lowerUrl.includes('youtube.com') || lowerUrl.includes('youtu.be')) {
+                const match = url.match(/(?:v=|\/)([0-9A-Za-z_-]{11})/);
+                const embedUrl = match ? `https://www.youtube.com/embed/${match[1]}?autoplay=1` : url;
+                html = `<iframe src="${embedUrl}" allow="autoplay; fullscreen; encrypted-media"></iframe>`;
+            } 
+            else if (lowerUrl.includes('drive.google.com/file/d/')) {
+                const match = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+                const embedUrl = match ? `https://drive.google.com/file/d/${match[1]}/preview` : url;
+                html = `<iframe src="${embedUrl}" allowfullscreen></iframe>`;
+            } 
+            else if (lowerUrl.match(/\.(mp4|webm|ogg)$/i)) {
+                html = `<video src="${url}" controls autoplay></video>`;
+            }
+            else if (lowerUrl.match(/\.(mp3|wav|m4a)$/i)) {
+                html = `<audio src="${url}" controls autoplay></audio>`;
+            }
+            else if (lowerUrl.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i)) {
+                html = `<img src="${url}" alt="${title}">`;
+            }
+            else {
+                html = `<iframe src="${url}"></iframe>`;
+            }
+
+            viewerBody.innerHTML = html;
+            document.getElementById('viewer').classList.add('active');
+        }
+
+        window.closeViewer = function() {
+            document.getElementById('viewer').classList.remove('active');
+            document.getElementById('viewer-body').innerHTML = ''; // Destroy iframe
+                // Trigger animation
+                setTimeout(() => node.classList.add('active'), 100);
+            });
+        }
+
+        // ==========================================
+        // 9. CONTRIBUTE LOGIC (Neo4j Saving)
+        // ==========================================
+        window.handleContribute = async function(e) {
+            e.preventDefault();
+            const type = document.getElementById('c-type').value;
+            const title = document.getElementById('c-title').value.trim();
+            const author = document.getElementById('c-author').value.trim();
+            const url = document.getElementById('c-url').value.trim();
+        // 3. The Bridge to the Next Layer (Integral.js / 5W1H)
+        function handleDomainSelection(domain) {
+            console.log(`[Earth 00 OS] Selected Domain: ${domain.name} (${domain.code})`);
+            statusText.innerText = `Focusing on ${domain.name}...`;
+
+            const rawTags = document.getElementById('c-tags').value;
+            const tags = rawTags.split(/[\s,]+/).filter(t => t.length > 0).map(t => {
+                return t.startsWith('#') ? t.toLowerCase() : `#${t.toLowerCase()}`;
+            });
+
+            await dbAddArtifact({
+                type,
+                title, author, url, tags,
+                source: 'library'
+            });
+            // Haptic feedback
+            if (navigator.vibrate) navigator.vibrate(30);
+
+            e.target.reset();
+            closeModal('contribute-modal');
+            // Fire event for the next engine (e.g., Integral.js Mandala)
+            window.dispatchEvent(new CustomEvent('khela:domain:focus', { 
+                detail: domain 
+            }));
+
+            if (document.getElementById('view-library').classList.contains('active')) {
+                loadLibrary();
+            }
+            // Visual feedback on the node
+            document.querySelectorAll('.domain-node').forEach(n => n.style.opacity = '0.3');
+            event.currentTarget.style.opacity = '1';
+            event.currentTarget.style.transform = 'scale(1.3)';
+        }
+
+        // ==========================================
+        // 10. INITIALIZATION
+        // ==========================================
+        window.addEventListener('DOMContentLoaded', async () => {
+            // Initialize Neo4j Driver Connection
+            await initNeo4j();
+            
+            document.addEventListener('keydown', (e) => {
+                if(e.key === 'Escape') {
+                    closeModal('contribute-modal');
+                    closeViewer();
+                }
+            });
+
+            document.querySelectorAll('.modal-overlay').forEach(modal => {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) modal.classList.remove('active');
+                });
+            });
+
+            setTimeout(() => document.getElementById('zen-input').focus(), 300);
+        // Handle window resize to keep orbit perfect
+        window.addEventListener('resize', () => {
+            // In a production app, we would recalculate X/Y here. 
+            // For Baby Step 2, a simple reload or CSS recalc handles it.
+        });
+
+    </script>
 </body>
 </html>
