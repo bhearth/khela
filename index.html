@@ -2,261 +2,523 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#020408">
-<meta name="description" content="Khel.o - Spatial Knowledge Engine">
-<title>Khel.o · Spatial Intelligence</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+<meta name="theme-color" content="#010204">
 <link rel="manifest" href="manifest.json">
-<script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
+<title>Khel.o · Living Universe v7</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
-
-:root{--bg:#020408;--glass:rgba(10,15,25,0.75);--border:rgba(255,255,255,0.07);--accent:#38bdf8;--gold:#fbbf24;--green:#10b981}
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--bg);color:#e2e8f0;font-family:'Inter',system-ui;overflow:hidden;touch-action:none;height:100vh;background-image:linear-gradient(rgba(56,189,248,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(56,189,248,0.025) 1px,transparent 1px);background-size:60px 60px}
-
-/* API Screen */
-#key-screen{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:20px}
-#key-screen.hidden{display:none}
-#key-screen h1{font-family:'Space Grotesk';font-size:28px;color:var(--accent);letter-spacing:6px}
-#key-screen input{width:400px;padding:14px 20px;background:var(--glass);border:1px solid var(--border);border-radius:12px;color:#fff;font-family:'JetBrains Mono';outline:none}
-#key-screen button{padding:14px 40px;background:var(--accent);color:#000;border:none;border-radius:12px;font-weight:700;cursor:pointer}
-.provider-select{display:flex;gap:10px}
-.provider-btn{padding:8px 16px;background:var(--glass);border:1px solid var(--border);border-radius:8px;color:#94a3b8;cursor:pointer}
-.provider-btn.active{border-color:var(--accent);color:var(--accent)}
-
-/* 3D Viewport */
-#viewport{position:fixed;inset:0;perspective:2500px}
-#hub{position:absolute;top:50%;left:50%;transform-style:preserve-3d}
-svg.links{position:absolute;top:-6000px;left:-6000px;width:12000px;height:12000px;pointer-events:none}
-.link-line{fill:none;stroke-width:1.5;stroke-linecap:round;stroke-dasharray:3000;stroke-dashoffset:3000;animation:draw 1.8s ease-out forwards}
-@keyframes draw{to{stroke-dashoffset:0}}
-
-/* Nodes */
-.node{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transform-style:preserve-3d;transition:transform .7s cubic-bezier(.34,1.56,.64,1);transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),var(--z)) scale(0);animation:pop .8s forwards}
-@keyframes pop{to{transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),var(--z)) scale(1)}}
-.node-core{width:90px;height:90px;border-radius:50%;background:var(--glass);border:2px solid currentColor;backdrop-filter:blur(10px)}
-.node-card{width:200px;padding:16px;border-radius:16px;background:linear-gradient(145deg,rgba(30,41,59,0.9),rgba(15,23,42,0.95));border:1px solid rgba(255,255,255,0.08);text-align:left}
-.node:hover{transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),calc(var(--z) + 40px)) scale(1.3)!important;z-index:500;box-shadow:0 0 40px currentColor}
-.n-icon{font-size:1.8em}
-.n-title{font-size:12px;font-weight:600;color:#fff;margin-top:6px}
-.n-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;margin-top:6px;color:#cbd5e1}
-
-/* HUD */
-#hud{position:fixed;top:20px;left:20px;z-index:1000;pointer-events:none}
-.hud-label{font-size:9px;letter-spacing:3px;color:#475569;text-transform:uppercase}
-.hud-val{font-family:'JetBrains Mono';font-size:11px;color:var(--green)}
-
-/* Search Bar */
-#search-bar{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:2000;display:flex;gap:10px;width:90%;max-width:700px}
-#search-input{flex:1;padding:14px 24px;background:var(--glass);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:16px;color:#fff;font-family:'JetBrains Mono';outline:none}
-#search-btn{padding:14px 28px;background:linear-gradient(135deg,#38bdf8,#818cf8);color:#fff;border:none;border-radius:16px;font-weight:700;cursor:pointer}
-
-/* Install Button */
-#install-btn{position:fixed;top:20px;right:20px;z-index:1000;padding:10px 20px;background:var(--gold);color:#000;border:none;border-radius:12px;font-weight:600;cursor:pointer;display:none}
-
-/* Loading */
-#warp{position:fixed;inset:0;z-index:5000;background:var(--bg);display:none;align-items:center;justify-content:center;flex-direction:column;gap:16px}
-#warp.active{display:flex}
-.warp-ring{width:60px;height:60px;border:2px solid transparent;border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:#010204;color:#e2e8f0;font-family:'Space Grotesk',system-ui,sans-serif;overflow:hidden;touch-action:none;user-select:none;height:100dvh;width:100dvw}
+#hud{position:fixed;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:flex-start;padding:clamp(12px,3vw,20px);pointer-events:none;z-index:50;background:linear-gradient(180deg,rgba(1,2,4,0.92) 60%,transparent)}
+.telemetry{font-size:clamp(10px,2.5vw,13px);letter-spacing:3px;text-transform:uppercase;color:#38bdf8;text-shadow:0 0 10px rgba(56,189,248,0.6);font-weight:500;line-height:1.6}
+.coords{font-size:clamp(9px,2vw,11px);color:#94a3b8;text-align:right;letter-spacing:2px;line-height:1.7}
+.hint{font-size:clamp(8px,1.8vw,10px);color:#475569;letter-spacing:1px}
+#toolbar{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:space-around;align-items:center;padding:clamp(8px,2.5vw,14px) 8px clamp(14px,4vw,26px);background:linear-gradient(0deg,rgba(1,2,4,0.97) 75%,transparent);z-index:50;gap:6px;pointer-events:auto}
+.tb{display:flex;flex-direction:column;align-items:center;gap:3px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:10px 14px;cursor:pointer;flex:1;max-width:90px;transition:background .2s,transform .15s}
+.tb:active{background:rgba(255,255,255,0.12);transform:scale(0.93)}
+.tb .em{font-size:clamp(22px,6vw,30px);line-height:1}
+.tb .lb{font-size:clamp(8px,2vw,10px);color:#64748b;letter-spacing:.5px;text-transform:uppercase;font-weight:700}
+#viewport{position:absolute;top:50dvh;left:50dvw}
+#hub{position:absolute;top:0;left:0;transform-style:preserve-3d;will-change:transform}
+svg{position:absolute;top:-10000px;left:-10000px;width:20000px;height:20000px;pointer-events:none;transform-style:preserve-3d}
+.stellar-path{fill:none;stroke-width:1.5;stroke-linecap:round;filter:drop-shadow(0 0 4px currentColor);stroke-dasharray:2000;stroke-dashoffset:2000;animation:spark 1.4s cubic-bezier(.25,1,.5,1) forwards}
+@keyframes spark{to{stroke-dashoffset:0}}
+.dot{position:absolute;border-radius:50%;cursor:pointer;transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),var(--z));transition:transform .35s cubic-bezier(.34,1.56,.64,1),box-shadow .3s,background .3s;will-change:transform;min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center}
+.dot .hit{border-radius:50%;background:var(--col);width:var(--sz);height:var(--sz);box-shadow:0 0 6px var(--col);transition:transform .3s,box-shadow .3s}
+.dot:hover .hit,.dot:active .hit{transform:scale(2.2);box-shadow:0 0 22px var(--col),0 0 40px var(--col);z-index:100}
+.seed-dot{position:absolute;width:80px;height:80px;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:50%}
+.seed-dot::after{content:'';position:absolute;width:clamp(16px,4vw,22px);height:clamp(16px,4vw,22px);background:#d4af37;border-radius:50%;box-shadow:0 0 40px 16px rgba(212,175,55,.7);animation:breath 3s infinite ease-in-out;transition:.3s}
+.seed-dot:hover::after,.seed-dot:active::after{transform:scale(1.8);background:#fff;box-shadow:0 0 70px 30px rgba(212,175,55,.9)}
+@keyframes breath{0%,100%{transform:scale(1);opacity:.8}50%{transform:scale(1.5);opacity:1}}
+.jnode{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:50%;cursor:pointer;text-align:center;background:rgba(10,15,25,0.65);border:1.5px solid;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),var(--z)) scale(0);animation:supernova .9s cubic-bezier(.34,1.56,.64,1) forwards;will-change:transform}
+.jnode:hover,.jnode:active{background:currentColor!important;color:#000!important;box-shadow:0 0 30px currentColor,inset 0 0 15px #fff;z-index:500;transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),calc(var(--z) + 50px)) scale(1.35)!important}
+.jnode .ji{font-size:clamp(18px,5vw,28px);filter:drop-shadow(0 2px 5px rgba(0,0,0,.8));transition:transform .3s;line-height:1}
+.jnode:hover .ji{transform:scale(1.25)}
+.jnode .jl{font-size:clamp(7px,1.8vw,10px);font-weight:700;text-transform:uppercase;letter-spacing:1.5px;margin-top:5px;pointer-events:none}
+@keyframes supernova{to{transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),var(--z)) scale(1)}}
+#search-overlay{position:fixed;inset:0;background:rgba(1,2,4,.97);backdrop-filter:blur(16px);z-index:200;display:none;flex-direction:column;padding:clamp(16px,5vw,32px);animation:fadeUp .25s ease}
+#search-overlay.active{display:flex}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+#search-wrap{display:flex;gap:10px;align-items:center;margin-bottom:16px}
+#search-input{flex:1;background:rgba(255,255,255,0.05);border:2px solid rgba(56,189,248,.35);border-radius:50px;padding:clamp(12px,3.5vw,16px) 20px;color:#fff;font-size:clamp(16px,4.5vw,20px);outline:none;font-family:inherit;font-weight:600}
+#search-input::placeholder{color:#334155}
+#search-close{width:clamp(44px,12vw,54px);height:clamp(44px,12vw,54px);border-radius:50%;background:rgba(255,255,255,0.07);border:none;color:#94a3b8;font-size:20px;cursor:pointer;flex-shrink:0}
+#search-results{overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:10px}
+.s-card{display:flex;align-items:center;gap:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:18px;padding:clamp(12px,3.5vw,18px);cursor:pointer;animation:fadeUp .3s both;transition:background .2s}
+.s-card:active{background:rgba(255,255,255,0.09)}
+.s-em{font-size:clamp(28px,8vw,40px);flex-shrink:0;line-height:1}
+.s-body h3{margin:0 0 3px;font-size:clamp(14px,4vw,18px);color:#fff;font-weight:700}
+.s-body p{margin:0;font-size:clamp(10px,2.8vw,13px);color:#475569;line-height:1.4}
+.s-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+.s-tag{background:rgba(56,189,248,.12);color:#38bdf8;padding:2px 9px;border-radius:20px;font-size:clamp(8px,2.2vw,11px);font-weight:700}
+#detail{position:fixed;bottom:-100%;left:0;right:0;background:rgba(5,8,15,.98);border-top:1.5px solid rgba(212,175,55,.3);border-radius:28px 28px 0 0;z-index:150;padding:clamp(18px,5vw,28px);transition:bottom .45s cubic-bezier(.34,1.56,.64,1);max-height:55vh;overflow-y:auto}
+#detail.open{bottom:0}
+#detail .handle{width:42px;height:5px;background:rgba(255,255,255,.18);border-radius:4px;margin:0 auto 16px}
+#d-icon{font-size:clamp(46px,13vw,68px);text-align:center;margin-bottom:8px}
+#d-title{font-size:clamp(17px,5vw,24px);color:#fff;font-weight:800;text-align:center;margin:0 0 6px}
+#d-desc{font-size:clamp(12px,3.3vw,15px);color:#64748b;text-align:center;line-height:1.6;margin:0 0 16px}
+#d-links{display:flex;flex-direction:column;gap:9px}
+.d-link{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:14px;padding:13px 16px;color:#a7f3d0;text-decoration:none;font-size:clamp(12px,3.3vw,14px);font-weight:600;transition:background .2s}
+.d-link:active{background:rgba(255,255,255,.11)}
+.d-close{width:100%;margin-top:12px;padding:13px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);color:#f87171;border-radius:14px;font-size:clamp(13px,4vw,15px);font-weight:700;cursor:pointer}
+#ai-setup{position:fixed;inset:0;background:rgba(1,2,4,.98);backdrop-filter:blur(20px);z-index:300;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:20px;padding:20px}
+#ai-setup.hidden{display:none}
+#ai-setup h2{font-size:clamp(20px,6vw,28px);color:#38bdf8;letter-spacing:4px;text-transform:uppercase}
+#ai-setup p{font-size:clamp(12px,3.5vw,15px);color:#64748b;text-align:center;max-width:500px;line-height:1.6}
+.provider-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;width:100%;max-width:600px}
+.prov-btn{background:rgba(255,255,255,0.04);border:2px solid rgba(255,255,255,0.1);border-radius:16px;padding:20px;cursor:pointer;text-align:center;transition:all .3s}
+.prov-btn:hover,.prov-btn.active{border-color:#38bdf8;background:rgba(56,189,248,0.1)}
+.prov-btn .p-icon{font-size:32px;margin-bottom:8px}
+.prov-btn .p-name{font-size:14px;font-weight:700;color:#fff}
+.prov-btn .p-desc{font-size:11px;color:#64748b;margin-top:4px}
+#api-key-input{width:100%;max-width:500px;padding:16px 20px;background:rgba(255,255,255,0.05);border:2px solid rgba(56,189,248,.3);border-radius:16px;color:#fff;font-size:16px;font-family:'JetBrains Mono',monospace;outline:none}
+#api-key-input:focus{border-color:#38bdf8;box-shadow:0 0 20px rgba(56,189,248,0.2)}
+#activate-btn{padding:16px 40px;background:linear-gradient(135deg,#38bdf8,#818cf8);color:#fff;border:none;border-radius:16px;font-size:16px;font-weight:700;cursor:pointer;letter-spacing:2px;text-transform:uppercase}
+#activate-btn:hover{transform:scale(1.05);box-shadow:0 0 30px rgba(56,189,248,0.4)}
+.skip-btn{background:none;border:none;color:#475569;font-size:13px;cursor:pointer;text-decoration:underline;margin-top:10px}
 </style>
 </head>
 <body>
 
-<!-- API Key Screen -->
-<div id="key-screen">
-    <h1>KHEL.O</h1>
-    <div class="provider-select">
-        <div class="provider-btn active" onclick="selectProvider('openrouter')">OpenRouter</div>
-        <div class="provider-btn" onclick="selectProvider('together')">Together AI</div>
-        <div class="provider-btn" onclick="selectProvider('groq')">Groq</div>
+<!-- AI Setup Screen -->
+<div id="ai-setup">
+  <h2>🌌 Khel.o</h2>
+  <p>Select AI provider to activate spatial knowledge engine</p>
+  
+  <div class="provider-grid">
+    <div class="prov-btn active" data-provider="openrouter" onclick="selectProvider(this)">
+      <div class="p-icon">🌐</div>
+      <div class="p-name">OpenRouter</div>
+      <div class="p-desc">Google login</div>
     </div>
-    <input type="password" id="api-key" placeholder="Enter API key...">
-    <button onclick="activateEngine()">INITIALIZE</button>
-    <p style="font-size:11px;color:#475569">Get key from openrouter.ai/keys (Google login)</p>
-</div>
-
-<!-- Install PWA Button -->
-<button id="install-btn" onclick="installPWA()">📥 Install Khel.o App</button>
-
-<!-- Loading -->
-<div id="warp"><div class="warp-ring"></div><div style="font-size:11px;letter-spacing:4px;color:var(--accent)">QUERYING</div></div>
-
-<!-- Search -->
-<div id="search-bar" style="display:none">
-    <input type="text" id="search-input" placeholder="Search the universe...">
-    <button id="search-btn" onclick="executeSearch()">WARP</button>
+    <div class="prov-btn" data-provider="together" onclick="selectProvider(this)">
+      <div class="p-icon">🤝</div>
+      <div class="p-name">Together AI</div>
+      <div class="p-desc">$25 free credit</div>
+    </div>
+    <div class="prov-btn" data-provider="groq" onclick="selectProvider(this)">
+      <div class="p-icon">⚡</div>
+      <div class="p-name">Groq</div>
+      <div class="p-desc">Fast & free tier</div>
+    </div>
+    <div class="prov-btn" data-provider="demo" onclick="selectProvider(this)">
+      <div class="p-icon">🎭</div>
+      <div class="p-name">Demo Mode</div>
+      <div class="p-desc">No API needed</div>
+    </div>
+  </div>
+  
+  <input type="password" id="api-key-input" placeholder="Paste API key (or skip for demo)">
+  <button id="activate-btn" onclick="activateEngine()">ACTIVATE</button>
+  <button class="skip-btn" onclick="activateEngine('demo')">Skip → Demo Mode</button>
 </div>
 
 <!-- HUD -->
-<div id="hud" style="display:none">
-    <div class="hud-label">Khel.o Engine</div>
-    <div class="hud-val" id="h-nodes">0 Nodes</div>
+<div id="hud">
+  <div class="telemetry">
+    <div id="status">✨ Touch the Golden Seed</div>
+    <div id="ai-tag" style="font-size:9px;color:#334155;letter-spacing:2px;margin-top:3px;"></div>
+  </div>
+  <div class="coords">
+    <div id="coord-display">Z: 1.000</div>
+    <div class="hint">DOUBLE-TAP TO RESET</div>
+  </div>
 </div>
 
-<!-- 3D Viewport -->
-<div id="viewport"><div id="hub"><svg class="links" id="svg-links"></svg></div></div>
+<!-- 3D viewport -->
+<div id="viewport"><div id="hub"><svg id="lines"></svg></div></div>
 
-<!-- Dis-play Widget (Embedded) -->
-<script src="display.js" data-upi="krishna.bh.earth@upi"></script>
+<!-- Bottom toolbar -->
+<div id="toolbar">
+  <div class="tb" onclick="openSearch()"><span class="em">🔍</span><span class="lb">Search</span></div>
+  <div class="tb" onclick="resetUniverse()"><span class="em">🌱</span><span class="lb">Seed</span></div>
+  <div class="tb" onclick="rollSurprise()"><span class="em">🎲</span><span class="lb">Dice</span></div>
+  <div class="tb" onclick="toggleVoice()"><span class="em" id="v-icon">👂</span><span class="lb">Voice</span></div>
+</div>
+
+<!-- Search -->
+<div id="search-overlay">
+  <div id="search-wrap">
+    <input id="search-input" type="search" placeholder="🌱 water • music • why?" autocomplete="off" oninput="runSearch(this.value)">
+    <button id="search-close" onclick="closeSearch()">✕</button>
+  </div>
+  <div id="search-results"></div>
+</div>
+
+<!-- Detail sheet -->
+<div id="detail">
+  <div class="handle" onclick="closeDetail()"></div>
+  <div id="d-icon"></div>
+  <div id="d-title"></div>
+  <div id="d-desc"></div>
+  <div id="d-links"></div>
+  <button class="d-close" onclick="closeDetail()">✕ Close</button>
+</div>
 
 <script>
 // ═══════════════════════════════════════════════════════
-//  KHLE.O SPATIAL ENGINE + AI PROVIDER ARCHITECTURE
+//  AI PROVIDER ARCHITECTURE
 // ═══════════════════════════════════════════════════════
-
-let API_KEY='',API_URL='',MODEL='',selectedProvider='openrouter';
-const PROVIDERS={
-    openrouter:{url:'https://openrouter.ai/api/v1/chat/completions',model:'qwen/qwen-2.5-72b-instruct'},
-    together:{url:'https://api.together.xyz/v1/chat/completions',model:'Qwen/Qwen2.5-72B-Instruct-Turbo'},
-    groq:{url:'https://api.groq.com/openai/v1/chat/completions',model:'qwen-2.5-72b'}
+let AI_PROVIDER = 'demo';
+let AI_KEY = '';
+const PROVIDERS = {
+  openrouter: { url: 'https://openrouter.ai/api/v1/chat/completions', model: 'qwen/qwen-2.5-72b-instruct', name: 'OpenRouter' },
+  together: { url: 'https://api.together.xyz/v1/chat/completions', model: 'Qwen/Qwen2.5-72B-Instruct-Turbo', name: 'Together AI' },
+  groq: { url: 'https://api.groq.com/openai/v1/chat/completions', model: 'qwen-2.5-72b', name: 'Groq' },
+  demo: { url: null, model: 'demo', name: 'Demo Mode' }
 };
 
-function selectProvider(p){
-    selectedProvider=p;
-    document.querySelectorAll('.provider-btn').forEach(b=>b.classList.remove('active'));
-    event.target.classList.add('active');
+function selectProvider(el) {
+  document.querySelectorAll('.prov-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  AI_PROVIDER = el.dataset.provider;
 }
 
-const cam={x:0,y:0,z:0.8,rx:0,ry:0},tgt={x:0,y:0,z:0.8,rx:0,ry:0};
-let vel={x:0,y:0},dragging=false,lastP={x:0,y:0},nodes=[],pathHistory=['ROOT'];
-const FRICTION=0.92,LERP=0.1,SVG_C=6000;
-
-function lerp(a,b,t){return a+(b-a)*t}
-
-function activateEngine(){
-    const k=document.getElementById('api-key').value.trim();
-    if(!k){alert('Enter API key');return}
-    API_KEY=k;API_URL=PROVIDERS[selectedProvider].url;MODEL=PROVIDERS[selectedProvider].model;
-    document.getElementById('key-screen').classList.add('hidden');
-    ['search-bar','hud'].forEach(id=>document.getElementById(id).style.display='');
-    setupGestures();renderLoop();spawnSeed();
+function activateEngine(mode) {
+  if (mode === 'demo' || AI_PROVIDER === 'demo') {
+    AI_PROVIDER = 'demo';
+    AI_KEY = '';
+  } else {
+    AI_KEY = document.getElementById('api-key-input').value.trim();
+    if (!AI_KEY) { alert('Please enter API key or use Demo Mode'); return; }
+  }
+  
+  document.getElementById('ai-setup').classList.add('hidden');
+  document.getElementById('ai-tag').innerText = `AI: ${PROVIDERS[AI_PROVIDER].name}`;
+  initUniverse();
 }
 
-async function queryQwen(query){
-    const sysPrompt=`You are Khel.o Spatial Engine. Generate JSON array of 8-15 knowledge nodes for: "${query}". Each node:{type:"core|card|media|book|hex",icon:"emoji",title:"name",subtitle:"category",desc:"2-3 sentences",color:"hex",children:["subtopic1","subtopic2"]}. Output ONLY valid JSON array.`;
-    
-    const res=await fetch(API_URL,{
-        method:'POST',
-        headers:{'Content-Type':'application/json','Authorization':`Bearer ${API_KEY}`},
-        body:JSON.stringify({model:MODEL,messages:[{role:'system',content:sysPrompt},{role:'user',content:`Generate nodes for: ${query}`}],temperature:0.8,max_tokens:4000})
-    });
-    if(!res.ok)throw new Error(await res.text());
-    const data=await res.json();
-    let text=data.choices[0].message.content.trim();
-    if(text.startsWith('```'))text=text.replace(/^```json?\n?/,'').replace(/\n?```$/,'');
-    return JSON.parse(text);
+// ═══════════════════════════════════════════════════════
+//  KNOWLEDGE BASE (Local - 5 tokens per click concept)
+// ═══════════════════════════════════════════════════════
+const KB = [
+  {icon:"💧",title:"Water",desc:"Clean water is the foundation of every life.",tags:["water","river","jal","rain"],catKey:"Where",links:[{label:"Water.org",url:"https://water.org"},{label:"WHO Water",url:"https://www.who.int/health-topics/drinking-water"}]},
+  {icon:"🌱",title:"Seed & Soil",desc:"Plant one seed. It works while you sleep.",tags:["seed","soil","farm","grow"],catKey:"How",links:[{label:"Navdanya",url:"https://navdanya.org"},{label:"FAO Soils",url:"https://www.fao.org/soils-portal"}]},
+  {icon:"🎵",title:"Music & Sound",desc:"Sound is the first healer.",tags:["music","song","sing","drum"],catKey:"Art",links:[{label:"Internet Archive",url:"https://archive.org/details/audio"},{label:"Kids Wiki",url:"https://kids.miraheze.org/wiki/Music"}]},
+  {icon:"💃",title:"Dance",desc:"The body knows what the mind forgets.",tags:["dance","move","yoga","body"],catKey:"Dance",links:[{label:"Yoga Journal",url:"https://www.yogajournal.com"},{label:"Dance Wiki",url:"https://kids.miraheze.org/wiki/Dance"}]},
+  {icon:"📚",title:"Learn",desc:"One page a day. One skill forever.",tags:["learn","read","book","school"],catKey:"What",links:[{label:"Khan Academy",url:"https://khanacademy.org"},{label:"Kids Wiki",url:"https://kids.miraheze.org"}]},
+  {icon:"🌍",title:"Earth",desc:"The planet is the teacher.",tags:["earth","ecology","nature","forest"],catKey:"Where",links:[{label:"WWF",url:"https://wwf.org"},{label:"Forest Watch",url:"https://globalforestwatch.org"}]},
+  {icon:"🤝",title:"Community",desc:"10 people + one Saturday = change.",tags:["community","together","volunteer","ngo"],catKey:"Why",links:[{label:"Idealist",url:"https://idealist.org"},{label:"Open Collective",url:"https://opencollective.com"}]},
+  {icon:"🍎",title:"Food & Health",desc:"Food is the first medicine.",tags:["food","health","eat","cook"],catKey:"How",links:[{label:"Open Food Facts",url:"https://world.openfoodfacts.org"},{label:"WHO Nutrition",url:"https://www.who.int/health-topics/nutrition"}]},
+  {icon:"☀️",title:"Energy",desc:"The sun gives more in one hour than we use in a year.",tags:["energy","solar","sun","power"],catKey:"What",links:[{label:"IRENA",url:"https://irena.org"},{label:"Open Energy",url:"https://openenergymonitor.org"}]},
+  {icon:"🎨",title:"Art",desc:"Making something is intelligence.",tags:["art","draw","create","paint"],catKey:"Art",links:[{label:"Open Library",url:"https://openlibrary.org"},{label:"Art Wiki",url:"https://kids.miraheze.org/wiki/Art"}]},
+  {icon:"🧠",title:"Mind",desc:"Curiosity is the only tool you always have.",tags:["mind","think","brain","idea"],catKey:"Why",links:[{label:"Mind Wiki",url:"https://kids.miraheze.org/wiki/Brain"},{label:"Khan Academy",url:"https://khanacademy.org"}]},
+  {icon:"🚀",title:"Space",desc:"We are made of stardust.",tags:["space","star","moon","planet"],catKey:"Space",links:[{label:"NASA",url:"https://nasa.gov"},{label:"ESA",url:"https://esa.int"}]},
+  {icon:"🌊",title:"Ocean",desc:"Rivers connect mountains to the sea.",tags:["water","ocean","river","fish"],catKey:"Where",links:[{label:"OBIS",url:"https://obis.org"},{label:"GBIF Marine",url:"https://gbif.org"}]},
+  {icon:"🎭",title:"Story",desc:"A story told once travels a thousand miles.",tags:["story","theatre","drama","culture"],catKey:"Art",links:[{label:"Archive Stories",url:"https://archive.org/details/texts"},{label:"Story Wiki",url:"https://kids.miraheze.org/wiki/Theatre"}]},
+  {icon:"🤲",title:"Contribution",desc:"Only what outlasts your effort counts.",tags:["contribute","give","share","help"],catKey:"Why",links:[{label:"Kids Miraheze",url:"https://kids.miraheze.org"},{label:"OpenStreetMap",url:"https://openstreetmap.org"}]},
+];
+
+function searchKB(q) {
+  if (!q) return KB;
+  const words = q.toLowerCase().split(/\s+/).filter(Boolean);
+  return KB.map(item => {
+    let score = 0;
+    const hay = (item.title + ' ' + item.tags.join(' ') + ' ' + item.desc).toLowerCase();
+    words.forEach(w => { if (hay.includes(w)) score += (item.title.toLowerCase().includes(w) ? 3 : 1); });
+    return { ...item, score };
+  }).filter(i => i.score > 0).sort((a, b) => b.score - a.score);
 }
 
-async function executeSearch(q){
-    if(!q)q=document.getElementById('search-input').value.trim();
-    if(!q)return;
-    document.getElementById('search-btn').disabled=true;
-    document.getElementById('warp').classList.add('active');
-    
-    try{
-        const result=await queryQwen(q);
-        nodes.forEach(n=>n.el.classList.add('faded'));
-        await new Promise(r=>setTimeout(r,500));
-        clearHub();
-        pathHistory.push(q.toUpperCase());
-        spawnGalaxy(result,q);
-        document.getElementById('h-nodes').innerText=`${result.length} Nodes`;
-    }catch(err){alert('Error: '+err.message)}
-    
-    document.getElementById('warp').classList.remove('active');
-    document.getElementById('search-btn').disabled=false;
-    tgt.z=0.8;tgt.x=0;tgt.y=0;
+// ═══════════════════════════════════════════════════════
+//  DOMAIN DATA
+// ═══════════════════════════════════════════════════════
+const DOMAINS = [
+  {name:"Individual",icon:"👤",color:"#38bdf8",layers:["🌱 Potential","🍚 Energy","🔥 Discipline","👑 Ego","🌸 Realization"]},
+  {name:"Community",icon:"👪",color:"#c084fc",layers:["🌱 Belonging","🍚 Capital","🔥 Culture","👑 Power","🌸 Harmony"]},
+  {name:"Ecology",icon:"🌱",color:"#10b981",layers:["🌱 Resource","🍚 Material","🔥 Production","👑 Exploitation","🌸 Circular"]},
+  {name:"Earth Eng",icon:"⚙️",color:"#94a3b8",layers:["🌱 Shelter","🍚 Structure","🔥 Ethics","👑 Concrete","🌸 Living"]},
+  {name:"Discovery",icon:"🔭",color:"#818cf8",layers:["🌱 Inquiry","🍚 Data","🔥 Method","👑 Truth","🌸 Cosmic"]},
+  {name:"Innovation",icon:"💡",color:"#f59e0b",layers:["🌱 Spark","🍚 Craft","🔥 Iteration","👑 Ownership","🌸 Beauty"]},
+  {name:"Sahyog",icon:"🤝",color:"#f43f5e",layers:["🌱 Purpose","🍚 Trust","🔥 Clarity","👑 Credit","🌸 Emergent"]},
+  {name:"Mukti",icon:"🕊️",color:"#a7f3d0",layers:["🌱 Longing","🍚 Letting go","🔥 Discernment","👑 Illusion","🌸 Union"]},
+];
+
+const CAT_COLORS = ["#d4af37","#10b981","#38bdf8","#f59e0b","#c084fc","#ec4899","#f43f5e","#a7f3d0"];
+
+// ═══════════════════════════════════════════════════════
+//  UNIVERSE ENGINE
+// ═══════════════════════════════════════════════════════
+const ENV = (() => {
+  const ua = navigator.userAgent;
+  const mobile = Math.min(window.innerWidth, window.innerHeight) < 600;
+  const lowPow = /Android [1-6]\./.test(ua) || navigator.hardwareConcurrency <= 2;
+  return {
+    mobile, lowPow,
+    dotCount: lowPow ? 80 : (mobile ? 120 : 200),
+    autoSpin: !lowPow
+  };
+})();
+
+let cam = {x:0,y:0,z:ENV.mobile?0.5:1,rx:0,ry:0};
+let tgt = {x:0,y:0,z:ENV.mobile?0.5:1,rx:0,ry:0};
+const hub = document.getElementById('hub');
+const svg = document.getElementById('lines');
+const SVG_O = 10000;
+let S_state = 0, lastTap = 0, drag = false, lx, ly, startX, startY;
+let pinchDist = 0;
+let jnodes = [];
+let dots = [];
+let voiceEnabled = false, voiceRecog = null;
+
+function buildDots() {
+  dots.forEach(d => d.remove()); dots.length = 0;
+  const N = ENV.dotCount;
+  for (let i = 1; i <= N; i++) {
+    const a = i * 137.508 * Math.PI / 180;
+    const r = 16 * Math.sqrt(i);
+    const x = r * Math.cos(a), y = -r * Math.sin(a);
+    const z3d = Math.sin(r / 40) * 60;
+    const col = CAT_COLORS[i % CAT_COLORS.length];
+    const sz = Math.max(4, Math.min(10, 3 + i / 30));
+    const el = document.createElement('div');
+    el.className = 'dot';
+    el.style.cssText = `--x:${x}px;--y:${y}px;--z:${z3d}px;--col:${col};--sz:${sz}px;`;
+    el.innerHTML = `<div class="hit"></div>`;
+    el.dataset.x = x; el.dataset.y = y; el.dataset.z = z3d; el.dataset.col = col;
+    hub.appendChild(el);
+    dots.push(el);
+  }
 }
 
-function spawnGalaxy(data,query){
-    const hub=document.getElementById('hub'),svg=document.getElementById('svg-links');
-    nodes=[];
-    
-    // Central seed
-    const seed=document.createElement('div');
-    seed.className='node node-core';
-    seed.style.cssText=`--x:0px;--y:0px;--z:0px;color:var(--accent);width:100px;height:100px;`;
-    seed.innerHTML=`<div class="n-icon">🔭</div><div class="n-label">${query}</div>`;
-    hub.appendChild(seed);nodes.push({el:seed,data:{title:query}});
-    
-    data.forEach((d,i)=>{
-        const angle=i*2.39996,r=250+(i*55);
-        const x=r*Math.cos(angle),y=r*Math.sin(angle),z=Math.sin(i*0.7)*120;
-        
-        // SVG Link
-        const path=document.createElementNS('http://www.w3.org/2000/svg','path');
-        const mx=x/2-y*0.12,my=y/2+x*0.12;
-        path.setAttribute('d',`M ${SVG_C} ${SVG_C} Q ${mx+SVG_C} ${my+SVG_C} ${x+SVG_C} ${y+SVG_C}`);
-        path.setAttribute('class','link-line');
-        path.style.stroke=d.color;path.style.strokeOpacity=0.35;
-        svg.appendChild(path);
-        
-        // Node
-        const el=document.createElement('div');
-        el.className=`node node-${d.type||'core'}`;
-        el.style.cssText=`--x:${x}px;--y:${y}px;--z:${z}px;color:${d.color};animation-delay:${i*0.08}s`;
-        el.innerHTML=d.type==='card'?`<div class="n-icon">${d.icon}</div><div class="n-title">${d.title}</div>`:`<div class="n-icon">${d.icon}</div><div class="n-label">${d.title}</div>`;
-        
-        el.onclick=(e)=>{e.stopPropagation();tgt.x=-x;tgt.y=-y;tgt.z=1.8;};
-        el.ondblclick=(e)=>{e.stopPropagation();if(d.children?.length){const c=d.children[Math.floor(Math.random()*d.children.length)];document.getElementById('search-input').value=c;executeSearch(c);}};
-        
-        hub.appendChild(el);nodes.push({el,data:d,x,y,z});
-    });
+function spawnJNode(px, py, pz, data, level, index, total) {
+  const baseR = level === 1 ? (ENV.mobile ? 900 : 1200) : (ENV.mobile ? 200 : 280);
+  let x, y, z;
+  if (level === 1) {
+    const a = (index / total) * Math.PI * 2;
+    x = px + baseR * Math.cos(a); y = py + baseR * Math.sin(a); z = pz + Math.sin(a * 3) * 80;
+  } else {
+    const a = index * 2.39996;
+    const r = baseR * Math.sqrt(index + 1) * 0.6;
+    x = px + r * Math.cos(a); y = py + r * Math.sin(a); z = pz + (index % 2 === 0 ? 50 : -50) + level * 120;
+  }
+  const color = data.color || "#38bdf8";
+  const sz = level === 1 ? (ENV.mobile ? 60 : 78) : (ENV.mobile ? 42 : 52);
+  
+  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  const mx = (px + x) / 2 - (y - py) * 0.15 + SVG_O;
+  const my = (py + y) / 2 + (x - px) * 0.15 + SVG_O;
+  path.setAttribute("d", `M${px + SVG_O} ${py + SVG_O} Q${mx} ${my} ${x + SVG_O} ${y + SVG_O}`);
+  path.setAttribute("class", "stellar-path");
+  path.style.stroke = color;
+  path.style.strokeOpacity = level === 1 ? "0.3" : "0.65";
+  path.style.animationDelay = `${index * 0.07}s`;
+  svg.appendChild(path);
+  
+  const el = document.createElement('div');
+  el.className = 'jnode';
+  el.style.cssText = `--x:${x}px;--y:${y}px;--z:${z}px;width:${sz}px;height:${sz}px;color:${color};border-color:${color};animation-delay:${index * 0.08}s;`;
+  el.innerHTML = `<div class="ji">${data.icon}</div><div class="jl" style="color:${color}">${data.name}</div>`;
+  el.dataset.level = level; el.dataset.expanded = "false";
+  
+  el.onclick = e => {
+    e.stopPropagation();
+    tgt.x = -x; tgt.y = -y; tgt.z = level === 1 ? 0.7 : 1.3;
+    updateStatus(`🔭 ${data.name}`);
+    if (el.dataset.expanded === "true") return;
+    el.dataset.expanded = "true";
+    if (level === 1 && data.layers) {
+      jnodes.forEach(n => { if (n !== el && n.dataset.level === "1") n.style.opacity = "0.2"; });
+      data.layers.forEach((lname, i) => {
+        const p = lname.split(' ');
+        spawnJNode(x, y, z, { icon: p[0], name: p[1], color }, 2, i, data.layers.length);
+      });
+    }
+  };
+  
+  hub.appendChild(el);
+  jnodes.push(el);
 }
 
-function spawnSeed(){
-    const el=document.createElement('div');
-    el.className='node node-core';
-    el.style.cssText=`--x:0px;--y:0px;--z:0px;color:var(--gold);width:110px;height:110px`;
-    el.innerHTML=`<div class="n-icon" style="font-size:2.2em">☀️</div><div class="n-label">SEARCH</div>`;
-    el.onclick=()=>document.getElementById('search-input').focus();
-    document.getElementById('hub').appendChild(el);nodes.push({el,data:{title:'ROOT'}});
+function expandFromDot(dotEl) {
+  clearExpansion();
+  const ox = parseFloat(dotEl.dataset.x);
+  const oy = parseFloat(dotEl.dataset.y);
+  const oz = parseFloat(dotEl.dataset.z);
+  updateStatus("🌌 Mapping domain roots…");
+  tgt.x = -ox; tgt.y = -oy; tgt.z = ENV.mobile ? 0.35 : 0.55;
+  DOMAINS.forEach((d, i) => spawnJNode(ox, oy, oz, { ...d }, 1, i, DOMAINS.length));
 }
 
-function clearHub(){
-    Array.from(document.getElementById('hub').children).forEach(c=>{if(c.id!=='svg-links')c.remove()});
-    document.getElementById('svg-links').innerHTML='';nodes=[];
+function clearExpansion() {
+  jnodes.forEach(n => n.remove());
+  jnodes.length = 0;
+  svg.innerHTML = '';
 }
 
-function setupGestures(){
-    const vp=document.getElementById('viewport'),mc=new Hammer.Manager(vp);
-    mc.add([new Hammer.Pan({direction:Hammer.DIRECTION_ALL,threshold:0}),new Hammer.Pinch({enable:true}),new Hammer.Tap({event:'doubletap',taps:2})]);
-    mc.get('pinch').recognizeWith(mc.get('pan'));
-    let iZ=1;
-    
-    mc.on('pinchstart',()=>{iZ=tgt.z});
-    mc.on('pinch',e=>{tgt.z=Math.max(0.05,Math.min(6,iZ*e.scale))});
-    mc.on('panstart',e=>{dragging=true;lastP={x:e.center.x,y:e.center.y}});
-    mc.on('panmove',e=>{if(!dragging)return;const dx=e.center.x-lastP.x,dy=e.center.y-lastP.y;if(e.pointers.length>=2){tgt.ry+=dx*0.3;tgt.rx-=dy*0.3}else{tgt.x+=dx/cam.z;tgt.y+=dy/cam.z}lastP={x:e.center.x,y:e.center.y}});
-    mc.on('panend',()=>{dragging=false});
-    mc.on('doubletap',()=>{tgt.x=0;tgt.y=0;tgt.z=0.8});
-    window.addEventListener('wheel',e=>{tgt.z=Math.max(0.05,Math.min(6,tgt.z-e.deltaY*0.0012))},{passive:true});
+function resetUniverse() {
+  clearExpansion();
+  S_state = 0;
+  cam = { x: 0, y: 0, z: ENV.mobile ? 0.5 : 1, rx: 0, ry: 0 };
+  tgt = { x: 0, y: 0, z: ENV.mobile ? 0.5 : 1, rx: 0, ry: 0 };
+  const old = hub.querySelector('.seed-dot');
+  if (old) old.remove();
+  if (dots.length === 0) buildDots();
+  else dots.forEach(d => { d.style.opacity = '1'; d.style.transition = 'opacity .5s'; });
+  
+  const seed = document.createElement('div');
+  seed.className = 'seed-dot';
+  seed.onclick = e => {
+    e.stopPropagation();
+    if (jnodes.length === 0) {
+      updateStatus("🌌 Awakening…");
+      tgt.z = ENV.mobile ? 0.35 : 0.5;
+      DOMAINS.forEach((d, i) => spawnJNode(0, 0, 0, { ...d }, 1, i, DOMAINS.length));
+    } else clearExpansion();
+  };
+  hub.prepend(seed);
+  updateStatus("✨ Touch the Golden Seed or any star");
 }
 
-function renderLoop(){
-    if(!dragging){tgt.x+=vel.x;tgt.y+=vel.y;vel.x*=FRICTION;vel.y*=FRICTION}
-    cam.x=lerp(cam.x,tgt.x,LERP);cam.y=lerp(cam.y,tgt.y,LERP);cam.z=lerp(cam.z,tgt.z,LERP);
-    cam.rx=lerp(cam.rx,tgt.rx,LERP);cam.ry=lerp(cam.ry,tgt.ry,LERP);
-    document.getElementById('hub').style.transform=`translate(-50%,-50%) scale(${cam.z}) translate3d(${cam.x}px,${cam.y}px,0) rotateX(${cam.rx}deg) rotateY(${cam.ry}deg)`;
-    if(!dragging&&nodes.length>1)tgt.ry+=0.01;
-    requestAnimationFrame(renderLoop);
+function updateStatus(msg) { document.getElementById('status').innerText = msg; }
+
+// ═══════════════════════════════════════════════════════
+//  INTERACTION
+// ═══════════════════════════════════════════════════════
+window.onpointerdown = e => {
+  if (e.target.closest('#toolbar,#search-overlay,#detail,#ai-setup')) return;
+  const now = Date.now();
+  if (now - lastTap < 320) { resetUniverse(); lastTap = 0; return; }
+  lastTap = now;
+  drag = true; lx = e.clientX; ly = e.clientY; startX = lx; startY = ly;
+};
+window.onpointermove = e => {
+  if (!drag) return;
+  const dx = e.clientX - lx, dy = e.clientY - ly;
+  const moved = Math.abs(e.clientX - startX) > 6 || Math.abs(e.clientY - startY) > 6;
+  if (moved) {
+    if (e.shiftKey || e.buttons === 2) { tgt.ry += dx * .3; tgt.rx -= dy * .3; }
+    else { tgt.x += dx / cam.z; tgt.y += dy / cam.z; }
+  }
+  lx = e.clientX; ly = e.clientY;
+};
+window.onpointerup = e => {
+  drag = false;
+  if (e.target.closest('#toolbar,#search-overlay,#detail,#ai-setup')) return;
+  const moved = Math.abs(e.clientX - startX) > 6 || Math.abs(e.clientY - startY) > 6;
+  if (!moved) {
+    const dot = e.target.closest('.dot');
+    if (dot) expandFromDot(dot);
+  }
+};
+window.oncontextmenu = e => e.preventDefault();
+window.onwheel = e => { tgt.z = Math.max(0.08, Math.min(5, tgt.z - e.deltaY * .0015)); };
+window.addEventListener('touchstart', e => {
+  if (e.touches.length === 2) { drag = false; pinchDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY); }
+}, { passive: true });
+window.addEventListener('touchmove', e => {
+  if (e.touches.length === 2) {
+    const d = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+    tgt.z = Math.max(0.08, Math.min(5, tgt.z + (d - pinchDist) * 0.004));
+    pinchDist = d;
+  }
+}, { passive: true });
+
+// ═══════════════════════════════════════════════════════
+//  RENDER LOOP
+// ═══════════════════════════════════════════════════════
+function lerp(a, b, t) { return a + (b - a) * t; }
+function renderLoop() {
+  const f = 0.065;
+  cam.x = lerp(cam.x, tgt.x, f); cam.y = lerp(cam.y, tgt.y, f);
+  cam.z = lerp(cam.z, tgt.z, f); cam.rx = lerp(cam.rx, tgt.rx, f); cam.ry = lerp(cam.ry, tgt.ry, f);
+  hub.style.transform = `translate(-50%,-50%) scale(${cam.z}) translate3d(${cam.x}px,${cam.y}px,0) rotateX(${cam.rx}deg) rotateY(${cam.ry}deg)`;
+  document.getElementById('coord-display').innerText = `Z:${cam.z.toFixed(3)} X:${Math.floor(cam.x)} Y:${Math.floor(cam.y)}`;
+  if (ENV.autoSpin && !drag && jnodes.length > 0) tgt.ry += 0.018;
+  requestAnimationFrame(renderLoop);
 }
 
-// PWA Installation
-let deferredPrompt;
-window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;document.getElementById('install-btn').style.display='block'});
+// ═══════════════════════════════════════════════════════
+//  SEARCH (FIXED)
+// ═══════════════════════════════════════════════════════
+function openSearch() {
+  document.getElementById('search-overlay').classList.add('active');
+  setTimeout(() => document.getElementById('search-input').focus(), 200);
+  runSearch('');
+}
+function closeSearch() {
+  document.getElementById('search-overlay').classList.remove('active');
+  document.getElementById('search-input').value = '';
+}
+function runSearch(q) {
+  const results = q.length > 0 ? searchKB(q) : KB.slice(0, 8);
+  const c = document.getElementById('search-results');
+  if (!results.length) {
+    c.innerHTML = `<div style="text-align:center;padding:40px;font-size:clamp(32px,10vw,48px);">🌱<br><span style="font-size:clamp(13px,3.5vw,16px);color:#475569;">No results — try another word</span></div>`;
+    return;
+  }
+  c.innerHTML = results.map((item, i) => `
+    <div class="s-card" style="animation-delay:${i * 45}ms" onclick='openKB(${JSON.stringify(JSON.stringify(item))})'>
+      <div class="s-em">${item.icon}</div>
+      <div class="s-body">
+        <h3>${item.title}</h3>
+        <p>${item.desc}</p>
+        <div class="s-tags">${item.tags.slice(0, 4).map(t => `<span class="s-tag">${t}</span>`).join('')}</div>
+      </div>
+    </div>`).join('');
+}
+function openKB(json) {
+  const item = JSON.parse(json);
+  closeSearch();
+  const dom = DOMAINS.find(d => d.name.toLowerCase().includes(item.catKey.toLowerCase()));
+  if (dom) {
+    clearExpansion();
+    const rdot = dots[Math.floor(Math.random() * dots.length)];
+    if (rdot) expandFromDot(rdot);
+  }
+  setTimeout(() => showDetail(item), 600);
+}
+function showDetail(item) {
+  document.getElementById('d-icon').innerText = item.icon;
+  document.getElementById('d-title').innerText = item.title;
+  document.getElementById('d-desc').innerText = item.desc;
+  document.getElementById('d-links').innerHTML = item.links.map(l => `<a class="d-link" href="${l.url}" target="_blank">🔗 ${l.label}</a>`).join('');
+  document.getElementById('detail').classList.add('open');
+}
+function closeDetail() { document.getElementById('detail').classList.remove('open'); }
 
-async function installPWA(){
-    if(!deferredPrompt)return;
-    deferredPrompt.prompt();
-    const{outcome}=await deferredPrompt.userChoice;
-    if(outcome==='accepted')document.getElementById('install-btn').style.display='none';
-    deferredPrompt=null;
+// ═══════════════════════════════════════════════════════
+//  VOICE & SURPRISE
+// ═══════════════════════════════════════════════════════
+function rollSurprise() {
+  clearExpansion();
+  const d = DOMAINS[Math.floor(Math.random() * DOMAINS.length)];
+  const randomDot = dots[Math.floor(Math.random() * dots.length)];
+  if (randomDot) expandFromDot(randomDot);
+  updateStatus(`🎲 Exploring ${d.icon} ${d.name}`);
 }
 
-document.getElementById('search-input').addEventListener('keydown',e=>{if(e.key==='Enter')executeSearch()});
+function toggleVoice() {
+  const ic = document.getElementById('v-icon');
+  if (voiceEnabled) {
+    try { voiceRecog.stop(); } catch (e) { }
+    voiceEnabled = false; ic.innerText = '👂'; return;
+  }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { updateStatus("⚠️ Voice not available"); return; }
+  voiceRecog = new SR();
+  voiceRecog.lang = 'en-IN'; voiceRecog.continuous = true; voiceRecog.interimResults = false;
+  voiceRecog.onresult = e => {
+    const said = e.results[e.results.length - 1][0].transcript.toLowerCase();
+    updateStatus(`🎙️ "${said}"`);
+    const hits = searchKB(said);
+    if (hits.length) { document.getElementById('search-input').value = said; openSearch(); runSearch(said); }
+  };
+  voiceRecog.onerror = () => { voiceEnabled = false; ic.innerText = '👂'; };
+  voiceRecog.onend = () => { if (voiceEnabled) voiceRecog.start(); };
+  voiceRecog.start();
+  voiceEnabled = true; ic.innerText = '🔴';
+  updateStatus("🎙️ Listening…");
+}
+
+// ═══════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════
+function initUniverse() {
+  buildDots();
+  resetUniverse();
+  renderLoop();
+}
 </script>
 </body>
 </html>
