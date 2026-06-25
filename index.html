@@ -3,110 +3,360 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Khel.o | The EVOD Universe</title>
-<link rel="manifest" href="manifest.json">
+<title>Khel.o | The Evolutionary Engine</title>
 <style>
     /* =========================================
-    CORE VOID & MOBILE FIRST (< 10KB CSS)
+    CORE VOID & MOBILE FIRST
     ========================================= */
-    :root { --bg: #030406; --gold: #fbbf24; --teal: #14b8a6; --text: #e2e8f0; }
+    :root { 
+        --bg: #030406; --gold: #fbbf24; --teal: #14b8a6; --text: #e2e8f0; 
+        --surface: rgba(15, 23, 42, 0.8); --border: rgba(255,255,255,0.1);
+    }
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
-    body { background: var(--bg); color: var(--text); font-family: system-ui, sans-serif; height: 100vh; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+    body { background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, sans-serif; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
 
     /* =========================================
-    THE FIBONACCI FLOWER RENDERER
+    THE UNIVERSE CONTAINER (Fibonacci Math)
     ========================================= */
-    #evo-container {
-        position: relative; width: 100vw; height: 100vh;
-        display: flex; align-items: center; justify-content: center;
-        transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    #universe {
+        flex: 1; position: relative; display: flex; align-items: center; justify-content: center;
+        transition: transform 1s cubic-bezier(0.16, 1, 0.3, 1);
     }
+    
+    /* THE DOT (State 0) */
+    #dot {
+        width: 14px; height: 14px; background: var(--gold); border-radius: 50%;
+        box-shadow: 0 0 30px 10px rgba(251,191,36,0.6);
+        cursor: pointer; animation: pulse 2.5s infinite ease-in-out;
+        transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    #dot.bloom { transform: scale(0); opacity: 0; pointer-events: none; }
+    @keyframes pulse { 0%, 100% { box-shadow: 0 0 30px 10px rgba(251,191,36,0.6); } 50% { box-shadow: 0 0 50px 20px rgba(251,191,36,0.9); } }
 
-    .evo-seed, .evo-petal {
-        position: absolute;
-        width: 80px; height: 80px; border-radius: 50%;
-        background: rgba(15, 23, 42, 0.8); border: 2px solid rgba(251,191,36,0.3);
+    /* THE NODES (Branches, Petals, Deep Nodes) */
+    .node {
+        position: absolute; width: 70px; height: 70px; border-radius: 50%;
+        background: var(--surface); border: 1px solid var(--border);
         display: flex; flex-direction: column; align-items: center; justify-content: center;
         backdrop-filter: blur(10px); cursor: pointer;
-        transform: translate(-50%, -50%) scale(0);
-        animation: bloom 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        transform: translate(-50%, -50%) scale(0); opacity: 0;
+        transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.5s, border-color 0.3s, background 0.3s;
     }
-    .evo-seed { width: 100px; height: 100px; border-color: var(--gold); box-shadow: 0 0 30px rgba(251,191,36,0.4); z-index: 10; }
-    .evo-petal { 
-        /* Fibonacci positioning via CSS variables */
-        transform: translate(-50%, -50%) rotate(var(--angle)) translateY(calc(-1 * var(--radius))) rotate(calc(-1 * var(--angle))) scale(0);
-    }
-    .evo-petal:active { background: rgba(251,191,36,0.2); border-color: var(--gold); }
+    .node.bloom { transform: translate(var(--x), var(--y)) scale(1); opacity: 1; }
+    .node:active { background: rgba(251,191,36,0.2); border-color: var(--gold); }
+    .node .icon { font-size: 24px; margin-bottom: 2px; }
+    .node .label { font-size: 8px; letter-spacing: 1px; text-transform: uppercase; color: var(--gold); font-weight: 700; text-align: center; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 4px;}
     
-    .evo-seed .icon, .evo-petal .icon { font-size: 28px; margin-bottom: 4px; }
-    .evo-seed .word, .evo-petal .word { font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: var(--gold); font-weight: 700; }
+    /* Core Branches (Larger, Glowing) */
+    .node.branch { width: 90px; height: 90px; border-color: var(--gold); box-shadow: 0 0 20px rgba(251,191,36,0.3); }
+    .node.branch .icon { font-size: 32px; }
+    .node.branch .label { font-size: 10px; }
 
-    @keyframes bloom { to { transform: translate(-50%, -50%) rotate(var(--angle, 0deg)) translateY(calc(-1 * var(--radius, 0px))) rotate(calc(-1 * var(--angle, 0deg))) scale(1); } }
-
-    .evo-loading, .evo-end {
-        position: absolute; color: var(--teal); font-family: monospace; letter-spacing: 2px;
-        animation: pulse 2s infinite;
+    /* =========================================
+    THE EVOLUTIONARY CONSOLE (File System Simulation)
+    ========================================= */
+    #evo-console {
+        height: 180px; background: #000; border-top: 1px solid var(--teal);
+        font-family: 'Courier New', monospace; font-size: 11px; color: var(--teal);
+        padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px;
+        box-shadow: 0 -10px 30px rgba(20,184,166,0.1);
     }
-    @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+    #evo-console::-webkit-scrollbar { width: 4px; }
+    #evo-console::-webkit-scrollbar-thumb { background: var(--teal); border-radius: 2px; }
+    .log-line { opacity: 0; animation: typeIn 0.3s forwards; }
+    .log-line.sys { color: var(--gold); }
+    .log-line.ai { color: #a78bfa; }
+    .log-line.err { color: #f43f5e; }
+    @keyframes typeIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
 
-    #evo-container {
-    position: relative; width: 100vw; height: 100vh;
-    display: flex; align-items: center; justify-content: center;
-    overflow: hidden;
-}
-.evo-seed {
-    position: absolute; width: 100px; height: 100px; border-radius: 50%;
-    background: rgba(251, 191, 36, 0.2); border: 2px solid #fbbf24;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    box-shadow: 0 0 40px rgba(251, 191, 36, 0.4); z-index: 10;
-}
-.evo-petal {
-    position: absolute; width: 80px; height: 80px; border-radius: 50%;
-    background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255,255,255,0.2);
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    cursor: pointer; backdrop-filter: blur(8px);
-    /* Start at center, scaled to 0 */
-    transform: translate(-50%, -50%) rotate(var(--angle)) translateY(0) rotate(calc(-1 * var(--angle))) scale(0);
-    opacity: 0;
-    transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s;
-}
-.evo-petal.bloom {
-    /* Bloom outward using the math variables */
-    transform: translate(-50%, -50%) rotate(var(--angle)) translateY(calc(-1 * var(--radius))) rotate(calc(-1 * var(--angle))) scale(1);
-    opacity: 1;
-}
-.evo-petal:active { background: rgba(251, 191, 36, 0.2); border-color: #fbbf24; }
-.icon { font-size: 24px; }
-.word { font-size: 8px; letter-spacing: 1px; text-transform: uppercase; color: #fbbf24; margin-top: 4px; text-align: center;}
-.evo-loading { color: #14b8a6; font-family: monospace; letter-spacing: 2px; animation: pulse 2s infinite; }
-@keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+    /* =========================================
+    HEADER & STATUS
+    ========================================= */
+    #header {
+        position: absolute; top: 20px; left: 20px; right: 20px; display: flex; justify-content: space-between; align-items: center;
+        z-index: 10; pointer-events: none;
+    }
+    #status { font-size: 10px; letter-spacing: 2px; color: var(--teal); text-transform: uppercase; background: rgba(0,0,0,0.5); padding: 6px 12px; border-radius: 20px; border: 1px solid var(--border); }
+    #back-btn {
+        pointer-events: auto; background: var(--surface); border: 1px solid var(--border); color: var(--text);
+        width: 36px; height: 36px; border-radius: 50%; display: none; align-items: center; justify-content: center;
+        cursor: pointer; font-size: 18px; backdrop-filter: blur(10px);
+    }
 </style>
 </head>
 <body>
 
-<!-- The Universe Container -->
-<div id="evo-container"></div>
+<div id="header">
+    <div id="status">AWAITING SEED...</div>
+    <button id="back-btn" onclick="goBack()">←</button>
+</div>
 
-<!-- The EVOD Engine -->
-<script src="evo-engine.js"></script>
+<div id="universe">
+    <div id="dot" onclick="triggerBigBang()"></div>
+</div>
+
+<!-- The Evolutionary File System Console -->
+<div id="evo-console">
+    <div class="log-line sys">[SYSTEM] Khel.o Evolutionary Engine v1.0 Initialized.</div>
+    <div class="log-line">[FS] Mounting browser storage for evolutionary memory...</div>
+    <div class="log-line ai">[AI] Ready to generate, overwrite, and evolve .evo files.</div>
+</div>
 
 <script>
     // ==========================================
-    // THE BIG BANG TRIGGER
+    // 1. STATE & CONFIGURATION
     // ==========================================
-    window.addEventListener('DOMContentLoaded', () => {
-        // Start with the root Sahyog seed
-        EVOD.init('sahyog', 'evo-container');
-    });
+    const GITHUB_BASE = 'https://bhearth.github.io/khela/';
+    const GOLDEN_ANGLE = 137.5;
+    let currentState = 'dot'; // dot -> branches -> petals -> deep
+    let historyStack = [];
+    let nodeCache = {}; // In-memory cache for fetched JSONs
+
+    const universe = document.getElementById('universe');
+    const consoleEl = document.getElementById('evo-console');
+    const statusEl = document.getElementById('status');
+    const backBtn = document.getElementById('back-btn');
 
     // ==========================================
-    // PWA INSTALL PROMPT
+    // 2. THE EVOLUTIONARY CONSOLE (File System Simulation)
     // ==========================================
-    let deferredPrompt;
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-    });
+    function log(msg, type = '') {
+        const line = document.createElement('div');
+        line.className = `log-line ${type}`;
+        line.textContent = msg;
+        consoleEl.appendChild(line);
+        consoleEl.scrollTop = consoleEl.scrollHeight;
+    }
+
+    // Simulates the AI creating/overwriting files in the background
+    async function evolveNode(nodeCode, data) {
+        log(`[FS] Creating temp file: ${nodeCode}.evo ...`, 'sys');
+        await sleep(300);
+        
+        // Generate the EVO JSON structure
+        const evoData = {
+            code: nodeCode,
+            name: data.name || nodeCode,
+            vector: data.vector || [0,0,0,0,0,0,0,0,0,0],
+            timestamp: Date.now(),
+            mutations: [`Synced with 1.json`, `Linked to ${nodeCode} children`]
+        };
+
+        log(`[AI] Analyzing 10D Dharma Vector for ${nodeCode}...`, 'ai');
+        await sleep(400);
+        
+        log(`[FS] Overwriting mesh_state.json with new resonance...`, 'sys');
+        await sleep(300);
+        
+        // Save to Browser Storage (The Evolutionary Memory)
+        saveToEvolutionaryMemory(nodeCode, evoData);
+        
+        log(`[SUCCESS] Evolutionary state saved. The mesh grows.`, 'ai');
+    }
+
+    function saveToEvolutionaryMemory(code, data) {
+        try {
+            let mesh = JSON.parse(localStorage.getItem('khela_evo_mesh') || '{}');
+            mesh[code] = data;
+            localStorage.setItem('khela_evo_mesh', JSON.stringify(mesh));
+        } catch(e) { log('[ERR] Storage full. Purging old mutations...', 'err'); }
+    }
+
+    function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+    // ==========================================
+    // 3. THE BIG BANG (Dot -> 3 Branches)
+    // ==========================================
+    async function triggerBigBang() {
+        if (currentState !== 'dot') return;
+        currentState = 'branches';
+        
+        log('[BIG BANG] Expanding singularity into 3 core branches...', 'sys');
+        statusEl.innerText = 'EXPANDING UNIVERSE...';
+        
+        document.getElementById('dot').classList.add('bloom');
+        backBtn.style.display = 'flex';
+        
+        await sleep(800);
+        
+        // The 3 Core Branches (Philosophy from about.html)
+        const branches = [
+            { code: '0.1', name: 'BA.EJ', icon: '🌱', desc: 'The Seed' },
+            { code: '0.8', name: 'SAHYOG', icon: '🤝', desc: 'Co-Creation' },
+            { code: '0.9', name: 'MUKTI', icon: '🕊️', desc: 'Liberation' }
+        ];
+
+        renderNodes(branches, 120, 'branch');
+        statusEl.innerText = 'TAP A BRANCH TO EXPLORE';
+    }
+
+    // ==========================================
+    // 4. RENDERING ENGINE (Fibonacci Math)
+    // ==========================================
+    function renderNodes(nodes, radius, className = '') {
+        // Clear previous nodes
+        document.querySelectorAll('.node').forEach(n => n.remove());
+
+        nodes.forEach((node, i) => {
+            const angle = i * GOLDEN_ANGLE;
+            const x = Math.cos(angle * Math.PI / 180) * radius;
+            const y = Math.sin(angle * Math.PI / 180) * radius;
+
+            const el = document.createElement('div');
+            el.className = `node ${className}`;
+            el.style.setProperty('--x', `${x}px`);
+            el.style.setProperty('--y', `${y}px`);
+            el.style.transitionDelay = `${i * 0.1}s`;
+            
+            el.innerHTML = `<span class="icon">${node.icon || '✨'}</span><span class="label">${node.name || node.code}</span>`;
+            
+            el.onclick = () => handleNodeClick(node, el);
+            universe.appendChild(el);
+            
+            // Trigger bloom animation
+            setTimeout(() => el.classList.add('bloom'), 50);
+        });
+    }
+
+    // ==========================================
+    // 5. NODE INTERACTION & JSON DRILL-DOWN
+    // ==========================================
+    async function handleNodeClick(node, el) {
+        historyStack.push(currentState);
+
+        if (currentState === 'branches') {
+            // Branch clicked -> Fetch 1.json and show 8 Petals
+            currentState = 'petals';
+            statusEl.innerText = `FETCHING ROOT DOMAINS (1.json)...`;
+            log(`[NET] Fetching ${GITHUB_BASE}1.json ...`, 'sys');
+            
+            const data = await fetchJSON('1.json');
+            if (!data) return;
+
+            const petals = Object.keys(data.domains).map(code => ({
+                code: code,
+                name: data.domains[code].name.toUpperCase(),
+                icon: getIconForDomain(code),
+                vector: data.domains[code].vector
+            }));
+
+            log(`[SUCCESS] 8 Root Domains loaded. Rendering Fibonacci Mandala.`, 'ai');
+            renderNodes(petals, 160);
+            statusEl.innerText = 'TAP A PETAL TO DRILL DOWN';
+
+        } else if (currentState === 'petals') {
+            // Petal clicked -> Fetch 2.json or 9.json (Decimal Hierarchy)
+            currentState = 'deep';
+            const code = node.code;
+            statusEl.innerText = `DRILLING DOWN: ${code}...`;
+            
+            log(`[MESH] Calculating decimal hierarchy for ${code}...`, 'ai');
+            
+            // Determine which file to fetch based on the code (Simulating mesh.js logic)
+            let targetFile = '2.json'; 
+            if (code === '0.8') targetFile = '9.json'; // Sahyog Tree
+            if (code === '0.1') targetFile = '2.json'; // Individual Tree
+
+            log(`[NET] Fetching ${targetFile} ...`, 'sys');
+            const data = await fetchJSON(targetFile);
+            if (!data) return;
+
+            // Find direct children using decimal math
+            const children = getDirectChildren(code, data.tree || data);
+            
+            if (children.length === 0) {
+                log(`[END] Node ${code} is a leaf. Triggering Evolutionary Save.`, 'ai');
+                await evolveNode(code, node);
+                statusEl.innerText = 'EVOLUTIONARY STATE SAVED';
+                return;
+            }
+
+            const deepNodes = children.map(c => ({
+                code: c,
+                name: (data.tree ? data.tree[c] : c).replace(/_/g, ' ').substring(0, 15),
+                icon: '🌿'
+            }));
+
+            log(`[SUCCESS] Found ${children.length} child nodes. Rendering.`, 'ai');
+            renderNodes(deepNodes, 180);
+            statusEl.innerText = 'TAP NODE TO EVOLVE';
+
+        } else if (currentState === 'deep') {
+            // Deep node clicked -> Trigger Evolutionary File Creation
+            statusEl.innerText = `EVOLVING ${node.code}...`;
+            await evolveNode(node.code, node);
+            statusEl.innerText = 'MESH EVOLVED. TAP BACK TO RETURN.';
+        }
+    }
+
+    // ==========================================
+    // 6. UTILITIES (Fetch, Math, Icons)
+    // ==========================================
+    async function fetchJSON(filename) {
+        if (nodeCache[filename]) return nodeCache[filename];
+        try {
+            const res = await fetch(`${GITHUB_BASE}${filename}`);
+            const data = await res.json();
+            nodeCache[filename] = data;
+            return data;
+        } catch (e) {
+            log(`[ERR] Failed to fetch ${filename}. Using fallback.`, 'err');
+            // Fallback data if GitHub is unreachable
+            return getFallbackData(filename);
+        }
+    }
+
+    function getDirectChildren(parentCode, allNodes) {
+        const parentLen = parentCode.length;
+        return Object.keys(allNodes).filter(key => 
+            key.startsWith(parentCode) && key.length === parentLen + 1
+        );
+    }
+
+    function getIconForDomain(code) {
+        const icons = {
+            '0.1': '🧠', '0.2': '🤝', '0.3': '🌍', '0.4': '🏗️', 
+            '0.5': '🔭', '0.6': '💡', '0.8': '🌱', '0.9': '🕊️'
+        };
+        return icons[code] || '✨';
+    }
+
+    function getFallbackData(filename) {
+        if (filename === '1.json') {
+            return { domains: {
+                '0.1': {name:'individual',vector:[0.7,0.8,0,0,0,0,0,0,0,0]},
+                '0.8': {name:'sahyog',vector:[0.9,0.7,0,0,0,0,0,0,0,0]},
+                '0.9': {name:'mukti',vector:[0.8,0.5,0,0,0,0,0,0,0,0]}
+            }};
+        }
+        if (filename === '9.json') {
+            return { tree: { '0.81': 'collaboration', '0.82': 'synthesis', '0.88': 'sanyog', '0.881': 'artistic_collab' } };
+        }
+        return { tree: { '0.11': 'body', '0.12': 'mind', '0.13': 'spirit' } };
+    }
+
+    function goBack() {
+        if (historyStack.length === 0) {
+            // Reset to Dot
+            currentState = 'dot';
+            document.querySelectorAll('.node').forEach(n => n.remove());
+            document.getElementById('dot').classList.remove('bloom');
+            backBtn.style.display = 'none';
+            statusEl.innerText = 'AWAITING SEED...';
+            log('[SYSTEM] Universe collapsed back to singularity.', 'sys');
+        } else {
+            const prevState = historyStack.pop();
+            currentState = prevState;
+            // Re-render previous state (simplified for this prototype)
+            if (prevState === 'branches') triggerBigBang(); 
+            else if (prevState === 'petals') handleNodeClick({code: '0.0'}, null); // Mock re-fetch
+        }
+    }
+
+    // ==========================================
+    // 7. INITIALIZATION
+    // ==========================================
+    log('[READY] Touch the Golden Dot to awaken the mesh.', 'ai');
 </script>
 </body>
 </html>
