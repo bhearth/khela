@@ -1,272 +1,1032 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
-<title>Khel.o</title>
+<meta name="theme-color" content="#010204">
+<title>Khel.o · EVOD — Earth Evolutionary Knowledge Network</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
 <link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Rounded" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#010204;font-family:system-ui;overflow:hidden;touch-action:none;user-select:none;color:#e2e8f0}
+:root{
+  --bg:#010204; --bg2:#050a14;
+  --glass:rgba(10,15,25,.65); --glass2:rgba(10,15,25,.92);
+  --border:rgba(255,255,255,.08); --border2:rgba(255,255,255,.14);
+  --accent:#38bdf8; --gold:#fbbf24; --emerald:#10b981; --rose:#f43f5e; --violet:#a78bfa;
+}
+html,body{background:var(--bg);color:#e2e8f0;font-family:'Inter',system-ui;overflow-x:hidden}
+body.evod-mode{overflow:hidden;touch-action:none;user-select:none;height:100dvh}
+.font-d{font-family:'Space Grotesk',sans-serif}
+.font-m{font-family:'JetBrains Mono',monospace}
+
+/* ── BACKGROUND ── */
+body::before{content:'';position:fixed;inset:0;background:
+  radial-gradient(ellipse at 20% 30%,rgba(16,185,129,.04) 0%,transparent 50%),
+  radial-gradient(ellipse at 80% 70%,rgba(251,191,36,.03) 0%,transparent 50%),
+  radial-gradient(ellipse at 50% 50%,rgba(56,189,248,.03) 0%,transparent 70%);
+  pointer-events:none;z-index:0}
+
+/* ── 3D ENGINE ── */
+#viewport{position:fixed;inset:0;perspective:2000px;z-index:1}
 #hub{position:absolute;top:50%;left:50%;transform-style:preserve-3d;will-change:transform}
-.d{position:absolute;border-radius:50%;cursor:pointer;transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),var(--z));animation:b .8s cubic-bezier(.34,1.56,.64,1) forwards;transition:transform .4s,box-shadow .3s}
-.d:hover{transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),calc(var(--z)+40px)) scale(1.8)!important;z-index:100}
-.s{width:80px;height:80px;transform:translate(-50%,-50%);cursor:pointer}
-.s::after{content:'';position:absolute;inset:30px;background:#d4af37;border-radius:50%;box-shadow:0 0 40px 16px rgba(212,175,55,.7);animation:br 3s infinite ease-in-out}
-@keyframes b{to{transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),var(--z)) scale(1)}}
-@keyframes br{0%,100%{transform:scale(1);opacity:.8}50%{transform:scale(1.4);opacity:1}}
-svg{position:absolute;top:-10000px;left:-10000px;width:20000px;height:20000px;pointer-events:none}
-.l{fill:none;stroke-width:1.5;stroke-dasharray:2000;stroke-dashoffset:2000;animation:dr 1.4s ease forwards}
-@keyframes dr{to{stroke-dashoffset:0}}
-.n{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:50%;cursor:pointer;background:rgba(10,15,25,.7);border:1.5px solid;backdrop-filter:blur(10px);transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),var(--z)) scale(0);animation:b .9s cubic-bezier(.34,1.56,.64,1) forwards}
-.n:active{background:currentColor;color:#000!important;box-shadow:0 0 30px currentColor;z-index:500}
-.c{position:absolute;width:180px;padding:14px;border-radius:16px;background:rgba(10,15,25,.9);border:1px solid rgba(255,255,255,.1);backdrop-filter:blur(20px);cursor:pointer;transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),var(--z)) scale(0);animation:b 1s cubic-bezier(.34,1.56,.64,1) forwards}
-.c:active{transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),calc(var(--z)+30px)) scale(1.08)!important;border-color:currentColor}
-#about{position:fixed;inset:0;background:#010204;z-index:200;overflow-y:auto;display:none;padding:20px}
-#about.show{display:block}
+svg.constellation{position:absolute;top:-10000px;left:-10000px;width:20000px;height:20000px;pointer-events:none;transform-style:preserve-3d}
+.stellar-path{fill:none;stroke-width:1.5;stroke-linecap:round;filter:drop-shadow(0 0 4px currentColor);stroke-dasharray:2000;stroke-dashoffset:2000;animation:draw 1.6s cubic-bezier(.25,1,.5,1) forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+
+.seed-dot{position:absolute;width:80px;height:80px;transform:translate(-50%,-50%);cursor:pointer;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.seed-dot::after{content:'';position:absolute;width:20px;height:20px;background:#d4af37;border-radius:50%;box-shadow:0 0 40px 16px rgba(212,175,55,.7);animation:breath 3s infinite ease-in-out}
+.seed-dot:hover::after{transform:scale(1.6);background:#fff}
+@keyframes breath{0%,100%{transform:scale(1);opacity:.8}50%{transform:scale(1.4);opacity:1}}
+
+.fdot{position:absolute;border-radius:50%;cursor:pointer;transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),var(--z)) scale(0);animation:bloom .9s cubic-bezier(.34,1.56,.64,1) forwards;min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center;transition:transform .35s,box-shadow .3s}
+.fdot .core{border-radius:50%;background:radial-gradient(circle at 30% 30%,var(--col-l),var(--col));width:var(--sz);height:var(--sz);box-shadow:0 0 8px var(--col),inset 0 0 6px rgba(255,255,255,.3);transition:transform .35s}
+.fdot:hover .core{transform:scale(2.2);box-shadow:0 0 30px var(--col),0 0 60px var(--col)}
+@keyframes bloom{to{transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),var(--z)) scale(1);opacity:1}}
+
+.node{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:50%;cursor:pointer;background:var(--glass);border:1.5px solid;backdrop-filter:blur(10px);transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),var(--z)) scale(0);animation:bloom .9s cubic-bezier(.34,1.56,.64,1) forwards;text-align:center;padding:8px}
+.node:active{background:currentColor!important;color:#000!important;box-shadow:0 0 30px currentColor;z-index:500}
+.node .ji{font-size:clamp(16px,4vw,24px);filter:drop-shadow(0 2px 5px rgba(0,0,0,.8))}
+.node .jl{font-size:clamp(8px,1.8vw,10px);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-top:4px;pointer-events:none}
+
+.portal-card{position:absolute;width:clamp(150px,36vw,190px);padding:12px;border-radius:16px;background:var(--glass2);border:1px solid var(--border);backdrop-filter:blur(20px);cursor:pointer;transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),var(--z)) scale(0) rotateY(90deg);animation:portalEnter .9s cubic-bezier(.34,1.56,.64,1) forwards;display:flex;align-items:center;gap:10px;text-align:left;transition:all .3s}
+.portal-card:active{transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),calc(var(--z) + 40px)) scale(1.08) rotateY(0deg)!important;border-color:var(--col);box-shadow:0 0 30px var(--col-s)}
+.portal-card .pc-icon{font-size:24px;flex-shrink:0}
+.portal-card .pc-name{font-size:12px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.portal-card .pc-cat{font-size:9px;color:var(--col);text-transform:uppercase;letter-spacing:1.5px;font-weight:700}
+@keyframes portalEnter{to{transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),var(--z)) scale(1) rotateY(0deg);opacity:1}}
+
+/* ── HUD ── */
+.hud{position:fixed;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:flex-start;padding:clamp(12px,3vw,20px);pointer-events:none;z-index:50;background:linear-gradient(180deg,rgba(1,2,4,.92) 60%,transparent)}
+.telemetry{font-size:clamp(10px,2.5vw,13px);letter-spacing:3px;text-transform:uppercase;color:#38bdf8;text-shadow:0 0 10px rgba(56,189,248,.6);font-weight:500}
+.telemetry-sub{font-size:clamp(9px,2vw,10px);color:#64748b;letter-spacing:2px;font-family:'JetBrains Mono',monospace;margin-top:4px}
+.mode-btn{pointer-events:auto;padding:8px 14px;background:var(--glass);backdrop-filter:blur(16px);border:1px solid var(--border);border-radius:10px;color:var(--accent);font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-weight:700;transition:.3s}
+.mode-btn:hover{border-color:var(--accent);box-shadow:0 0 20px rgba(56,189,248,.2)}
+.mode-btn.active{background:linear-gradient(135deg,var(--emerald),#059669);color:#000;border-color:transparent}
+
+/* ── TOOLBAR (EVOD mode) ── */
+.toolbar{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:space-around;align-items:center;padding:clamp(10px,2.5vw,16px) 8px clamp(16px,4vw,28px);background:linear-gradient(0deg,rgba(1,2,4,.97) 70%,transparent);z-index:50;gap:6px}
+.tb{display:flex;flex-direction:column;align-items:center;gap:3px;background:var(--glass);border:1px solid var(--border);border-radius:16px;padding:10px 14px;cursor:pointer;flex:1;max-width:90px;transition:.2s;color:#e2e8f0}
+.tb:active{background:var(--accent);color:#000;transform:scale(.93)}
+.tb .em{font-size:clamp(20px,5.5vw,26px);line-height:1}
+.tb .lb{font-size:clamp(8px,2vw,10px);color:#94a3b8;letter-spacing:.5px;text-transform:uppercase;font-weight:700}
+
+/* ── BREADCRUMB ── */
+.path-bar{position:fixed;top:clamp(60px,12vh,90px);left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:8px;padding:8px 16px;background:var(--glass);backdrop-filter:blur(16px);border:1px solid var(--border);border-radius:20px;z-index:40;max-width:90vw;overflow-x:auto;transition:.4s}
+.path-bar::-webkit-scrollbar{display:none}
+.path-bar.hidden{opacity:0;pointer-events:none}
+.path-chip{display:flex;align-items:center;gap:6px;padding:4px 10px;background:rgba(255,255,255,.03);border-radius:10px;white-space:nowrap;cursor:pointer;font-size:11px;font-weight:600}
+.path-chip.current{background:rgba(56,189,248,.15);color:var(--accent)}
+.path-arrow{color:#334155;font-size:10px}
+
+/* ── ABOUT / EVOD PAGE (SCROLL MODE) ── */
+#evod-page{position:relative;z-index:10;display:none}
+body:not(.evod-mode) #evod-page{display:block}
+body:not(.evod-mode) #viewport,body:not(.evod-mode) .toolbar,body:not(.evod-mode) .path-bar{display:none}
+body:not(.evod-mode) .hud{background:linear-gradient(180deg,rgba(1,2,4,.85) 40%,transparent)}
+
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:100px 20px 60px;text-align:center;position:relative}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);border-radius:50px;font-size:10px;font-weight:700;color:var(--emerald);letter-spacing:3px;text-transform:uppercase;margin-bottom:30px}
+.hero-title{font-family:'Space Grotesk',sans-serif;font-size:clamp(36px,8vw,72px);font-weight:700;line-height:1.05;margin-bottom:24px;background:linear-gradient(135deg,var(--emerald) 0%,var(--gold) 40%,var(--accent) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:-1px}
+.hero-sub{font-size:clamp(15px,2.8vw,20px);color:#94a3b8;line-height:1.7;max-width:760px;margin-bottom:40px}
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:14px 28px;border-radius:50px;font-weight:700;font-size:12px;letter-spacing:2px;text-transform:uppercase;text-decoration:none;transition:.3s;cursor:pointer;border:none}
+.btn-primary{background:linear-gradient(135deg,var(--emerald),#059669);color:#fff;box-shadow:0 0 40px rgba(16,185,129,.3)}
+.btn-primary:hover{transform:scale(1.05);box-shadow:0 0 60px rgba(16,185,129,.5)}
+.btn-secondary{background:var(--glass);border:1px solid var(--border);color:var(--text)}
+.btn-secondary:hover{border-color:var(--gold);color:var(--gold)}
+
+.section{padding:clamp(60px,10vw,100px) clamp(20px,6vw,60px);max-width:1100px;margin:0 auto;position:relative}
+.section-label{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--emerald);letter-spacing:4px;text-transform:uppercase;margin-bottom:14px;opacity:.8}
+.section-title{font-family:'Space Grotesk',sans-serif;font-size:clamp(26px,5vw,44px);font-weight:700;margin-bottom:18px;line-height:1.2}
+.section-desc{font-size:clamp(14px,2.3vw,17px);color:#94a3b8;line-height:1.8;margin-bottom:40px;max-width:760px}
+
+/* ── CUSTOM SEMANTIC TAGS (The Essence Engine) ── */
+/* These get preprocessed by JS below to reduce repetitive Tailwind classes */
+d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z{text-align:left;display:block}
+d{color:#94a3b8;line-height:1.8;font-size:clamp(14px,2.2vw,16px);margin-bottom:16px}
+e{color:#6ee7b7;line-height:1.8;font-size:clamp(14px,2.2vw,16px);margin-bottom:16px}
+f{color:#fcd34d;line-height:1.8;font-size:clamp(14px,2.2vw,16px);margin-bottom:16px}
+g{font-family:'Space Grotesk',sans-serif;font-size:clamp(20px,4vw,28px);font-weight:700;background:linear-gradient(135deg,var(--emerald),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:18px}
+hh{display:block;background:var(--glass2);border:1px solid var(--border);border-radius:20px;padding:clamp(24px,5vw,36px);margin-bottom:24px;position:relative;overflow:hidden}
+hh::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+hh.eco::before{background:linear-gradient(90deg,transparent,var(--emerald),transparent)}
+hh.sky::before{background:linear-gradient(90deg,transparent,var(--accent),transparent)}
+hh h3{font-family:'Space Grotesk',sans-serif;font-size:clamp(18px,3.5vw,24px);font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+hh h3.gold{color:var(--gold)} hh h3.eco{color:var(--emerald)} hh h3.sky{color:var(--accent)} hh h3.rose{color:var(--rose)} hh h3.violet{color:var(--violet)}
+
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;margin-top:24px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:24px}
+.grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-top:20px}
+
+.card{background:var(--glass);backdrop-filter:blur(14px);border:1px solid var(--border);border-radius:18px;padding:22px;transition:.3s}
+.card:hover{transform:translateY(-4px);border-color:var(--accent);box-shadow:0 16px 48px rgba(56,189,248,.15)}
+.card .ci{font-size:32px;margin-bottom:12px}
+.card .ct{font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;color:#fff;margin-bottom:8px}
+.card .cd{font-size:13px;color:#94a3b8;line-height:1.7}
+
+.link{display:flex;align-items:center;gap:14px;background:var(--glass);border:1px solid var(--border);border-radius:16px;padding:16px 20px;text-decoration:none;color:var(--text);transition:.3s;margin-bottom:12px}
+.link:hover{transform:translateX(4px);border-color:var(--emerald);background:rgba(16,185,129,.06)}
+.link .li{font-size:28px;flex-shrink:0}
+.link .ln{font-weight:700;color:#fff;font-size:14px;margin-bottom:2px}
+.link .ld{font-size:11px;color:#64748b;letter-spacing:1px;text-transform:uppercase;font-family:'JetBrains Mono',monospace}
+.link .lm{margin-left:auto;color:#475569}
+
+.flow{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px;margin:24px 0;padding:18px;background:rgba(0,0,0,.25);border:1px solid var(--border);border-radius:14px}
+.flow-item{background:var(--glass);border:1px solid var(--border);border-radius:10px;padding:10px 16px;font-size:12px;font-weight:600;color:#e2e8f0;text-align:center;min-width:90px}
+.flow-item.gold{border-color:rgba(251,191,36,.4);color:var(--gold)}
+.flow-item.eco{border-color:rgba(16,185,129,.4);color:var(--emerald)}
+.flow-item.sky{border-color:rgba(56,189,248,.4);color:var(--accent)}
+.flow-item.violet{border-color:rgba(167,139,250,.4);color:var(--violet)}
+.flow-item.rose{border-color:rgba(244,63,94,.4);color:var(--rose)}
+.flow-arrow{font-size:18px;color:#475569;font-weight:700}
+
+.code{background:#050812;border:1px solid var(--border);border-radius:14px;padding:20px;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.8;color:#94a3b8;overflow-x:auto;margin:18px 0;white-space:pre}
+.code .k{color:var(--accent)} .code .s{color:var(--emerald)} .code .n{color:var(--gold)} .code .c{color:#475569;font-style:italic}
+
+.shift-grid{display:grid;grid-template-columns:1fr;gap:20px;margin:30px 0}
+@media(min-width:768px){.shift-grid{grid-template-columns:1fr auto 1fr}}
+.shift{background:var(--glass);backdrop-filter:blur(14px);border:1px solid var(--border);border-radius:20px;padding:24px}
+.shift.old{border-color:rgba(244,63,94,.2)}
+.shift.new{border-color:rgba(16,185,129,.3);box-shadow:0 0 40px rgba(16,185,129,.05)}
+.shift h3{font-family:'Space Grotesk',sans-serif;font-size:17px;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.shift.old h3{color:#fb7185} .shift.new h3{color:var(--emerald)}
+.shift ul{list-style:none}
+.shift li{font-size:13px;color:#94a3b8;line-height:1.6;padding:6px 0 6px 20px;position:relative}
+.shift li::before{content:'';position:absolute;left:0;top:12px;width:8px;height:8px;border-radius:50%}
+.shift.old li::before{background:#fb7185} .shift.new li::before{background:var(--emerald)}
+.shift-arrow{display:none}
+@media(min-width:768px){.shift-arrow{display:flex;align-items:center;justify-content:center;font-size:32px;color:var(--gold);font-weight:700}}
+
+.quote{border-left:3px solid var(--gold);padding:16px 24px;margin:24px 0;background:rgba(251,191,36,.05);border-radius:0 12px 12px 0}
+.quote .qt{font-size:clamp(15px,2.8vw,18px);font-style:italic;color:#e2e8f0;line-height:1.6;margin-bottom:10px}
+.quote .qa{font-size:11px;color:#64748b;letter-spacing:2px;text-transform:uppercase}
+
+.pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;font-family:'JetBrains Mono',monospace}
+.pill.gold{background:rgba(251,191,36,.15);color:var(--gold);border:1px solid rgba(251,191,36,.3)}
+.pill.eco{background:rgba(16,185,129,.15);color:var(--emerald);border:1px solid rgba(16,185,129,.3)}
+.pill.sky{background:rgba(56,189,248,.15);color:var(--accent);border:1px solid rgba(56,189,248,.3)}
+.pill.violet{background:rgba(167,139,250,.15);color:var(--violet);border:1px solid rgba(167,139,250,.3)}
+
+.trust-meter{display:flex;align-items:center;gap:10px;margin-top:10px}
+.trust-bar{flex:1;height:6px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden}
+.trust-fill{height:100%;background:linear-gradient(90deg,var(--rose),var(--gold),var(--emerald));border-radius:3px}
+.trust-score{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--gold);font-weight:700;min-width:50px;text-align:right}
+
+.creator{text-align:center;padding:80px 20px;background:linear-gradient(180deg,transparent,rgba(16,185,129,.04),transparent)}
+.creator-name{font-family:'Space Grotesk',sans-serif;font-size:clamp(32px,7vw,64px);font-weight:700;background:linear-gradient(135deg,var(--gold),var(--emerald),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:12px}
+.creator-title{font-size:13px;color:#64748b;letter-spacing:4px;text-transform:uppercase;margin-bottom:30px}
+.creator-bio{max-width:720px;margin:0 auto;font-size:15px;line-height:1.9;color:#cbd5e1}
+
+.footer{text-align:center;padding:40px 20px;border-top:1px solid var(--border);color:#64748b;font-size:12px}
+
+@media(max-width:640px){
+  .grid2,.grid3,.grid4{grid-template-columns:1fr 1fr;gap:10px}
+  .card{padding:14px}
+  .card .ci{font-size:24px;margin-bottom:8px}
+  .card .ct{font-size:13px}
+  .card .cd{font-size:11px}
+}
 </style>
 </head>
-<body>
+<body class="evod-mode">
 
-<!-- HUD -->
-<div class="fixed top-0 left-0 right-0 flex justify-between items-start p-4 pointer-events-none z-50 bg-gradient-to-b from-black/80 to-transparent">
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- HUD (Always visible, switches role based on mode) -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="hud">
   <div>
-    <div class="text-xs tracking-[3px] uppercase text-sky-400 font-medium" id="status">✨ Touch the Golden Seed</div>
-    <div class="text-[10px] text-slate-500 font-mono mt-1" id="depth">DEPTH: 0 · NODES: 0</div>
+    <div class="telemetry" id="status">✨ Touch the Golden Seed</div>
+    <div class="telemetry-sub" id="depth">DEPTH: 0 · NODES: 0</div>
   </div>
-  <button onclick="toggleAbout()" class="pointer-events-auto text-[10px] tracking-[2px] uppercase text-sky-400 font-bold bg-white/5 border border-white/10 rounded-lg px-3 py-2 backdrop-blur">ⓘ ABOUT</button>
+  <div style="display:flex;gap:8px">
+    <button class="mode-btn active" id="btn-3d" onclick="setMode('3d')">🌌 3D</button>
+    <button class="mode-btn" id="btn-evod" onclick="setMode('evod')">ⓘ EVOD</button>
+  </div>
 </div>
 
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- BREADCRUMB (3D mode only) -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="path-bar hidden" id="path-bar"></div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
 <!-- 3D VIEWPORT -->
-<div id="viewport" class="fixed inset-0" style="perspective:2000px">
-  <div id="hub"><svg id="lines"></svg></div>
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="viewport">
+  <div id="hub"><svg class="constellation" id="lines"></svg></div>
 </div>
 
-<!-- TOOLBAR -->
-<div class="fixed bottom-0 left-0 right-0 flex justify-around items-center p-3 pb-6 bg-gradient-to-t from-black/95 to-transparent z-50 gap-2">
-  <button onclick="reset()" class="flex flex-col items-center gap-1 bg-white/5 border border-white/10 rounded-2xl px-4 py-2 active:scale-90 transition">
-    <span class="material-symbols-rounded text-2xl">park</span>
-    <span class="text-[9px] uppercase tracking-wider font-bold text-slate-400">Seed</span>
-  </button>
-  <button onclick="back()" class="flex flex-col items-center gap-1 bg-white/5 border border-white/10 rounded-2xl px-4 py-2 active:scale-90 transition">
-    <span class="material-symbols-rounded text-2xl">arrow_back</span>
-    <span class="text-[9px] uppercase tracking-wider font-bold text-slate-400">Back</span>
-  </button>
-  <button onclick="surprise()" class="flex flex-col items-center gap-1 bg-white/5 border border-white/10 rounded-2xl px-4 py-2 active:scale-90 transition">
-    <span class="material-symbols-rounded text-2xl">casino</span>
-    <span class="text-[9px] uppercase tracking-wider font-bold text-slate-400">Dice</span>
-  </button>
-  <button onclick="toggleAbout()" class="flex flex-col items-center gap-1 bg-white/5 border border-white/10 rounded-2xl px-4 py-2 active:scale-90 transition">
-    <span class="material-symbols-rounded text-2xl">info</span>
-    <span class="text-[9px] uppercase tracking-wider font-bold text-slate-400">About</span>
-  </button>
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- TOOLBAR (3D mode only) -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="toolbar" id="toolbar">
+  <button class="tb" onclick="resetUniverse()"><span class="material-symbols-rounded em">park</span><span class="lb">Seed</span></button>
+  <button class="tb" onclick="goBack()"><span class="material-symbols-rounded em">arrow_back</span><span class="lb">Back</span></button>
+  <button class="tb" onclick="rollSurprise()"><span class="material-symbols-rounded em">casino</span><span class="lb">Dice</span></button>
+  <button class="tb" onclick="setMode('evod')"><span class="material-symbols-rounded em">auto_stories</span><span class="lb">Manifesto</span></button>
 </div>
 
-<!-- ABOUT PAGE (Integrated) -->
-<div id="about">
-  <button onclick="toggleAbout()" class="fixed top-4 right-4 w-12 h-12 rounded-full bg-white/5 border border-white/10 text-2xl text-slate-400 flex items-center justify-center z-10">×</button>
-  
-  <div class="max-w-3xl mx-auto pt-8 pb-24">
-    <!-- Hero -->
-    <div class="text-center mb-12">
-      <div class="inline-block px-4 py-1 bg-emerald-500/10 border border-emerald-500/30 rounded-full text-[10px] tracking-[3px] uppercase text-emerald-400 font-bold mb-4">EVOD · Earth Evolutionary Knowledge</div>
-      <h1 class="text-5xl md:text-7xl font-bold bg-gradient-to-br from-emerald-400 via-amber-400 to-sky-400 bg-clip-text text-transparent mb-4 leading-tight">The Flower of<br>Possibilities</h1>
-      <p class="text-slate-400 text-lg max-w-xl mx-auto">A living map where every dot is a unique perspective — an individual, a culture, a language, a discovery, a possibility.</p>
-    </div>
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- EVOD / ABOUT PAGE (Scroll mode) -->
+<!-- Using custom semantic tags: d,e,f,g,hh,card,link,flow,code -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="evod-page">
 
-    <!-- Paradigm Shift -->
-    <div class="grid md:grid-cols-2 gap-4 mb-8">
-      <div class="bg-red-500/5 border border-red-500/20 rounded-2xl p-5">
-        <h3 class="text-red-400 font-bold text-lg mb-3 flex items-center gap-2"><span class="material-symbols-rounded">close</span>Old Web (WWW)</h3>
-        <ul class="space-y-2 text-sm text-slate-400">
-          <li>• Static pages, isolated info</li>
-          <li>• Search → click → read</li>
-          <li>• Knowledge dies in archives</li>
-          <li>• Centralized servers</li>
-          <li>• AI generates answers</li>
-        </ul>
-      </div>
-      <div class="bg-emerald-500/5 border border-emerald-500/30 rounded-2xl p-5 shadow-[0_0_40px_rgba(16,185,129,0.1)]">
-        <h3 class="text-emerald-400 font-bold text-lg mb-3 flex items-center gap-2"><span class="material-symbols-rounded">check</span>EVOD (Earth)</h3>
-        <ul class="space-y-2 text-sm text-slate-300">
-          <li>• <strong>Living knowledge nodes</strong></li>
-          <li>• Touch → bloom → connect → evolve</li>
-          <li>• Knowledge grows with community</li>
-          <li>• Offline mesh + global sync</li>
-          <li>• Humans evolve knowledge together</li>
-        </ul>
-      </div>
-    </div>
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">🌱 EVOD · Earth Evolutionary Knowledge Network</div>
+  <h1 class="hero-title">The Flower of<br>Human Possibilities</h1>
+  <p class="hero-sub">A living map where every dot is a unique perspective — an individual, a culture, a language, a discovery, a possibility. Not a search engine. Not a website. A new standard of connection.</p>
+  <div class="hero-actions">
+    <button class="btn btn-primary" onclick="setMode('3d')">🌌 Enter the Universe →</button>
+    <a class="btn btn-secondary" href="https://github.com/bhearth/khela" target="_blank">⚡ View Source</a>
+  </div>
+</section>
 
-    <!-- Thought Scientist -->
-    <div class="bg-white/5 border border-white/10 rounded-2xl p-6 mb-6 relative overflow-hidden">
-      <div class="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-amber-400 to-transparent"></div>
-      <h3 class="text-amber-400 text-xl font-bold mb-3">🌱 The Thought Scientist</h3>
-      <p class="text-slate-300 leading-relaxed mb-3">A human is a continuously evolving system: <strong class="text-amber-400">Thoughts → Emotions → Intentions → Actions → Habits → Character → Reality</strong>.</p>
-      <p class="text-slate-300 leading-relaxed mb-3">The body is a continuous chemical process. Everything we consume — food, knowledge, emotions, relationships — transforms into energy and expression. We are <strong class="text-sky-400">hallucinatory beings</strong> — when a group shares a belief, it becomes shared reality. This is <strong class="text-emerald-400">cosmic entanglement</strong>.</p>
-      <p class="text-slate-300 leading-relaxed">There are infinite paths of liberation. The entire existence is an illusion — like AR, VR, or a movie. <strong class="text-amber-400">Mukti is not escape from life. Mukti is freedom while participating fully in life.</strong></p>
-    </div>
+<!-- ═══ SECTION 1: THE PARADIGM SHIFT ═══ -->
+<section class="section">
+  <div class="section-label">01 · The Paradigm Shift</div>
+  <h2 class="section-title">From WWW to EVOD</h2>
+  <p class="section-desc">The World Wide Web gave us information. EVOD gives us <strong style="color:var(--emerald)">living knowledge</strong> — connected, verified, evolving, and liberated from advertising-driven noise.</p>
 
-    <!-- 4D Formula -->
-    <div class="bg-white/5 border border-white/10 rounded-2xl p-6 mb-6">
-      <h3 class="text-amber-400 text-xl font-bold mb-4">🕉️ The 4D Formula for 3D World</h3>
-      <p class="text-slate-400 text-sm mb-4">Language intersection: <strong class="text-amber-400">e/arth</strong> (English) + <strong class="text-amber-400">अर्थ</strong> (Hindi: meaning/value)</p>
-      <div class="grid grid-cols-4 gap-2 text-center">
-        <div class="bg-black/40 rounded-xl p-3 border border-amber-500/30"><div class="text-2xl mb-1">🙏</div><div class="text-amber-400 font-bold text-sm">Dharma</div><div class="text-[10px] text-slate-500">Responsibility</div></div>
-        <div class="bg-black/40 rounded-xl p-3 border border-emerald-500/30"><div class="text-2xl mb-1">💰</div><div class="text-emerald-400 font-bold text-sm">Artha</div><div class="text-[10px] text-slate-500">Resources</div></div>
-        <div class="bg-black/40 rounded-xl p-3 border border-rose-500/30"><div class="text-2xl mb-1">❤️</div><div class="text-rose-400 font-bold text-sm">Kama</div><div class="text-[10px] text-slate-500">Desire</div></div>
-        <div class="bg-black/40 rounded-xl p-3 border border-sky-500/30"><div class="text-2xl mb-1">🕊️</div><div class="text-sky-400 font-bold text-sm">Moksha</div><div class="text-[10px] text-slate-500">Liberation</div></div>
-      </div>
+  <div class="shift-grid">
+    <div class="shift old">
+      <h3><span class="material-symbols-rounded">close</span> WWW — Old Internet</h3>
+      <ul>
+        <li>Static HTML pages, isolated islands</li>
+        <li>Search → click → read → close</li>
+        <li>Knowledge buried in archives</li>
+        <li>Centralized corporate servers</li>
+        <li>AI generates synthetic answers</li>
+        <li>Ads, trackers, manipulation</li>
+        <li>Outdated, unverifiable content</li>
+        <li>Every site reinvents UX</li>
+      </ul>
     </div>
-
-    <!-- Econology -->
-    <div class="bg-emerald-500/5 border border-emerald-500/30 rounded-2xl p-6 mb-6">
-      <h3 class="text-emerald-400 text-xl font-bold mb-3 flex items-center gap-2">🌿 <a href="https://kids.miraheze.org/wiki/Econology" target="_blank" class="hover:underline">Econology</a></h3>
-      <p class="text-slate-300 leading-relaxed mb-3">Human civilization built economics, technology, trade — but forgot the foundation: <strong class="text-emerald-400">Ecology</strong>. The planet, plants, water, soil, species, and ecosystems are the ground that supports all human activity.</p>
-      <p class="text-slate-300 leading-relaxed">Econology reconnects: <strong>Human progress × Planet health × Resource wisdom</strong>.</p>
-    </div>
-
-    <!-- Creator -->
-    <div class="text-center py-12 border-t border-white/10">
-      <h2 class="text-4xl font-bold bg-gradient-to-r from-amber-400 to-emerald-400 bg-clip-text text-transparent mb-2">Krishna Bharat</h2>
-      <p class="text-slate-500 text-sm tracking-[3px] uppercase mb-6">Thought Scientist · Orchestrator</p>
-      <p class="text-slate-400 max-w-2xl mx-auto leading-relaxed">Envisioning the bridge between human creativity and intelligent systems — where technology helps humanity discover better ways to connect, contribute, and evolve.</p>
+    <div class="shift-arrow">→</div>
+    <div class="shift new">
+      <h3><span class="material-symbols-rounded">check</span> EVOD — Earth Network</h3>
+      <ul>
+        <li>Living nodes, connected ecosystems</li>
+        <li>Touch → bloom → connect → evolve</li>
+        <li>Knowledge grows with community</li>
+        <li>Decentralized edge mesh + cloud</li>
+        <li>Humans curate, machines route</li>
+        <li>Zero ads, zero trackers, pure signal</li>
+        <li>Verified, semantic-weighted content</li>
+        <li>Universal standard of access</li>
+      </ul>
     </div>
   </div>
-</div>
+</section>
+
+<!-- ═══ SECTION 2: THE EVOD PROTOCOL ═══ -->
+<section class="section">
+  <div class="section-label">02 · The Protocol</div>
+  <h2 class="section-title">A New Standard of Connection</h2>
+  <p class="section-desc">EVOD is not a website. It is a <strong style="color:var(--accent)">communication protocol</strong> — a verified, semantic-weighted network where only the highest-quality sources are indexed. Like ARPANET became the internet, EVOD becomes the <em>evolutionary internet</em>.</p>
+
+  <hh class="sky">
+    <h3 class="sky">🛰️ The EVOD Stack</h3>
+    <d>Every node in the EVOD network is a verified, standards-compliant source. The protocol assigns <strong style="color:var(--accent)">semantic weights</strong> to every link based on trust, recency, UX quality, and community validation. Garbage is filtered before it reaches the user.</d>
+    
+    <div class="code"><span class="c">// EVOD Node Schema (like OpenAI Retrieval)</span>
+{
+  <span class="k">"id"</span>: <span class="s">"evod:openalex:works/quantum"</span>,
+  <span class="k">"type"</span>: <span class="s">"academic"</span>,
+  <span class="k">"trust"</span>: <span class="n">0.94</span>,
+  <span class="k">"semantic_weight"</span>: <span class="n">0.87</span>,
+  <span class="k">"ux_score"</span>: <span class="n">0.91</span>,
+  <span class="k">"ads"</span>: <span class="n">false</span>,
+  <span class="k">"verified_by"</span>: [<span class="s">"community"</span>, <span class="s">"worldbank"</span>],
+  <span class="k">"edge_node"</span>: <span class="s">"evod://node.khel.earth/openalex"</span>
+}</div>
+
+    <d>Cloudflare Workers host EVOD edge nodes globally. Every query runs through <strong style="color:var(--gold)">semantic retrieval</strong> — the same architecture OpenAI uses — but routed to verified sources, not hallucinated answers.</d>
+  </hh>
+
+  <hh class="eco">
+    <h3 class="eco">🌐 The EVOD Address Space</h3>
+    <d>Instead of <code style="color:var(--gold)">https://</code> the EVOD protocol introduces a new scheme:</d>
+    <div class="flow">
+      <div class="flow-item eco">evod://wiki.kids</div>
+      <div class="flow-item eco">evod://openalex.works</div>
+      <div class="flow-item eco">evod://worldbank.okr</div>
+      <div class="flow-item eco">evod://nasa.missions</div>
+      <div class="flow-item eco">evod://wikidata.Q42</div>
+    </div>
+    <d>Accessible via the normal internet, but <strong style="color:var(--emerald)">tagged, verified, and weighted</strong> within EVOD — so users always land on the highest-quality version of knowledge.</d>
+  </hh>
+</section>
+
+<!-- ═══ SECTION 3: VERIFIED STANDARD SITES ═══ -->
+<section class="section">
+  <div class="section-label">03 · The Standard Sites</div>
+  <h2 class="section-title">The EVOD Index — Real Examples</h2>
+  <p class="section-desc">These are not theoretical. These are live, verified, non-profit, ad-free sources that form the backbone of EVOD. Every site in the EVOD index meets strict standards: no ads, verified data, clean UX, open access.</p>
+
+  <hh>
+    <h3 class="gold">🎓 Academic & Research</h3>
+    <a class="link" href="https://openalex.org/" target="_blank">
+      <span class="li">🔬</span>
+      <div><div class="ln">OpenAlex</div><div class="ld">250M+ SCHOLARLY WORKS · OPEN CATALOG</div></div>
+      <span class="lm">↗</span>
+    </a>
+    <a class="link" href="https://www.semanticscholar.org/" target="_blank">
+      <span class="li">🧬</span>
+      <div><div class="ln">Semantic Scholar</div><div class="ld">AI-POWERED · 200M+ PAPERS</div></div>
+      <span class="lm">↗</span>
+    </a>
+    <a class="link" href="https://arxiv.org/" target="_blank">
+      <span class="li">📄</span>
+      <div><div class="ln">arXiv</div><div class="ld">PREPRINTS · PHYSICS, MATH, CS, BIO</div></div>
+      <span class="lm">↗</span>
+    </a>
+    <a class="link" href="https://pubmed.ncbi.nlm.nih.gov/" target="_blank">
+      <span class="li">💊</span>
+      <div><div class="ln">PubMed</div><div class="ld">35M+ BIOMEDICAL CITATIONS</div></div>
+      <span class="lm">↗</span>
+    </a>
+    <a class="link" href="https://core.ac.uk/" target="_blank">
+      <span class="li">🌐</span>
+      <div><div class="ln">CORE</div><div class="ld">WORLD'S LARGEST OPEN ACCESS</div></div>
+      <span class="lm">↗</span>
+    </a>
+    <a class="link" href="https://doaj.org/" target="_blank">
+      <span class="li">📰</span>
+      <div><div class="ln">DOAJ</div><div class="ld">DIRECTORY OF OPEN ACCESS JOURNALS</div></div>
+      <span class="lm">↗</span>
+    </a>
+  </hh>
+
+  <hh class="eco">
+    <h3 class="eco">🌿 Kids & Education</h3>
+    <a class="link" href="https://kids.miraheze.org/wiki/Main_Page" target="_blank">
+      <span class="li">🌱</span>
+      <div><div class="ln">Kids Miraheze</div><div class="ld">SAFE CHILD-FRIENDLY WIKI · EVOD SEED NODE</div></div>
+      <span class="lm">↗</span>
+    </a>
+    <a class="link" href="https://kids.miraheze.org/wiki/Econology" target="_blank">
+      <span class="li">🌍</span>
+      <div><div class="ln">Econology (Kids)</div><div class="ld">ECOLOGY + ECONOMICS RECONNECTED</div></div>
+      <span class="lm">↗</span>
+    </a>
+    <a class="link" href="https://kids.miraheze.org/wiki/List_of_Space_Exploration,_Aerospace_%26_Astronomy_Networks" target="_blank">
+      <span class="li">🚀</span>
+      <div><div class="ln">Space Networks (Kids)</div><div class="ld">100+ SPACE AGENCIES CATALOG</div></div>
+      <span class="lm">↗</span>
+    </a>
+    <a class="link" href="https://kids.miraheze.org/wiki/List_of_Species_Understanding,_Biodiversity_%26_Ecosystem_Networks" target="_blank">
+      <span class="li">🦋</span>
+      <div><div class="ln">Biodiversity Networks</div><div class="ld">IUCN, GBIF, SPECIES INDEX</div></div>
+      <span class="lm">↗</span>
+    </a>
+    <a class="link" href="https://www.khanacademy.org/" target="_blank">
+      <span class="li">🎓</span>
+      <div><div class="ln">Khan Academy</div><div class="ld">FREE WORLD-CLASS EDUCATION</div></div>
+      <span class="lm">↗</span>
+    </a>
+    <a class="link" href="https://openlibrary.org/" target="_blank">
+      <span class="li">📗</span>
+      <div><div class="ln">Open Library</div><div class="ld">ONE WEB PAGE PER BOOK EVER PUBLISHED</div></div>
+      <span class="lm">↗</span>
+    </a>
+  </hh>
+
+  <hh class="sky">
+    <h3 class="sky">🏛️ Governance & Global Standards</h3>
+    <a class="link" href="https://www.worldbank.org/en/about/unit/unitokr" target="_blank">
+      <span class="li">📊</span>
+      <div><div class="ln">World Bank OKR</div><div class="ld">OFFICIAL KNOWLEDGE REPOSITORY · STANDARDS</div></div>
+      <span class="lm">↗</span>
+    </a>
+    <a class="link" href="https://www.un.org/" target="_blank">
+      <span class="li">🇺🇳</span>
+      <div><div class="ln">United Nations</div><div class="ld">INTERNATIONAL COOPERATION · SDGs</div></div>
+      <span class="lm">↗</span>
+    </a>
+    <a class="link" href="https://www.who.int/" target="_blank">
+      <span class="li">🏥</span>
+      <div><div class="ln">WHO</div><div class="ld">GLOBAL PUBLIC HEALTH · VERIFIED</div></div>
+      <span class="lm">↗</span>
+    </a>
+    <a class="link" href="https://wikidata.org/" target="_blank">
+      <span class="li">🗃️</span>
+      <div><div class="ln">Wikidata</div><div class="ld">FREE STRUCTURED KNOWLEDGE · THE BRAIN OF WIKIPEDIA</div></div>
+      <span class="lm">↗</span>
+    </a>
+    <a class="link" href="https://data.worldbank.org/" target="_blank">
+      <span class="li">📈</span>
+      <div><div class="ln">World Bank Open Data</div><div class="ld">GLOBAL DEVELOPMENT METRICS</div></div>
+      <span class="lm">↗</span>
+    </a>
+    <a class="link" href="https://ourworldindata.org/" target="_blank">
+      <span class="li">📉</span>
+      <div><div class="ln">Our World in Data</div><div class="ld">RESEARCH & VISUALIZATIONS · OPEN</div></div>
+      <span class="lm">↗</span>
+    </a>
+  </hh>
+
+  <hh>
+    <h3 class="violet">🚀 Space & Science</h3>
+    <a class="link" href="https://www.nasa.gov/" target="_blank">
+      <span class="li">🚀</span>
+      <div><div class="ln">NASA</div><div class="ld">SPACE EXPLORATION · EARTH SCIENCE</div></div>
+      <span class="lm">↗</span>
+    </a>
+    <a class="link" href="https://www.esa.int/" target="_blank">
+      <span class="li">🛰️</span>
+      <div><div class="ln">ESA</div><div class="ld">EUROPEAN SPACE AGENCY</div></div>
+      <span class="lm">↗</span>
+    </a>
+    <a class="link" href="https://www.isro.gov.in/" target="_blank">
+      <span class="li">🇮🇳</span>
+      <div><div class="ln">ISRO</div><div class="ld">INDIAN SPACE RESEARCH · CHANDRAYAAN</div></div>
+      <span class="lm">↗</span>
+    </a>
+    <a class="link" href="https://eyes.nasa.gov/" target="_blank">
+      <span class="li">👁️</span>
+      <div><div class="ln">NASA Eyes</div><div class="ld">REAL-TIME SOLAR SYSTEM VISUALIZATION</div></div>
+      <span class="lm">↗</span>
+    </a>
+    <a class="link" href="https://www.gbif.org/" target="_blank">
+      <span class="li">🦋</span>
+      <div><div class="ln">GBIF</div><div class="ld">GLOBAL BIODIVERSITY INFORMATION FACILITY</div></div>
+      <span class="lm">↗</span>
+    </a>
+  </hh>
+
+  <hh class="eco">
+    <h3 class="eco">🌍 Ecology & Human Development</h3>
+    <a class="link" href="https://www.wwf.org/" target="_blank">
+      <span class="li">🐼</span>
+      <div><div class="ln">WWF</div><div class="ld">CONSERVATION · CLIMATE</div></div>
+      <span class="lm">↗</span>
+    </a>
+    <a class="link" href="https://www.globalforestwatch.org/" target="_blank">
+      <span class="li">🌳</span>
+      <div><div class="ln">Global Forest Watch</div><div class="ld">REAL-TIME FOREST MONITORING</div></div>
+      <span class="lm">↗</span>
+    </a>
+    <a class="link" href="https://www.idealist.org/" target="_blank">
+      <span class="li">🤝</span>
+      <div><div class="ln">Idealist</div><div class="ld">NON-PROFITS · VOLUNTEER · JOBS</div></div>
+      <span class="lm">↗</span>
+    </a>
+    <a class="link" href="https://www.globalgiving.org/" target="_blank">
+      <span class="li">🤲</span>
+      <div><div class="ln">GlobalGiving</div><div class="ld">VETTED NON-PROFITS WORLDWIDE</div></div>
+      <span class="lm">↗</span>
+    </a>
+    <a class="link" href="https://archive.org/" target="_blank">
+      <span class="li">🏛️</span>
+      <div><div class="ln">Internet Archive</div><div class="ld">35M+ BOOKS, MOVIES, SOFTWARE · FREE</div></div>
+      <span class="lm">↗</span>
+    </a>
+  </hh>
+</section>
+
+<!-- ═══ SECTION 4: SEMANTIC WEIGHTING ═══ -->
+<section class="section">
+  <div class="section-label">04 · Semantic Weighting</div>
+  <h2 class="section-title">How EVOD Filters Noise</h2>
+  <p class="section-desc">Inspired by OpenAI's Retrieval architecture, EVOD assigns a <strong style="color:var(--gold)">trust score</strong> and <strong style="color:var(--accent)">semantic weight</strong> to every source. Only high-scoring content surfaces.</p>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="ci">📖</div>
+      <div class="ct">Kids Miraheze: Econology</div>
+      <div class="cd">Child-safe, verified, open-access ecological economics content.</div>
+      <div class="trust-meter">
+        <div class="trust-bar"><div class="trust-fill" style="width:94%"></div></div>
+        <div class="trust-score">0.94</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ci">🔬</div>
+      <div class="ct">OpenAlex Research Paper</div>
+      <div class="cd">Peer-reviewed, cited 1,200+ times, institutional host.</div>
+      <div class="trust-meter">
+        <div class="trust-bar"><div class="trust-fill" style="width:97%"></div></div>
+        <div class="trust-score">0.97</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ci">📊</div>
+      <div class="ct">World Bank OKR Report</div>
+      <div class="cd">Official knowledge repository, governance-verified.</div>
+      <div class="trust-meter">
+        <div class="trust-bar"><div class="trust-fill" style="width:99%"></div></div>
+        <div class="trust-score">0.99</div>
+      </div>
+    </div>
+    <div class="card" style="opacity:.6">
+      <div class="ci">⚠️</div>
+      <div class="ct">Generic YouTube Video</div>
+      <div class="cd">Ads, algorithmic promotion, unverified claims, tracking.</div>
+      <div class="trust-meter">
+        <div class="trust-bar"><div class="trust-fill" style="width:22%"></div></div>
+        <div class="trust-score" style="color:var(--rose)">0.22</div>
+      </div>
+    </div>
+  </div>
+
+  <hh class="sky" style="margin-top:30px">
+    <h3 class="sky">🧮 The Weighting Algorithm</h3>
+    <d>Each source is scored on 7 dimensions. The total weight determines whether it appears in EVOD search results:</d>
+    <div class="code"><span class="c">// EVOD Semantic Weight Formula</span>
+<span class="k">function</span> computeWeight(source) {
+  <span class="k">return</span>
+    source.verification   * <span class="n">0.25</span> <span class="c">// Is the source verified?</span>
+  + source.recency        * <span class="n">0.10</span> <span class="c">// How recent?</span>
+  + source.ux_quality     * <span class="n">0.15</span> <span class="c">// Clean, ad-free, accessible?</span>
+  + source.open_access    * <span class="n">0.15</span> <span class="c">// Free, open, non-profit?</span>
+  + source.community      * <span class="n">0.15</span> <span class="c">// Curated by humans?</span>
+  + source.depth          * <span class="n">0.10</span> <span class="c">// Depth of content</span>
+  + source.ecology_link   * <span class="n">0.10</span> <span class="c">// Connects to Earth systems?</span>
+}
+
+<span class="c">// Threshold: weight ≥ 0.75 → indexed in EVOD</span>
+<span class="c">// Threshold: weight ≥ 0.90 → surfaces first in results</span></div>
+  </hh>
+</section>
+
+<!-- ═══ SECTION 5: REAL-TIME EVOLUTION ═══ -->
+<section class="section">
+  <div class="section-label">05 · Real-Time Evolution</div>
+  <h2 class="section-title">How a Page Evolves in EVOD</h2>
+  <p class="section-desc">A traditional wiki page is static. An EVOD node is a <strong style="color:var(--emerald)">living structure</strong> — growing, branching, connecting across languages, cultures, and disciplines.</p>
+
+  <hh class="eco">
+    <h3 class="eco">🌱 Example: The Word "Water"</h3>
+    <d>When a user touches the "Water" dot in the EVOD flower, the node <strong style="color:var(--emerald)">blooms</strong> — not into a single article, but into a constellation of verified, weighted connections:</d>
+
+    <div class="flow">
+      <div class="flow-item gold">💧 Water</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-item eco">🌊 Oceans (GBIF)</div>
+      <div class="flow-item sky">🔬 H₂O (arXiv)</div>
+      <div class="flow-item violet">💊 Health (WHO)</div>
+      <div class="flow-item rose">🎨 Art (WikiArt)</div>
+      <div class="flow-item eco">🌱 Agriculture (FAO)</div>
+    </div>
+
+    <d>Each connection is <strong style="color:var(--accent)">semantically weighted</strong> — so the user gets the most verified, most relevant, most meaningful next steps. No ads. No noise. No hallucination.</d>
+  </hh>
+
+  <hh>
+    <h3 class="gold">🕉️ The Language Layer</h3>
+    <d>The same node blooms differently depending on language, culture, and intent. The word <strong style="color:var(--gold)">e/arth</strong> in English meets <strong style="color:var(--gold)">अर्थ (Arth)</strong> in Hindi — and together they unlock the 4D formula:</d>
+    <div class="grid4">
+      <div class="card" style="text-align:center;padding:16px">
+        <div class="ci">🙏</div>
+        <div class="ct" style="color:var(--gold)">Dharma</div>
+        <div class="cd">Responsibility</div>
+      </div>
+      <div class="card" style="text-align:center;padding:16px">
+        <div class="ci">💰</div>
+        <div class="ct" style="color:var(--emerald)">Artha</div>
+        <div class="cd">Resources</div>
+      </div>
+      <div class="card" style="text-align:center;padding:16px">
+        <div class="ci">❤️</div>
+        <div class="ct" style="color:var(--rose)">Kama</div>
+        <div class="cd">Desire</div>
+      </div>
+      <div class="card" style="text-align:center;padding:16px">
+        <div class="ci">🕊️</div>
+        <div class="ct" style="color:var(--accent)">Moksha</div>
+        <div class="cd">Liberation</div>
+      </div>
+    </div>
+    <d style="margin-top:20px">This is not philosophy. This is <strong style="color:var(--gold)">4D clarity in a 3D world</strong> — a framework for responsibility, resources, desires, and liberation.</d>
+  </hh>
+</section>
+
+<!-- ═══ SECTION 6: THE THOUGHT SCIENTIST ═══ -->
+<section class="section">
+  <div class="section-label">06 · The Human Layer</div>
+  <h2 class="section-title">The Thought Scientist</h2>
+  <p class="section-desc">EVOD is not only about information. It is about the <strong style="color:var(--gold)">human operating system</strong> — how thoughts become reality, how beliefs become civilizations, how liberation is possible while fully living.</p>
+
+  <hh>
+    <h3 class="gold">🧠 The Creation Chain</h3>
+    <d>Every experience enters through the senses and transforms into action. EVOD tracks and honors this entire chain:</d>
+    <div class="flow">
+      <div class="flow-item violet">Thought</div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-item rose">Emotion</div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-item gold">Intention</div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-item eco">Action</div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-item sky">Habit</div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-item gold">Reality</div>
+    </div>
+    <d>When many humans share a belief, it becomes <strong style="color:var(--accent)">shared reality</strong> — what we call <strong style="color:var(--accent)">cosmic entanglement</strong>. This is what quantum physics, chemistry, and civilization are all about.</d>
+  </hh>
+
+  <hh class="eco">
+    <h3 class="eco">🌿 Econology — The Forgotten Foundation</h3>
+    <d>Human civilization built economics, technology, trade, systems. But humanity often forgets the <strong style="color:var(--emerald)">foundation: Ecology</strong>. The planet, plants, water, soil, species, and ecosystems are the ground that supports all human activity.</d>
+    <d>EVOD reconnects: <strong style="color:var(--emerald)">Human Progress × Planet Health × Resource Wisdom</strong>.</d>
+    <div style="margin-top:16px"><a class="link" href="https://kids.miraheze.org/wiki/Econology" target="_blank"><span class="li">🌍</span><div><div class="ln">Read: Econology</div><div class="ld">KIDS MIRAHEZE · EVOD SEED DOCUMENT</div></div><span class="lm">↗</span></a></div>
+  </hh>
+
+  <hh class="sky">
+    <h3 class="sky">🕊️ The Liberation Path</h3>
+    <d>Based on this understanding, EVOD maps the infinite paths of liberation — freedom from the grossness in which energy is caged. The entire existence is an illusion — like AR, VR, or a movie.</d>
+    <div class="quote">
+      <div class="qt">"Mukti is not escape from life. Mukti is freedom while participating fully in life."</div>
+      <div class="qa">— EVOD Philosophy</div>
+    </div>
+  </hh>
+</section>
+
+<!-- ═══ SECTION 7: CLOUD WORKERS & EDGE ═══ -->
+<section class="section">
+  <div class="section-label">07 · The Infrastructure</div>
+  <h2 class="section-title">EVOD Cloud Workers & Edge Nodes</h2>
+  <p class="section-desc">EVOD runs on a global mesh of Cloudflare Workers — tiny, fast, verified edge nodes that route queries to the highest-trust sources in milliseconds.</p>
+
+  <hh>
+    <h3 class="gold">⚡ Example: Cloudflare Worker for EVOD Routing</h3>
+    <div class="code"><span class="c">// evod-worker.js — runs on Cloudflare edge</span>
+<span class="k">export default</span> {
+  <span class="k">async</span> fetch(request) {
+    <span class="k">const</span> query = <span class="k">new</span> URL(request.url).searchParams.get(<span class="s">"q"</span>);
+    
+    <span class="c">// 1. Semantic search across EVOD-indexed sources</span>
+    <span class="k">const</span> results = <span class="k">await</span> EVOD_INDEX.search(query, {
+      weights: { trust: <span class="n">0.3</span>, semantic: <span class="n">0.4</span>, ux: <span class="n">0.2</span>, eco: <span class="n">0.1</span> }
+    });
+    
+    <span class="c">// 2. Filter: only sources ≥ 0.75 trust score</span>
+    <span class="k">const</span> clean = results.filter(r => r.weight >= <span class="n">0.75</span>);
+    
+    <span class="c">// 3. Return weighted, verified constellation</span>
+    <span class="k">return new</span> Response(JSON.stringify(clean), {
+      headers: { <span class="s">"EVOD-Version"</span>: <span class="s">"1.0"</span> }
+    });
+  }
+};</div>
+    <d>Deployed in 300+ cities worldwide. Response time: &lt;50ms. No AI hallucination — only verified sources.</d>
+  </hh>
+
+  <hh class="eco">
+    <h3 class="eco">🌐 The EVOD Network Topology</h3>
+    <div class="flow">
+      <div class="flow-item gold">🌱 User Query</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-item sky">🛰️ EVOD Edge Worker</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-item violet">🔍 Semantic Retrieval</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-item eco">✅ Verified Sources</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-item rose">🌸 Constellation</div>
+    </div>
+    <d>The network is accessible via the normal internet, but EVOD provides a <strong style="color:var(--emerald)">verified overlay</strong> — a new standard of connection above the noise of the commercial web.</d>
+  </hh>
+</section>
+
+<!-- ═══ SECTION 8: THE CREATOR ═══ -->
+<section class="creator">
+  <div class="section-label" style="text-align:center">08 · The Orchestrator</div>
+  <h2 class="creator-name">Krishna Bharat</h2>
+  <div class="creator-title">Thought Scientist · Orchestrator</div>
+  <p class="creator-bio">
+    EVOD is envisioned and orchestrated by <strong style="color:var(--gold)">Krishna Bharat</strong> — a thought scientist exploring the relationship between human consciousness, language, knowledge, technology, ecology, and civilization. The vision is to create a bridge between human creativity and intelligent systems — where technology helps humanity discover better ways to connect, contribute, and evolve.
+    <br><br>
+    Every word, every node, every connection in EVOD is an invitation: to think more clearly, to act more consciously, to live more freely — while fully participating in the beautiful, shared reality we are creating together.
+  </p>
+</section>
+
+<!-- ═══ SECTION 9: THE MANIFESTO ═══ -->
+<section class="section">
+  <div class="section-label">09 · The Manifesto</div>
+  <h2 class="section-title">Why EVOD Matters</h2>
+
+  <hh>
+    <h3 class="gold">📜 A Message to AI Researchers</h3>
+    <d>Large language models demonstrate that language can create powerful connections between concepts. Humans have done something similar for thousands of years — languages are compressed knowledge systems. Words carry history, culture, emotion, meaning, memory, possibility.</d>
+    <d>The future is not only about artificial intelligence. It is about combining <strong style="color:var(--gold)">human intelligence + collective knowledge + ecological awareness + creative technology</strong> to build systems that help humanity flourish.</d>
+    <d>EVOD is one such system. It is open. It is verified. It is ad-free. It is a gift to the next generation of thinkers, children, scientists, artists, and citizens of Earth.</d>
+  </hh>
+
+  <hh class="eco">
+    <h3 class="eco">🌱 To Every Human on Earth</h3>
+    <d>You are not a user. You are a <strong style="color:var(--emerald)">node in the living flower</strong>. Every touch, every query, every connection you make helps EVOD grow. There are infinite paths of liberation. The entire existence is an illusion — and you, dear friend, are the one who decides what the next reality will be.</d>
+    <div class="quote">
+      <div class="qt">"The goal is not rejection of life. The goal is conscious participation."</div>
+      <div class="qa">— EVOD</div>
+    </div>
+  </hh>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div style="margin-bottom:14px">
+    <a href="https://github.com/bhearth/khela" target="_blank" style="color:#64748b;margin:0 10px;text-decoration:none">GitHub</a>
+    <a href="https://kids.miraheze.org/wiki/Econology" target="_blank" style="color:#64748b;margin:0 10px;text-decoration:none">Econology</a>
+    <a href="https://openalex.org/" target="_blank" style="color:#64748b;margin:0 10px;text-decoration:none">OpenAlex</a>
+    <a href="https://wikidata.org/" target="_blank" style="color:#64748b;margin:0 10px;text-decoration:none">Wikidata</a>
+  </div>
+  <div>© 2026 EVOD · Earth Evolutionary Knowledge Network · Orchestrated by Krishna Bharat</div>
+  <div style="margin-top:6px;font-size:10px;color:#475569">A living map of human possibilities · Ad-free · Verified · Open</div>
+</footer>
+
+</div><!-- /evod-page -->
 
 <script>
-// 3D ENGINE (from v4)
-const hub=document.getElementById('hub'),svg=document.getElementById('lines'),SVG_O=10000;
-let cam={x:0,y:0,z:1,rx:0,ry:0},tgt={x:0,y:0,z:1,rx:0,ry:0},nodes=[],path=[],isAnim=false;
+/* ═══════════════════════════════════════════════════════════════
+   MODE SWITCHING: 3D (exploration) ↔ EVOD (manifesto scroll)
+   ═══════════════════════════════════════════════════════════════ */
+function setMode(mode){
+  const body=document.body;
+  if(mode==='3d'){
+    body.classList.add('evod-mode');
+    document.getElementById('btn-3d').classList.add('active');
+    document.getElementById('btn-evod').classList.remove('active');
+    window.scrollTo(0,0);
+  }else{
+    body.classList.remove('evod-mode');
+    document.getElementById('btn-3d').classList.remove('active');
+    document.getElementById('btn-evod').classList.add('active');
+  }
+}
 
-// Hammer.js
+/* ═══════════════════════════════════════════════════════════════
+   3D ENGINE — The Flower
+   ═══════════════════════════════════════════════════════════════ */
+const hub=document.getElementById('hub'), svg=document.getElementById('lines');
+const SVG_O=10000;
+const cam={x:0,y:0,z:1,rx:0,ry:0}, tgt={x:0,y:0,z:1,rx:0,ry:0};
+const vel={x:0,y:0};
+let nodes=[], pathHistory=[], isAnim=false;
+
+// Sites registry — real verified sources
+const SITES=[
+  {id:'wiki',icon:'📖',name:'Wikipedia',cat:'Knowledge',url:'https://en.wikipedia.org/w/index.php?search={q}',desc:'Free encyclopedia · millions of articles'},
+  {id:'wikidata',icon:'🗃️',name:'Wikidata',cat:'Knowledge',url:'https://www.wikidata.org/w/index.php?search={q}',desc:'Structured knowledge · the brain of Wikipedia'},
+  {id:'kids',icon:'🌱',name:'Kids Miraheze',cat:'Education',url:'https://kids.miraheze.org/w/index.php?search={q}',desc:'Child-safe wiki · EVOD seed node'},
+  {id:'openalex',icon:'🔬',name:'OpenAlex',cat:'Research',url:'https://openalex.org/works?search={q}',desc:'250M+ scholarly works · open catalog'},
+  {id:'scholar',icon:'🎓',name:'Google Scholar',cat:'Research',url:'https://scholar.google.com/scholar?q={q}',desc:'Academic papers · theses · books'},
+  {id:'arxiv',icon:'📄',name:'arXiv',cat:'Research',url:'https://arxiv.org/search/?query={q}',desc:'Preprints · physics · math · CS · biology'},
+  {id:'pubmed',icon:'💊',name:'PubMed',cat:'Research',url:'https://pubmed.ncbi.nlm.nih.gov/?term={q}',desc:'35M+ biomedical citations'},
+  {id:'youtube',icon:'📺',name:'YouTube',cat:'Media',url:'https://youtube.com/results?search_query={q}',desc:'Video · documentaries · tutorials'},
+  {id:'archive',icon:'🏛️',name:'Internet Archive',cat:'Knowledge',url:'https://archive.org/search?query={q}',desc:'35M+ free books · movies · software'},
+  {id:'openlib',icon:'📗',name:'Open Library',cat:'Books',url:'https://openlibrary.org/search?q={q}',desc:'One web page per book ever published'},
+  {id:'amazon',icon:'📦',name:'Amazon',cat:'Products',url:'https://amazon.com/s?k={q}',desc:'Marketplace · books · products'},
+  {id:'reddit',icon:'💬',name:'Reddit',cat:'Community',url:'https://reddit.com/search/?q={q}',desc:'Front page of the internet · communities'},
+  {id:'github',icon:'🐙',name:'GitHub',cat:'Code',url:'https://github.com/search?q={q}',desc:'100M+ code repositories'},
+  {id:'meetup',icon:'🤝',name:'Meetup',cat:'Events',url:'https://meetup.com/find/?keywords={q}',desc:'Local events · communities'},
+  {id:'osm',icon:'🗺️',name:'OpenStreetMap',cat:'Places',url:'https://openstreetmap.org/search?query={q}',desc:'Free editable map · community-driven'},
+  {id:'nasa',icon:'🚀',name:'NASA',cat:'Science',url:'https://nasa.gov/search/?query={q}',desc:'Space exploration · Earth science'},
+  {id:'worldbank',icon:'📊',name:'World Bank',cat:'Standards',url:'https://www.worldbank.org/en/search?query={q}',desc:'Global development data · OKR'},
+  {id:'who',icon:'🏥',name:'WHO',cat:'Health',url:'https://www.who.int/search?query={q}',desc:'Global public health · verified'},
+  {id:'khan',icon:'🎓',name:'Khan Academy',cat:'Education',url:'https://www.khanacademy.org/search?page_search_query={q}',desc:'Free world-class education'},
+  {id:'ourworld',icon:'📉',name:'Our World in Data',cat:'Standards',url:'https://ourworldindata.org/?s={q}',desc:'Research & visualizations · open'},
+];
+
+const ROOT_BRANCHES=[
+  {name:'Self',icon:'👤',hue:200,children:['Mind','Body','Skill','Emotion','Dream','Purpose']},
+  {name:'World',icon:'🌍',hue:140,children:['Nature','Society','Culture','Tech','History','Future']},
+  {name:'Action',icon:'💡',hue:40,children:['Create','Connect','Give','Learn','Build','Heal']},
+];
+
+/* ── HAMMER.JS GESTURES ── */
 const mc=new Hammer.Manager(document.getElementById('viewport'));
 mc.add(new Hammer.Pan({direction:Hammer.DIRECTION_ALL,threshold:0}));
 mc.add(new Hammer.Pinch({enable:true}));
 mc.add(new Hammer.Tap({event:'doubletap',taps:2}));
 mc.get('pinch').recognizeWith(mc.get('pan'));
-let pinchStart=1,dragging=false,lastP={x:0,y:0};
 
-mc.on('panstart',e=>{dragging=true;lastP={x:e.center.x,y:e.center.y}});
+let isDragging=false,lastP={x:0,y:0},pinchStart=1;
+
+mc.on('panstart',e=>{isDragging=true;lastP={x:e.center.x,y:e.center.y};vel.x=vel.y=0});
 mc.on('panmove',e=>{
-  if(!dragging)return;
-  const dx=e.center.x-lastP.x,dy=e.center.y-lastP.y;
-  if(e.pointers.length>=2){tgt.ry+=dx*.3;tgt.rx-=dy*.3}
+  if(!isDragging)return;
+  const dx=e.center.x-lastP.x, dy=e.center.y-lastP.y;
+  if(e.pointers.length>=2){tgt.ry+=dx*.35;tgt.rx-=dy*.35}
   else{tgt.x+=dx/cam.z;tgt.y+=dy/cam.z}
   lastP={x:e.center.x,y:e.center.y};
 });
-mc.on('panend',()=>dragging=false);
+mc.on('panend',()=>isDragging=false);
 mc.on('pinchstart',()=>pinchStart=tgt.z);
-mc.on('pinch',e=>tgt.z=Math.max(.1,Math.min(5,pinchStart*e.scale)));
-mc.on('doubletap',reset);
+mc.on('pinch',e=>{tgt.z=Math.max(.15,Math.min(5,pinchStart*e.scale))});
+mc.on('doubletap',resetUniverse);
 
-// Spawn nodes
-function spawn(px,py,pz,data,idx,total,level,hue){
-  const r=level===1?400:200,a=(idx/total)*Math.PI*2;
-  const x=px+Math.cos(a)*r,y=py+Math.sin(a)*r,z=pz+Math.sin(a*2)*40;
-  const col=`hsl(${hue+idx*30},70%,60%)`;
-  
-  // Line
+document.getElementById('viewport').addEventListener('wheel',e=>{
+  e.preventDefault();
+  tgt.z=Math.max(.15,Math.min(5,tgt.z-e.deltaY*.0012));
+},{passive:false});
+
+/* ── MATH ── */
+function lerp(a,b,t){return a+(b-a)*t}
+function hsl(h,s=70,l=60){return `hsl(${h},${s}%,${l}%)`}
+function ringPos(i,n,r){const a=(i/n)*Math.PI*2;return{x:r*Math.cos(a),y:r*Math.sin(a),z:Math.sin(a*2)*40}}
+function fibPos(i,n,r){const a=i*2.39996;const R=r*Math.sqrt((i+1)/n);return{x:R*Math.cos(a),y:R*Math.sin(a),z:Math.sin(i*.7)*60}}
+function spiralPos(i,n,r){const a=i*.8;const R=r*(.3+.7*(i/n));return{x:R*Math.cos(a),y:R*Math.sin(a),z:Math.sin(i)*50}}
+
+/* ── SVG LINE ── */
+function drawLine(x1,y1,x2,y2,color,opacity=.4,delay=0){
   const path=document.createElementNS('http://www.w3.org/2000/svg','path');
-  path.setAttribute('d',`M${px+SVG_O} ${py+SVG_O} Q${(px+x)/2+SVG_O} ${(py+y)/2+SVG_O} ${x+SVG_O} ${y+SVG_O}`);
-  path.setAttribute('class','l');
-  path.style.stroke=col;
+  const mx=(x1+x2)/2-(y2-y1)*.15, my=(y1+y2)/2+(x2-x1)*.15;
+  path.setAttribute('d',`M${x1+SVG_O} ${y1+SVG_O} Q${mx+SVG_O} ${my+SVG_O} ${x2+SVG_O} ${y2+SVG_O}`);
+  path.setAttribute('class','stellar-path');
+  path.style.stroke=color;path.style.strokeOpacity=opacity;path.style.animationDelay=delay+'s';
   svg.appendChild(path);
-  
-  // Node
+}
+
+/* ── DOT SPAWNER ── */
+function spawnFibDot(px,py,pz,data,index,total,level,parentHue){
+  const isMob=innerWidth<600;
+  const radius=level===1?(isMob?320:420):(isMob?180:240);
+  const pos=level===1?ringPos(index,total,radius):level===2?fibPos(index,total,radius):spiralPos(index,total,radius);
+  const x=px+pos.x, y=py+pos.y, z=pz+pos.z;
+  const hue=(parentHue+index*35+level*20)%360;
+  const col=hsl(hue), colL=hsl(hue,80,75);
+  const size=Math.max(10,(level===1?22:level===2?16:12)-level*2+Math.random()*4);
+
+  drawLine(px,py,x,y,col,.35,index*.08);
+
   const el=document.createElement('div');
-  el.className=level>=3?'c':'n';
-  el.style.cssText=`--x:${x}px;--y:${y}px;--z:${z}px;color:${col};border-color:${col};animation-delay:${idx*.1}s`;
-  el.innerHTML=level>=3?`<div class="text-2xl mb-1">${data.icon}</div><div class="text-xs font-bold">${data.name}</div>`:`<div class="text-2xl">${data.icon}</div><div class="text-[9px] uppercase tracking-wider mt-1">${data.name}</div>`;
-  el.onclick=e=>{
+  el.className='fdot';
+  el.style.cssText=`--x:${x}px;--y:${y}px;--z:${z}px;--col:${col};--col-l:${colL};--sz:${size}px;animation-delay:${index*.06}s`;
+  el.innerHTML=`<div class="core"></div>`;
+  el.dataset.name=data.name;el.dataset.icon=data.icon||'✦';el.dataset.level=level;
+  el.dataset.hue=hue;el.dataset.x=x;el.dataset.y=y;el.dataset.z=z;
+  el.addEventListener('click',e=>{e.stopPropagation();if(!isAnim)handleDotClick(el)});
+  hub.appendChild(el);nodes.push(el);
+  return el;
+}
+
+/* ── PORTAL CARD ── */
+function spawnPortal(px,py,pz,site,keyword,index,total,level){
+  const isMob=innerWidth<600;
+  const radius=isMob?220:300;
+  const pos=ringPos(index,total,radius);
+  const x=px+pos.x, y=py+pos.y, z=pz+pos.z+50;
+  const hue=(index*60)%360;
+  const col=hsl(hue,70,65), colS=hsl(hue,70,60,.25);
+
+  drawLine(px,py,x,y,col,.5,index*.1);
+
+  const el=document.createElement('div');
+  el.className='portal-card';
+  el.style.cssText=`--x:${x}px;--y:${y}px;--z:${z}px;--col:${col};--col-s:${colS};animation-delay:${index*.1}s`;
+  el.innerHTML=`<div class="pc-icon">${site.icon}</div><div style="flex:1;min-width:0"><div class="pc-name">${site.name}</div><div class="pc-cat">${site.cat} →</div></div>`;
+  el.addEventListener('click',e=>{
     e.stopPropagation();
-    if(isAnim)return;
-    isAnim=true;
-    tgt.x=-x*.7;tgt.y=-y*.7;tgt.z=Math.max(.5,1.5-level*.15);
-    path.push({name:data.name,icon:data.icon,x,y,z});
-    setTimeout(()=>{
-      if(level>=3){
-        // Show search portals
-        const sites=[
-          {icon:'📖',name:'Wikipedia',url:'https://en.wikipedia.org/w/index.php?search='+encodeURIComponent(data.name)},
-          {icon:'📺',name:'YouTube',url:'https://youtube.com/results?search_query='+encodeURIComponent(data.name)},
-          {icon:'🎓',name:'OpenAlex',url:'https://openalex.org/works?search='+encodeURIComponent(data.name)},
-          {icon:'📚',name:'Open Library',url:'https://openlibrary.org/search?q='+encodeURIComponent(data.name)},
-          {icon:'📦',name:'Amazon',url:'https://amazon.com/s?k='+encodeURIComponent(data.name)},
-          {icon:'💬',name:'Reddit',url:'https://reddit.com/search/?q='+encodeURIComponent(data.name)}
-        ];
-        sites.forEach((s,i)=>spawn(x,y,z,s,i,sites.length,level+1,hue));
-      }else{
-        const children=['Origins','Impact','Future','Ethics','Science'];
-        children.slice(0,3).forEach((c,i)=>spawn(x,y,z,{name:c,icon:'✦'},i,3,level+1,hue));
-      }
-      isAnim=false;
-    },600);
-  };
-  hub.appendChild(el);
-  nodes.push(el);
+    const url=site.url.replace('{q}',encodeURIComponent(keyword));
+    window.open(url,'_blank','noopener');
+  });
+  hub.appendChild(el);nodes.push(el);
 }
 
-function reset(){
-  nodes.forEach(n=>n.remove());
-  nodes=[];
-  svg.innerHTML='';
-  path=[];
-  cam={x:0,y:0,z:1,rx:0,ry:0};
-  tgt={x:0,y:0,z:1,rx:0,ry:0};
-  
-  const seed=document.createElement('div');
-  seed.className='s';
-  seed.onclick=e=>{
-    e.stopPropagation();
-    seed.remove();
-    const roots=[{name:'Self',icon:'👤'},{name:'World',icon:'🌍'},{name:'Action',icon:'💡'}];
-    roots.forEach((r,i)=>spawn(0,0,0,r,i,3,1,i*120));
-    document.getElementById('status').innerText='🌸 Touch any dot to explore';
-  };
-  hub.appendChild(seed);
-  document.getElementById('status').innerText='✨ Touch the Golden Seed';
-}
+/* ── CLICK HANDLER (Infinite recursion) ── */
+function handleDotClick(dotEl){
+  const name=dotEl.dataset.name, level=+dotEl.dataset.level, hue=+dotEl.dataset.hue;
+  const x=+dotEl.dataset.x, y=+dotEl.dataset.y, z=+dotEl.dataset.z;
 
-function back(){
-  if(path.length>0){
-    path.pop();
-    const last=nodes.slice(-3);
-    last.forEach(n=>n.remove());
-    nodes=nodes.slice(0,-3);
-  }else reset();
-}
+  isAnim=true;
+  tgt.x=-x*.7;tgt.y=-y*.7;tgt.z=Math.max(.5,1.5-level*.15);
+  document.getElementById('status').innerText=`🌌 ${name}`;
+  pathHistory.push({name,icon:dotEl.dataset.icon,x,y,z});
+  updatePath();
 
-function surprise(){
-  reset();
   setTimeout(()=>{
-    const seed=hub.querySelector('.s');
-    if(seed)seed.click();
+    if(level>=3){
+      // Spawn search portals
+      const maxPortals=innerWidth<600?6:8;
+      const categories=['Knowledge','Research','Media','Books','Community','Events','Education','Standards'];
+      const selected=[];
+      for(const cat of categories){
+        if(selected.length>=maxPortals)break;
+        const pool=SITES.filter(s=>s.cat===cat&&!selected.includes(s));
+        if(pool.length)selected.push(pool[Math.floor(Math.random()*pool.length)]);
+      }
+      while(selected.length<maxPortals&&selected.length<SITES.length){
+        const pool=SITES.filter(s=>!selected.includes(s));
+        if(!pool.length)break;
+        selected.push(pool[Math.floor(Math.random()*pool.length)]);
+      }
+      selected.forEach((s,i)=>spawnPortal(x,y,z,s,name,i,selected.length,level));
+    }else{
+      const children=generateChildren(name,level);
+      children.slice(0,Math.min(children.length,5)).forEach((c,i)=>
+        spawnFibDot(x,y,z,{name:c,icon:getIcon(c)},i,children.length,level+1,hue));
+    }
+    isAnim=false;
+  },600);
+}
+
+function generateChildren(name,level){
+  const root=ROOT_BRANCHES.find(r=>r.name===name);
+  if(root&&root.children)return root.children;
+  const dims=['Origins','Impact','Future','Ethics','Science','Art','Community','History','Practice','Vision'];
+  const used=pathHistory.map(p=>p.name);
+  const avail=dims.filter(d=>!used.includes(d)).sort(()=>Math.random()-.5);
+  return avail.slice(0,5).map(d=>`${name} ${d}`);
+}
+
+function getIcon(name){
+  const map={'Self':'👤','World':'🌍','Action':'💡','Mind':'🧠','Body':'🫀','Skill':'🛠️','Emotion':'❤️','Dream':'💭','Purpose':'🎯','Nature':'🌱','Society':'🤝','Culture':'🎭','Tech':'🚀','History':'📜','Future':'🔮','Create':'🎨','Connect':'🌐','Give':'🤲','Learn':'📚','Build':'🏗️','Heal':'💚'};
+  for(const[k,v]of Object.entries(map))if(name.toLowerCase().includes(k.toLowerCase()))return v;
+  return '✦';
+}
+
+/* ── PATH BREADCRUMB ── */
+function updatePath(){
+  const bar=document.getElementById('path-bar');
+  if(pathHistory.length===0){bar.classList.add('hidden');return}
+  bar.classList.remove('hidden');
+  bar.innerHTML='';
+  pathHistory.forEach((p,i)=>{
+    const chip=document.createElement('div');
+    chip.className='path-chip'+(i===pathHistory.length-1?' current':'');
+    chip.innerHTML=`<span>${p.icon}</span><span>${p.name}</span>`;
+    chip.onclick=()=>{while(pathHistory.length>i+1)goBack()};
+    bar.appendChild(chip);
+    if(i<pathHistory.length-1){
+      const arr=document.createElement('span');arr.className='path-arrow';arr.innerText='→';
+      bar.appendChild(arr);
+    }
+  });
+  bar.scrollLeft=bar.scrollWidth;
+}
+
+/* ── UNIVERSE CONTROL ── */
+function resetUniverse(){
+  isAnim=true;
+  nodes.forEach(n=>{n.style.transition='opacity .5s,transform .5s';n.style.opacity='0';n.style.transform+=' scale(.3)'});
+  svg.style.transition='opacity .5s';svg.style.opacity='0';
+
+  setTimeout(()=>{
+    nodes.forEach(n=>n.remove());nodes=[];
+    svg.innerHTML='';svg.style.opacity='1';
+    cam.x=cam.y=cam.rx=cam.ry=0;tgt.x=tgt.y=tgt.rx=tgt.ry=0;cam.z=tgt.z=1;vel.x=vel.y=0;
+    pathHistory=[];updatePath();
+    spawnGoldenSeed();
+    document.getElementById('status').innerText='✨ Touch the Golden Seed';
+    document.getElementById('depth').innerText='DEPTH: 0 · NODES: 0';
+    isAnim=false;
   },500);
 }
 
-function toggleAbout(){
-  document.getElementById('about').classList.toggle('show');
+function spawnGoldenSeed(){
+  const seed=document.createElement('div');
+  seed.className='seed-dot';
+  seed.onclick=e=>{
+    e.stopPropagation();if(isAnim)return;
+    seed.style.transition='all .6s';seed.style.transform='translate(-50%,-50%) scale(3)';seed.style.opacity='0';
+    setTimeout(()=>seed.remove(),600);
+    tgt.z=.8;
+    setTimeout(()=>{
+      ROOT_BRANCHES.forEach((b,i)=>spawnFibDot(0,0,0,b,i,ROOT_BRANCHES.length,1,b.hue));
+      document.getElementById('status').innerText='🌸 Touch any dot to explore';
+    },400);
+  };
+  hub.appendChild(seed);
 }
 
-// Render loop
-function lerp(a,b,t){return a+(b-a)*t}
+function goBack(){
+  if(pathHistory.length<=1){resetUniverse();return}
+  pathHistory.pop();
+  const maxLvl=Math.max(...nodes.map(n=>+n.dataset.level||0));
+  const toRemove=nodes.filter(n=>+n.dataset.level===maxLvl);
+  toRemove.forEach(n=>{n.style.transition='opacity .4s';n.style.opacity='0';setTimeout(()=>n.remove(),400)});
+  nodes=nodes.filter(n=>!toRemove.includes(n));
+  if(pathHistory.length>0){
+    const p=pathHistory[pathHistory.length-1];
+    tgt.x=-p.x*.7;tgt.y=-p.y*.7;tgt.z=Math.max(.5,1.5-(pathHistory.length-1)*.15);
+  }
+  updatePath();
+  document.getElementById('status').innerText=pathHistory.length?`🌌 ${pathHistory[pathHistory.length-1].name}`:'✨ Touch the Golden Seed';
+}
+
+function rollSurprise(){
+  if(isAnim)return;
+  const concepts=['Water','Music','Space','Democracy','Forest','Quantum','Poetry','Ocean','Agriculture','Dance','Philosophy','Medicine','Climate','Language','Ecology'];
+  const c=concepts[Math.floor(Math.random()*concepts.length)];
+  nodes.forEach(n=>n.remove());nodes=[];svg.innerHTML='';pathHistory=[];
+  const hue=Math.floor(Math.random()*360);
+  ROOT_BRANCHES.length=0;
+  ROOT_BRANCHES.push({name:c,icon:getIcon(c),hue,children:generateChildren(c,0)});
+  const others=concepts.filter(x=>x!==c).sort(()=>Math.random()-.5).slice(0,2);
+  others.forEach((o,i)=>ROOT_BRANCHES.push({name:o,icon:getIcon(o),hue:(hue+120*(i+1))%360,children:generateChildren(o,0)}));
+  resetUniverse();
+  setTimeout(()=>{const s=hub.querySelector('.seed-dot');if(s)s.click()},500);
+}
+
+/* ── RENDER LOOP ── */
 function render(){
-  cam.x=lerp(cam.x,tgt.x,.08);
-  cam.y=lerp(cam.y,tgt.y,.08);
-  cam.z=lerp(cam.z,tgt.z,.08);
-  cam.rx=lerp(cam.rx,tgt.rx,.08);
-  cam.ry=lerp(cam.ry,tgt.ry,.08);
-  hub.style.transform=`translate(-50%,-50%) scale(${cam.z}) translate3d(${cam.x}px,${cam.y}px,0) rotateX(${cam.rx}deg) rotateY(${cam.ry}deg)`;
-  document.getElementById('depth').innerText=`Z:${cam.z.toFixed(3)} · NODES:${nodes.length}`;
-  requestAnimationFrame(render);
-}
-
-reset();
-render();
-</script>
-</body>
-</html>
+  if(!isDragging){tgt.x+=vel.x;tgt.y+=vel.y;vel.x*=.92;vel.y*=.92;if(Math.abs(vel.x)<.01)vel.x=0;if(Math.abs(vel.y)<.01)vel.y=0}
+  const f=.08;
+  cam.x=lerp(cam.x,tgt
