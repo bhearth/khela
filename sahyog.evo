@@ -1,31 +1,11 @@
 {
-  "meta": {
-    "type": "EVOD",
-    "version": "1.0",
-    "format": "application/x-evo",
-    "license": "CC0 – Public Domain"
-  },
-  "seed": {
-    "id": "0.8",
-    "word": "sahyog",
-    "essence": "co-creation",
-    "vector": [0.95, 0.77, 0.44, 0.82, 0.89, 0.75, 0.66, 0.55, 0.88, 0.91],
-    "icon": "🤝"
-  },
+  "meta": { "type": "EVOD", "version": "1.0" },
+  "seed": { "id": "0.8", "word": "sahyog", "essence": "co-creation", "icon": "🤝" },
   "nodes": [
-    { "id": "0.81", "name": "collaboration", "icon": "🤝", "load": "collaboration.evo" },
+    { "id": "0.81", "name": "collaboration", "icon": "🤝", "load": "collab.evo" },
+    { "id": "0.82", "name": "synthesis", "icon": "🧬", "load": "synth.evo" },
     { "id": "0.88", "name": "sanyog", "icon": "🌌", "load": "sanyog.evo" },
     { "id": "0.888", "name": "devotional_flute", "icon": "🪈", "load": "flute.evo" }
   ],
-  "resources": {
-    "books": ["amazon.com/s?k=sahyog+community&tag=amazon0339f-21"],
-    "wiki": ["https://kids.miraheze.org/wiki/Networking_and_Development"],
-    "events": ["park_work_collective"]
-  },
-  "rules": {
-    "expand": "fibonacci",
-    "max_depth": 3,
-    "render": "flower_3d",
-    "language": "auto_detect"
-  }
+  "rules": { "expand": "fibonacci", "render": "flower_3d" }
 }
