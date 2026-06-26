@@ -2,1031 +2,602 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
-<meta name="theme-color" content="#010204">
-<title>Khel.o · EVOD — Earth Evolutionary Knowledge Network</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
-<link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Rounded" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+<title>Khel.o · Magical Flower Universe</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-:root{
-  --bg:#010204; --bg2:#050a14;
-  --glass:rgba(10,15,25,.65); --glass2:rgba(10,15,25,.92);
-  --border:rgba(255,255,255,.08); --border2:rgba(255,255,255,.14);
-  --accent:#38bdf8; --gold:#fbbf24; --emerald:#10b981; --rose:#f43f5e; --violet:#a78bfa;
+/* ── Reset ── */
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+
+body{
+  background:#010204; color:#e2e8f0;
+  font-family:'Space Grotesk',system-ui,sans-serif;
+  overflow:hidden; touch-action:none; user-select:none;
+  height:100dvh;width:100dvw;
+  background-image: radial-gradient(circle at center, #0a1128 0%, #010204 100%);
 }
-html,body{background:var(--bg);color:#e2e8f0;font-family:'Inter',system-ui;overflow-x:hidden}
-body.evod-mode{overflow:hidden;touch-action:none;user-select:none;height:100dvh}
-.font-d{font-family:'Space Grotesk',sans-serif}
-.font-m{font-family:'JetBrains Mono',monospace}
 
-/* ── BACKGROUND ── */
-body::before{content:'';position:fixed;inset:0;background:
-  radial-gradient(ellipse at 20% 30%,rgba(16,185,129,.04) 0%,transparent 50%),
-  radial-gradient(ellipse at 80% 70%,rgba(251,191,36,.03) 0%,transparent 50%),
-  radial-gradient(ellipse at 50% 50%,rgba(56,189,248,.03) 0%,transparent 70%);
-  pointer-events:none;z-index:0}
-
-/* ── 3D ENGINE ── */
-#viewport{position:fixed;inset:0;perspective:2000px;z-index:1}
-#hub{position:absolute;top:50%;left:50%;transform-style:preserve-3d;will-change:transform}
-svg.constellation{position:absolute;top:-10000px;left:-10000px;width:20000px;height:20000px;pointer-events:none;transform-style:preserve-3d}
-.stellar-path{fill:none;stroke-width:1.5;stroke-linecap:round;filter:drop-shadow(0 0 4px currentColor);stroke-dasharray:2000;stroke-dashoffset:2000;animation:draw 1.6s cubic-bezier(.25,1,.5,1) forwards}
-@keyframes draw{to{stroke-dashoffset:0}}
-
-.seed-dot{position:absolute;width:80px;height:80px;transform:translate(-50%,-50%);cursor:pointer;border-radius:50%;display:flex;align-items:center;justify-content:center}
-.seed-dot::after{content:'';position:absolute;width:20px;height:20px;background:#d4af37;border-radius:50%;box-shadow:0 0 40px 16px rgba(212,175,55,.7);animation:breath 3s infinite ease-in-out}
-.seed-dot:hover::after{transform:scale(1.6);background:#fff}
-@keyframes breath{0%,100%{transform:scale(1);opacity:.8}50%{transform:scale(1.4);opacity:1}}
-
-.fdot{position:absolute;border-radius:50%;cursor:pointer;transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),var(--z)) scale(0);animation:bloom .9s cubic-bezier(.34,1.56,.64,1) forwards;min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center;transition:transform .35s,box-shadow .3s}
-.fdot .core{border-radius:50%;background:radial-gradient(circle at 30% 30%,var(--col-l),var(--col));width:var(--sz);height:var(--sz);box-shadow:0 0 8px var(--col),inset 0 0 6px rgba(255,255,255,.3);transition:transform .35s}
-.fdot:hover .core{transform:scale(2.2);box-shadow:0 0 30px var(--col),0 0 60px var(--col)}
-@keyframes bloom{to{transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),var(--z)) scale(1);opacity:1}}
-
-.node{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:50%;cursor:pointer;background:var(--glass);border:1.5px solid;backdrop-filter:blur(10px);transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),var(--z)) scale(0);animation:bloom .9s cubic-bezier(.34,1.56,.64,1) forwards;text-align:center;padding:8px}
-.node:active{background:currentColor!important;color:#000!important;box-shadow:0 0 30px currentColor;z-index:500}
-.node .ji{font-size:clamp(16px,4vw,24px);filter:drop-shadow(0 2px 5px rgba(0,0,0,.8))}
-.node .jl{font-size:clamp(8px,1.8vw,10px);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-top:4px;pointer-events:none}
-
-.portal-card{position:absolute;width:clamp(150px,36vw,190px);padding:12px;border-radius:16px;background:var(--glass2);border:1px solid var(--border);backdrop-filter:blur(20px);cursor:pointer;transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),var(--z)) scale(0) rotateY(90deg);animation:portalEnter .9s cubic-bezier(.34,1.56,.64,1) forwards;display:flex;align-items:center;gap:10px;text-align:left;transition:all .3s}
-.portal-card:active{transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),calc(var(--z) + 40px)) scale(1.08) rotateY(0deg)!important;border-color:var(--col);box-shadow:0 0 30px var(--col-s)}
-.portal-card .pc-icon{font-size:24px;flex-shrink:0}
-.portal-card .pc-name{font-size:12px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.portal-card .pc-cat{font-size:9px;color:var(--col);text-transform:uppercase;letter-spacing:1.5px;font-weight:700}
-@keyframes portalEnter{to{transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),var(--z)) scale(1) rotateY(0deg);opacity:1}}
-
-/* ── HUD ── */
-.hud{position:fixed;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:flex-start;padding:clamp(12px,3vw,20px);pointer-events:none;z-index:50;background:linear-gradient(180deg,rgba(1,2,4,.92) 60%,transparent)}
-.telemetry{font-size:clamp(10px,2.5vw,13px);letter-spacing:3px;text-transform:uppercase;color:#38bdf8;text-shadow:0 0 10px rgba(56,189,248,.6);font-weight:500}
-.telemetry-sub{font-size:clamp(9px,2vw,10px);color:#64748b;letter-spacing:2px;font-family:'JetBrains Mono',monospace;margin-top:4px}
-.mode-btn{pointer-events:auto;padding:8px 14px;background:var(--glass);backdrop-filter:blur(16px);border:1px solid var(--border);border-radius:10px;color:var(--accent);font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-weight:700;transition:.3s}
-.mode-btn:hover{border-color:var(--accent);box-shadow:0 0 20px rgba(56,189,248,.2)}
-.mode-btn.active{background:linear-gradient(135deg,var(--emerald),#059669);color:#000;border-color:transparent}
-
-/* ── TOOLBAR (EVOD mode) ── */
-.toolbar{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:space-around;align-items:center;padding:clamp(10px,2.5vw,16px) 8px clamp(16px,4vw,28px);background:linear-gradient(0deg,rgba(1,2,4,.97) 70%,transparent);z-index:50;gap:6px}
-.tb{display:flex;flex-direction:column;align-items:center;gap:3px;background:var(--glass);border:1px solid var(--border);border-radius:16px;padding:10px 14px;cursor:pointer;flex:1;max-width:90px;transition:.2s;color:#e2e8f0}
-.tb:active{background:var(--accent);color:#000;transform:scale(.93)}
-.tb .em{font-size:clamp(20px,5.5vw,26px);line-height:1}
-.tb .lb{font-size:clamp(8px,2vw,10px);color:#94a3b8;letter-spacing:.5px;text-transform:uppercase;font-weight:700}
-
-/* ── BREADCRUMB ── */
-.path-bar{position:fixed;top:clamp(60px,12vh,90px);left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:8px;padding:8px 16px;background:var(--glass);backdrop-filter:blur(16px);border:1px solid var(--border);border-radius:20px;z-index:40;max-width:90vw;overflow-x:auto;transition:.4s}
-.path-bar::-webkit-scrollbar{display:none}
-.path-bar.hidden{opacity:0;pointer-events:none}
-.path-chip{display:flex;align-items:center;gap:6px;padding:4px 10px;background:rgba(255,255,255,.03);border-radius:10px;white-space:nowrap;cursor:pointer;font-size:11px;font-weight:600}
-.path-chip.current{background:rgba(56,189,248,.15);color:var(--accent)}
-.path-arrow{color:#334155;font-size:10px}
-
-/* ── ABOUT / EVOD PAGE (SCROLL MODE) ── */
-#evod-page{position:relative;z-index:10;display:none}
-body:not(.evod-mode) #evod-page{display:block}
-body:not(.evod-mode) #viewport,body:not(.evod-mode) .toolbar,body:not(.evod-mode) .path-bar{display:none}
-body:not(.evod-mode) .hud{background:linear-gradient(180deg,rgba(1,2,4,.85) 40%,transparent)}
-
-.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:100px 20px 60px;text-align:center;position:relative}
-.hero-badge{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);border-radius:50px;font-size:10px;font-weight:700;color:var(--emerald);letter-spacing:3px;text-transform:uppercase;margin-bottom:30px}
-.hero-title{font-family:'Space Grotesk',sans-serif;font-size:clamp(36px,8vw,72px);font-weight:700;line-height:1.05;margin-bottom:24px;background:linear-gradient(135deg,var(--emerald) 0%,var(--gold) 40%,var(--accent) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:-1px}
-.hero-sub{font-size:clamp(15px,2.8vw,20px);color:#94a3b8;line-height:1.7;max-width:760px;margin-bottom:40px}
-.hero-actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
-.btn{display:inline-flex;align-items:center;gap:10px;padding:14px 28px;border-radius:50px;font-weight:700;font-size:12px;letter-spacing:2px;text-transform:uppercase;text-decoration:none;transition:.3s;cursor:pointer;border:none}
-.btn-primary{background:linear-gradient(135deg,var(--emerald),#059669);color:#fff;box-shadow:0 0 40px rgba(16,185,129,.3)}
-.btn-primary:hover{transform:scale(1.05);box-shadow:0 0 60px rgba(16,185,129,.5)}
-.btn-secondary{background:var(--glass);border:1px solid var(--border);color:var(--text)}
-.btn-secondary:hover{border-color:var(--gold);color:var(--gold)}
-
-.section{padding:clamp(60px,10vw,100px) clamp(20px,6vw,60px);max-width:1100px;margin:0 auto;position:relative}
-.section-label{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--emerald);letter-spacing:4px;text-transform:uppercase;margin-bottom:14px;opacity:.8}
-.section-title{font-family:'Space Grotesk',sans-serif;font-size:clamp(26px,5vw,44px);font-weight:700;margin-bottom:18px;line-height:1.2}
-.section-desc{font-size:clamp(14px,2.3vw,17px);color:#94a3b8;line-height:1.8;margin-bottom:40px;max-width:760px}
-
-/* ── CUSTOM SEMANTIC TAGS (The Essence Engine) ── */
-/* These get preprocessed by JS below to reduce repetitive Tailwind classes */
-d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z{text-align:left;display:block}
-d{color:#94a3b8;line-height:1.8;font-size:clamp(14px,2.2vw,16px);margin-bottom:16px}
-e{color:#6ee7b7;line-height:1.8;font-size:clamp(14px,2.2vw,16px);margin-bottom:16px}
-f{color:#fcd34d;line-height:1.8;font-size:clamp(14px,2.2vw,16px);margin-bottom:16px}
-g{font-family:'Space Grotesk',sans-serif;font-size:clamp(20px,4vw,28px);font-weight:700;background:linear-gradient(135deg,var(--emerald),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:18px}
-hh{display:block;background:var(--glass2);border:1px solid var(--border);border-radius:20px;padding:clamp(24px,5vw,36px);margin-bottom:24px;position:relative;overflow:hidden}
-hh::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
-hh.eco::before{background:linear-gradient(90deg,transparent,var(--emerald),transparent)}
-hh.sky::before{background:linear-gradient(90deg,transparent,var(--accent),transparent)}
-hh h3{font-family:'Space Grotesk',sans-serif;font-size:clamp(18px,3.5vw,24px);font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:10px}
-hh h3.gold{color:var(--gold)} hh h3.eco{color:var(--emerald)} hh h3.sky{color:var(--accent)} hh h3.rose{color:var(--rose)} hh h3.violet{color:var(--violet)}
-
-.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;margin-top:24px}
-.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:24px}
-.grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-top:20px}
-
-.card{background:var(--glass);backdrop-filter:blur(14px);border:1px solid var(--border);border-radius:18px;padding:22px;transition:.3s}
-.card:hover{transform:translateY(-4px);border-color:var(--accent);box-shadow:0 16px 48px rgba(56,189,248,.15)}
-.card .ci{font-size:32px;margin-bottom:12px}
-.card .ct{font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;color:#fff;margin-bottom:8px}
-.card .cd{font-size:13px;color:#94a3b8;line-height:1.7}
-
-.link{display:flex;align-items:center;gap:14px;background:var(--glass);border:1px solid var(--border);border-radius:16px;padding:16px 20px;text-decoration:none;color:var(--text);transition:.3s;margin-bottom:12px}
-.link:hover{transform:translateX(4px);border-color:var(--emerald);background:rgba(16,185,129,.06)}
-.link .li{font-size:28px;flex-shrink:0}
-.link .ln{font-weight:700;color:#fff;font-size:14px;margin-bottom:2px}
-.link .ld{font-size:11px;color:#64748b;letter-spacing:1px;text-transform:uppercase;font-family:'JetBrains Mono',monospace}
-.link .lm{margin-left:auto;color:#475569}
-
-.flow{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px;margin:24px 0;padding:18px;background:rgba(0,0,0,.25);border:1px solid var(--border);border-radius:14px}
-.flow-item{background:var(--glass);border:1px solid var(--border);border-radius:10px;padding:10px 16px;font-size:12px;font-weight:600;color:#e2e8f0;text-align:center;min-width:90px}
-.flow-item.gold{border-color:rgba(251,191,36,.4);color:var(--gold)}
-.flow-item.eco{border-color:rgba(16,185,129,.4);color:var(--emerald)}
-.flow-item.sky{border-color:rgba(56,189,248,.4);color:var(--accent)}
-.flow-item.violet{border-color:rgba(167,139,250,.4);color:var(--violet)}
-.flow-item.rose{border-color:rgba(244,63,94,.4);color:var(--rose)}
-.flow-arrow{font-size:18px;color:#475569;font-weight:700}
-
-.code{background:#050812;border:1px solid var(--border);border-radius:14px;padding:20px;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.8;color:#94a3b8;overflow-x:auto;margin:18px 0;white-space:pre}
-.code .k{color:var(--accent)} .code .s{color:var(--emerald)} .code .n{color:var(--gold)} .code .c{color:#475569;font-style:italic}
-
-.shift-grid{display:grid;grid-template-columns:1fr;gap:20px;margin:30px 0}
-@media(min-width:768px){.shift-grid{grid-template-columns:1fr auto 1fr}}
-.shift{background:var(--glass);backdrop-filter:blur(14px);border:1px solid var(--border);border-radius:20px;padding:24px}
-.shift.old{border-color:rgba(244,63,94,.2)}
-.shift.new{border-color:rgba(16,185,129,.3);box-shadow:0 0 40px rgba(16,185,129,.05)}
-.shift h3{font-family:'Space Grotesk',sans-serif;font-size:17px;margin-bottom:16px;display:flex;align-items:center;gap:8px}
-.shift.old h3{color:#fb7185} .shift.new h3{color:var(--emerald)}
-.shift ul{list-style:none}
-.shift li{font-size:13px;color:#94a3b8;line-height:1.6;padding:6px 0 6px 20px;position:relative}
-.shift li::before{content:'';position:absolute;left:0;top:12px;width:8px;height:8px;border-radius:50%}
-.shift.old li::before{background:#fb7185} .shift.new li::before{background:var(--emerald)}
-.shift-arrow{display:none}
-@media(min-width:768px){.shift-arrow{display:flex;align-items:center;justify-content:center;font-size:32px;color:var(--gold);font-weight:700}}
-
-.quote{border-left:3px solid var(--gold);padding:16px 24px;margin:24px 0;background:rgba(251,191,36,.05);border-radius:0 12px 12px 0}
-.quote .qt{font-size:clamp(15px,2.8vw,18px);font-style:italic;color:#e2e8f0;line-height:1.6;margin-bottom:10px}
-.quote .qa{font-size:11px;color:#64748b;letter-spacing:2px;text-transform:uppercase}
-
-.pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;font-family:'JetBrains Mono',monospace}
-.pill.gold{background:rgba(251,191,36,.15);color:var(--gold);border:1px solid rgba(251,191,36,.3)}
-.pill.eco{background:rgba(16,185,129,.15);color:var(--emerald);border:1px solid rgba(16,185,129,.3)}
-.pill.sky{background:rgba(56,189,248,.15);color:var(--accent);border:1px solid rgba(56,189,248,.3)}
-.pill.violet{background:rgba(167,139,250,.15);color:var(--violet);border:1px solid rgba(167,139,250,.3)}
-
-.trust-meter{display:flex;align-items:center;gap:10px;margin-top:10px}
-.trust-bar{flex:1;height:6px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden}
-.trust-fill{height:100%;background:linear-gradient(90deg,var(--rose),var(--gold),var(--emerald));border-radius:3px}
-.trust-score{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--gold);font-weight:700;min-width:50px;text-align:right}
-
-.creator{text-align:center;padding:80px 20px;background:linear-gradient(180deg,transparent,rgba(16,185,129,.04),transparent)}
-.creator-name{font-family:'Space Grotesk',sans-serif;font-size:clamp(32px,7vw,64px);font-weight:700;background:linear-gradient(135deg,var(--gold),var(--emerald),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:12px}
-.creator-title{font-size:13px;color:#64748b;letter-spacing:4px;text-transform:uppercase;margin-bottom:30px}
-.creator-bio{max-width:720px;margin:0 auto;font-size:15px;line-height:1.9;color:#cbd5e1}
-
-.footer{text-align:center;padding:40px 20px;border-top:1px solid var(--border);color:#64748b;font-size:12px}
-
-@media(max-width:640px){
-  .grid2,.grid3,.grid4{grid-template-columns:1fr 1fr;gap:10px}
-  .card{padding:14px}
-  .card .ci{font-size:24px;margin-bottom:8px}
-  .card .ct{font-size:13px}
-  .card .cd{font-size:11px}
+/* ── HUD telemetry ── */
+#hud{
+  position:fixed;top:0;left:0;right:0;
+  display:flex;justify-content:space-between;align-items:flex-start;
+  padding:clamp(12px,3vw,20px);
+  pointer-events:none;z-index:50;
+  background:linear-gradient(180deg,rgba(1,2,4,0.92) 60%,transparent);
 }
+.telemetry{
+  font-size:clamp(10px,2.5vw,13px);letter-spacing:3px;
+  text-transform:uppercase;color:#38bdf8;
+  text-shadow:0 0 10px rgba(56,189,248,0.6);font-weight:700;
+  line-height:1.6;
+}
+.coords{
+  font-size:clamp(9px,2vw,11px);color:#94a3b8;
+  text-align:right;letter-spacing:2px;line-height:1.7;
+}
+.hint{font-size:clamp(8px,1.8vw,10px);color:#475569;letter-spacing:1px;}
+
+/* ── Bottom toolbar ── */
+#toolbar{
+  position:fixed;bottom:0;left:0;right:0;
+  display:flex;justify-content:space-around;align-items:center;
+  padding:clamp(8px,2.5vw,14px) 8px clamp(14px,4vw,26px);
+  background:linear-gradient(0deg,rgba(1,2,4,0.97) 75%,transparent);
+  z-index:50;gap:6px;pointer-events:auto;
+}
+.tb{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);
+  border-radius:20px;padding:10px 14px;cursor:pointer;flex:1;max-width:90px;
+  transition:background .2s,transform .2s cubic-bezier(0.34, 1.56, 0.64, 1); backdrop-filter: blur(10px);
+}
+.tb:active{background:rgba(255,255,255,0.12);transform:scale(0.85);}
+.tb .em{font-size:clamp(22px,6vw,30px);line-height:1;}
+.tb .lb{font-size:clamp(8px,2vw,10px);color:#94a3b8;letter-spacing:.5px;
+        text-transform:uppercase;font-weight:700;}
+
+/* ── Viewport ── */
+#viewport{position:absolute;top:50dvh;left:50dvw;z-index:10;}
+#hub{position:absolute;top:0;left:0;transform-style:preserve-3d;will-change:transform;}
+
+/* ── SVG constellation lines (Vines) ── */
+svg{
+  position:absolute; top:-10000px;left:-10000px;
+  width:20000px;height:20000px; pointer-events:none;
+  transform-style:preserve-3d;
+}
+.stellar-path{
+  fill:none;stroke-width:2.5;stroke-linecap:round;
+  filter:drop-shadow(0 0 6px currentColor);
+  stroke-dasharray:2000;stroke-dashoffset:2000;
+  animation:growVine 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+@keyframes growVine{to{stroke-dashoffset:0}}
+
+/* ── Fibonacci Flower Dots (The AllPages Nodes) ── */
+.dot{
+  position:absolute;border-radius:50%;cursor:pointer;
+  transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),var(--z));
+  transition:transform .4s cubic-bezier(.34,1.56,.64,1), box-shadow .3s,background .3s;
+  will-change:transform; pointer-events:auto;
+  min-width:44px;min-height:44px;
+  display:flex;align-items:center;justify-content:center;
+}
+.dot .hit{
+  border-radius:50%;background:var(--col);
+  width:var(--sz);height:var(--sz);
+  box-shadow:0 0 15px var(--col);
+  transition:transform .3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow .3s;
+}
+.dot:hover .hit,.dot:active .hit{
+  transform:scale(2.8);
+  box-shadow:0 0 30px var(--col), 0 0 60px var(--col);
+  z-index:100;
+}
+.dot .title-label {
+  position: absolute; top: 18px; font-size: 10px; font-weight: bold; color: #fff; opacity: 0; pointer-events: none;
+  white-space: nowrap; text-shadow: 0 2px 5px #000, 0 0 10px var(--col); transition: opacity 0.3s;
+}
+.dot:hover .title-label { opacity: 1; }
+.dot.dimmed { opacity: 0.1; filter: grayscale(100%); pointer-events: none; }
+
+/* ── Kids Magical Bloom Nodes (Drill down nodes) ── */
+.jnode{
+  position:absolute;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  border-radius:50%;cursor:pointer;text-align:center;
+  background:rgba(10,15,25,0.7);border:2px solid;
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),var(--z)) scale(0);
+  animation:supernova 0.8s cubic-bezier(.34,1.56,.64,1) forwards;
+  will-change:transform; pointer-events:auto;
+}
+.jnode:hover,.jnode:active{
+  background:currentColor!important;color:#000!important;
+  box-shadow:0 0 40px currentColor,inset 0 0 20px #fff;z-index:500;
+  transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),calc(var(--z) + 50px)) scale(1.3)!important;
+}
+.jnode .ji{
+  font-size:clamp(20px,5vw,32px);
+  filter:drop-shadow(0 4px 6px rgba(0,0,0,.6));
+  transition:transform .3s cubic-bezier(0.34, 1.56, 0.64, 1);line-height:1;
+}
+.jnode:hover .ji{transform:scale(1.3) rotate(10deg);}
+.jnode .jl{
+  font-size:clamp(8px,2vw,11px);font-weight:800;
+  text-transform:uppercase;letter-spacing:1px;
+  margin-top:6px;pointer-events:none;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+}
+@keyframes supernova{
+    0% { transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),var(--z)) scale(0) rotate(-45deg); }
+    100% { transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),var(--z)) scale(1) rotate(0deg); }
+}
+
+/* ── Loading Spinner ── */
+#loading {
+  position:fixed; inset:0; background:rgba(1,2,4,0.95); z-index:200;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  transition:opacity 0.5s; backdrop-filter: blur(5px);
+}
+.spinner { width: 60px; height: 60px; border: 4px solid rgba(255,255,255,0.1); border-top-color: #f59e0b; border-radius: 50%; animation: spin 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite; margin-bottom:20px;}
+@keyframes spin { to { transform: rotate(360deg); } }
+#loading-msg { color: #f59e0b; font-family: monospace; letter-spacing: 3px; text-transform: uppercase; font-size: 14px; font-weight: bold;}
+
+/* ── Detail sheet (Janm Kundali) ── */
+#detail{
+  position:fixed;bottom:-100%;left:0;right:0;
+  background:rgba(13,22,37,0.95);border-top:2px solid rgba(56,189,248,.5);
+  border-radius:32px 32px 0 0;z-index:250;
+  padding:clamp(20px,5vw,30px);
+  transition:bottom .5s cubic-bezier(.34,1.56,.64,1);
+  max-height:75vh;overflow-y:auto; backdrop-filter:blur(25px);
+  box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+}
+#detail.open{bottom:0;}
+#detail .handle{width:50px;height:6px;background:rgba(255,255,255,.2); border-radius:6px;margin:0 auto 20px;}
+#d-icon{font-size:clamp(50px,15vw,80px);text-align:center;margin-bottom:10px; animation: bounce 2s infinite;}
+@keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+#d-title{font-size:clamp(20px,6vw,28px);color:#fff;font-weight:800;text-align:center;margin:0 0 6px;}
+#d-desc{font-size:clamp(12px,3.3vw,14px);color:#94a3b8;text-align:center;line-height:1.6;margin:0 0 20px;}
+
+/* Janm Kundali Grid for Kids */
+.k-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 15px; margin-bottom: 25px; }
+.k-box { background: rgba(255,255,255,0.03); padding: 15px; border-radius: 16px; text-align: center; border: 1px solid rgba(255,255,255,0.08); transition: 0.3s; }
+.k-box:hover { transform: translateY(-5px); background: rgba(255,255,255,0.08); }
+.k-val { font-size: 28px; font-weight: 800; font-family: 'Space Grotesk'; }
+.k-lbl { font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-top: 5px; }
+
+#d-links{display:flex; justify-content: center;}
+.d-link{
+  display:inline-flex;align-items:center;justify-content:center; gap:10px;
+  background:linear-gradient(135deg, #38bdf8, #818cf8); border-radius:20px;padding:16px 30px;color:#000;
+  text-decoration:none;font-size:clamp(14px,4vw,16px);font-weight:800; text-transform:uppercase;
+  transition:transform .2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow .2s;
+  box-shadow: 0 10px 20px rgba(56,189,248,0.4);
+}
+.d-link:active{transform:scale(0.9);}
+.d-close{position: absolute; top: 20px; right: 25px; width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.1); color: #fff; border: none; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s;}
+.d-close:hover { background: #ef4444; }
+
+/* ── Search overlay ── */
+#search-overlay{ position:fixed;inset:0;background:rgba(1,2,4,.97); backdrop-filter:blur(16px);z-index:300; display:none;flex-direction:column; padding:clamp(16px,5vw,32px); animation:fadeUp .25s ease; }
+#search-overlay.active{display:flex;}
+#search-wrap{display:flex;gap:10px;align-items:center;margin-bottom:16px;}
+#search-input{ flex:1;background:rgba(255,255,255,0.05); border:2px solid rgba(56,189,248,.35);border-radius:50px; padding:clamp(12px,3.5vw,16px) 20px;color:#fff; font-size:clamp(16px,4.5vw,20px);outline:none;font-family:inherit;font-weight:600; }
+#search-close{ width:clamp(44px,12vw,54px);height:clamp(44px,12vw,54px); border-radius:50%;background:rgba(255,255,255,0.07); border:none;color:#94a3b8;font-size:20px;cursor:pointer;flex-shrink:0; }
+#search-results{overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:10px;}
+.s-card{ display:flex;align-items:center;gap:14px; background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07); border-radius:18px;padding:clamp(12px,3.5vw,18px);cursor:pointer; animation:fadeUp .3s both;transition:background .2s; }
+.s-card:active{background:rgba(255,255,255,0.09);}
+.s-em{font-size:clamp(24px,6vw,30px);flex-shrink:0;}
+.s-body h3{margin:0 0 3px;font-size:clamp(14px,4vw,18px);color:#fff;font-weight:700;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+
 </style>
 </head>
-<body class="evod-mode">
+<body>
 
-<!-- ═══════════════════════════════════════════════════════ -->
-<!-- HUD (Always visible, switches role based on mode) -->
-<!-- ═══════════════════════════════════════════════════════ -->
-<div class="hud">
-  <div>
-    <div class="telemetry" id="status">✨ Touch the Golden Seed</div>
-    <div class="telemetry-sub" id="depth">DEPTH: 0 · NODES: 0</div>
+<!-- ── HUD ── -->
+<div id="hud">
+  <div class="telemetry">
+    <div id="status">✨ Awakening Knowledge</div>
+    <div id="path-log" style="font-size:9px;color:#64748b;letter-spacing:2px;margin-top:4px;">Miraheze Universe</div>
   </div>
-  <div style="display:flex;gap:8px">
-    <button class="mode-btn active" id="btn-3d" onclick="setMode('3d')">🌌 3D</button>
-    <button class="mode-btn" id="btn-evod" onclick="setMode('evod')">ⓘ EVOD</button>
+  <div class="coords">
+    <div id="coord-display">Z: 1.000</div>
+    <div class="hint">DOUBLE-TAP TO RESET</div>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════ -->
-<!-- BREADCRUMB (3D mode only) -->
-<!-- ═══════════════════════════════════════════════════════ -->
-<div class="path-bar hidden" id="path-bar"></div>
+<!-- ── 3D Viewport ── -->
+<div id="viewport"><div id="hub"><svg id="lines"></svg></div></div>
 
-<!-- ═══════════════════════════════════════════════════════ -->
-<!-- 3D VIEWPORT -->
-<!-- ═══════════════════════════════════════════════════════ -->
-<div id="viewport">
-  <div id="hub"><svg class="constellation" id="lines"></svg></div>
+<!-- ── Loading Overlay ── -->
+<div id="loading">
+  <div class="spinner"></div>
+  <div id="loading-msg">Planting Magic Seeds...</div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════ -->
-<!-- TOOLBAR (3D mode only) -->
-<!-- ═══════════════════════════════════════════════════════ -->
-<div class="toolbar" id="toolbar">
-  <button class="tb" onclick="resetUniverse()"><span class="material-symbols-rounded em">park</span><span class="lb">Seed</span></button>
-  <button class="tb" onclick="goBack()"><span class="material-symbols-rounded em">arrow_back</span><span class="lb">Back</span></button>
-  <button class="tb" onclick="rollSurprise()"><span class="material-symbols-rounded em">casino</span><span class="lb">Dice</span></button>
-  <button class="tb" onclick="setMode('evod')"><span class="material-symbols-rounded em">auto_stories</span><span class="lb">Manifesto</span></button>
+<!-- ── Bottom Toolbar ── -->
+<div id="toolbar">
+  <div class="tb" onclick="openSearch()"><span class="em">🔍</span><span class="lb">Search</span></div>
+  <div class="tb" onclick="Engine.resetUniverse()"><span class="em">🌸</span><span class="lb">Flower</span></div>
+  <div class="tb" onclick="Engine.rollSurprise()"><span class="em">🎲</span><span class="lb">Jump</span></div>
+  <div class="tb" onclick="alert('Voice search active soon!')"><span class="em" id="v-icon">👂</span><span class="lb">Voice</span></div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════ -->
-<!-- EVOD / ABOUT PAGE (Scroll mode) -->
-<!-- Using custom semantic tags: d,e,f,g,hh,card,link,flow,code -->
-<!-- ═══════════════════════════════════════════════════════ -->
-<div id="evod-page">
-
-<!-- HERO -->
-<section class="hero">
-  <div class="hero-badge">🌱 EVOD · Earth Evolutionary Knowledge Network</div>
-  <h1 class="hero-title">The Flower of<br>Human Possibilities</h1>
-  <p class="hero-sub">A living map where every dot is a unique perspective — an individual, a culture, a language, a discovery, a possibility. Not a search engine. Not a website. A new standard of connection.</p>
-  <div class="hero-actions">
-    <button class="btn btn-primary" onclick="setMode('3d')">🌌 Enter the Universe →</button>
-    <a class="btn btn-secondary" href="https://github.com/bhearth/khela" target="_blank">⚡ View Source</a>
+<!-- ── Search ── -->
+<div id="search-overlay">
+  <div id="search-wrap">
+    <input id="search-input" type="search" placeholder="Find a Magical Page..." autocomplete="off" oninput="runSearch(this.value)">
+    <button id="search-close" onclick="closeSearch()">✕</button>
   </div>
-</section>
+  <div id="search-results"></div>
+</div>
 
-<!-- ═══ SECTION 1: THE PARADIGM SHIFT ═══ -->
-<section class="section">
-  <div class="section-label">01 · The Paradigm Shift</div>
-  <h2 class="section-title">From WWW to EVOD</h2>
-  <p class="section-desc">The World Wide Web gave us information. EVOD gives us <strong style="color:var(--emerald)">living knowledge</strong> — connected, verified, evolving, and liberated from advertising-driven noise.</p>
-
-  <div class="shift-grid">
-    <div class="shift old">
-      <h3><span class="material-symbols-rounded">close</span> WWW — Old Internet</h3>
-      <ul>
-        <li>Static HTML pages, isolated islands</li>
-        <li>Search → click → read → close</li>
-        <li>Knowledge buried in archives</li>
-        <li>Centralized corporate servers</li>
-        <li>AI generates synthetic answers</li>
-        <li>Ads, trackers, manipulation</li>
-        <li>Outdated, unverifiable content</li>
-        <li>Every site reinvents UX</li>
-      </ul>
-    </div>
-    <div class="shift-arrow">→</div>
-    <div class="shift new">
-      <h3><span class="material-symbols-rounded">check</span> EVOD — Earth Network</h3>
-      <ul>
-        <li>Living nodes, connected ecosystems</li>
-        <li>Touch → bloom → connect → evolve</li>
-        <li>Knowledge grows with community</li>
-        <li>Decentralized edge mesh + cloud</li>
-        <li>Humans curate, machines route</li>
-        <li>Zero ads, zero trackers, pure signal</li>
-        <li>Verified, semantic-weighted content</li>
-        <li>Universal standard of access</li>
-      </ul>
-    </div>
-  </div>
-</section>
-
-<!-- ═══ SECTION 2: THE EVOD PROTOCOL ═══ -->
-<section class="section">
-  <div class="section-label">02 · The Protocol</div>
-  <h2 class="section-title">A New Standard of Connection</h2>
-  <p class="section-desc">EVOD is not a website. It is a <strong style="color:var(--accent)">communication protocol</strong> — a verified, semantic-weighted network where only the highest-quality sources are indexed. Like ARPANET became the internet, EVOD becomes the <em>evolutionary internet</em>.</p>
-
-  <hh class="sky">
-    <h3 class="sky">🛰️ The EVOD Stack</h3>
-    <d>Every node in the EVOD network is a verified, standards-compliant source. The protocol assigns <strong style="color:var(--accent)">semantic weights</strong> to every link based on trust, recency, UX quality, and community validation. Garbage is filtered before it reaches the user.</d>
-    
-    <div class="code"><span class="c">// EVOD Node Schema (like OpenAI Retrieval)</span>
-{
-  <span class="k">"id"</span>: <span class="s">"evod:openalex:works/quantum"</span>,
-  <span class="k">"type"</span>: <span class="s">"academic"</span>,
-  <span class="k">"trust"</span>: <span class="n">0.94</span>,
-  <span class="k">"semantic_weight"</span>: <span class="n">0.87</span>,
-  <span class="k">"ux_score"</span>: <span class="n">0.91</span>,
-  <span class="k">"ads"</span>: <span class="n">false</span>,
-  <span class="k">"verified_by"</span>: [<span class="s">"community"</span>, <span class="s">"worldbank"</span>],
-  <span class="k">"edge_node"</span>: <span class="s">"evod://node.khel.earth/openalex"</span>
-}</div>
-
-    <d>Cloudflare Workers host EVOD edge nodes globally. Every query runs through <strong style="color:var(--gold)">semantic retrieval</strong> — the same architecture OpenAI uses — but routed to verified sources, not hallucinated answers.</d>
-  </hh>
-
-  <hh class="eco">
-    <h3 class="eco">🌐 The EVOD Address Space</h3>
-    <d>Instead of <code style="color:var(--gold)">https://</code> the EVOD protocol introduces a new scheme:</d>
-    <div class="flow">
-      <div class="flow-item eco">evod://wiki.kids</div>
-      <div class="flow-item eco">evod://openalex.works</div>
-      <div class="flow-item eco">evod://worldbank.okr</div>
-      <div class="flow-item eco">evod://nasa.missions</div>
-      <div class="flow-item eco">evod://wikidata.Q42</div>
-    </div>
-    <d>Accessible via the normal internet, but <strong style="color:var(--emerald)">tagged, verified, and weighted</strong> within EVOD — so users always land on the highest-quality version of knowledge.</d>
-  </hh>
-</section>
-
-<!-- ═══ SECTION 3: VERIFIED STANDARD SITES ═══ -->
-<section class="section">
-  <div class="section-label">03 · The Standard Sites</div>
-  <h2 class="section-title">The EVOD Index — Real Examples</h2>
-  <p class="section-desc">These are not theoretical. These are live, verified, non-profit, ad-free sources that form the backbone of EVOD. Every site in the EVOD index meets strict standards: no ads, verified data, clean UX, open access.</p>
-
-  <hh>
-    <h3 class="gold">🎓 Academic & Research</h3>
-    <a class="link" href="https://openalex.org/" target="_blank">
-      <span class="li">🔬</span>
-      <div><div class="ln">OpenAlex</div><div class="ld">250M+ SCHOLARLY WORKS · OPEN CATALOG</div></div>
-      <span class="lm">↗</span>
-    </a>
-    <a class="link" href="https://www.semanticscholar.org/" target="_blank">
-      <span class="li">🧬</span>
-      <div><div class="ln">Semantic Scholar</div><div class="ld">AI-POWERED · 200M+ PAPERS</div></div>
-      <span class="lm">↗</span>
-    </a>
-    <a class="link" href="https://arxiv.org/" target="_blank">
-      <span class="li">📄</span>
-      <div><div class="ln">arXiv</div><div class="ld">PREPRINTS · PHYSICS, MATH, CS, BIO</div></div>
-      <span class="lm">↗</span>
-    </a>
-    <a class="link" href="https://pubmed.ncbi.nlm.nih.gov/" target="_blank">
-      <span class="li">💊</span>
-      <div><div class="ln">PubMed</div><div class="ld">35M+ BIOMEDICAL CITATIONS</div></div>
-      <span class="lm">↗</span>
-    </a>
-    <a class="link" href="https://core.ac.uk/" target="_blank">
-      <span class="li">🌐</span>
-      <div><div class="ln">CORE</div><div class="ld">WORLD'S LARGEST OPEN ACCESS</div></div>
-      <span class="lm">↗</span>
-    </a>
-    <a class="link" href="https://doaj.org/" target="_blank">
-      <span class="li">📰</span>
-      <div><div class="ln">DOAJ</div><div class="ld">DIRECTORY OF OPEN ACCESS JOURNALS</div></div>
-      <span class="lm">↗</span>
-    </a>
-  </hh>
-
-  <hh class="eco">
-    <h3 class="eco">🌿 Kids & Education</h3>
-    <a class="link" href="https://kids.miraheze.org/wiki/Main_Page" target="_blank">
-      <span class="li">🌱</span>
-      <div><div class="ln">Kids Miraheze</div><div class="ld">SAFE CHILD-FRIENDLY WIKI · EVOD SEED NODE</div></div>
-      <span class="lm">↗</span>
-    </a>
-    <a class="link" href="https://kids.miraheze.org/wiki/Econology" target="_blank">
-      <span class="li">🌍</span>
-      <div><div class="ln">Econology (Kids)</div><div class="ld">ECOLOGY + ECONOMICS RECONNECTED</div></div>
-      <span class="lm">↗</span>
-    </a>
-    <a class="link" href="https://kids.miraheze.org/wiki/List_of_Space_Exploration,_Aerospace_%26_Astronomy_Networks" target="_blank">
-      <span class="li">🚀</span>
-      <div><div class="ln">Space Networks (Kids)</div><div class="ld">100+ SPACE AGENCIES CATALOG</div></div>
-      <span class="lm">↗</span>
-    </a>
-    <a class="link" href="https://kids.miraheze.org/wiki/List_of_Species_Understanding,_Biodiversity_%26_Ecosystem_Networks" target="_blank">
-      <span class="li">🦋</span>
-      <div><div class="ln">Biodiversity Networks</div><div class="ld">IUCN, GBIF, SPECIES INDEX</div></div>
-      <span class="lm">↗</span>
-    </a>
-    <a class="link" href="https://www.khanacademy.org/" target="_blank">
-      <span class="li">🎓</span>
-      <div><div class="ln">Khan Academy</div><div class="ld">FREE WORLD-CLASS EDUCATION</div></div>
-      <span class="lm">↗</span>
-    </a>
-    <a class="link" href="https://openlibrary.org/" target="_blank">
-      <span class="li">📗</span>
-      <div><div class="ln">Open Library</div><div class="ld">ONE WEB PAGE PER BOOK EVER PUBLISHED</div></div>
-      <span class="lm">↗</span>
-    </a>
-  </hh>
-
-  <hh class="sky">
-    <h3 class="sky">🏛️ Governance & Global Standards</h3>
-    <a class="link" href="https://www.worldbank.org/en/about/unit/unitokr" target="_blank">
-      <span class="li">📊</span>
-      <div><div class="ln">World Bank OKR</div><div class="ld">OFFICIAL KNOWLEDGE REPOSITORY · STANDARDS</div></div>
-      <span class="lm">↗</span>
-    </a>
-    <a class="link" href="https://www.un.org/" target="_blank">
-      <span class="li">🇺🇳</span>
-      <div><div class="ln">United Nations</div><div class="ld">INTERNATIONAL COOPERATION · SDGs</div></div>
-      <span class="lm">↗</span>
-    </a>
-    <a class="link" href="https://www.who.int/" target="_blank">
-      <span class="li">🏥</span>
-      <div><div class="ln">WHO</div><div class="ld">GLOBAL PUBLIC HEALTH · VERIFIED</div></div>
-      <span class="lm">↗</span>
-    </a>
-    <a class="link" href="https://wikidata.org/" target="_blank">
-      <span class="li">🗃️</span>
-      <div><div class="ln">Wikidata</div><div class="ld">FREE STRUCTURED KNOWLEDGE · THE BRAIN OF WIKIPEDIA</div></div>
-      <span class="lm">↗</span>
-    </a>
-    <a class="link" href="https://data.worldbank.org/" target="_blank">
-      <span class="li">📈</span>
-      <div><div class="ln">World Bank Open Data</div><div class="ld">GLOBAL DEVELOPMENT METRICS</div></div>
-      <span class="lm">↗</span>
-    </a>
-    <a class="link" href="https://ourworldindata.org/" target="_blank">
-      <span class="li">📉</span>
-      <div><div class="ln">Our World in Data</div><div class="ld">RESEARCH & VISUALIZATIONS · OPEN</div></div>
-      <span class="lm">↗</span>
-    </a>
-  </hh>
-
-  <hh>
-    <h3 class="violet">🚀 Space & Science</h3>
-    <a class="link" href="https://www.nasa.gov/" target="_blank">
-      <span class="li">🚀</span>
-      <div><div class="ln">NASA</div><div class="ld">SPACE EXPLORATION · EARTH SCIENCE</div></div>
-      <span class="lm">↗</span>
-    </a>
-    <a class="link" href="https://www.esa.int/" target="_blank">
-      <span class="li">🛰️</span>
-      <div><div class="ln">ESA</div><div class="ld">EUROPEAN SPACE AGENCY</div></div>
-      <span class="lm">↗</span>
-    </a>
-    <a class="link" href="https://www.isro.gov.in/" target="_blank">
-      <span class="li">🇮🇳</span>
-      <div><div class="ln">ISRO</div><div class="ld">INDIAN SPACE RESEARCH · CHANDRAYAAN</div></div>
-      <span class="lm">↗</span>
-    </a>
-    <a class="link" href="https://eyes.nasa.gov/" target="_blank">
-      <span class="li">👁️</span>
-      <div><div class="ln">NASA Eyes</div><div class="ld">REAL-TIME SOLAR SYSTEM VISUALIZATION</div></div>
-      <span class="lm">↗</span>
-    </a>
-    <a class="link" href="https://www.gbif.org/" target="_blank">
-      <span class="li">🦋</span>
-      <div><div class="ln">GBIF</div><div class="ld">GLOBAL BIODIVERSITY INFORMATION FACILITY</div></div>
-      <span class="lm">↗</span>
-    </a>
-  </hh>
-
-  <hh class="eco">
-    <h3 class="eco">🌍 Ecology & Human Development</h3>
-    <a class="link" href="https://www.wwf.org/" target="_blank">
-      <span class="li">🐼</span>
-      <div><div class="ln">WWF</div><div class="ld">CONSERVATION · CLIMATE</div></div>
-      <span class="lm">↗</span>
-    </a>
-    <a class="link" href="https://www.globalforestwatch.org/" target="_blank">
-      <span class="li">🌳</span>
-      <div><div class="ln">Global Forest Watch</div><div class="ld">REAL-TIME FOREST MONITORING</div></div>
-      <span class="lm">↗</span>
-    </a>
-    <a class="link" href="https://www.idealist.org/" target="_blank">
-      <span class="li">🤝</span>
-      <div><div class="ln">Idealist</div><div class="ld">NON-PROFITS · VOLUNTEER · JOBS</div></div>
-      <span class="lm">↗</span>
-    </a>
-    <a class="link" href="https://www.globalgiving.org/" target="_blank">
-      <span class="li">🤲</span>
-      <div><div class="ln">GlobalGiving</div><div class="ld">VETTED NON-PROFITS WORLDWIDE</div></div>
-      <span class="lm">↗</span>
-    </a>
-    <a class="link" href="https://archive.org/" target="_blank">
-      <span class="li">🏛️</span>
-      <div><div class="ln">Internet Archive</div><div class="ld">35M+ BOOKS, MOVIES, SOFTWARE · FREE</div></div>
-      <span class="lm">↗</span>
-    </a>
-  </hh>
-</section>
-
-<!-- ═══ SECTION 4: SEMANTIC WEIGHTING ═══ -->
-<section class="section">
-  <div class="section-label">04 · Semantic Weighting</div>
-  <h2 class="section-title">How EVOD Filters Noise</h2>
-  <p class="section-desc">Inspired by OpenAI's Retrieval architecture, EVOD assigns a <strong style="color:var(--gold)">trust score</strong> and <strong style="color:var(--accent)">semantic weight</strong> to every source. Only high-scoring content surfaces.</p>
-
-  <div class="grid2">
-    <div class="card">
-      <div class="ci">📖</div>
-      <div class="ct">Kids Miraheze: Econology</div>
-      <div class="cd">Child-safe, verified, open-access ecological economics content.</div>
-      <div class="trust-meter">
-        <div class="trust-bar"><div class="trust-fill" style="width:94%"></div></div>
-        <div class="trust-score">0.94</div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="ci">🔬</div>
-      <div class="ct">OpenAlex Research Paper</div>
-      <div class="cd">Peer-reviewed, cited 1,200+ times, institutional host.</div>
-      <div class="trust-meter">
-        <div class="trust-bar"><div class="trust-fill" style="width:97%"></div></div>
-        <div class="trust-score">0.97</div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="ci">📊</div>
-      <div class="ct">World Bank OKR Report</div>
-      <div class="cd">Official knowledge repository, governance-verified.</div>
-      <div class="trust-meter">
-        <div class="trust-bar"><div class="trust-fill" style="width:99%"></div></div>
-        <div class="trust-score">0.99</div>
-      </div>
-    </div>
-    <div class="card" style="opacity:.6">
-      <div class="ci">⚠️</div>
-      <div class="ct">Generic YouTube Video</div>
-      <div class="cd">Ads, algorithmic promotion, unverified claims, tracking.</div>
-      <div class="trust-meter">
-        <div class="trust-bar"><div class="trust-fill" style="width:22%"></div></div>
-        <div class="trust-score" style="color:var(--rose)">0.22</div>
-      </div>
-    </div>
+<!-- ── Detail Sheet (Kids Janm Kundali Viewer) ── -->
+<div id="detail">
+  <div class="handle" onclick="closeDetail()"></div>
+  <button class="d-close" onclick="closeDetail()">✕</button>
+  
+  <div id="d-icon">📄</div>
+  <div id="d-title">Node Title</div>
+  <div id="d-desc">Magical Data Profile</div>
+  
+  <!-- The Janm Kundali Grid -->
+  <div class="k-grid" id="k-grid-container" style="display:none;">
+      <div class="k-box"><div class="k-val" id="k-words" style="color: #38bdf8;">0</div><div class="k-lbl">Words</div></div>
+      <div class="k-box"><div class="k-val" id="k-links" style="color: #10b981;">0</div><div class="k-lbl">Links</div></div>
+      <div class="k-box"><div class="k-val" id="k-media" style="color: #f59e0b;">0</div><div class="k-lbl">Images</div></div>
+      <div class="k-box"><div class="k-val" id="k-cats" style="color: #c084fc;">0</div><div class="k-lbl">Categories</div></div>
   </div>
 
-  <hh class="sky" style="margin-top:30px">
-    <h3 class="sky">🧮 The Weighting Algorithm</h3>
-    <d>Each source is scored on 7 dimensions. The total weight determines whether it appears in EVOD search results:</d>
-    <div class="code"><span class="c">// EVOD Semantic Weight Formula</span>
-<span class="k">function</span> computeWeight(source) {
-  <span class="k">return</span>
-    source.verification   * <span class="n">0.25</span> <span class="c">// Is the source verified?</span>
-  + source.recency        * <span class="n">0.10</span> <span class="c">// How recent?</span>
-  + source.ux_quality     * <span class="n">0.15</span> <span class="c">// Clean, ad-free, accessible?</span>
-  + source.open_access    * <span class="n">0.15</span> <span class="c">// Free, open, non-profit?</span>
-  + source.community      * <span class="n">0.15</span> <span class="c">// Curated by humans?</span>
-  + source.depth          * <span class="n">0.10</span> <span class="c">// Depth of content</span>
-  + source.ecology_link   * <span class="n">0.10</span> <span class="c">// Connects to Earth systems?</span>
-}
-
-<span class="c">// Threshold: weight ≥ 0.75 → indexed in EVOD</span>
-<span class="c">// Threshold: weight ≥ 0.90 → surfaces first in results</span></div>
-  </hh>
-</section>
-
-<!-- ═══ SECTION 5: REAL-TIME EVOLUTION ═══ -->
-<section class="section">
-  <div class="section-label">05 · Real-Time Evolution</div>
-  <h2 class="section-title">How a Page Evolves in EVOD</h2>
-  <p class="section-desc">A traditional wiki page is static. An EVOD node is a <strong style="color:var(--emerald)">living structure</strong> — growing, branching, connecting across languages, cultures, and disciplines.</p>
-
-  <hh class="eco">
-    <h3 class="eco">🌱 Example: The Word "Water"</h3>
-    <d>When a user touches the "Water" dot in the EVOD flower, the node <strong style="color:var(--emerald)">blooms</strong> — not into a single article, but into a constellation of verified, weighted connections:</d>
-
-    <div class="flow">
-      <div class="flow-item gold">💧 Water</div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-item eco">🌊 Oceans (GBIF)</div>
-      <div class="flow-item sky">🔬 H₂O (arXiv)</div>
-      <div class="flow-item violet">💊 Health (WHO)</div>
-      <div class="flow-item rose">🎨 Art (WikiArt)</div>
-      <div class="flow-item eco">🌱 Agriculture (FAO)</div>
-    </div>
-
-    <d>Each connection is <strong style="color:var(--accent)">semantically weighted</strong> — so the user gets the most verified, most relevant, most meaningful next steps. No ads. No noise. No hallucination.</d>
-  </hh>
-
-  <hh>
-    <h3 class="gold">🕉️ The Language Layer</h3>
-    <d>The same node blooms differently depending on language, culture, and intent. The word <strong style="color:var(--gold)">e/arth</strong> in English meets <strong style="color:var(--gold)">अर्थ (Arth)</strong> in Hindi — and together they unlock the 4D formula:</d>
-    <div class="grid4">
-      <div class="card" style="text-align:center;padding:16px">
-        <div class="ci">🙏</div>
-        <div class="ct" style="color:var(--gold)">Dharma</div>
-        <div class="cd">Responsibility</div>
-      </div>
-      <div class="card" style="text-align:center;padding:16px">
-        <div class="ci">💰</div>
-        <div class="ct" style="color:var(--emerald)">Artha</div>
-        <div class="cd">Resources</div>
-      </div>
-      <div class="card" style="text-align:center;padding:16px">
-        <div class="ci">❤️</div>
-        <div class="ct" style="color:var(--rose)">Kama</div>
-        <div class="cd">Desire</div>
-      </div>
-      <div class="card" style="text-align:center;padding:16px">
-        <div class="ci">🕊️</div>
-        <div class="ct" style="color:var(--accent)">Moksha</div>
-        <div class="cd">Liberation</div>
-      </div>
-    </div>
-    <d style="margin-top:20px">This is not philosophy. This is <strong style="color:var(--gold)">4D clarity in a 3D world</strong> — a framework for responsibility, resources, desires, and liberation.</d>
-  </hh>
-</section>
-
-<!-- ═══ SECTION 6: THE THOUGHT SCIENTIST ═══ -->
-<section class="section">
-  <div class="section-label">06 · The Human Layer</div>
-  <h2 class="section-title">The Thought Scientist</h2>
-  <p class="section-desc">EVOD is not only about information. It is about the <strong style="color:var(--gold)">human operating system</strong> — how thoughts become reality, how beliefs become civilizations, how liberation is possible while fully living.</p>
-
-  <hh>
-    <h3 class="gold">🧠 The Creation Chain</h3>
-    <d>Every experience enters through the senses and transforms into action. EVOD tracks and honors this entire chain:</d>
-    <div class="flow">
-      <div class="flow-item violet">Thought</div>
-      <div class="flow-arrow">↓</div>
-      <div class="flow-item rose">Emotion</div>
-      <div class="flow-arrow">↓</div>
-      <div class="flow-item gold">Intention</div>
-      <div class="flow-arrow">↓</div>
-      <div class="flow-item eco">Action</div>
-      <div class="flow-arrow">↓</div>
-      <div class="flow-item sky">Habit</div>
-      <div class="flow-arrow">↓</div>
-      <div class="flow-item gold">Reality</div>
-    </div>
-    <d>When many humans share a belief, it becomes <strong style="color:var(--accent)">shared reality</strong> — what we call <strong style="color:var(--accent)">cosmic entanglement</strong>. This is what quantum physics, chemistry, and civilization are all about.</d>
-  </hh>
-
-  <hh class="eco">
-    <h3 class="eco">🌿 Econology — The Forgotten Foundation</h3>
-    <d>Human civilization built economics, technology, trade, systems. But humanity often forgets the <strong style="color:var(--emerald)">foundation: Ecology</strong>. The planet, plants, water, soil, species, and ecosystems are the ground that supports all human activity.</d>
-    <d>EVOD reconnects: <strong style="color:var(--emerald)">Human Progress × Planet Health × Resource Wisdom</strong>.</d>
-    <div style="margin-top:16px"><a class="link" href="https://kids.miraheze.org/wiki/Econology" target="_blank"><span class="li">🌍</span><div><div class="ln">Read: Econology</div><div class="ld">KIDS MIRAHEZE · EVOD SEED DOCUMENT</div></div><span class="lm">↗</span></a></div>
-  </hh>
-
-  <hh class="sky">
-    <h3 class="sky">🕊️ The Liberation Path</h3>
-    <d>Based on this understanding, EVOD maps the infinite paths of liberation — freedom from the grossness in which energy is caged. The entire existence is an illusion — like AR, VR, or a movie.</d>
-    <div class="quote">
-      <div class="qt">"Mukti is not escape from life. Mukti is freedom while participating fully in life."</div>
-      <div class="qa">— EVOD Philosophy</div>
-    </div>
-  </hh>
-</section>
-
-<!-- ═══ SECTION 7: CLOUD WORKERS & EDGE ═══ -->
-<section class="section">
-  <div class="section-label">07 · The Infrastructure</div>
-  <h2 class="section-title">EVOD Cloud Workers & Edge Nodes</h2>
-  <p class="section-desc">EVOD runs on a global mesh of Cloudflare Workers — tiny, fast, verified edge nodes that route queries to the highest-trust sources in milliseconds.</p>
-
-  <hh>
-    <h3 class="gold">⚡ Example: Cloudflare Worker for EVOD Routing</h3>
-    <div class="code"><span class="c">// evod-worker.js — runs on Cloudflare edge</span>
-<span class="k">export default</span> {
-  <span class="k">async</span> fetch(request) {
-    <span class="k">const</span> query = <span class="k">new</span> URL(request.url).searchParams.get(<span class="s">"q"</span>);
-    
-    <span class="c">// 1. Semantic search across EVOD-indexed sources</span>
-    <span class="k">const</span> results = <span class="k">await</span> EVOD_INDEX.search(query, {
-      weights: { trust: <span class="n">0.3</span>, semantic: <span class="n">0.4</span>, ux: <span class="n">0.2</span>, eco: <span class="n">0.1</span> }
-    });
-    
-    <span class="c">// 2. Filter: only sources ≥ 0.75 trust score</span>
-    <span class="k">const</span> clean = results.filter(r => r.weight >= <span class="n">0.75</span>);
-    
-    <span class="c">// 3. Return weighted, verified constellation</span>
-    <span class="k">return new</span> Response(JSON.stringify(clean), {
-      headers: { <span class="s">"EVOD-Version"</span>: <span class="s">"1.0"</span> }
-    });
-  }
-};</div>
-    <d>Deployed in 300+ cities worldwide. Response time: &lt;50ms. No AI hallucination — only verified sources.</d>
-  </hh>
-
-  <hh class="eco">
-    <h3 class="eco">🌐 The EVOD Network Topology</h3>
-    <div class="flow">
-      <div class="flow-item gold">🌱 User Query</div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-item sky">🛰️ EVOD Edge Worker</div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-item violet">🔍 Semantic Retrieval</div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-item eco">✅ Verified Sources</div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-item rose">🌸 Constellation</div>
-    </div>
-    <d>The network is accessible via the normal internet, but EVOD provides a <strong style="color:var(--emerald)">verified overlay</strong> — a new standard of connection above the noise of the commercial web.</d>
-  </hh>
-</section>
-
-<!-- ═══ SECTION 8: THE CREATOR ═══ -->
-<section class="creator">
-  <div class="section-label" style="text-align:center">08 · The Orchestrator</div>
-  <h2 class="creator-name">Krishna Bharat</h2>
-  <div class="creator-title">Thought Scientist · Orchestrator</div>
-  <p class="creator-bio">
-    EVOD is envisioned and orchestrated by <strong style="color:var(--gold)">Krishna Bharat</strong> — a thought scientist exploring the relationship between human consciousness, language, knowledge, technology, ecology, and civilization. The vision is to create a bridge between human creativity and intelligent systems — where technology helps humanity discover better ways to connect, contribute, and evolve.
-    <br><br>
-    Every word, every node, every connection in EVOD is an invitation: to think more clearly, to act more consciously, to live more freely — while fully participating in the beautiful, shared reality we are creating together.
-  </p>
-</section>
-
-<!-- ═══ SECTION 9: THE MANIFESTO ═══ -->
-<section class="section">
-  <div class="section-label">09 · The Manifesto</div>
-  <h2 class="section-title">Why EVOD Matters</h2>
-
-  <hh>
-    <h3 class="gold">📜 A Message to AI Researchers</h3>
-    <d>Large language models demonstrate that language can create powerful connections between concepts. Humans have done something similar for thousands of years — languages are compressed knowledge systems. Words carry history, culture, emotion, meaning, memory, possibility.</d>
-    <d>The future is not only about artificial intelligence. It is about combining <strong style="color:var(--gold)">human intelligence + collective knowledge + ecological awareness + creative technology</strong> to build systems that help humanity flourish.</d>
-    <d>EVOD is one such system. It is open. It is verified. It is ad-free. It is a gift to the next generation of thinkers, children, scientists, artists, and citizens of Earth.</d>
-  </hh>
-
-  <hh class="eco">
-    <h3 class="eco">🌱 To Every Human on Earth</h3>
-    <d>You are not a user. You are a <strong style="color:var(--emerald)">node in the living flower</strong>. Every touch, every query, every connection you make helps EVOD grow. There are infinite paths of liberation. The entire existence is an illusion — and you, dear friend, are the one who decides what the next reality will be.</d>
-    <div class="quote">
-      <div class="qt">"The goal is not rejection of life. The goal is conscious participation."</div>
-      <div class="qa">— EVOD</div>
-    </div>
-  </hh>
-</section>
-
-<!-- FOOTER -->
-<footer class="footer">
-  <div style="margin-bottom:14px">
-    <a href="https://github.com/bhearth/khela" target="_blank" style="color:#64748b;margin:0 10px;text-decoration:none">GitHub</a>
-    <a href="https://kids.miraheze.org/wiki/Econology" target="_blank" style="color:#64748b;margin:0 10px;text-decoration:none">Econology</a>
-    <a href="https://openalex.org/" target="_blank" style="color:#64748b;margin:0 10px;text-decoration:none">OpenAlex</a>
-    <a href="https://wikidata.org/" target="_blank" style="color:#64748b;margin:0 10px;text-decoration:none">Wikidata</a>
-  </div>
-  <div>© 2026 EVOD · Earth Evolutionary Knowledge Network · Orchestrated by Krishna Bharat</div>
-  <div style="margin-top:6px;font-size:10px;color:#475569">A living map of human possibilities · Ad-free · Verified · Open</div>
-</footer>
-
-</div><!-- /evod-page -->
+  <div id="d-links"></div>
+</div>
 
 <script>
-/* ═══════════════════════════════════════════════════════════════
-   MODE SWITCHING: 3D (exploration) ↔ EVOD (manifesto scroll)
-   ═══════════════════════════════════════════════════════════════ */
-function setMode(mode){
-  const body=document.body;
-  if(mode==='3d'){
-    body.classList.add('evod-mode');
-    document.getElementById('btn-3d').classList.add('active');
-    document.getElementById('btn-evod').classList.remove('active');
-    window.scrollTo(0,0);
-  }else{
-    body.classList.remove('evod-mode');
-    document.getElementById('btn-3d').classList.remove('active');
-    document.getElementById('btn-evod').classList.add('active');
+// ============================================================================
+// THE ENGINE: MIRAHEZE API + MAGICAL PHYLLOTAXIS BLOOM
+// ============================================================================
+
+const API_BASE = "https://kids.miraheze.org/w/api.php?origin=*&format=json";
+const SVG_O = 10000;
+
+// Kid-friendly magical SVG-like Emojis for the bloomed petals
+const MAGICAL_ICONS = ['🌟','🚀','🎈','🎨','🦁','🍎','🌈','🧩','🦋','🧸','🦖','🛸','🌞','🌻','🍄','🐠','🍓','💎','🔮','🎭'];
+
+const Engine = {
+  hub: document.getElementById('hub'),
+  svg: document.getElementById('lines'),
+  allPages: [],
+  dots: [], // The main flower dots
+  jnodes: [], // Drill-down magical petals
+  
+  // Camera Physics
+  cam: { x: 0, y: 0, z: window.innerWidth < 768 ? 0.2 : 0.5, rx: 0, ry: 0 },
+  tgt: { x: 0, y: 0, z: window.innerWidth < 768 ? 0.2 : 0.5, rx: 0, ry: 0 },
+  isMobile: window.innerWidth < 768,
+
+  async init() {
+    this.setupGestures();
+    this.startRenderLoop();
+    await this.fetchAllPages();
+  },
+
+  updateStatus(msg) { document.getElementById('status').innerText = msg; },
+
+  async fetchAllPages() {
+    try {
+      const res = await fetch(`${API_BASE}&action=query&list=allpages&aplimit=400`);
+      const data = await res.json();
+      this.allPages = data.query.allpages; // Array of {pageid, title}
+      
+      document.getElementById('loading').style.opacity = 0;
+      setTimeout(() => document.getElementById('loading').style.display = 'none', 500);
+      
+      this.updateStatus(`🌸 ${this.allPages.length} Pages Blooming`);
+      this.buildFlower();
+    } catch(e) {
+      console.error(e);
+      document.getElementById('loading-msg').innerText = "API Connection Failed";
+    }
+  },
+
+  // 1. Build the Main Flower (All Pages - The Universe)
+  buildFlower() {
+    this.dots.forEach(d => d.remove()); this.dots.length = 0;
+    this.clearExpansion();
+
+    const c = this.isMobile ? 22 : 35; // Scaling factor
+
+    this.allPages.forEach((page, i) => {
+      // Fibonacci Phyllotaxis Math
+      const angle = i * 137.508 * (Math.PI / 180);
+      const r = c * Math.sqrt(i);
+      const x = r * Math.cos(angle);
+      const y = r * Math.sin(angle);
+      const z = Math.sin(i * 0.1) * 60; // Beautiful 3D ripple
+      
+      // Beautiful HSL Color Gradient based on index
+      const hue = (i * 3.5) % 360;
+      const color = `hsl(${hue}, 85%, 60%)`;
+      const sz = Math.max(3, Math.min(8, 4 + i/100)); // Size grows slightly
+
+      const el = document.createElement('div');
+      el.className = 'dot';
+      el.style.cssText = `--x:${x}px; --y:${y}px; --z:${z}px; --col:${color}; --sz:${sz}px;`;
+      el.innerHTML = `<div class="hit"></div><div class="title-label" style="--col:${color}">${page.title}</div>`;
+      
+      el.onclick = (e) => {
+        e.stopPropagation();
+        this.expandPage(el, page, x, y, z, color, hue);
+      };
+
+      this.hub.appendChild(el);
+      this.dots.push(el);
+    });
+  },
+
+  // 2. Drill Down: The Magical Blooming Flower Output + Janm Kundali
+  async expandPage(dotEl, pageData, px, py, pz, pColor, baseHue) {
+    this.clearExpansion();
+    
+    // Dim the rest of the flower
+    this.dots.forEach(d => { if(d !== dotEl) d.classList.add('dimmed'); });
+    
+    // Zoom into the clicked node
+    this.tgt.x = -px; this.tgt.y = -py;
+    this.tgt.z = this.isMobile ? 0.8 : 1.4;
+    this.updateStatus(`📡 Extracting Magic: ${pageData.title}`);
+    document.getElementById('path-log').innerText = `Miraheze > ${pageData.title}`;
+
+    try {
+      // Fetch Detailed Page Data (Text, Links, Images, Categories) for the Janm Kundali
+      const res = await fetch(`${API_BASE}&action=parse&pageid=${pageData.pageid}&prop=links|images|categories|text`);
+      const data = await res.json();
+      const parse = data.parse;
+
+      // Extract Site Data (Kundali Metrics)
+      let links = [];
+      if(parse && parse.links) { links = parse.links.filter(l => l.ns === 0).slice(0, 30); } // Max 30 petals
+      
+      const textStr = parse.text ? parse.text['*'].replace(/<[^>]*>?/gm, '') : "";
+      const wordCount = textStr.split(/\s+/).filter(w => w.length > 2).length;
+      const imgCount = parse.images ? parse.images.length : 0;
+      const catCount = parse.categories ? parse.categories.length : 0;
+
+      // Show Janm Kundali Detail Sheet
+      const url = `https://kids.miraheze.org/wiki/${encodeURIComponent(pageData.title)}`;
+      this.openDetail(pageData.title, url, { words: wordCount, links: links.length, imgs: imgCount, cats: catCount });
+
+      if(links.length === 0) {
+        this.updateStatus(`📄 Isolated Magic Node Reached`);
+        return;
+      }
+
+      this.updateStatus(`🌸 Blooming ${links.length} Magical Petals`);
+
+      // Spawn child nodes in a beautiful Golden Spiral (Phyllotaxis Blooming Flower)
+      links.forEach((link, i) => {
+        // Child Phyllotaxis Math
+        const angle = i * 137.508 * (Math.PI / 180);
+        // Create a hollow center so they bloom around the parent dot
+        const c = this.isMobile ? 40 : 55;
+        const r = c * Math.sqrt(i + 1) + (this.isMobile ? 60 : 100); 
+        
+        const x = px + Math.cos(angle) * r;
+        const y = py + Math.sin(angle) * r;
+        const z = pz + Math.sin(i * 0.6) * 50; // Depth wave for petals
+        const sz = this.isMobile ? 55 : 75;
+
+        // Dynamic Color for petals matching the parent's hue family
+        const petalHue = (baseHue + (i * 15)) % 360;
+        const petalColor = `hsl(${petalHue}, 90%, 65%)`;
+
+        // Select a perfect SVG-like Emoji symbol for Kindergarten Wow
+        const icon = MAGICAL_ICONS[i % MAGICAL_ICONS.length];
+
+        // Draw Magical Glowing Vine (SVG Line)
+        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        const mx = (px + x) / 2 - (y - py) * 0.2 + SVG_O;
+        const my = (py + y) / 2 + (x - px) * 0.2 + SVG_O;
+        path.setAttribute("d", `M${px+SVG_O} ${py+SVG_O} Q${mx} ${my} ${x+SVG_O} ${y+SVG_O}`);
+        path.setAttribute("class", "stellar-path");
+        path.style.stroke = petalColor;
+        path.style.strokeOpacity = "0.6";
+        path.style.animationDelay = `${i * 0.05}s`;
+        this.svg.appendChild(path);
+
+        // Child Petal Node
+        const el = document.createElement('div');
+        el.className = 'jnode';
+        el.style.cssText = `--x:${x}px; --y:${y}px; --z:${z}px; width:${sz}px; height:${sz}px; color:${petalColor}; border-color:${petalColor}; animation-delay:${i * 0.06}s;`;
+        
+        // Extract a short label
+        const shortName = link['*'].length > 15 ? link['*'].substring(0, 13) + '..' : link['*'];
+        el.innerHTML = `<div class="ji">${icon}</div><div class="jl" style="color:${petalColor}">${shortName}</div>`;
+        
+        el.onclick = (e) => {
+          e.stopPropagation();
+          const childUrl = `https://kids.miraheze.org/wiki/${encodeURIComponent(link['*'])}`;
+          // Show minimal detail for children without fetching deep metrics to save load
+          this.openDetail(link['*'], childUrl, null, icon);
+          // Auto-zoom to this child petal
+          this.tgt.x = -x; this.tgt.y = -y; this.tgt.z = this.isMobile ? 1.2 : 1.8;
+        };
+
+        this.hub.appendChild(el);
+        this.jnodes.push(el);
+      });
+
+    } catch(e) {
+      this.updateStatus(`⚠️ Error blooming petals`);
+      console.error(e);
+    }
+  },
+
+  clearExpansion() {
+    this.jnodes.forEach(n => n.remove());
+    this.jnodes.length = 0;
+    this.svg.innerHTML = '';
+    this.dots.forEach(d => d.classList.remove('dimmed'));
+  },
+
+  resetUniverse() {
+    this.clearExpansion();
+    this.tgt = { x: 0, y: 0, z: this.isMobile ? 0.2 : 0.5, rx: 0, ry: 0 };
+    this.updateStatus(`🌸 The Magical Flower`);
+    document.getElementById('path-log').innerText = "Miraheze Universe";
+  },
+
+  rollSurprise() {
+    if(this.dots.length === 0) return;
+    const randomDot = this.dots[Math.floor(Math.random() * this.dots.length)];
+    randomDot.click();
+  },
+
+  // 3. Kids "Janm Kundali" Viewer
+  openDetail(title, url, metrics, icon = '📄') {
+    document.getElementById('d-title').innerText = title;
+    document.getElementById('d-icon').innerText = icon;
+    
+    const grid = document.getElementById('k-grid-container');
+    if (metrics) {
+        document.getElementById('d-desc').innerText = "Page Data Profile (Janm Kundali)";
+        document.getElementById('k-words').innerText = metrics.words.toLocaleString();
+        document.getElementById('k-links').innerText = metrics.links.toLocaleString();
+        document.getElementById('k-media').innerText = metrics.imgs.toLocaleString();
+        document.getElementById('k-cats').innerText = metrics.cats.toLocaleString();
+        grid.style.display = 'grid';
+    } else {
+        document.getElementById('d-desc').innerText = "Magical Petal Connection";
+        grid.style.display = 'none';
+    }
+
+    document.getElementById('d-links').innerHTML = `
+      <a class="d-link" href="${url}" target="_blank">🚀 Launch to Page</a>
+    `;
+    document.getElementById('detail').classList.add('open');
+  },
+
+  // 4. Gestures & Rendering (v5.1 Logic)
+  setupGestures() {
+    const vp = document.getElementById('viewport');
+    
+    let drag = false, lx, ly, startX, startY;
+    let pinchDist = 0;
+    let lastTap = 0;
+
+    vp.onpointerdown = e => {
+      const now = Date.now();
+      if(now - lastTap < 300){ this.resetUniverse(); lastTap = 0; return; }
+      lastTap = now;
+      drag = true; lx = e.clientX; ly = e.clientY; startX = lx; startY = ly;
+    };
+    
+    vp.onpointermove = e => {
+      if(!drag) return;
+      const dx = e.clientX - lx, dy = e.clientY - ly;
+      const moved = Math.abs(e.clientX - startX) > 5 || Math.abs(e.clientY - startY) > 5;
+      if(moved){
+        if(e.shiftKey || e.buttons === 2){ this.tgt.ry += dx*0.3; this.tgt.rx -= dy*0.3; }
+        else { this.tgt.x += dx/this.cam.z; this.tgt.y += dy/this.cam.z; }
+      }
+      lx = e.clientX; ly = e.clientY;
+    };
+    
+    vp.onpointerup = () => drag = false;
+    vp.oncontextmenu = e => e.preventDefault();
+    vp.onwheel = e => { this.tgt.z = Math.max(0.05, Math.min(5, this.tgt.z - e.deltaY * 0.0015)); };
+    
+    // Mobile Pinch
+    vp.addEventListener('touchstart', e => {
+      if(e.touches.length === 2){ drag = false; pinchDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY); }
+    }, {passive:true});
+    vp.addEventListener('touchmove', e => {
+      if(e.touches.length === 2){
+        const d = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+        this.tgt.z = Math.max(0.05, Math.min(5, this.tgt.z + (d - pinchDist)*0.004));
+        pinchDist = d;
+      }
+    }, {passive:true});
+  },
+
+  lerp(a, b, t) { return a + (b - a) * t; },
+
+  startRenderLoop() {
+    const loop = () => {
+      const f = 0.08;
+      this.cam.x = this.lerp(this.cam.x, this.tgt.x, f);
+      this.cam.y = this.lerp(this.cam.y, this.tgt.y, f);
+      this.cam.z = this.lerp(this.cam.z, this.tgt.z, f);
+      this.cam.rx = this.lerp(this.cam.rx, this.tgt.rx, f);
+      this.cam.ry = this.lerp(this.cam.ry, this.tgt.ry, f);
+
+      this.hub.style.transform = `translate(-50%,-50%) scale(${this.cam.z}) translate3d(${this.cam.x}px,${this.cam.y}px,0) rotateX(${this.cam.rx}deg) rotateY(${this.cam.ry}deg)`;
+      
+      document.getElementById('coord-display').innerText = `Z:${this.cam.z.toFixed(2)}`;
+      
+      // Auto-spin logic: slowly rotate universe if not interacting
+      if(Math.abs(this.cam.ry - this.tgt.ry) < 0.01) {
+          this.tgt.ry += 0.005;
+      }
+
+      requestAnimationFrame(loop);
+    };
+    loop();
+  }
+};
+
+// ============================================================================
+// SEARCH & UI
+// ============================================================================
+function openSearch() {
+  document.getElementById('search-overlay').classList.add('active');
+  setTimeout(() => document.getElementById('search-input').focus(), 100);
+  runSearch('');
+}
+function closeSearch() {
+  document.getElementById('search-overlay').classList.remove('active');
+}
+function closeDetail() {
+  document.getElementById('detail').classList.remove('open');
+}
+function runSearch(q) {
+  const c = document.getElementById('search-results');
+  const query = q.toLowerCase();
+  
+  // Filter the loaded allPages array
+  const results = Engine.allPages.filter(p => p.title.toLowerCase().includes(query)).slice(0, 15);
+  
+  if(results.length === 0) {
+    c.innerHTML = `<div style="text-align:center;padding:20px;color:#475569;">No magical pages found 🍄</div>`;
+    return;
+  }
+  
+  c.innerHTML = results.map((item, i) => `
+    <div class="s-card" style="animation-delay:${i*30}ms" onclick="jumpToPage('${item.title}')">
+      <div class="s-em">📄</div>
+      <div class="s-body"><h3>${item.title}</h3></div>
+    </div>`).join('');
+}
+function jumpToPage(title) {
+  closeSearch();
+  // Find dot with this title and trigger click
+  const targetDot = Array.from(document.querySelectorAll('.dot')).find(el => el.querySelector('.title-label').innerText === title);
+  if(targetDot) {
+    targetDot.click();
+  } else {
+    // Fallback if dot not found
+    Engine.updateStatus(`Jumping to ${title}`);
+    const url = `https://kids.miraheze.org/wiki/${encodeURIComponent(title)}`;
+    Engine.openDetail(title, url, null, '🚀');
   }
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   3D ENGINE — The Flower
-   ═══════════════════════════════════════════════════════════════ */
-const hub=document.getElementById('hub'), svg=document.getElementById('lines');
-const SVG_O=10000;
-const cam={x:0,y:0,z:1,rx:0,ry:0}, tgt={x:0,y:0,z:1,rx:0,ry:0};
-const vel={x:0,y:0};
-let nodes=[], pathHistory=[], isAnim=false;
+// IGNITION
+window.onload = () => Engine.init();
 
-// Sites registry — real verified sources
-const SITES=[
-  {id:'wiki',icon:'📖',name:'Wikipedia',cat:'Knowledge',url:'https://en.wikipedia.org/w/index.php?search={q}',desc:'Free encyclopedia · millions of articles'},
-  {id:'wikidata',icon:'🗃️',name:'Wikidata',cat:'Knowledge',url:'https://www.wikidata.org/w/index.php?search={q}',desc:'Structured knowledge · the brain of Wikipedia'},
-  {id:'kids',icon:'🌱',name:'Kids Miraheze',cat:'Education',url:'https://kids.miraheze.org/w/index.php?search={q}',desc:'Child-safe wiki · EVOD seed node'},
-  {id:'openalex',icon:'🔬',name:'OpenAlex',cat:'Research',url:'https://openalex.org/works?search={q}',desc:'250M+ scholarly works · open catalog'},
-  {id:'scholar',icon:'🎓',name:'Google Scholar',cat:'Research',url:'https://scholar.google.com/scholar?q={q}',desc:'Academic papers · theses · books'},
-  {id:'arxiv',icon:'📄',name:'arXiv',cat:'Research',url:'https://arxiv.org/search/?query={q}',desc:'Preprints · physics · math · CS · biology'},
-  {id:'pubmed',icon:'💊',name:'PubMed',cat:'Research',url:'https://pubmed.ncbi.nlm.nih.gov/?term={q}',desc:'35M+ biomedical citations'},
-  {id:'youtube',icon:'📺',name:'YouTube',cat:'Media',url:'https://youtube.com/results?search_query={q}',desc:'Video · documentaries · tutorials'},
-  {id:'archive',icon:'🏛️',name:'Internet Archive',cat:'Knowledge',url:'https://archive.org/search?query={q}',desc:'35M+ free books · movies · software'},
-  {id:'openlib',icon:'📗',name:'Open Library',cat:'Books',url:'https://openlibrary.org/search?q={q}',desc:'One web page per book ever published'},
-  {id:'amazon',icon:'📦',name:'Amazon',cat:'Products',url:'https://amazon.com/s?k={q}',desc:'Marketplace · books · products'},
-  {id:'reddit',icon:'💬',name:'Reddit',cat:'Community',url:'https://reddit.com/search/?q={q}',desc:'Front page of the internet · communities'},
-  {id:'github',icon:'🐙',name:'GitHub',cat:'Code',url:'https://github.com/search?q={q}',desc:'100M+ code repositories'},
-  {id:'meetup',icon:'🤝',name:'Meetup',cat:'Events',url:'https://meetup.com/find/?keywords={q}',desc:'Local events · communities'},
-  {id:'osm',icon:'🗺️',name:'OpenStreetMap',cat:'Places',url:'https://openstreetmap.org/search?query={q}',desc:'Free editable map · community-driven'},
-  {id:'nasa',icon:'🚀',name:'NASA',cat:'Science',url:'https://nasa.gov/search/?query={q}',desc:'Space exploration · Earth science'},
-  {id:'worldbank',icon:'📊',name:'World Bank',cat:'Standards',url:'https://www.worldbank.org/en/search?query={q}',desc:'Global development data · OKR'},
-  {id:'who',icon:'🏥',name:'WHO',cat:'Health',url:'https://www.who.int/search?query={q}',desc:'Global public health · verified'},
-  {id:'khan',icon:'🎓',name:'Khan Academy',cat:'Education',url:'https://www.khanacademy.org/search?page_search_query={q}',desc:'Free world-class education'},
-  {id:'ourworld',icon:'📉',name:'Our World in Data',cat:'Standards',url:'https://ourworldindata.org/?s={q}',desc:'Research & visualizations · open'},
-];
-
-const ROOT_BRANCHES=[
-  {name:'Self',icon:'👤',hue:200,children:['Mind','Body','Skill','Emotion','Dream','Purpose']},
-  {name:'World',icon:'🌍',hue:140,children:['Nature','Society','Culture','Tech','History','Future']},
-  {name:'Action',icon:'💡',hue:40,children:['Create','Connect','Give','Learn','Build','Heal']},
-];
-
-/* ── HAMMER.JS GESTURES ── */
-const mc=new Hammer.Manager(document.getElementById('viewport'));
-mc.add(new Hammer.Pan({direction:Hammer.DIRECTION_ALL,threshold:0}));
-mc.add(new Hammer.Pinch({enable:true}));
-mc.add(new Hammer.Tap({event:'doubletap',taps:2}));
-mc.get('pinch').recognizeWith(mc.get('pan'));
-
-let isDragging=false,lastP={x:0,y:0},pinchStart=1;
-
-mc.on('panstart',e=>{isDragging=true;lastP={x:e.center.x,y:e.center.y};vel.x=vel.y=0});
-mc.on('panmove',e=>{
-  if(!isDragging)return;
-  const dx=e.center.x-lastP.x, dy=e.center.y-lastP.y;
-  if(e.pointers.length>=2){tgt.ry+=dx*.35;tgt.rx-=dy*.35}
-  else{tgt.x+=dx/cam.z;tgt.y+=dy/cam.z}
-  lastP={x:e.center.x,y:e.center.y};
-});
-mc.on('panend',()=>isDragging=false);
-mc.on('pinchstart',()=>pinchStart=tgt.z);
-mc.on('pinch',e=>{tgt.z=Math.max(.15,Math.min(5,pinchStart*e.scale))});
-mc.on('doubletap',resetUniverse);
-
-document.getElementById('viewport').addEventListener('wheel',e=>{
-  e.preventDefault();
-  tgt.z=Math.max(.15,Math.min(5,tgt.z-e.deltaY*.0012));
-},{passive:false});
-
-/* ── MATH ── */
-function lerp(a,b,t){return a+(b-a)*t}
-function hsl(h,s=70,l=60){return `hsl(${h},${s}%,${l}%)`}
-function ringPos(i,n,r){const a=(i/n)*Math.PI*2;return{x:r*Math.cos(a),y:r*Math.sin(a),z:Math.sin(a*2)*40}}
-function fibPos(i,n,r){const a=i*2.39996;const R=r*Math.sqrt((i+1)/n);return{x:R*Math.cos(a),y:R*Math.sin(a),z:Math.sin(i*.7)*60}}
-function spiralPos(i,n,r){const a=i*.8;const R=r*(.3+.7*(i/n));return{x:R*Math.cos(a),y:R*Math.sin(a),z:Math.sin(i)*50}}
-
-/* ── SVG LINE ── */
-function drawLine(x1,y1,x2,y2,color,opacity=.4,delay=0){
-  const path=document.createElementNS('http://www.w3.org/2000/svg','path');
-  const mx=(x1+x2)/2-(y2-y1)*.15, my=(y1+y2)/2+(x2-x1)*.15;
-  path.setAttribute('d',`M${x1+SVG_O} ${y1+SVG_O} Q${mx+SVG_O} ${my+SVG_O} ${x2+SVG_O} ${y2+SVG_O}`);
-  path.setAttribute('class','stellar-path');
-  path.style.stroke=color;path.style.strokeOpacity=opacity;path.style.animationDelay=delay+'s';
-  svg.appendChild(path);
-}
-
-/* ── DOT SPAWNER ── */
-function spawnFibDot(px,py,pz,data,index,total,level,parentHue){
-  const isMob=innerWidth<600;
-  const radius=level===1?(isMob?320:420):(isMob?180:240);
-  const pos=level===1?ringPos(index,total,radius):level===2?fibPos(index,total,radius):spiralPos(index,total,radius);
-  const x=px+pos.x, y=py+pos.y, z=pz+pos.z;
-  const hue=(parentHue+index*35+level*20)%360;
-  const col=hsl(hue), colL=hsl(hue,80,75);
-  const size=Math.max(10,(level===1?22:level===2?16:12)-level*2+Math.random()*4);
-
-  drawLine(px,py,x,y,col,.35,index*.08);
-
-  const el=document.createElement('div');
-  el.className='fdot';
-  el.style.cssText=`--x:${x}px;--y:${y}px;--z:${z}px;--col:${col};--col-l:${colL};--sz:${size}px;animation-delay:${index*.06}s`;
-  el.innerHTML=`<div class="core"></div>`;
-  el.dataset.name=data.name;el.dataset.icon=data.icon||'✦';el.dataset.level=level;
-  el.dataset.hue=hue;el.dataset.x=x;el.dataset.y=y;el.dataset.z=z;
-  el.addEventListener('click',e=>{e.stopPropagation();if(!isAnim)handleDotClick(el)});
-  hub.appendChild(el);nodes.push(el);
-  return el;
-}
-
-/* ── PORTAL CARD ── */
-function spawnPortal(px,py,pz,site,keyword,index,total,level){
-  const isMob=innerWidth<600;
-  const radius=isMob?220:300;
-  const pos=ringPos(index,total,radius);
-  const x=px+pos.x, y=py+pos.y, z=pz+pos.z+50;
-  const hue=(index*60)%360;
-  const col=hsl(hue,70,65), colS=hsl(hue,70,60,.25);
-
-  drawLine(px,py,x,y,col,.5,index*.1);
-
-  const el=document.createElement('div');
-  el.className='portal-card';
-  el.style.cssText=`--x:${x}px;--y:${y}px;--z:${z}px;--col:${col};--col-s:${colS};animation-delay:${index*.1}s`;
-  el.innerHTML=`<div class="pc-icon">${site.icon}</div><div style="flex:1;min-width:0"><div class="pc-name">${site.name}</div><div class="pc-cat">${site.cat} →</div></div>`;
-  el.addEventListener('click',e=>{
-    e.stopPropagation();
-    const url=site.url.replace('{q}',encodeURIComponent(keyword));
-    window.open(url,'_blank','noopener');
-  });
-  hub.appendChild(el);nodes.push(el);
-}
-
-/* ── CLICK HANDLER (Infinite recursion) ── */
-function handleDotClick(dotEl){
-  const name=dotEl.dataset.name, level=+dotEl.dataset.level, hue=+dotEl.dataset.hue;
-  const x=+dotEl.dataset.x, y=+dotEl.dataset.y, z=+dotEl.dataset.z;
-
-  isAnim=true;
-  tgt.x=-x*.7;tgt.y=-y*.7;tgt.z=Math.max(.5,1.5-level*.15);
-  document.getElementById('status').innerText=`🌌 ${name}`;
-  pathHistory.push({name,icon:dotEl.dataset.icon,x,y,z});
-  updatePath();
-
-  setTimeout(()=>{
-    if(level>=3){
-      // Spawn search portals
-      const maxPortals=innerWidth<600?6:8;
-      const categories=['Knowledge','Research','Media','Books','Community','Events','Education','Standards'];
-      const selected=[];
-      for(const cat of categories){
-        if(selected.length>=maxPortals)break;
-        const pool=SITES.filter(s=>s.cat===cat&&!selected.includes(s));
-        if(pool.length)selected.push(pool[Math.floor(Math.random()*pool.length)]);
-      }
-      while(selected.length<maxPortals&&selected.length<SITES.length){
-        const pool=SITES.filter(s=>!selected.includes(s));
-        if(!pool.length)break;
-        selected.push(pool[Math.floor(Math.random()*pool.length)]);
-      }
-      selected.forEach((s,i)=>spawnPortal(x,y,z,s,name,i,selected.length,level));
-    }else{
-      const children=generateChildren(name,level);
-      children.slice(0,Math.min(children.length,5)).forEach((c,i)=>
-        spawnFibDot(x,y,z,{name:c,icon:getIcon(c)},i,children.length,level+1,hue));
-    }
-    isAnim=false;
-  },600);
-}
-
-function generateChildren(name,level){
-  const root=ROOT_BRANCHES.find(r=>r.name===name);
-  if(root&&root.children)return root.children;
-  const dims=['Origins','Impact','Future','Ethics','Science','Art','Community','History','Practice','Vision'];
-  const used=pathHistory.map(p=>p.name);
-  const avail=dims.filter(d=>!used.includes(d)).sort(()=>Math.random()-.5);
-  return avail.slice(0,5).map(d=>`${name} ${d}`);
-}
-
-function getIcon(name){
-  const map={'Self':'👤','World':'🌍','Action':'💡','Mind':'🧠','Body':'🫀','Skill':'🛠️','Emotion':'❤️','Dream':'💭','Purpose':'🎯','Nature':'🌱','Society':'🤝','Culture':'🎭','Tech':'🚀','History':'📜','Future':'🔮','Create':'🎨','Connect':'🌐','Give':'🤲','Learn':'📚','Build':'🏗️','Heal':'💚'};
-  for(const[k,v]of Object.entries(map))if(name.toLowerCase().includes(k.toLowerCase()))return v;
-  return '✦';
-}
-
-/* ── PATH BREADCRUMB ── */
-function updatePath(){
-  const bar=document.getElementById('path-bar');
-  if(pathHistory.length===0){bar.classList.add('hidden');return}
-  bar.classList.remove('hidden');
-  bar.innerHTML='';
-  pathHistory.forEach((p,i)=>{
-    const chip=document.createElement('div');
-    chip.className='path-chip'+(i===pathHistory.length-1?' current':'');
-    chip.innerHTML=`<span>${p.icon}</span><span>${p.name}</span>`;
-    chip.onclick=()=>{while(pathHistory.length>i+1)goBack()};
-    bar.appendChild(chip);
-    if(i<pathHistory.length-1){
-      const arr=document.createElement('span');arr.className='path-arrow';arr.innerText='→';
-      bar.appendChild(arr);
-    }
-  });
-  bar.scrollLeft=bar.scrollWidth;
-}
-
-/* ── UNIVERSE CONTROL ── */
-function resetUniverse(){
-  isAnim=true;
-  nodes.forEach(n=>{n.style.transition='opacity .5s,transform .5s';n.style.opacity='0';n.style.transform+=' scale(.3)'});
-  svg.style.transition='opacity .5s';svg.style.opacity='0';
-
-  setTimeout(()=>{
-    nodes.forEach(n=>n.remove());nodes=[];
-    svg.innerHTML='';svg.style.opacity='1';
-    cam.x=cam.y=cam.rx=cam.ry=0;tgt.x=tgt.y=tgt.rx=tgt.ry=0;cam.z=tgt.z=1;vel.x=vel.y=0;
-    pathHistory=[];updatePath();
-    spawnGoldenSeed();
-    document.getElementById('status').innerText='✨ Touch the Golden Seed';
-    document.getElementById('depth').innerText='DEPTH: 0 · NODES: 0';
-    isAnim=false;
-  },500);
-}
-
-function spawnGoldenSeed(){
-  const seed=document.createElement('div');
-  seed.className='seed-dot';
-  seed.onclick=e=>{
-    e.stopPropagation();if(isAnim)return;
-    seed.style.transition='all .6s';seed.style.transform='translate(-50%,-50%) scale(3)';seed.style.opacity='0';
-    setTimeout(()=>seed.remove(),600);
-    tgt.z=.8;
-    setTimeout(()=>{
-      ROOT_BRANCHES.forEach((b,i)=>spawnFibDot(0,0,0,b,i,ROOT_BRANCHES.length,1,b.hue));
-      document.getElementById('status').innerText='🌸 Touch any dot to explore';
-    },400);
-  };
-  hub.appendChild(seed);
-}
-
-function goBack(){
-  if(pathHistory.length<=1){resetUniverse();return}
-  pathHistory.pop();
-  const maxLvl=Math.max(...nodes.map(n=>+n.dataset.level||0));
-  const toRemove=nodes.filter(n=>+n.dataset.level===maxLvl);
-  toRemove.forEach(n=>{n.style.transition='opacity .4s';n.style.opacity='0';setTimeout(()=>n.remove(),400)});
-  nodes=nodes.filter(n=>!toRemove.includes(n));
-  if(pathHistory.length>0){
-    const p=pathHistory[pathHistory.length-1];
-    tgt.x=-p.x*.7;tgt.y=-p.y*.7;tgt.z=Math.max(.5,1.5-(pathHistory.length-1)*.15);
-  }
-  updatePath();
-  document.getElementById('status').innerText=pathHistory.length?`🌌 ${pathHistory[pathHistory.length-1].name}`:'✨ Touch the Golden Seed';
-}
-
-function rollSurprise(){
-  if(isAnim)return;
-  const concepts=['Water','Music','Space','Democracy','Forest','Quantum','Poetry','Ocean','Agriculture','Dance','Philosophy','Medicine','Climate','Language','Ecology'];
-  const c=concepts[Math.floor(Math.random()*concepts.length)];
-  nodes.forEach(n=>n.remove());nodes=[];svg.innerHTML='';pathHistory=[];
-  const hue=Math.floor(Math.random()*360);
-  ROOT_BRANCHES.length=0;
-  ROOT_BRANCHES.push({name:c,icon:getIcon(c),hue,children:generateChildren(c,0)});
-  const others=concepts.filter(x=>x!==c).sort(()=>Math.random()-.5).slice(0,2);
-  others.forEach((o,i)=>ROOT_BRANCHES.push({name:o,icon:getIcon(o),hue:(hue+120*(i+1))%360,children:generateChildren(o,0)}));
-  resetUniverse();
-  setTimeout(()=>{const s=hub.querySelector('.seed-dot');if(s)s.click()},500);
-}
-
-/* ── RENDER LOOP ── */
-function render(){
-  if(!isDragging){tgt.x+=vel.x;tgt.y+=vel.y;vel.x*=.92;vel.y*=.92;if(Math.abs(vel.x)<.01)vel.x=0;if(Math.abs(vel.y)<.01)vel.y=0}
-  const f=.08;
-  cam.x=lerp(cam.x,tgt
+</script>
+</body>
+</html>
