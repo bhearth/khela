@@ -3,253 +3,252 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-<title>Khel.o · Magical Flower Universe</title>
+<title>Khel.o · WonderGraph Universe</title>
 <style>
-/* ── Reset ── */
+/* ── Reset & Base ── */
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-
 body{
-  background:#010204; color:#e2e8f0;
+  background:#010204;color:#e2e8f0;
   font-family:'Space Grotesk',system-ui,sans-serif;
-  overflow:hidden; touch-action:none; user-select:none;
+  overflow:hidden;touch-action:none;user-select:none;
   height:100dvh;width:100dvw;
-  background-image: radial-gradient(circle at center, #0a1128 0%, #010204 100%);
+  background-image:radial-gradient(circle at center,#0a1128 0%,#010204 100%);
 }
 
-/* ── HUD telemetry ── */
+/* ── HUD ── */
 #hud{
   position:fixed;top:0;left:0;right:0;
   display:flex;justify-content:space-between;align-items:flex-start;
-  padding:clamp(12px,3vw,20px);
+  padding:clamp(10px,3vw,18px);
   pointer-events:none;z-index:50;
-  background:linear-gradient(180deg,rgba(1,2,4,0.92) 60%,transparent);
+  background:linear-gradient(180deg,rgba(1,2,4,0.94) 60%,transparent);
 }
-.telemetry{
-  font-size:clamp(10px,2.5vw,13px);letter-spacing:3px;
-  text-transform:uppercase;color:#38bdf8;
-  text-shadow:0 0 10px rgba(56,189,248,0.6);font-weight:700;
-  line-height:1.6;
-}
-.coords{
-  font-size:clamp(9px,2vw,11px);color:#94a3b8;
-  text-align:right;letter-spacing:2px;line-height:1.7;
-}
+.telemetry{font-size:clamp(10px,2.5vw,13px);letter-spacing:3px;text-transform:uppercase;color:#38bdf8;text-shadow:0 0 10px rgba(56,189,248,0.6);font-weight:700;line-height:1.6;}
+.coords{font-size:clamp(9px,2vw,11px);color:#94a3b8;text-align:right;letter-spacing:2px;line-height:1.7;}
 .hint{font-size:clamp(8px,1.8vw,10px);color:#475569;letter-spacing:1px;}
 
-/* ── Bottom toolbar ── */
+/* ── Toolbar ── */
 #toolbar{
   position:fixed;bottom:0;left:0;right:0;
   display:flex;justify-content:space-around;align-items:center;
-  padding:clamp(8px,2.5vw,14px) 8px clamp(14px,4vw,26px);
+  padding:clamp(8px,2.5vw,12px) 8px clamp(12px,4vw,22px);
   background:linear-gradient(0deg,rgba(1,2,4,0.97) 75%,transparent);
-  z-index:50;gap:6px;pointer-events:auto;
+  z-index:50;gap:4px;pointer-events:auto;
 }
 .tb{
   display:flex;flex-direction:column;align-items:center;gap:3px;
   background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);
-  border-radius:20px;padding:10px 14px;cursor:pointer;flex:1;max-width:90px;
-  transition:background .2s,transform .2s cubic-bezier(0.34, 1.56, 0.64, 1); backdrop-filter: blur(10px);
+  border-radius:18px;padding:8px 10px;cursor:pointer;flex:1;max-width:80px;
+  transition:background .2s,transform .2s cubic-bezier(0.34,1.56,0.64,1);backdrop-filter:blur(10px);
 }
 .tb:active{background:rgba(255,255,255,0.12);transform:scale(0.85);}
-.tb .em{font-size:clamp(22px,6vw,30px);line-height:1;}
-.tb .lb{font-size:clamp(8px,2vw,10px);color:#94a3b8;letter-spacing:.5px;
-        text-transform:uppercase;font-weight:700;}
+.tb .em{font-size:clamp(20px,5.5vw,28px);line-height:1;}
+.tb .lb{font-size:clamp(7px,1.8vw,9px);color:#94a3b8;letter-spacing:.5px;text-transform:uppercase;font-weight:700;}
 
-/* ── Viewport ── */
+/* ── 3D Viewport ── */
 #viewport{position:absolute;top:50dvh;left:50dvw;z-index:10;}
 #hub{position:absolute;top:0;left:0;transform-style:preserve-3d;will-change:transform;}
 
-/* ── SVG constellation lines (Vines) ── */
-svg{
-  position:absolute; top:-10000px;left:-10000px;
-  width:20000px;height:20000px; pointer-events:none;
-  transform-style:preserve-3d;
-}
-.stellar-path{
-  fill:none;stroke-width:2.5;stroke-linecap:round;
-  filter:drop-shadow(0 0 6px currentColor);
-  stroke-dasharray:2000;stroke-dashoffset:2000;
-  animation:growVine 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-}
+/* ── SVG Constellation lines ── */
+svg{position:absolute;top:-10000px;left:-10000px;width:20000px;height:20000px;pointer-events:none;}
+.stellar-path{fill:none;stroke-width:2;stroke-linecap:round;filter:drop-shadow(0 0 5px currentColor);stroke-dasharray:2000;stroke-dashoffset:2000;animation:growVine 1.4s cubic-bezier(0.25,1,0.5,1) forwards;}
 @keyframes growVine{to{stroke-dashoffset:0}}
 
-/* ── Fibonacci Flower Dots (The AllPages Nodes) ── */
+/* ── Universe Flower Dots ── */
 .dot{
   position:absolute;border-radius:50%;cursor:pointer;
   transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),var(--z));
-  transition:transform .4s cubic-bezier(.34,1.56,.64,1), box-shadow .3s,background .3s;
-  will-change:transform; pointer-events:auto;
-  min-width:44px;min-height:44px;
+  transition:transform .4s cubic-bezier(.34,1.56,.64,1),box-shadow .3s;
+  will-change:transform;pointer-events:auto;min-width:44px;min-height:44px;
   display:flex;align-items:center;justify-content:center;
 }
-.dot .hit{
-  border-radius:50%;background:var(--col);
-  width:var(--sz);height:var(--sz);
-  box-shadow:0 0 15px var(--col);
-  transition:transform .3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow .3s;
-}
-.dot:hover .hit,.dot:active .hit{
-  transform:scale(2.8);
-  box-shadow:0 0 30px var(--col), 0 0 60px var(--col);
-  z-index:100;
-}
-.dot .title-label {
-  position: absolute; top: 18px; font-size: 10px; font-weight: bold; color: #fff; opacity: 0; pointer-events: none;
-  white-space: nowrap; text-shadow: 0 2px 5px #000, 0 0 10px var(--col); transition: opacity 0.3s;
-}
-.dot:hover .title-label { opacity: 1; }
-.dot.dimmed { opacity: 0.1; filter: grayscale(100%); pointer-events: none; }
+.dot .hit{border-radius:50%;background:var(--col);width:var(--sz);height:var(--sz);box-shadow:0 0 12px var(--col);transition:transform .3s cubic-bezier(0.34,1.56,0.64,1),box-shadow .3s;}
+.dot:hover .hit,.dot:active .hit{transform:scale(2.6);box-shadow:0 0 28px var(--col),0 0 55px var(--col);z-index:100;}
+.dot .title-label{position:absolute;top:16px;font-size:9px;font-weight:bold;color:#fff;opacity:0;pointer-events:none;white-space:nowrap;text-shadow:0 2px 5px #000,0 0 10px var(--col);transition:opacity .3s;}
+.dot:hover .title-label{opacity:1;}
+.dot.dimmed{opacity:0.08;filter:grayscale(100%);pointer-events:none;}
 
-/* ── Kids Magical Bloom Nodes (Drill down nodes) ── */
+/* ── Bloom / Drill-down Petals ── */
 .jnode{
-  position:absolute;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
+  position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;
   border-radius:50%;cursor:pointer;text-align:center;
-  background:rgba(10,15,25,0.7);border:2px solid;
-  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  background:rgba(10,15,25,0.75);border:2px solid;backdrop-filter:blur(10px);
   transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),var(--z)) scale(0);
-  animation:supernova 0.8s cubic-bezier(.34,1.56,.64,1) forwards;
-  will-change:transform; pointer-events:auto;
+  animation:supernova 0.75s cubic-bezier(.34,1.56,.64,1) forwards;
+  will-change:transform;pointer-events:auto;
 }
-.jnode:hover,.jnode:active{
-  background:currentColor!important;color:#000!important;
-  box-shadow:0 0 40px currentColor,inset 0 0 20px #fff;z-index:500;
-  transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),calc(var(--z) + 50px)) scale(1.3)!important;
-}
-.jnode .ji{
-  font-size:clamp(20px,5vw,32px);
-  filter:drop-shadow(0 4px 6px rgba(0,0,0,.6));
-  transition:transform .3s cubic-bezier(0.34, 1.56, 0.64, 1);line-height:1;
-}
+.jnode:hover,.jnode:active{background:currentColor!important;color:#000!important;box-shadow:0 0 36px currentColor,inset 0 0 18px #fff;z-index:500;transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),calc(var(--z) + 50px)) scale(1.3)!important;}
+.jnode .ji{font-size:clamp(18px,4.5vw,28px);filter:drop-shadow(0 4px 6px rgba(0,0,0,.6));transition:transform .3s cubic-bezier(0.34,1.56,0.64,1);line-height:1;}
 .jnode:hover .ji{transform:scale(1.3) rotate(10deg);}
-.jnode .jl{
-  font-size:clamp(8px,2vw,11px);font-weight:800;
-  text-transform:uppercase;letter-spacing:1px;
-  margin-top:6px;pointer-events:none;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.8);
-}
-@keyframes supernova{
-    0% { transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),var(--z)) scale(0) rotate(-45deg); }
-    100% { transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),var(--z)) scale(1) rotate(0deg); }
-}
+.jnode .jl{font-size:clamp(7px,1.8vw,10px);font-weight:800;text-transform:uppercase;letter-spacing:.8px;margin-top:5px;pointer-events:none;text-shadow:0 1px 3px rgba(0,0,0,0.8);}
+@keyframes supernova{0%{transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),var(--z)) scale(0) rotate(-45deg);}100%{transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),var(--z)) scale(1) rotate(0deg);}}
 
-/* ── Loading Spinner ── */
-#loading {
-  position:fixed; inset:0; background:rgba(1,2,4,0.95); z-index:200;
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  transition:opacity 0.5s; backdrop-filter: blur(5px);
-}
-.spinner { width: 60px; height: 60px; border: 4px solid rgba(255,255,255,0.1); border-top-color: #f59e0b; border-radius: 50%; animation: spin 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite; margin-bottom:20px;}
-@keyframes spin { to { transform: rotate(360deg); } }
-#loading-msg { color: #f59e0b; font-family: monospace; letter-spacing: 3px; text-transform: uppercase; font-size: 14px; font-weight: bold;}
+/* ── Loading ── */
+#loading{position:fixed;inset:0;background:rgba(1,2,4,0.97);z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 0.5s;backdrop-filter:blur(5px);}
+.spinner{width:56px;height:56px;border:4px solid rgba(255,255,255,0.08);border-top-color:#f59e0b;border-radius:50%;animation:spin 0.9s cubic-bezier(0.68,-0.55,0.265,1.55) infinite;margin-bottom:18px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+#loading-msg{color:#f59e0b;font-family:monospace;letter-spacing:3px;text-transform:uppercase;font-size:13px;font-weight:bold;}
+#loading-sub{color:#475569;font-size:10px;letter-spacing:2px;margin-top:8px;}
 
-/* ── Detail sheet (Janm Kundali) ── */
+/* ── Detail / Kundali Sheet ── */
 #detail{
   position:fixed;bottom:-100%;left:0;right:0;
-  background:rgba(13,22,37,0.95);border-top:2px solid rgba(56,189,248,.5);
+  background:rgba(8,16,32,0.97);border-top:2px solid rgba(56,189,248,.5);
   border-radius:32px 32px 0 0;z-index:250;
-  padding:clamp(20px,5vw,30px);
+  padding:clamp(16px,4vw,28px);
   transition:bottom .5s cubic-bezier(.34,1.56,.64,1);
-  max-height:75vh;overflow-y:auto; backdrop-filter:blur(25px);
-  box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+  max-height:82vh;overflow-y:auto;backdrop-filter:blur(25px);
+  box-shadow:0 -10px 40px rgba(0,0,0,0.6);
 }
 #detail.open{bottom:0;}
-#detail .handle{width:50px;height:6px;background:rgba(255,255,255,.2); border-radius:6px;margin:0 auto 20px;}
-#d-icon{font-size:clamp(50px,15vw,80px);text-align:center;margin-bottom:10px; animation: bounce 2s infinite;}
-@keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+#detail .handle{width:48px;height:5px;background:rgba(255,255,255,.18);border-radius:6px;margin:0 auto 16px;cursor:pointer;}
+#d-icon{font-size:clamp(42px,12vw,68px);text-align:center;margin-bottom:8px;animation:bounce 2.5s infinite;}
+@keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+#d-title{font-size:clamp(16px,5vw,24px);color:#fff;font-weight:800;text-align:center;margin:0 0 5px;line-height:1.2;}
+#d-desc{font-size:clamp(11px,3vw,13px);color:#64748b;text-align:center;line-height:1.5;margin:0 0 16px;}
+.d-close{position:absolute;top:18px;right:22px;width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.08);color:#fff;border:none;font-size:16px;font-weight:bold;cursor:pointer;transition:.3s;}
+.d-close:hover{background:#ef4444;}
 
-#d-title{font-size:clamp(20px,6vw,28px);color:#fff;font-weight:800;text-align:center;margin:0 0 6px;}
-#d-desc{font-size:clamp(12px,3.3vw,14px);color:#94a3b8;text-align:center;line-height:1.6;margin:0 0 20px;}
-
-/* Janm Kundali Grid for Kids */
-.k-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 15px; margin-bottom: 25px; }
-.k-box { background: rgba(255,255,255,0.03); padding: 15px; border-radius: 16px; text-align: center; border: 1px solid rgba(255,255,255,0.08); transition: 0.3s; }
-.k-box:hover { transform: translateY(-5px); background: rgba(255,255,255,0.08); }
-.k-val { font-size: 28px; font-weight: 800; font-family: 'Space Grotesk'; }
-.k-lbl { font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-top: 5px; }
-
-#d-links{display:flex; justify-content: center;}
-.d-link{
-  display:inline-flex;align-items:center;justify-content:center; gap:10px;
-  background:linear-gradient(135deg, #38bdf8, #818cf8); border-radius:20px;padding:16px 30px;color:#000;
-  text-decoration:none;font-size:clamp(14px,4vw,16px);font-weight:800; text-transform:uppercase;
-  transition:transform .2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow .2s;
-  box-shadow: 0 10px 20px rgba(56,189,248,0.4);
+/* ── KUNDALI TABS ── */
+#k-tabs{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;padding-bottom:2px;}
+.k-tab{
+  flex-shrink:0;padding:7px 14px;border-radius:20px;font-size:10px;font-weight:800;
+  text-transform:uppercase;letter-spacing:.8px;cursor:pointer;
+  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:#64748b;
+  transition:all .2s;
 }
+.k-tab.on{background:rgba(56,189,248,.15);border-color:#38bdf8;color:#38bdf8;}
+
+/* ── Kundali Grid (Stats) ── */
+.k-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:18px;}
+.k-box{background:rgba(255,255,255,0.03);padding:12px;border-radius:14px;text-align:center;border:1px solid rgba(255,255,255,0.07);transition:.3s;cursor:default;}
+.k-box:hover{transform:translateY(-4px);background:rgba(255,255,255,0.07);}
+.k-val{font-size:clamp(20px,6vw,26px);font-weight:800;line-height:1.1;}
+.k-lbl{font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.8px;margin-top:4px;}
+.k-icon{font-size:16px;margin-bottom:3px;}
+
+/* ── Kundali Graph tab ── */
+#wg-canvas-wrap{width:100%;height:240px;background:rgba(0,0,0,.3);border-radius:16px;overflow:hidden;position:relative;margin-bottom:14px;}
+#wg-canvas{display:block;width:100%;height:100%;}
+#wg-legend{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
+.wg-leg-item{display:flex;align-items:center;gap:4px;font-size:9px;color:#94a3b8;}
+.wg-leg-dot{width:7px;height:7px;border-radius:50%;}
+
+/* ── Keyword cloud ── */
+#kw-cloud{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;}
+.kw-tag{padding:3px 10px;border-radius:20px;font-size:10px;font-weight:600;cursor:pointer;background:rgba(56,189,248,.1);color:#38bdf8;border:1px solid rgba(56,189,248,.2);transition:opacity .2s;}
+.kw-tag:hover{opacity:.75;}
+
+/* ── External links list ── */
+.ext-link-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:11px;}
+.ext-link-row a{color:#38bdf8;text-decoration:none;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ext-link-row a:hover{text-decoration:underline;}
+
+/* ── Launch button ── */
+#d-links{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:16px;}
+.d-link{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#38bdf8,#818cf8);border-radius:18px;padding:13px 24px;color:#000;text-decoration:none;font-size:clamp(12px,3.5vw,14px);font-weight:800;text-transform:uppercase;transition:transform .2s cubic-bezier(0.34,1.56,0.64,1),box-shadow .2s;box-shadow:0 8px 18px rgba(56,189,248,0.35);}
 .d-link:active{transform:scale(0.9);}
-.d-close{position: absolute; top: 20px; right: 25px; width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.1); color: #fff; border: none; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s;}
-.d-close:hover { background: #ef4444; }
+.d-link-sec{background:linear-gradient(135deg,#10b981,#06b6d4);}
 
 /* ── Search overlay ── */
-#search-overlay{ position:fixed;inset:0;background:rgba(1,2,4,.97); backdrop-filter:blur(16px);z-index:300; display:none;flex-direction:column; padding:clamp(16px,5vw,32px); animation:fadeUp .25s ease; }
+#search-overlay{position:fixed;inset:0;background:rgba(1,2,4,.97);backdrop-filter:blur(16px);z-index:300;display:none;flex-direction:column;padding:clamp(16px,5vw,28px);animation:fadeUp .25s ease;}
 #search-overlay.active{display:flex;}
-#search-wrap{display:flex;gap:10px;align-items:center;margin-bottom:16px;}
-#search-input{ flex:1;background:rgba(255,255,255,0.05); border:2px solid rgba(56,189,248,.35);border-radius:50px; padding:clamp(12px,3.5vw,16px) 20px;color:#fff; font-size:clamp(16px,4.5vw,20px);outline:none;font-family:inherit;font-weight:600; }
-#search-close{ width:clamp(44px,12vw,54px);height:clamp(44px,12vw,54px); border-radius:50%;background:rgba(255,255,255,0.07); border:none;color:#94a3b8;font-size:20px;cursor:pointer;flex-shrink:0; }
-#search-results{overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:10px;}
-.s-card{ display:flex;align-items:center;gap:14px; background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07); border-radius:18px;padding:clamp(12px,3.5vw,18px);cursor:pointer; animation:fadeUp .3s both;transition:background .2s; }
+#search-wrap{display:flex;gap:10px;align-items:center;margin-bottom:14px;}
+#search-input{flex:1;background:rgba(255,255,255,0.05);border:2px solid rgba(56,189,248,.35);border-radius:50px;padding:clamp(11px,3.5vw,15px) 18px;color:#fff;font-size:clamp(15px,4.5vw,19px);outline:none;font-family:inherit;font-weight:600;}
+#search-close{width:clamp(44px,12vw,52px);height:clamp(44px,12vw,52px);border-radius:50%;background:rgba(255,255,255,0.07);border:none;color:#94a3b8;font-size:19px;cursor:pointer;flex-shrink:0;}
+#search-results{overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:8px;}
+.s-card{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:clamp(10px,3.5vw,16px);cursor:pointer;animation:fadeUp .3s both;transition:background .2s;}
 .s-card:active{background:rgba(255,255,255,0.09);}
-.s-em{font-size:clamp(24px,6vw,30px);flex-shrink:0;}
-.s-body h3{margin:0 0 3px;font-size:clamp(14px,4vw,18px);color:#fff;font-weight:700;}
-@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.s-em{font-size:clamp(22px,5.5vw,28px);flex-shrink:0;}
+.s-body h3{margin:0 0 2px;font-size:clamp(13px,3.8vw,16px);color:#fff;font-weight:700;}
+.s-body p{font-size:10px;color:#64748b;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
 
+/* ── Error toast ── */
+#toast{position:fixed;top:60px;left:50%;transform:translateX(-50%);background:#ef4444;color:#fff;padding:10px 20px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:1px;z-index:400;display:none;animation:fadeUp .3s;}
+#toast.show{display:block;}
 </style>
 </head>
 <body>
 
-<!-- ── HUD ── -->
+<!-- HUD -->
 <div id="hud">
   <div class="telemetry">
     <div id="status">✨ Awakening Knowledge</div>
-    <div id="path-log" style="font-size:9px;color:#64748b;letter-spacing:2px;margin-top:4px;">Miraheze Universe</div>
+    <div id="path-log" style="font-size:9px;color:#64748b;letter-spacing:2px;margin-top:3px;">Miraheze Universe</div>
   </div>
   <div class="coords">
-    <div id="coord-display">Z: 1.000</div>
+    <div id="coord-display">Z: 0.500</div>
     <div class="hint">DOUBLE-TAP TO RESET</div>
   </div>
 </div>
 
-<!-- ── 3D Viewport ── -->
+<!-- 3D Viewport -->
 <div id="viewport"><div id="hub"><svg id="lines"></svg></div></div>
 
-<!-- ── Loading Overlay ── -->
+<!-- Loading -->
 <div id="loading">
   <div class="spinner"></div>
-  <div id="loading-msg">Planting Magic Seeds...</div>
+  <div id="loading-msg">Planting Magic Seeds…</div>
+  <div id="loading-sub">Connecting to Miraheze Universe</div>
 </div>
 
-<!-- ── Bottom Toolbar ── -->
+<!-- Toast -->
+<div id="toast"></div>
+
+<!-- Toolbar -->
 <div id="toolbar">
   <div class="tb" onclick="openSearch()"><span class="em">🔍</span><span class="lb">Search</span></div>
   <div class="tb" onclick="Engine.resetUniverse()"><span class="em">🌸</span><span class="lb">Flower</span></div>
   <div class="tb" onclick="Engine.rollSurprise()"><span class="em">🎲</span><span class="lb">Jump</span></div>
-  <div class="tb" onclick="alert('Voice search active soon!')"><span class="em" id="v-icon">👂</span><span class="lb">Voice</span></div>
+  <div class="tb" onclick="Engine.toggleView()"><span class="em" id="view-icon">🕸️</span><span class="lb" id="view-lb">Graph</span></div>
+  <div class="tb" onclick="Engine.shareKundali()"><span class="em">📤</span><span class="lb">Share</span></div>
 </div>
 
-<!-- ── Search ── -->
+<!-- Search -->
 <div id="search-overlay">
   <div id="search-wrap">
-    <input id="search-input" type="search" placeholder="Find a Magical Page..." autocomplete="off" oninput="runSearch(this.value)">
+    <input id="search-input" type="search" placeholder="Find a Knowledge Page…" autocomplete="off" oninput="runSearch(this.value)">
     <button id="search-close" onclick="closeSearch()">✕</button>
   </div>
   <div id="search-results"></div>
 </div>
 
-<!-- ── Detail Sheet (Kids Janm Kundali Viewer) ── -->
+<!-- Detail / Kundali Sheet -->
 <div id="detail">
   <div class="handle" onclick="closeDetail()"></div>
   <button class="d-close" onclick="closeDetail()">✕</button>
-  
   <div id="d-icon">📄</div>
-  <div id="d-title">Node Title</div>
-  <div id="d-desc">Magical Data Profile</div>
-  
-  <!-- The Janm Kundali Grid -->
-  <div class="k-grid" id="k-grid-container" style="display:none;">
-      <div class="k-box"><div class="k-val" id="k-words" style="color: #38bdf8;">0</div><div class="k-lbl">Words</div></div>
-      <div class="k-box"><div class="k-val" id="k-links" style="color: #10b981;">0</div><div class="k-lbl">Links</div></div>
-      <div class="k-box"><div class="k-val" id="k-media" style="color: #f59e0b;">0</div><div class="k-lbl">Images</div></div>
-      <div class="k-box"><div class="k-val" id="k-cats" style="color: #c084fc;">0</div><div class="k-lbl">Categories</div></div>
+  <div id="d-title">Page Title</div>
+  <div id="d-desc">Loading DNA…</div>
+
+  <!-- Kundali Tabs -->
+  <div id="k-tabs">
+    <div class="k-tab on" onclick="KD.tab('stats')">📊 Stats</div>
+    <div class="k-tab" onclick="KD.tab('graph')">🕸️ Graph</div>
+    <div class="k-tab" onclick="KD.tab('keywords')">🧬 Concepts</div>
+    <div class="k-tab" onclick="KD.tab('links')">🔗 Links</div>
+  </div>
+
+  <!-- Stats panel -->
+  <div id="kd-stats">
+    <div class="k-grid" id="k-grid"></div>
+  </div>
+
+  <!-- Mini-graph panel -->
+  <div id="kd-graph" style="display:none">
+    <div id="wg-canvas-wrap"><canvas id="wg-canvas"></canvas></div>
+    <div id="wg-legend"></div>
+  </div>
+
+  <!-- Keywords panel -->
+  <div id="kd-keywords" style="display:none">
+    <div id="kw-cloud"></div>
+  </div>
+
+  <!-- Links panel -->
+  <div id="kd-links" style="display:none">
+    <div id="ext-links-list"></div>
   </div>
 
   <div id="d-links"></div>
@@ -257,28 +256,240 @@ svg{
 
 <script>
 // ============================================================================
-// THE ENGINE: MIRAHEZE API + MAGICAL PHYLLOTAXIS BLOOM
+// KHELA WONDERGRAPH — Enhanced Phyllotaxis Universe + Full Kundali DNA
 // ============================================================================
 
-const API_BASE = "https://kids.miraheze.org/w/api.php?origin=*&format=json";
+const API = "https://kids.miraheze.org/w/api.php?origin=*&format=json";
+const WIKI_BASE = "https://kids.miraheze.org/wiki/";
 const SVG_O = 10000;
 
-// Kid-friendly magical SVG-like Emojis for the bloomed petals
-const MAGICAL_ICONS = ['🌟','🚀','🎈','🎨','🦁','🍎','🌈','🧩','🦋','🧸','🦖','🛸','🌞','🌻','🍄','🐠','🍓','💎','🔮','🎭'];
+const ICONS = ['🌟','🚀','🎈','🎨','🦁','🍎','🌈','🧩','🦋','🧸','🦖','🛸','🌞','🌻','🍄','🐠','🍓','💎','🔮','🎭','📚','🎯','🌊','🔥','⚡','🎪','🏔️','🌺','🦚','🎵'];
 
+// Node colours for mini-graph
+const NC = { root:'#38bdf8', wiki:'#60a5fa', category:'#a78bfa', section:'#34d399', template:'#fbbf24', image:'#f87171', external:'#fb923c', reference:'#22d3ee' };
+
+// ============================================================================
+// KUNDALI DISPLAY CONTROLLER
+// ============================================================================
+const KD = {
+  current: null,  // { stats, nodes, edges, keywords, extLinks }
+  activeTab: 'stats',
+  miniNodes: [], miniEdges: [],
+  af: null,
+
+  tab(name) {
+    this.activeTab = name;
+    document.querySelectorAll('.k-tab').forEach((t,i) => {
+      t.classList.toggle('on', ['stats','graph','keywords','links'][i] === name);
+    });
+    document.getElementById('kd-stats').style.display   = name==='stats'    ? '' : 'none';
+    document.getElementById('kd-graph').style.display   = name==='graph'    ? '' : 'none';
+    document.getElementById('kd-keywords').style.display= name==='keywords' ? '' : 'none';
+    document.getElementById('kd-links').style.display   = name==='links'    ? '' : 'none';
+    if(name==='graph' && this.current) this.renderMiniGraph();
+  },
+
+  render(data, icon='📄') {
+    this.current = data;
+    const s = data.stats;
+
+    // Stats grid
+    const statDefs = [
+      { val: s.wordCount?.toLocaleString()||'0', lbl:'Words',       col:'#38bdf8', icon:'📝' },
+      { val: s.linkCount||0,                      lbl:'Int. Links',  col:'#10b981', icon:'🔗' },
+      { val: s.imageCount||0,                     lbl:'Images',      col:'#f59e0b', icon:'🖼️' },
+      { val: s.videoCount||0,                     lbl:'Videos',      col:'#818cf8', icon:'🎬' },
+      { val: s.categoryCount||0,                  lbl:'Categories',  col:'#a78bfa', icon:'🏷️' },
+      { val: s.sectionCount||0,                   lbl:'Sections',    col:'#34d399', icon:'📑' },
+      { val: s.refCount||0,                       lbl:'References',  col:'#22d3ee', icon:'📚' },
+      { val: s.citCount||0,                       lbl:'Citations',   col:'#06b6d4', icon:'🔖' },
+      { val: s.templateCount||0,                  lbl:'Templates',   col:'#fbbf24', icon:'⚙️' },
+      { val: s.extLinkCount||0,                   lbl:'Ext. Links',  col:'#fb923c', icon:'🌐' },
+      { val: s.recentEdits||0,                    lbl:'Edits 30d',   col:'#ef4444', icon:'✏️' },
+      { val: s.pageSize ? (s.pageSize/1000).toFixed(1)+'K' : '?', lbl:'Page Size', col:'#64748b', icon:'💾' },
+    ];
+
+    document.getElementById('k-grid').innerHTML = statDefs.map(d =>
+      `<div class="k-box">
+        <div class="k-icon">${d.icon}</div>
+        <div class="k-val" style="color:${d.col}">${d.val}</div>
+        <div class="k-lbl">${d.lbl}</div>
+      </div>`
+    ).join('');
+
+    // Keywords
+    document.getElementById('kw-cloud').innerHTML = (data.keywords||[]).map(kw =>
+      `<span class="kw-tag">${kw}</span>`
+    ).join('');
+
+    // External links
+    const extEl = document.getElementById('ext-links-list');
+    if(data.extLinks && data.extLinks.length) {
+      extEl.innerHTML = data.extLinks.slice(0,20).map(u =>
+        `<div class="ext-link-row"><a href="${u}" target="_blank">${u.slice(0,60)}${u.length>60?'…':''}</a></div>`
+      ).join('');
+    } else {
+      extEl.innerHTML = '<div style="color:#475569;font-size:11px;padding:12px 0">No external links found</div>';
+    }
+
+    // Build mini-graph nodes/edges
+    this.buildMiniGraph(data);
+  },
+
+  buildMiniGraph(data) {
+    const s = data.stats;
+    const root = { id:'root', label: s.title?.slice(0,16)||'Page', type:'root', w:10, x:0, y:0, vx:0, vy:0 };
+    const nodes = [root];
+    const edges = [];
+
+    const add = (id, label, type, weight, count) => {
+      if(!count) return;
+      const n = { id, label:`${label} (${count})`, type, w: Math.max(3, Math.min(8, weight)), x:0, y:0, vx:0, vy:0 };
+      nodes.push(n);
+      edges.push({ s:'root', t:id, w:weight*0.5 });
+    };
+
+    add('words',    `${(s.wordCount||0).toLocaleString()}w`, 'wiki',      7, s.wordCount);
+    add('links',    'Links',      'wiki',      5, s.linkCount);
+    add('cats',     'Categories', 'category',  4, s.categoryCount);
+    add('secs',     'Sections',   'section',   4, s.sectionCount);
+    add('imgs',     'Images',     'image',     3, s.imageCount);
+    add('refs',     'References', 'reference', 3, s.refCount);
+    add('tmpls',    'Templates',  'template',  3, s.templateCount);
+    add('ext',      'Ext Links',  'external',  3, s.extLinkCount);
+    add('edits',    '30d Edits',  'reference', 4, s.recentEdits);
+
+    // Init positions radially
+    nodes.forEach((n,i) => {
+      const a = (i/nodes.length)*Math.PI*2;
+      n.x = i===0 ? 0 : Math.cos(a)*80;
+      n.y = i===0 ? 0 : Math.sin(a)*60;
+    });
+
+    this.miniNodes = nodes;
+    this.miniEdges = edges;
+  },
+
+  renderMiniGraph() {
+    const wrap = document.getElementById('wg-canvas-wrap');
+    const cv = document.getElementById('wg-canvas');
+    cv.width = wrap.clientWidth * devicePixelRatio;
+    cv.height = wrap.clientHeight * devicePixelRatio;
+    cv.style.width = wrap.clientWidth + 'px';
+    cv.style.height = wrap.clientHeight + 'px';
+    const ctx = cv.getContext('2d');
+    ctx.scale(devicePixelRatio, devicePixelRatio);
+    const W = wrap.clientWidth, H = wrap.clientHeight;
+    const cx = W/2, cy = H/2;
+    let alpha = 1;
+
+    if(this.af) cancelAnimationFrame(this.af);
+    const nodes = this.miniNodes, edges = this.miniEdges;
+
+    const tick = () => {
+      alpha *= 0.97;
+      if(alpha > 0.005) {
+        // Simple force
+        for(let i=0;i<nodes.length;i++){
+          for(let j=i+1;j<nodes.length;j++){
+            const a=nodes[i],b=nodes[j];
+            const dx=b.x-a.x,dy=b.y-a.y,d=Math.sqrt(dx*dx+dy*dy)||.1;
+            const f=(600*alpha)/(d*d);
+            const fx=dx/d*f,fy=dy/d*f;
+            a.vx-=fx;a.vy-=fy;b.vx+=fx;b.vy+=fy;
+          }
+        }
+        edges.forEach(e=>{
+          const s=nodes.find(n=>n.id===e.s),t=nodes.find(n=>n.id===e.t);
+          if(!s||!t)return;
+          const dx=t.x-s.x,dy=t.y-s.y,d=Math.sqrt(dx*dx+dy*dy)||.1;
+          const f=((d-80)/d)*0.06*alpha;
+          s.vx+=dx*f;s.vy+=dy*f;t.vx-=dx*f;t.vy-=dy*f;
+        });
+        nodes.forEach(n=>{
+          n.vx+=(0-n.x)*0.003*alpha;n.vy+=(0-n.y)*0.003*alpha;
+          n.vx*=0.85;n.vy*=0.85;n.x+=n.vx;n.y+=n.vy;
+        });
+      }
+
+      ctx.clearRect(0,0,W,H);
+
+      // Draw edges
+      edges.forEach(e=>{
+        const s=nodes.find(n=>n.id===e.s),t=nodes.find(n=>n.id===e.t);
+        if(!s||!t)return;
+        ctx.beginPath();
+        ctx.moveTo(cx+s.x,cy+s.y);ctx.lineTo(cx+t.x,cy+t.y);
+        ctx.strokeStyle=`rgba(56,189,248,0.2)`;ctx.lineWidth=1;ctx.stroke();
+      });
+
+      // Draw nodes
+      nodes.forEach(n=>{
+        const r=Math.max(4,n.w*1.8);
+        const col=NC[n.type]||'#64748b';
+        ctx.beginPath();ctx.arc(cx+n.x,cy+n.y,r,0,Math.PI*2);
+        ctx.fillStyle=col+'88';ctx.fill();
+        ctx.strokeStyle=col;ctx.lineWidth=1.5;ctx.stroke();
+        if(W>300){
+          ctx.fillStyle='rgba(226,232,240,.75)';
+          ctx.font=`600 8px system-ui`;ctx.textAlign='center';
+          const lbl=n.label.length>12?n.label.slice(0,11)+'…':n.label;
+          ctx.fillText(lbl,cx+n.x,cy+n.y+r+10);
+        }
+      });
+
+      this.af=requestAnimationFrame(tick);
+    };
+    tick();
+
+    // Legend
+    const shown = [...new Set(nodes.map(n=>n.type))];
+    document.getElementById('wg-legend').innerHTML = shown.map(t =>
+      `<div class="wg-leg-item"><div class="wg-leg-dot" style="background:${NC[t]||'#64748b'}"></div>${t}</div>`
+    ).join('');
+  }
+};
+
+// ============================================================================
+// NLP-LITE: Extract keywords (no library)
+// ============================================================================
+const SW = new Set(['the','a','an','and','or','but','in','on','at','to','for','of','with','by','from','as','is','was','are','were','be','been','being','have','has','had','do','does','did','will','would','could','should','may','might','shall','can','this','that','these','those','it','its','which','who','what','where','when','how','all','any','each','not','so','if','than','then','there','here','also','about','into','through','before','after','over','under','once','page','section','see','refer','references','external','links','note','edit','history','talk','main','category','wikipedia','wikimedia','retrieved','https','http','wiki','www','org','com','net','https:','http:']);
+
+function extractKeywords(text) {
+  const words = (text||'').toLowerCase().replace(/[^a-z0-9\s]/g,' ').split(/\s+/);
+  const freq = {};
+  words.forEach((w,i) => {
+    if(w.length < 3 || SW.has(w)) return;
+    freq[w] = (freq[w]||0) + 1 + 1/(i+1);
+  });
+  for(let i=0;i<words.length-1;i++){
+    const a=words[i],b=words[i+1];
+    if(!SW.has(a)&&!SW.has(b)&&a.length>2&&b.length>2){
+      const bg=`${a} ${b}`;
+      freq[bg]=(freq[bg]||0)+1.5;
+    }
+  }
+  return Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,24).map(([w])=>w);
+}
+
+// ============================================================================
+// MAIN ENGINE
+// ============================================================================
 const Engine = {
   hub: document.getElementById('hub'),
   svg: document.getElementById('lines'),
   allPages: [],
-  dots: [], // The main flower dots
-  jnodes: [], // Drill-down magical petals
-  
-  // Camera Physics
-  cam: { x: 0, y: 0, z: window.innerWidth < 768 ? 0.2 : 0.5, rx: 0, ry: 0 },
-  tgt: { x: 0, y: 0, z: window.innerWidth < 768 ? 0.2 : 0.5, rx: 0, ry: 0 },
+  dots: [],
+  jnodes: [],
+  cam: { x:0, y:0, z:0.5, rx:0, ry:0 },
+  tgt: { x:0, y:0, z:0.5, rx:0, ry:0 },
   isMobile: window.innerWidth < 768,
+  viewMode: 'flower', // 'flower' | 'graph'
+  currentPage: null,
 
   async init() {
+    this.isMobile = window.innerWidth < 768;
+    this.cam.z = this.tgt.z = this.isMobile ? 0.22 : 0.5;
     this.setupGestures();
     this.startRenderLoop();
     await this.fetchAllPages();
@@ -288,261 +499,290 @@ const Engine = {
 
   async fetchAllPages() {
     try {
-      const res = await fetch(`${API_BASE}&action=query&list=allpages&aplimit=400`);
+      setLoadMsg('Connecting to Miraheze…', 'Fetching all pages');
+      const res = await fetch(`${API}&action=query&list=allpages&aplimit=400`);
+      if(!res.ok) throw new Error('Network error');
       const data = await res.json();
-      this.allPages = data.query.allpages; // Array of {pageid, title}
-      
-      document.getElementById('loading').style.opacity = 0;
-      setTimeout(() => document.getElementById('loading').style.display = 'none', 500);
-      
+      this.allPages = data.query?.allpages || [];
+      document.getElementById('loading').style.opacity = '0';
+      setTimeout(() => document.getElementById('loading').style.display='none', 600);
       this.updateStatus(`🌸 ${this.allPages.length} Pages Blooming`);
       this.buildFlower();
     } catch(e) {
+      document.getElementById('loading-msg').innerText = '⚠️ API Connection Failed';
+      document.getElementById('loading-sub').innerText = e.message;
       console.error(e);
-      document.getElementById('loading-msg').innerText = "API Connection Failed";
     }
   },
 
-  // 1. Build the Main Flower (All Pages - The Universe)
   buildFlower() {
-    this.dots.forEach(d => d.remove()); this.dots.length = 0;
+    this.dots.forEach(d=>d.remove()); this.dots.length=0;
     this.clearExpansion();
-
-    const c = this.isMobile ? 22 : 35; // Scaling factor
-
-    this.allPages.forEach((page, i) => {
-      // Fibonacci Phyllotaxis Math
-      const angle = i * 137.508 * (Math.PI / 180);
+    const c = this.isMobile ? 20 : 34;
+    this.allPages.forEach((page,i) => {
+      const angle = i * 137.508 * (Math.PI/180);
       const r = c * Math.sqrt(i);
       const x = r * Math.cos(angle);
       const y = r * Math.sin(angle);
-      const z = Math.sin(i * 0.1) * 60; // Beautiful 3D ripple
-      
-      // Beautiful HSL Color Gradient based on index
-      const hue = (i * 3.5) % 360;
-      const color = `hsl(${hue}, 85%, 60%)`;
-      const sz = Math.max(3, Math.min(8, 4 + i/100)); // Size grows slightly
+      const z = Math.sin(i*0.1)*60;
+      const hue = (i*3.5)%360;
+      const color = `hsl(${hue},85%,62%)`;
+      const sz = Math.max(3, Math.min(8, 3.5 + i/120));
 
       const el = document.createElement('div');
       el.className = 'dot';
-      el.style.cssText = `--x:${x}px; --y:${y}px; --z:${z}px; --col:${color}; --sz:${sz}px;`;
+      el.style.cssText = `--x:${x}px;--y:${y}px;--z:${z}px;--col:${color};--sz:${sz}px;`;
       el.innerHTML = `<div class="hit"></div><div class="title-label" style="--col:${color}">${page.title}</div>`;
-      
-      el.onclick = (e) => {
-        e.stopPropagation();
-        this.expandPage(el, page, x, y, z, color, hue);
-      };
-
+      el.onclick = e => { e.stopPropagation(); this.expandPage(el,page,x,y,z,color,hue); };
       this.hub.appendChild(el);
       this.dots.push(el);
     });
   },
 
-  // 2. Drill Down: The Magical Blooming Flower Output + Janm Kundali
+  // ── FULL KUNDALI FETCH ─────────────────────────────────────────────────
   async expandPage(dotEl, pageData, px, py, pz, pColor, baseHue) {
     this.clearExpansion();
-    
-    // Dim the rest of the flower
-    this.dots.forEach(d => { if(d !== dotEl) d.classList.add('dimmed'); });
-    
-    // Zoom into the clicked node
-    this.tgt.x = -px; this.tgt.y = -py;
-    this.tgt.z = this.isMobile ? 0.8 : 1.4;
-    this.updateStatus(`📡 Extracting Magic: ${pageData.title}`);
-    document.getElementById('path-log').innerText = `Miraheze > ${pageData.title}`;
+    this.dots.forEach(d => { if(d!==dotEl) d.classList.add('dimmed'); });
+    this.tgt.x=-px; this.tgt.y=-py;
+    this.tgt.z = this.isMobile ? 0.85 : 1.5;
+    this.updateStatus(`📡 Reading DNA: ${pageData.title}`);
+    document.getElementById('path-log').innerText=`Miraheze › ${pageData.title}`;
+    this.currentPage = pageData;
+
+    // Show sheet with loading state immediately
+    document.getElementById('d-icon').innerText='⏳';
+    document.getElementById('d-title').innerText=pageData.title;
+    document.getElementById('d-desc').innerText='Reading full page DNA…';
+    document.getElementById('k-grid').innerHTML='<div style="grid-column:1/-1;color:#64748b;font-size:11px;padding:12px 0">Loading…</div>';
+    document.getElementById('d-links').innerHTML='';
+    document.getElementById('detail').classList.add('open');
+    KD.tab('stats');
 
     try {
-      // Fetch Detailed Page Data (Text, Links, Images, Categories) for the Janm Kundali
-      const res = await fetch(`${API_BASE}&action=parse&pageid=${pageData.pageid}&prop=links|images|categories|text`);
-      const data = await res.json();
-      const parse = data.parse;
+      // ── Parallel API calls for full Kundali ──────────────────────────
 
-      // Extract Site Data (Kundali Metrics)
-      let links = [];
-      if(parse && parse.links) { links = parse.links.filter(l => l.ns === 0).slice(0, 30); } // Max 30 petals
-      
-      const textStr = parse.text ? parse.text['*'].replace(/<[^>]*>?/gm, '') : "";
-      const wordCount = textStr.split(/\s+/).filter(w => w.length > 2).length;
-      const imgCount = parse.images ? parse.images.length : 0;
-      const catCount = parse.categories ? parse.categories.length : 0;
+      // 1. Parse: links, categories, sections, images, external links, templates, wikitext
+      const [parseRes, queryRes, recentRes] = await Promise.allSettled([
+        fetch(`${API}&action=parse&pageid=${pageData.pageid}&prop=links|images|categories|sections|externallinks|templates|wikitext`),
+        fetch(`${API}&action=query&pageids=${pageData.pageid}&prop=revisions|info&rvprop=ids|timestamp|user|size&rvlimit=30&inprop=url`),
+        fetch(`${API}&action=query&list=recentchanges&rcnamespace=0&rclimit=50&rcprop=timestamp|title&rcstart=${new Date().toISOString()}&rcend=${new Date(Date.now()-30*24*60*60*1000).toISOString()}`)
+      ]);
 
-      // Show Janm Kundali Detail Sheet
-      const url = `https://kids.miraheze.org/wiki/${encodeURIComponent(pageData.title)}`;
-      this.openDetail(pageData.title, url, { words: wordCount, links: links.length, imgs: imgCount, cats: catCount });
+      const parseData  = parseRes.status==='fulfilled'  && parseRes.value.ok  ? await parseRes.value.json()  : null;
+      const queryData  = queryRes.status==='fulfilled'  && queryRes.value.ok  ? await queryRes.value.json()  : null;
+      const recentData = recentRes.status==='fulfilled' && recentRes.value.ok ? await recentRes.value.json() : null;
 
+      const parse    = parseData?.parse || {};
+      const pPage    = queryData?.query?.pages?.[pageData.pageid] || {};
+      const revs     = pPage?.revisions || [];
+
+      // ── Count recent edits for THIS page ────────────────────────────
+      const recentEdits = (recentData?.query?.recentchanges||[])
+        .filter(r=>r.title===pageData.title).length;
+
+      // ── Wikitext analysis ─────────────────────────────────────────
+      const wikitext = parse.wikitext?.['*'] || '';
+      const plainText = wikitext.replace(/\{\{[^}]*\}\}/g,'').replace(/<[^>]*>/g,'').replace(/\[\[([^\]|]*)[^\]]*\]\]/g,'$1');
+      const wordCount = plainText.split(/\s+/).filter(w=>w.length>2).length;
+      const refCount  = (wikitext.match(/<ref\b/gi)||[]).length;
+      const citCount  = (wikitext.match(/\{\{cite/gi)||[]).length;
+
+      // ── Structured data ───────────────────────────────────────────
+      const links     = (parse.links||[]).filter(l=>l.ns===0);
+      const images    = parse.images||[];
+      const cats      = parse.categories||[];
+      const sections  = parse.sections||[];
+      const templates = (parse.templates||[]).filter(t=>t.ns===10);
+      const extLinks  = parse.externallinks||[];
+
+      const videoCount = images.filter(i=>/\.(mp4|webm|ogv|ogg)$/i.test(i)).length;
+      const imageCount = images.length - videoCount;
+
+      const keywords = extractKeywords(plainText + ' ' + pageData.title + ' ' + cats.map(c=>c['*']||'').join(' ') + ' ' + sections.map(s=>s.line||'').join(' '));
+
+      const stats = {
+        title: pageData.title,
+        wordCount, linkCount: links.length,
+        imageCount, videoCount,
+        categoryCount: cats.length,
+        sectionCount: sections.length,
+        refCount, citCount,
+        templateCount: templates.length,
+        extLinkCount: extLinks.length,
+        recentEdits,
+        pageSize: revs[0]?.size||0,
+        lastEditor: revs[0]?.user||'?',
+        lastEditDate: revs[0]?.timestamp||'',
+        pageUrl: `${WIKI_BASE}${encodeURIComponent(pageData.title)}`,
+      };
+
+      // ── Store full data for tabs ──────────────────────────────────
+      const kundaliData = { stats, keywords, extLinks, nodes:[], edges:[] };
+      KD.render(kundaliData, '📄');
+
+      // Update header
+      document.getElementById('d-icon').innerText='📄';
+      document.getElementById('d-desc').innerText=
+        `${wordCount.toLocaleString()} words · ${cats.length} categories · ${recentEdits} edits in 30 days`;
+
+      // ── Launch buttons ────────────────────────────────────────────
+      document.getElementById('d-links').innerHTML=
+        `<a class="d-link" href="${stats.pageUrl}" target="_blank">🚀 Open Page</a>
+         <a class="d-link d-link-sec" href="${stats.pageUrl}?action=history" target="_blank">📜 History</a>`;
+
+      // ── Bloom the linked petals ───────────────────────────────────
       if(links.length === 0) {
-        this.updateStatus(`📄 Isolated Magic Node Reached`);
+        this.updateStatus(`📄 Leaf Node — No Outlinks`);
         return;
       }
-
-      this.updateStatus(`🌸 Blooming ${links.length} Magical Petals`);
-
-      // Spawn child nodes in a beautiful Golden Spiral (Phyllotaxis Blooming Flower)
-      links.forEach((link, i) => {
-        // Child Phyllotaxis Math
-        const angle = i * 137.508 * (Math.PI / 180);
-        // Create a hollow center so they bloom around the parent dot
-        const c = this.isMobile ? 40 : 55;
-        const r = c * Math.sqrt(i + 1) + (this.isMobile ? 60 : 100); 
-        
-        const x = px + Math.cos(angle) * r;
-        const y = py + Math.sin(angle) * r;
-        const z = pz + Math.sin(i * 0.6) * 50; // Depth wave for petals
-        const sz = this.isMobile ? 55 : 75;
-
-        // Dynamic Color for petals matching the parent's hue family
-        const petalHue = (baseHue + (i * 15)) % 360;
-        const petalColor = `hsl(${petalHue}, 90%, 65%)`;
-
-        // Select a perfect SVG-like Emoji symbol for Kindergarten Wow
-        const icon = MAGICAL_ICONS[i % MAGICAL_ICONS.length];
-
-        // Draw Magical Glowing Vine (SVG Line)
-        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        const mx = (px + x) / 2 - (y - py) * 0.2 + SVG_O;
-        const my = (py + y) / 2 + (x - px) * 0.2 + SVG_O;
-        path.setAttribute("d", `M${px+SVG_O} ${py+SVG_O} Q${mx} ${my} ${x+SVG_O} ${y+SVG_O}`);
-        path.setAttribute("class", "stellar-path");
-        path.style.stroke = petalColor;
-        path.style.strokeOpacity = "0.6";
-        path.style.animationDelay = `${i * 0.05}s`;
-        this.svg.appendChild(path);
-
-        // Child Petal Node
-        const el = document.createElement('div');
-        el.className = 'jnode';
-        el.style.cssText = `--x:${x}px; --y:${y}px; --z:${z}px; width:${sz}px; height:${sz}px; color:${petalColor}; border-color:${petalColor}; animation-delay:${i * 0.06}s;`;
-        
-        // Extract a short label
-        const shortName = link['*'].length > 15 ? link['*'].substring(0, 13) + '..' : link['*'];
-        el.innerHTML = `<div class="ji">${icon}</div><div class="jl" style="color:${petalColor}">${shortName}</div>`;
-        
-        el.onclick = (e) => {
-          e.stopPropagation();
-          const childUrl = `https://kids.miraheze.org/wiki/${encodeURIComponent(link['*'])}`;
-          // Show minimal detail for children without fetching deep metrics to save load
-          this.openDetail(link['*'], childUrl, null, icon);
-          // Auto-zoom to this child petal
-          this.tgt.x = -x; this.tgt.y = -y; this.tgt.z = this.isMobile ? 1.2 : 1.8;
-        };
-
-        this.hub.appendChild(el);
-        this.jnodes.push(el);
-      });
+      this.updateStatus(`🌸 Blooming ${Math.min(links.length,30)} Petals`);
+      this.bloomPetals(links.slice(0,30), px, py, pz, baseHue);
 
     } catch(e) {
-      this.updateStatus(`⚠️ Error blooming petals`);
-      console.error(e);
+      console.error('Kundali fetch error:', e);
+      document.getElementById('d-desc').innerText='Could not fully read DNA — see page directly.';
+      document.getElementById('d-links').innerHTML=
+        `<a class="d-link" href="${WIKI_BASE}${encodeURIComponent(pageData.title)}" target="_blank">🚀 Open Page</a>`;
+      this.updateStatus(`⚠️ Partial data — open page directly`);
+      showToast('Some data could not load — API limit or empty page');
     }
+  },
+
+  bloomPetals(links, px, py, pz, baseHue) {
+    const cScale = this.isMobile ? 38 : 52;
+    links.forEach((link, i) => {
+      const angle  = i * 137.508 * (Math.PI/180);
+      const r      = cScale * Math.sqrt(i+1) + (this.isMobile ? 55 : 95);
+      const x      = px + Math.cos(angle)*r;
+      const y      = py + Math.sin(angle)*r;
+      const z      = pz + Math.sin(i*0.6)*45;
+      const sz     = this.isMobile ? 52 : 70;
+      const petalH = (baseHue + i*14)%360;
+      const col    = `hsl(${petalH},90%,64%)`;
+      const icon   = ICONS[i%ICONS.length];
+
+      // SVG vine
+      const path = document.createElementNS("http://www.w3.org/2000/svg","path");
+      const mx=(px+x)/2-(y-py)*0.2+SVG_O, my=(py+y)/2+(x-px)*0.2+SVG_O;
+      path.setAttribute("d",`M${px+SVG_O} ${py+SVG_O} Q${mx} ${my} ${x+SVG_O} ${y+SVG_O}`);
+      path.setAttribute("class","stellar-path");
+      path.style.stroke=col; path.style.strokeOpacity="0.55";
+      path.style.animationDelay=`${i*0.045}s`;
+      this.svg.appendChild(path);
+
+      // Petal node
+      const name  = link['*']||link.title||'';
+      const short = name.length>14 ? name.slice(0,12)+'..' : name;
+      const el    = document.createElement('div');
+      el.className='jnode';
+      el.style.cssText=`--x:${x}px;--y:${y}px;--z:${z}px;width:${sz}px;height:${sz}px;color:${col};border-color:${col};animation-delay:${i*0.055}s;`;
+      el.innerHTML=`<div class="ji">${icon}</div><div class="jl" style="color:${col}">${short}</div>`;
+      el.onclick=e=>{
+        e.stopPropagation();
+        // Drill into this child page
+        const childPage = this.allPages.find(p=>p.title===name);
+        if(childPage) {
+          this.expandPage(el, childPage, x, y, z, col, petalH);
+        } else {
+          // Open directly if not in allPages list
+          const url = `${WIKI_BASE}${encodeURIComponent(name)}`;
+          document.getElementById('d-icon').innerText=icon;
+          document.getElementById('d-title').innerText=name;
+          document.getElementById('d-desc').innerText='Child petal — page may be external';
+          document.getElementById('d-links').innerHTML=`<a class="d-link" href="${url}" target="_blank">🚀 Open Page</a>`;
+          document.getElementById('detail').classList.add('open');
+        }
+        this.tgt.x=-x; this.tgt.y=-y;
+        this.tgt.z=this.isMobile?1.1:1.7;
+      };
+      this.hub.appendChild(el);
+      this.jnodes.push(el);
+    });
   },
 
   clearExpansion() {
-    this.jnodes.forEach(n => n.remove());
-    this.jnodes.length = 0;
-    this.svg.innerHTML = '';
-    this.dots.forEach(d => d.classList.remove('dimmed'));
+    this.jnodes.forEach(n=>n.remove()); this.jnodes.length=0;
+    this.svg.innerHTML='';
+    this.dots.forEach(d=>d.classList.remove('dimmed'));
+    if(KD.af) cancelAnimationFrame(KD.af);
   },
 
   resetUniverse() {
-    this.clearExpansion();
-    this.tgt = { x: 0, y: 0, z: this.isMobile ? 0.2 : 0.5, rx: 0, ry: 0 };
+    this.clearExpansion(); closeDetail();
+    this.tgt={x:0,y:0,z:this.isMobile?0.22:0.5,rx:0,ry:0};
     this.updateStatus(`🌸 The Magical Flower`);
-    document.getElementById('path-log').innerText = "Miraheze Universe";
+    document.getElementById('path-log').innerText='Miraheze Universe';
   },
 
   rollSurprise() {
-    if(this.dots.length === 0) return;
-    const randomDot = this.dots[Math.floor(Math.random() * this.dots.length)];
-    randomDot.click();
+    if(!this.dots.length) return;
+    this.dots[Math.floor(Math.random()*this.dots.length)].click();
   },
 
-  // 3. Kids "Janm Kundali" Viewer
-  openDetail(title, url, metrics, icon = '📄') {
-    document.getElementById('d-title').innerText = title;
-    document.getElementById('d-icon').innerText = icon;
-    
-    const grid = document.getElementById('k-grid-container');
-    if (metrics) {
-        document.getElementById('d-desc').innerText = "Page Data Profile (Janm Kundali)";
-        document.getElementById('k-words').innerText = metrics.words.toLocaleString();
-        document.getElementById('k-links').innerText = metrics.links.toLocaleString();
-        document.getElementById('k-media').innerText = metrics.imgs.toLocaleString();
-        document.getElementById('k-cats').innerText = metrics.cats.toLocaleString();
-        grid.style.display = 'grid';
-    } else {
-        document.getElementById('d-desc').innerText = "Magical Petal Connection";
-        grid.style.display = 'none';
-    }
-
-    document.getElementById('d-links').innerHTML = `
-      <a class="d-link" href="${url}" target="_blank">🚀 Launch to Page</a>
-    `;
-    document.getElementById('detail').classList.add('open');
+  toggleView() {
+    this.viewMode = this.viewMode==='flower' ? 'graph' : 'flower';
+    document.getElementById('view-icon').innerText = this.viewMode==='graph' ? '🌸' : '🕸️';
+    document.getElementById('view-lb').innerText   = this.viewMode==='graph' ? 'Flower' : 'Graph';
+    if(this.viewMode==='graph' && KD.current) { KD.tab('graph'); document.getElementById('detail').classList.add('open'); }
+    if(this.viewMode==='flower') closeDetail();
   },
 
-  // 4. Gestures & Rendering (v5.1 Logic)
+  shareKundali() {
+    if(!this.currentPage) { showToast('Open a page first'); return; }
+    const url = `${WIKI_BASE}${encodeURIComponent(this.currentPage.title)}`;
+    if(navigator.share) { navigator.share({title:this.currentPage.title, url}).catch(()=>{}); }
+    else { navigator.clipboard?.writeText(url).then(()=>showToast('URL copied!')).catch(()=>{}); }
+  },
+
+  // ── Gestures ──────────────────────────────────────────────────────────
   setupGestures() {
     const vp = document.getElementById('viewport');
-    
-    let drag = false, lx, ly, startX, startY;
-    let pinchDist = 0;
-    let lastTap = 0;
+    let drag=false, lx, ly, sx, sy, lastTap=0, pinchD=0;
 
     vp.onpointerdown = e => {
-      const now = Date.now();
-      if(now - lastTap < 300){ this.resetUniverse(); lastTap = 0; return; }
-      lastTap = now;
-      drag = true; lx = e.clientX; ly = e.clientY; startX = lx; startY = ly;
+      const now=Date.now();
+      if(now-lastTap<300){ this.resetUniverse(); lastTap=0; return; }
+      lastTap=now; drag=true; lx=e.clientX; ly=e.clientY; sx=lx; sy=ly;
     };
-    
     vp.onpointermove = e => {
       if(!drag) return;
-      const dx = e.clientX - lx, dy = e.clientY - ly;
-      const moved = Math.abs(e.clientX - startX) > 5 || Math.abs(e.clientY - startY) > 5;
+      const dx=e.clientX-lx, dy=e.clientY-ly;
+      const moved=Math.abs(e.clientX-sx)>5||Math.abs(e.clientY-sy)>5;
       if(moved){
-        if(e.shiftKey || e.buttons === 2){ this.tgt.ry += dx*0.3; this.tgt.rx -= dy*0.3; }
-        else { this.tgt.x += dx/this.cam.z; this.tgt.y += dy/this.cam.z; }
+        if(e.shiftKey||e.buttons===2){ this.tgt.ry+=dx*.3; this.tgt.rx-=dy*.3; }
+        else{ this.tgt.x+=dx/this.cam.z; this.tgt.y+=dy/this.cam.z; }
       }
-      lx = e.clientX; ly = e.clientY;
+      lx=e.clientX; ly=e.clientY;
     };
-    
-    vp.onpointerup = () => drag = false;
-    vp.oncontextmenu = e => e.preventDefault();
-    vp.onwheel = e => { this.tgt.z = Math.max(0.05, Math.min(5, this.tgt.z - e.deltaY * 0.0015)); };
-    
-    // Mobile Pinch
-    vp.addEventListener('touchstart', e => {
-      if(e.touches.length === 2){ drag = false; pinchDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY); }
-    }, {passive:true});
-    vp.addEventListener('touchmove', e => {
-      if(e.touches.length === 2){
-        const d = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
-        this.tgt.z = Math.max(0.05, Math.min(5, this.tgt.z + (d - pinchDist)*0.004));
-        pinchDist = d;
+    vp.onpointerup=()=>{ drag=false; };
+    vp.oncontextmenu=e=>e.preventDefault();
+    vp.onwheel=e=>{ this.tgt.z=Math.max(0.04,Math.min(6,this.tgt.z-e.deltaY*.0012)); };
+
+    vp.addEventListener('touchstart',e=>{
+      if(e.touches.length===2){ drag=false; pinchD=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY); }
+    },{passive:true});
+    vp.addEventListener('touchmove',e=>{
+      if(e.touches.length===2){
+        const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+        this.tgt.z=Math.max(0.04,Math.min(6,this.tgt.z+(d-pinchD)*0.004)); pinchD=d;
       }
-    }, {passive:true});
+    },{passive:true});
   },
 
-  lerp(a, b, t) { return a + (b - a) * t; },
+  lerp(a,b,t){ return a+(b-a)*t; },
 
   startRenderLoop() {
-    const loop = () => {
-      const f = 0.08;
-      this.cam.x = this.lerp(this.cam.x, this.tgt.x, f);
-      this.cam.y = this.lerp(this.cam.y, this.tgt.y, f);
-      this.cam.z = this.lerp(this.cam.z, this.tgt.z, f);
-      this.cam.rx = this.lerp(this.cam.rx, this.tgt.rx, f);
-      this.cam.ry = this.lerp(this.cam.ry, this.tgt.ry, f);
-
-      this.hub.style.transform = `translate(-50%,-50%) scale(${this.cam.z}) translate3d(${this.cam.x}px,${this.cam.y}px,0) rotateX(${this.cam.rx}deg) rotateY(${this.cam.ry}deg)`;
-      
-      document.getElementById('coord-display').innerText = `Z:${this.cam.z.toFixed(2)}`;
-      
-      // Auto-spin logic: slowly rotate universe if not interacting
-      if(Math.abs(this.cam.ry - this.tgt.ry) < 0.01) {
-          this.tgt.ry += 0.005;
-      }
-
+    let autoRot=0;
+    const loop=()=>{
+      const f=0.075;
+      this.cam.x=this.lerp(this.cam.x,this.tgt.x,f);
+      this.cam.y=this.lerp(this.cam.y,this.tgt.y,f);
+      this.cam.z=this.lerp(this.cam.z,this.tgt.z,f);
+      this.cam.rx=this.lerp(this.cam.rx,this.tgt.rx,f);
+      this.cam.ry=this.lerp(this.cam.ry,this.tgt.ry,f);
+      this.hub.style.transform=`translate(-50%,-50%) scale(${this.cam.z}) translate3d(${this.cam.x}px,${this.cam.y}px,0) rotateX(${this.cam.rx}deg) rotateY(${this.cam.ry}deg)`;
+      document.getElementById('coord-display').innerText=`Z:${this.cam.z.toFixed(2)}`;
+      if(Math.abs(this.cam.ry-this.tgt.ry)<0.01) this.tgt.ry+=0.004;
       requestAnimationFrame(loop);
     };
     loop();
@@ -550,54 +790,49 @@ const Engine = {
 };
 
 // ============================================================================
-// SEARCH & UI
+// SEARCH
 // ============================================================================
 function openSearch() {
   document.getElementById('search-overlay').classList.add('active');
-  setTimeout(() => document.getElementById('search-input').focus(), 100);
+  setTimeout(()=>document.getElementById('search-input').focus(),100);
   runSearch('');
 }
-function closeSearch() {
-  document.getElementById('search-overlay').classList.remove('active');
-}
-function closeDetail() {
-  document.getElementById('detail').classList.remove('open');
-}
+function closeSearch() { document.getElementById('search-overlay').classList.remove('active'); }
+function closeDetail() { document.getElementById('detail').classList.remove('open'); if(KD.af)cancelAnimationFrame(KD.af); }
+
 function runSearch(q) {
-  const c = document.getElementById('search-results');
-  const query = q.toLowerCase();
-  
-  // Filter the loaded allPages array
-  const results = Engine.allPages.filter(p => p.title.toLowerCase().includes(query)).slice(0, 15);
-  
-  if(results.length === 0) {
-    c.innerHTML = `<div style="text-align:center;padding:20px;color:#475569;">No magical pages found 🍄</div>`;
-    return;
-  }
-  
-  c.innerHTML = results.map((item, i) => `
-    <div class="s-card" style="animation-delay:${i*30}ms" onclick="jumpToPage('${item.title}')">
+  const c=document.getElementById('search-results');
+  const results=Engine.allPages.filter(p=>p.title.toLowerCase().includes(q.toLowerCase())).slice(0,16);
+  if(!results.length){ c.innerHTML=`<div style="text-align:center;padding:20px;color:#475569">No pages found 🍄</div>`; return; }
+  c.innerHTML=results.map((item,i)=>`
+    <div class="s-card" style="animation-delay:${i*25}ms" onclick="jumpToPage('${item.title.replace(/'/g,"\\'")}')">
       <div class="s-em">📄</div>
-      <div class="s-body"><h3>${item.title}</h3></div>
+      <div class="s-body"><h3>${item.title}</h3><p>kids.miraheze.org wiki</p></div>
     </div>`).join('');
 }
+
 function jumpToPage(title) {
   closeSearch();
-  // Find dot with this title and trigger click
-  const targetDot = Array.from(document.querySelectorAll('.dot')).find(el => el.querySelector('.title-label').innerText === title);
-  if(targetDot) {
-    targetDot.click();
-  } else {
-    // Fallback if dot not found
-    Engine.updateStatus(`Jumping to ${title}`);
-    const url = `https://kids.miraheze.org/wiki/${encodeURIComponent(title)}`;
-    Engine.openDetail(title, url, null, '🚀');
-  }
+  const dot=Array.from(document.querySelectorAll('.dot')).find(el=>el.querySelector('.title-label')?.innerText===title);
+  if(dot) dot.click();
+  else Engine.updateStatus(`Navigating to ${title}`);
 }
 
-// IGNITION
-window.onload = () => Engine.init();
+// ── Toast ─────────────────────────────────────────────────────────────────
+function showToast(msg) {
+  const t=document.getElementById('toast');
+  t.innerText=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
 
+// ── Loading text ──────────────────────────────────────────────────────────
+function setLoadMsg(main,sub) {
+  document.getElementById('loading-msg').innerText=main;
+  document.getElementById('loading-sub').innerText=sub||'';
+}
+
+// ── IGNITION ──────────────────────────────────────────────────────────────
+window.onload=()=>Engine.init();
 </script>
 </body>
 </html>
