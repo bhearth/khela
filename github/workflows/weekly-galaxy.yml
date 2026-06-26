@@ -1,0 +1,27 @@
+name: Weekly Knowledge Galaxy Update
+
+on:
+  schedule:
+    - cron: '0 0 * * 0'  # Every Sunday at midnight UTC
+  workflow_dispatch:       # Allows manual trigger
+
+jobs:
+  update-graph:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+      
+      - name: Install dependencies
+        run: npm install node-fetch
+      
+      - name: Run Knowledge Galaxy Worker
+        env:
+          QWEN_API_KEY: ${{'sk-ws-H.LMPDLM.b4tI.MEUCIDvHspyy0_aP_DmBExNqd5E3kAx--PpgIZZokc93Hbq-AiEAt9AqGmFfh4XnFlR2kGpg9-ecpPmyZuss2y0DFQqqhlI'}}
+          WIKI_USERNAME: ${{'Krishnaheda@JS'}}
+          WIKI_PASSWORD: ${{'f6c7br84vnpafsvuep4m7b2d4q6op6qp'}}
+        run: node galaxy-worker.js
