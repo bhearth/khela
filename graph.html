@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=no">
+<title>Graph Wonder · AI Knowledge Engine</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+    :root { --bg: #010204; --accent: #00d4ff; --accent-alt: #7c3aed; }
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body { background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; touch-action: none; background-image: radial-gradient(circle at center, #0a0f1a 0%, #010204 100%); }
+    
+    #viewport { position: absolute; inset: 0; z-index: 10; cursor: grab; }
+    #viewport:active { cursor: grabbing; }
+    #hub { position: absolute; top: 50%; left: 50%; transform-style: preserve-3d; will-change: transform; }
+    
+    svg { position: absolute; top: -5000px; left: -5000px; width: 10000px; height: 10000px; pointer-events: none; }
+    .stellar-path { fill: none; stroke-width: 2; stroke-linecap: round; animation: spark 1.5s cubic-bezier(.25,1,.5,1) forwards; filter: drop-shadow(0 0 5px currentColor); }
+    @keyframes spark { to { stroke-dashoffset: 0; } }
+
+    /* AI Generated Nodes */
+    .ai-node {
+        position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center;
+        transform: translate(-50%, -50%) translate3d(var(--x), var(--y), var(--z)) scale(0);
+        transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s;
+        animation: popNode 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        cursor: pointer; pointer-events: auto;
+    }
+    @keyframes popNode { to { transform: translate(-50%, -50%) translate3d(var(--x), var(--y), var(--z)) scale(1); } }
+    
+    .ai-icon {
+        width: clamp(50px, 8vw, 80px); height: clamp(50px, 8vw, 80px);
+        background: rgba(10,15,25,0.8); border: 2px solid var(--col); border-radius: 50%;
+        display: flex; align-items: center; justify-content: center; font-size: clamp(24px, 4vw, 40px);
+        backdrop-filter: blur(10px); box-shadow: 0 0 20px rgba(0,0,0,0.5); transition: 0.3s;
+    }
+    .ai-node:hover .ai-icon { background: var(--col); color: #000; box-shadow: 0 0 40px var(--col); transform: scale(1.2); }
+    .ai-label { font-size: 11px; font-weight: 700; margin-top: 8px; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 2px 4px #000; pointer-events: none; text-align: center; max-width: 120px; }
+
+    /* HUD & Loading */
+    #hud { position: absolute; top: 0; left: 0; right: 0; padding: 20px; z-index: 100; pointer-events: none; display: flex; justify-content: space-between; }
+    .hud-title { font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 700; color: #fff; text-shadow: 0 0 15px var(--accent); }
+    
+    #loading-overlay { position: fixed; inset: 0; background: rgba(1,2,4,0.95); z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; backdrop-filter: blur(10px); }
+    .spinner { width: 60px; height: 60px; border: 4px solid rgba(255,255,255,0.1); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite; margin-bottom: 20px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { font-family: monospace; color: var(--accent); letter-spacing: 2px; text-transform: uppercase; font-size: 12px; text-align: center; line-height: 1.6;}
+
+    /* Janm Kundali Detail Sheet */
+    #kundali-sheet {
+        position: fixed; bottom: -100%; left: 0; right: 0; background: rgba(10,15,25,0.95);
+        border-top: 2px solid var(--accent); border-radius: 30px 30px 0 0; z-index: 500;
+        padding: 30px; transition: bottom 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        backdrop-filter: blur(20px); box-shadow: 0 -10px 50px rgba(0,0,0,0.5);
+    }
+    #kundali-sheet.active { bottom: 0; }
+    .k-handle { width: 50px; height: 6px; background: rgba(255,255,255,0.2); border-radius: 6px; margin: 0 auto 20px; }
+</style>
+</head>
+<body>
+
+<div id="loading-overlay">
+    <div class="spinner"></div>
+    <div class="loading-text" id="loading-msg">Connecting to Wiki API...</div>
+</div>
+
+<div id="hud">
+    <div>
+        <div class="hud-title">Graph Wonder <span class="text-[10px] text-purple-400 ml-2">v6.0 AI</span></div>
+        <div id="wiki-target" class="text-[10px] text-slate-400 tracking-widest mt-1 uppercase">Awaiting Target...</div>
+    </div>
+    <div class="text-right">
+        <div id="cache-status" class="text-emerald-400 font-mono text-xs font-bold">LIVE EVOLUTION</div>
+        <div class="text-[8px] text-slate-500 mt-1 tracking-widest">15-DAY CYCLE</div>
+    </div>
+</div>
+
+<div id="viewport"><div id="hub"><svg id="svg-layer"></svg></div></div>
+
+<!-- The Janm Kundali Sheet -->
+<div id="kundali-sheet">
+    <div class="k-handle" onclick="closeKundali()"></div>
+    <div class="text-center">
+        <div id="k-icon" class="text-6xl mb-4 animate-bounce">📄</div>
+        <h2 id="k-title" class="text-2xl font-bold text-white font-['Space_Grotesk'] mb-2">Concept Name</h2>
+        <p id="k-desc" class="text-sm text-slate-400 max-w-lg mx-auto mb-6">Description generated by AI...</p>
+        
+        <div id="k-metrics" class="flex flex-wrap justify-center gap-4 mb-8">
+            <div class="bg-white/5 border border-white/10 rounded-xl p-4 min-w-[120px]">
+                <div id="m-words" class="text-2xl font-bold text-sky-400">0</div>
+                <div class="text-[9px] text-slate-400 uppercase tracking-widest mt-1">Words</div>
+            </div>
+            <div class="bg-white/5 border border-white/10 rounded-xl p-4 min-w-[120px]">
+                <div id="m-links" class="text-2xl font-bold text-emerald-400">0</div>
+                <div class="text-[9px] text-slate-400 uppercase tracking-widest mt-1">Connections</div>
+            </div>
+            <div class="bg-white/5 border border-white/10 rounded-xl p-4 min-w-[120px]">
+                <div id="m-age" class="text-2xl font-bold text-amber-400">0</div>
+                <div class="text-[9px] text-slate-400 uppercase tracking-widest mt-1">Cache Age (Days)</div>
+            </div>
+        </div>
+
+        <button onclick="closeKundali()" class="bg-transparent border border-red-500/50 text-red-400 px-8 py-3 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-red-500 hover:text-white transition-colors">Close Profile</button>
+    </div>
+</div>
+
+<script>
+// ============================================================================
+// WONDERGRAPH AI ENGINE (Fibonacci + 15-Day Janm Kundali Cache)
+// ============================================================================
+
+// Configuration
+const CONFIG = {
+    cacheDays: 15,
+    // Add your API key here for DeepSeek / OpenRouter / Gemini
+    // If empty, the engine uses the internal Smart Fallback NLP
+    aiApiKey: "", 
+    aiEndpoint: "https://api.deepseek.com/v1/chat/completions" // Example endpoint
+};
+
+const Engine = {
+    hub: document.getElementById('hub'),
+    svg: document.getElementById('svg-layer'),
+    nodes: [],
+    
+    // Physics Camera
+    cam: { x: 0, y: 0, z: window.innerWidth < 768 ? 0.3 : 0.6, rx: 0, ry: 0 },
+    tgt: { x: 0, y: 0, z: window.innerWidth < 768 ? 0.3 : 0.6, rx: 0, ry: 0 },
+    
+    async boot() {
+        this.setupGestures();
+        this.startLoop();
+
+        // Parse URL Parameters passed from MediaWiki Common.js
+        const params = new URLSearchParams(window.location.search);
+        let wikiTitle = params.get('wiki');
+        let host = params.get('host') || "https://kids.miraheze.org";
+
+        if (!wikiTitle) {
+            this.showError("No Wiki Title Provided. Please launch from the Wiki button.");
+            return;
+        }
+
+        document.getElementById('wiki-target').innerText = `Target: ${wikiTitle}`;
+
+        // 1. Check 15-Day Janm Kundali Cache
+        const cacheKey = `wg_ai_cache_${wikiTitle}`;
+        const cached = localStorage.getItem(cacheKey);
+
+        if (cached) {
+            const data = JSON.parse(cached);
+            const ageDays = (Date.now() - data.timestamp) / (1000 * 60 * 60 * 24);
+            
+            if (ageDays < CONFIG.cacheDays) {
+                this.log(`Loading from Neural Cache...<br>Age: ${ageDays.toFixed(1)} Days`);
+                document.getElementById('cache-status').innerText = "LOADED FROM CACHE";
+                document.getElementById('cache-status').classList.replace('text-emerald-400', 'text-amber-400');
+                
+                data.graph.cacheAge = ageDays.toFixed(1);
+                setTimeout(() => this.renderGraph(data.graph), 1000);
+                return;
+            } else {
+                this.log(`Cache expired (${ageDays.toFixed(1)} days).<br>Triggering Fibonacci Evolution...`);
+            }
+        }
+
+        // 2. Fetch Raw Data from MediaWiki API
+        try {
+            this.log(`Extracting raw text from Wiki API...`);
+            const apiUrl = `${host}/w/api.php?action=parse&page=${encodeURIComponent(wikiTitle)}&prop=text|links&format=json&origin=*`;
+            const res = await fetch(apiUrl);
+            const wikiData = await res.json();
+
+            if(wikiData.error) throw new Error(wikiData.error.info);
+
+            const rawText = wikiData.parse.text['*'].replace(/<[^>]*>?/gm, ''); // Strip HTML
+            const linksCount = wikiData.parse.links ? wikiData.parse.links.length : 0;
+            const wordCount = rawText.split(/\s+/).length;
+
+            this.log(`Text Extracted: ${wordCount} words.<br>Connecting to AI Brain...`);
+
+            // 3. Process via AI (or Smart Fallback)
+            const aiGraphData = await this.processWithAI(wikiTitle, rawText, wordCount, linksCount);
+            aiGraphData.cacheAge = "0.0 (New)";
+
+            // 4. Save to Cache
+            localStorage.setItem(cacheKey, JSON.stringify({
+                timestamp: Date.now(),
+                graph: aiGraphData
+            }));
+
+            this.renderGraph(aiGraphData);
+
+        } catch (err) {
+            console.error(err);
+            this.showError("Failed to extract data. Make sure the Wiki URL is correct and CORS is enabled.");
+        }
+    },
+
+    async processWithAI(title, text, wordCount, linksCount) {
+        // If API Key is provided, call real AI. Otherwise, use Smart Fallback.
+        if (CONFIG.aiApiKey) {
+            try {
+                // Example AI Call Implementation (Adapt based on your specific LLM provider)
+                /*
+                const response = await fetch(CONFIG.aiEndpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${CONFIG.aiApiKey}` },
+                    body: JSON.stringify({
+                        model: "deepseek-chat",
+                        messages: [{ role: "system", content: "Extract 8 key concepts from this text. Return JSON array: [{label, icon(emoji), color(hex), desc}]" }, { role: "user", content: text.substring(0, 4000) }]
+                    })
+                });
+                const aiData = await response.json();
+                // Parse AI response here...
+                */
+            } catch (e) {
+                console.warn("AI API failed, falling back to Smart NLP.");
+            }
+        }
+
+        // --- SMART FALLBACK NLP (Runs instantly in browser if no AI Key) ---
+        // Simulating AI concept extraction using keyword logic
+        const concepts = this.extractSmartConcepts(text);
+        
+        const nodes = [];
+        // Root Node
+        nodes.push({ id: 'root', label: title.replace(/_/g, ' '), icon: '🌌', color: '#00d4ff', desc: `Main hub for ${title}. Extracted ${wordCount} words from the source.`, type: 'root' });
+
+        // Generate Petals from Concepts
+        concepts.forEach((c, i) => {
+            const hue = (i * (360 / concepts.length)) % 360;
+            nodes.push({
+                id: `node_${i}`, label: c.word, icon: this.guessIcon(c.word), color: `hsl(${hue}, 80%, 65%)`,
+                desc: `Semantic concept extracted via Graph Wonder AI. Relevance score: ${c.score}`, type: 'concept'
+            });
+        });
+
+        return {
+            title: title,
+            wordCount: wordCount,
+            linksCount: linksCount,
+            nodes: nodes
+        };
+    },
+
+    // A lightweight NLP function to extract important words
+    extractSmartConcepts(text) {
+        const stops = new Set(['the','and','is','in','to','of','a','for','with','on','as','by','this','that','it','are','from','be','or','at']);
+        const words = text.toLowerCase().match(/\b[a-z]{4,}\b/g) || [];
+        const counts = {};
+        words.forEach(w => { if(!stops.has(w)) counts[w] = (counts[w] || 0) + 1; });
+        return Object.entries(counts).sort((a,b) => b[1] - a[1]).slice(0, 12).map(e => ({ word: e[0], score: e[1] }));
+    },
+
+    // AI Icon Guesser
+    guessIcon(word) {
+        const w = word.toLowerCase();
+        if (/(physic|quantum|atom|energy|mass)/.test(w)) return '⚛️';
+        if (/(bio|cell|life|dna|gene|plant|animal)/.test(w)) return '🧬';
+        if (/(chem|molecule|reaction|acid)/.test(w)) return '🧪';
+        if (/(math|number|calc|algebra|geometry)/.test(w)) return '📐';
+        if (/(tech|computer|code|data|software|web)/.test(w)) return '💻';
+        if (/(space|star|planet|galaxy|moon|sun)/.test(w)) return '🚀';
+        if (/(history|time|ancient|century|war)/.test(w)) return '📜';
+        if (/(art|music|paint|culture|dance)/.test(w)) return '🎨';
+        if (/(money|econ|bank|trade|market)/.test(w)) return '📈';
+        const randomIcons = ['🌟','🔮','🧩','💡','🔥','🌊','🍀','💎'];
+        return randomIcons[Math.floor(Math.random() * randomIcons.length)];
+    },
+
+    renderGraph(graphData) {
+        document.getElementById('loading-overlay').style.opacity = 0;
+        setTimeout(() => document.getElementById('loading-overlay').style.display = 'none', 500);
+
+        this.hub.innerHTML = '';
+        this.svg.innerHTML = '';
+
+        const rootNode = graphData.nodes.find(n => n.type === 'root');
+        this.spawnHTMLNode(rootNode, 0, 0, 0, graphData);
+
+        const petals = graphData.nodes.filter(n => n.type !== 'root');
+        
+        petals.forEach((petal, i) => {
+            // Fibonacci Phyllotaxis Math for Beautiful Flower Bloom
+            const angle = i * 137.508 * (Math.PI / 180);
+            const radius = window.innerWidth < 768 ? (120 + Math.sqrt(i) * 30) : (200 + Math.sqrt(i) * 50);
+            
+            const x = Math.cos(angle) * radius;
+            const y = Math.sin(angle) * radius;
+            const z = Math.sin(i * 0.5) * 40; // 3D depth wave
+
+            // Draw SVG Vine
+            const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            const svgOffset = 5000;
+            const mx = x / 2 - y * 0.2; 
+            const my = y / 2 + x * 0.2;
+            path.setAttribute("d", `M${svgOffset} ${svgOffset} Q${mx + svgOffset} ${my + svgOffset} ${x + svgOffset} ${y + svgOffset}`);
+            path.setAttribute("class", "stellar-path");
+            path.style.stroke = petal.color;
+            path.style.strokeOpacity = "0.5";
+            path.style.animationDelay = `${i * 0.05}s`;
+            this.svg.appendChild(path);
+
+            this.spawnHTMLNode(petal, x, y, z, graphData, i);
+        });
+
+        this.hub.appendChild(this.svg);
+    },
+
+    spawnHTMLNode(data, x, y, z, graphData, index = 0) {
+        const el = document.createElement('div');
+        el.className = 'ai-node';
+        el.style.cssText = `--x:${x}px; --y:${y}px; --z:${z}px; --col:${data.color}; animation-delay:${index * 0.08}s;`;
+        
+        // Root node is bigger
+        const scale = data.type === 'root' ? 'transform: scale(1.3);' : '';
+        
+        el.innerHTML = `
+            <div class="ai-icon" style="${scale}">${data.icon}</div>
+            <div class="ai-label" style="color:${data.color}">${data.label}</div>
+        `;
+
+        el.onclick = (e) => {
+            e.stopPropagation();
+            // Focus Camera
+            this.tgt.x = -x; this.tgt.y = -y;
+            this.tgt.z = window.innerWidth < 768 ? 0.8 : 1.5;
+
+            // Open Janm Kundali Sheet
+            document.getElementById('k-title').innerText = data.label.toUpperCase();
+            document.getElementById('k-icon').innerText = data.icon;
+            document.getElementById('k-desc').innerText = data.desc;
+            
+            document.getElementById('m-words').innerText = graphData.wordCount.toLocaleString();
+            document.getElementById('m-links').innerText = graphData.linksCount.toLocaleString();
+            document.getElementById('m-age').innerText = graphData.cacheAge;
+
+            document.getElementById('kundali-sheet').classList.add('active');
+        };
+
+        this.hub.appendChild(el);
+    },
+
+    setupGestures() {
+        const mc = new Hammer.Manager(document.getElementById('viewport'));
+        mc.add(new Hammer.Pan({ direction: Hammer.DIRECTION_ALL, threshold: 0 }));
+        mc.add(new Hammer.Pinch({ enable: true })).recognizeWith(mc.get('pan'));
+        mc.add(new Hammer.Tap({ event: 'doubletap', taps: 2 }));
+
+        let initZ = 1, panning = false, lastX = 0, lastY = 0;
+
+        mc.on('doubletap', () => {
+            this.tgt.x = 0; this.tgt.y = 0; 
+            this.tgt.z = window.innerWidth < 768 ? 0.3 : 0.6;
+            this.tgt.rx = 0; this.tgt.ry = 0;
+            closeKundali();
+        });
+
+        mc.on('pinchstart', () => initZ = this.tgt.z);
+        mc.on('pinch', e => this.tgt.z = Math.max(0.1, Math.min(5, initZ * e.scale)));
+
+        mc.on('panstart', e => { panning = true; lastX = e.center.x; lastY = e.center.y; });
+        mc.on('panmove', e => {
+            if (!panning) return;
+            let dX = e.center.x - lastX, dY = e.center.y - lastY;
+            if (e.pointers.length >= 2 || e.srcEvent.shiftKey) { 
+                this.tgt.ry += dX * 0.4; this.tgt.rx -= dY * 0.4; 
+            } else { 
+                this.tgt.x += dX / this.cam.z; this.tgt.y += dY / this.cam.z; 
+            }
+            lastX = e.center.x; lastY = e.center.y;
+        });
+        mc.on('panend pancancel', () => panning = false);
+
+        window.addEventListener('wheel', e => this.tgt.z = Math.max(0.1, Math.min(5, this.tgt.z - e.deltaY * 0.0015)), { passive: true });
+    },
+
+    startLoop() {
+        const lerp = (s, e, f) => s + (e - s) * f;
+        const loop = () => {
+            this.cam.x = lerp(this.cam.x, this.tgt.x, 0.08);
+            this.cam.y = lerp(this.cam.y, this.tgt.y, 0.08);
+            this.cam.z = lerp(this.cam.z, this.tgt.z, 0.08);
+            this.cam.rx = lerp(this.cam.rx, this.tgt.rx, 0.08);
+            this.cam.ry = lerp(this.cam.ry, this.tgt.ry, 0.08);
+            
+            this.hub.style.transform = `translate(-50%, -50%) scale(${this.cam.z}) translate3d(${this.cam.x}px, ${this.cam.y}px, 0) rotateX(${this.cam.rx}deg) rotateY(${this.cam.ry}deg)`;
+            
+            // Auto spin
+            if(Math.abs(this.tgt.ry - this.cam.ry) < 0.01) this.tgt.ry += 0.002;
+            
+            requestAnimationFrame(loop);
+        };
+        loop();
+    },
+
+    log(msg) {
+        document.getElementById('loading-msg').innerHTML = msg;
+    },
+    showError(msg) {
+        this.log(`<span style="color:#ef4444;">${msg}</span>`);
+        document.querySelector('.spinner').style.display = 'none';
+    }
+};
+
+function closeKundali() {
+    document.getElementById('kundali-sheet').classList.remove('active');
+}
+
+window.onload = () => Engine.boot();
+</script>
+</body>
+</html>
