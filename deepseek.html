@@ -3,173 +3,498 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=no">
-<title>Khel.o · Ultimate WonderGraph</title>
+<title>Graph Wonder · AI Knowledge Engine</title>
 <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
-  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  body{background:#010204;color:#e2e8f0;font-family:system-ui,sans-serif;overflow:hidden;height:100dvh;width:100dvw;}
-  #hud{position:fixed;top:0;left:0;right:0;display:flex;justify-content:space-between;padding:15px;z-index:50;pointer-events:none;}
-  #toolbar{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:center;gap:10px;padding:15px;z-index:50;pointer-events:auto;}
-  .btn{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:10px 15px;cursor:pointer;color:#fff;}
-  #viewport{position:absolute;inset:0;z-index:10;}
-  #hub{position:absolute;top:50%;left:50%;transform-style:preserve-3d;will-change:transform;}
-  svg{position:absolute;top:-5000px;left:-5000px;width:10000px;height:10000px;pointer-events:none;}
-  .stellar-path{fill:none;stroke-width:2;stroke-linecap:round;transition:d 1s;}
-  .jnode{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:50%;cursor:pointer;background:rgba(10,15,25,0.8);border:2px solid;transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),var(--z)) scale(var(--s, 1));transition:transform 0.8s;pointer-events:auto;}
-  .jnode:hover{background:currentColor!important;color:#000!important;--s:1.3;z-index:500;box-shadow:0 0 30px currentColor;}
-  .ji{font-size:24px;} .jl{font-size:10px;font-weight:bold;margin-top:4px;}
-  #modal{position:fixed;bottom:-100%;left:0;right:0;background:#0a0f19;border-top:2px solid var(--col);border-radius:24px 24px 0 0;padding:30px;transition:0.5s;z-index:250;text-align:center;}
-  #modal.open{bottom:0;}
-  .clue{background:rgba(236,72,153,0.1);border:1px solid #ec4899;padding:10px;border-radius:10px;color:#fbcfe8;font-size:12px;margin:15px 0;}
-  #export-canvas{display:none;}
+/* ── CORE STYLES ── */
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:#010204;color:#e2e8f0;font-family:'Space Grotesk',system-ui,sans-serif;overflow:hidden;touch-action:none;user-select:none;height:100dvh;width:100dvw;background-image:radial-gradient(circle at center,#0a1128 0%,#010204 100%);}
+
+/* ── HUD & TOOLBAR ── */
+#hud{position:fixed;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:flex-start;padding:15px;pointer-events:none;z-index:50;}
+.brand{font-size:18px;font-weight:700;color:#00d4ff;text-transform:uppercase;letter-spacing:2px;text-shadow:0 0 10px rgba(0,212,255,0.6);}
+#toolbar{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:center;gap:10px;padding:15px;z-index:50;pointer-events:auto;background:linear-gradient(0deg,rgba(1,2,4,0.9) 50%,transparent);}
+.ext-btn{display:flex;flex-direction:column;align-items:center;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:10px 15px;cursor:pointer;backdrop-filter:blur(10px);transition:0.2s;}
+.ext-btn:active{transform:scale(0.9);}
+.ext-btn .icon{font-size:24px;}
+.ext-btn .label{font-size:9px;color:#94a3b8;text-transform:uppercase;margin-top:4px;font-weight:700;}
+
+/* ── 3D VIEWPORT ── */
+#viewport{position:absolute;inset:0;z-index:10;}
+#hub{position:absolute;top:50%;left:50%;transform-style:preserve-3d;will-change:transform;}
+svg{position:absolute;top:-5000px;left:-5000px;width:10000px;height:10000px;pointer-events:none;}
+.stellar-path{fill:none;stroke-width:2.5;stroke-linecap:round;transition:d 1s cubic-bezier(0.34,1.56,0.64,1);filter:drop-shadow(0 0 5px currentColor);}
+
+/* ── NODES ── */
+.jnode{
+  position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  border-radius:50%;cursor:pointer;text-align:center;
+  background:rgba(10,15,25,0.85);border:2px solid;backdrop-filter:blur(10px);
+  transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),var(--z)) scale(var(--s, 1));
+  transition:transform 0.8s cubic-bezier(.34,1.56,.64,1),box-shadow .3s;
+  pointer-events:auto;
+}
+.jnode:hover{background:currentColor!important;color:#000!important;box-shadow:0 0 30px currentColor, inset 0 0 10px #fff;z-index:500;--s:1.3;}
+.jnode .ji{font-size:clamp(20px,4vw,34px);transition:0.3s;line-height:1;}
+.jnode:hover .ji{transform:scale(1.2);}
+.jnode .jl{font-size:10px;font-weight:800;text-transform:uppercase;margin-top:6px;pointer-events:none;color:#fff;text-shadow:0 2px 4px #000;}
+
+/* ── MODALS & OVERLAYS ── */
+#loading{position:fixed;inset:0;background:rgba(1,2,4,0.95);z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 0.5s;}
+.spinner{width:50px;height:50px;border:3px solid rgba(255,255,255,0.1);border-top-color:#00d4ff;border-radius:50%;animation:spin 1s infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+#loading-msg{color:#00d4ff;font-family:monospace;letter-spacing:2px;margin-top:15px;text-align:center;}
+
+#detail-modal{
+  position:fixed;bottom:-100%;left:0;right:0;background:rgba(10,15,25,0.98);
+  border-top:2px solid var(--col, #00d4ff);border-radius:30px 30px 0 0;z-index:250;
+  padding:30px;transition:bottom 0.5s cubic-bezier(.34,1.56,.64,1);max-height:85vh;overflow-y:auto;
+  box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+}
+#detail-modal.open{bottom:0;}
+#search-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.95);backdrop-filter:blur(10px);z-index:300;display:none;padding:30px;}
+#search-overlay.open{display:flex;flex-direction:column;}
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#ef4444;color:#fff;padding:10px 20px;border-radius:20px;font-size:12px;font-weight:bold;z-index:400;display:none;}
+
+/* Kids Magic Style */
+.magic-clue { background: linear-gradient(135deg, rgba(236,72,153,0.15), rgba(139,92,246,0.15)); border: 1px solid rgba(236,72,153,0.5); padding: 15px; border-radius: 15px; color: #fbcfe8; font-size: 14px; text-align: center; margin: 15px 0; }
 </style>
 </head>
 <body>
 
 <div id="hud">
-  <div style="color:#38bdf8;font-weight:bold;letter-spacing:2px;">Khel.o OS</div>
-  <div style="text-align:right;font-size:10px;color:#94a3b8;"><span id="zoom">Z: 1.0</span><br>Live Data</div>
+  <div class="brand">Khel.o Graph</div>
+  <div style="text-align:right;font-size:10px;color:#94a3b8;font-family:monospace;">
+    <span id="zoom-level">Z: 0.50</span><br>
+    <span id="target-title">Target: Pending</span>
+  </div>
 </div>
 
 <div id="viewport"><div id="hub"><svg id="lines"></svg></div></div>
-<canvas id="export-canvas" width="1920" height="1080"></canvas>
+<canvas id="export-canvas" style="display:none;" width="1920" height="1080"></canvas>
 
-<div id="toolbar">
-  <button class="btn" onclick="KhelOS.fire('changeLayout','flower')">🌸 Flower</button>
-  <button class="btn" onclick="KhelOS.fire('changeLayout','tree')">🌳 Tree</button>
-  <button class="btn" onclick="KhelOS.fire('exportGraph')">🎨 Export</button>
+<div id="toolbar"></div>
+
+<div id="loading" style="display:none;"><div class="spinner"></div><div id="loading-msg">Processing...</div></div>
+<div id="toast" class="toast"></div>
+
+<!-- Search Overlay -->
+<div id="search-overlay">
+  <input id="search-input" type="text" placeholder="Enter Wiki Topic (e.g., Physics)..." style="width:100%;padding:15px;border-radius:30px;background:#1e293b;border:2px solid #00d4ff;color:#fff;font-size:16px;outline:none;">
+  <button onclick="document.getElementById('search-overlay').classList.remove('open')" style="margin-top:20px;padding:10px;background:transparent;color:#ef4444;font-weight:bold;border:none;cursor:pointer;">✕ Cancel</button>
 </div>
 
-<div id="modal">
-  <div style="width:40px;height:5px;background:#334155;border-radius:5px;margin:0 auto 15px;" onclick="document.getElementById('modal').classList.remove('open')"></div>
-  <div id="m-content"></div>
+<!-- Janm Kundali / Detail Modal -->
+<div id="detail-modal">
+  <div style="width:50px;height:6px;background:rgba(255,255,255,0.2);border-radius:6px;margin:0 auto 20px;cursor:pointer;" onclick="document.getElementById('detail-modal').classList.remove('open')"></div>
+  <div id="dm-content"></div>
 </div>
 
 <script>
+// ============================================================================
+// 1. KHEL.O CORE OS
+// ============================================================================
 const KhelOS = {
-  hub: document.getElementById('hub'), svg: document.getElementById('lines'),
-  nodes: [], edges: [], plugins: [],
-  cam: {x:0, y:0, z:0.5, rx:0, ry:0}, tgt: {x:0, y:0, z:0.5, rx:0, ry:0},
+  hub: document.getElementById('hub'),
+  svg: document.getElementById('lines'),
+  plugins: [],
+  nodes: [], edges: [],
   
-  use(p) { this.plugins.push(p); if(p.init) p.init(this); },
-  fire(h, d) { let r = d; for(let p of this.plugins) if(p[h]) r = p[h](r, this) || r; return r; },
+  cam: { x:0, y:0, z:0.5, rx:0, ry:0 },
+  tgt: { x:0, y:0, z:0.5, rx:0, ry:0 },
   
-  boot() { this.setupGestures(); this.loop(); this.fire('onBoot'); },
-  
-  addNode(data, x, y, z) {
-    const el = document.createElement('div'); el.className = 'jnode';
-    el.style.cssText = `--x:${x}px; --y:${y}px; --z:${z}px; width:70px; height:70px; color:${data.color}; border-color:${data.color};`;
-    el.innerHTML = `<div class="ji">${data.icon}</div><div class="jl">${data.title.substring(0,12)}</div>`;
-    const n = { el, data, tx:x, ty:y, tz:z };
-    el.onclick = (e) => { e.stopPropagation(); this.tgt.x=-n.tx; this.tgt.y=-n.ty; this.tgt.z=1.2; this.fire('onClick', n); };
-    this.hub.appendChild(el); this.nodes.push(n); return n;
+  use(plugin) {
+    this.plugins.push(plugin);
+    if(plugin.install) plugin.install(this);
   },
-  
-  addEdge(s, t, c) {
+
+  fire(hook, payload) {
+    let result = payload;
+    for(let p of this.plugins) {
+      if(p[hook]) result = p[hook](result, this) || result;
+    }
+    return result;
+  },
+
+  boot() {
+    this.setupGestures();
+    this.startLoop();
+    this.fire('onBoot');
+  },
+
+  spawnNode(data, x, y, z) {
+    const el = document.createElement('div');
+    el.className = 'jnode';
+    const sz = data.isRoot ? 100 : 75;
+    el.style.cssText = `--x:${x}px; --y:${y}px; --z:${z}px; width:${sz}px; height:${sz}px; color:${data.color}; border-color:${data.color};`;
+    
+    el.innerHTML = `<div class="ji">${data.icon}</div><div class="jl">${data.title.length > 14 ? data.title.substring(0,12)+'..' : data.title}</div>`;
+    
+    const nodeObj = { id: data.id, el, data, x, y, z, tx: x, ty: y, tz: z };
+    
+    el.onclick = (e) => {
+      e.stopPropagation();
+      this.tgt.x = -nodeObj.tx; this.tgt.y = -nodeObj.ty; this.tgt.z = 1.0;
+      this.fire('onNodeClick', nodeObj);
+    };
+
+    this.hub.appendChild(el);
+    this.nodes.push(nodeObj);
+    return nodeObj;
+  },
+
+  addEdge(source, target, color) {
     const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-    path.setAttribute("class", "stellar-path"); path.style.stroke = c; path.style.strokeOpacity = 0.5;
-    this.svg.appendChild(path); this.edges.push({s, t, el: path});
+    path.setAttribute("class", "stellar-path");
+    path.style.stroke = color; path.style.strokeOpacity = 0.5;
+    this.svg.appendChild(path);
+    this.edges.push({ s: source, t: target, el: path });
+  },
+
+  clear() {
+    this.nodes.forEach(n => n.el.remove()); this.nodes = [];
+    this.edges = []; this.svg.innerHTML = '';
+  },
+
+  showLoading(msg) {
+    document.getElementById('loading').style.display = 'flex';
+    document.getElementById('loading-msg').innerHTML = msg;
+  },
+  hideLoading() { document.getElementById('loading').style.display = 'none'; },
+  showToast(msg, isError = true) { 
+    const t = document.getElementById('toast'); 
+    t.innerText = msg; 
+    t.style.background = isError ? '#ef4444' : '#10b981';
+    t.style.display = 'block'; 
+    setTimeout(() => t.style.display = 'none', 4000);
   },
 
   setupGestures() {
     const mc = new Hammer.Manager(document.getElementById('viewport'));
-    mc.add(new Hammer.Pan({ threshold: 0 })); mc.add(new Hammer.Pinch({ enable: true })).recognizeWith(mc.get('pan'));
+    mc.add(new Hammer.Pan({ threshold: 0 }));
+    mc.add(new Hammer.Pinch({ enable: true })).recognizeWith(mc.get('pan'));
     mc.add(new Hammer.Tap({ event: 'doubletap', taps: 2 }));
-    let iz = 1, pan = false, lx = 0, ly = 0;
+
+    let initZ = 1, isPanning = false, lx = 0, ly = 0;
     
-    mc.on('doubletap', () => { this.tgt.x=0; this.tgt.y=0; this.tgt.z=0.5; this.tgt.rx=0; this.tgt.ry=0; });
-    mc.on('pinchstart', () => iz = this.tgt.z);
-    mc.on('pinch', e => this.tgt.z = Math.max(0.1, Math.min(4, iz * e.scale)));
-    mc.on('panstart', e => { pan = true; lx = e.center.x; ly = e.center.y; });
+    mc.on('doubletap', () => { this.tgt.x = 0; this.tgt.y = 0; this.tgt.z = 0.5; this.tgt.rx = 0; this.tgt.ry = 0; });
+    mc.on('pinchstart', () => initZ = this.tgt.z);
+    mc.on('pinch', e => this.tgt.z = Math.max(0.1, Math.min(4, initZ * e.scale)));
+    mc.on('panstart', e => { isPanning = true; lx = e.center.x; ly = e.center.y; });
     mc.on('panmove', e => {
-      if(!pan) return; let dx = e.center.x - lx, dy = e.center.y - ly;
-      if (e.pointers.length >= 2 || e.srcEvent.shiftKey) { this.tgt.ry += dx*0.4; this.tgt.rx -= dy*0.4; } 
-      else { this.tgt.x += dx/this.cam.z; this.tgt.y += dy/this.cam.z; }
+      if(!isPanning) return;
+      let dx = e.center.x - lx, dy = e.center.y - ly;
+      if (e.pointers.length >= 2 || e.srcEvent.shiftKey) { this.tgt.ry += dx * 0.4; this.tgt.rx -= dy * 0.4; } 
+      else { this.tgt.x += dx / this.cam.z; this.tgt.y += dy / this.cam.z; }
       lx = e.center.x; ly = e.center.y;
     });
-    mc.on('panend', () => pan = false);
+    mc.on('panend', () => isPanning = false);
     window.onwheel = e => this.tgt.z = Math.max(0.1, Math.min(4, this.tgt.z - e.deltaY * 0.0015));
   },
 
-  loop() {
-    const lerp = (s,e,f) => s+(e-s)*f; const O = 5000;
-    const tick = () => {
-      this.cam.x=lerp(this.cam.x,this.tgt.x,0.08); this.cam.y=lerp(this.cam.y,this.tgt.y,0.08); this.cam.z=lerp(this.cam.z,this.tgt.z,0.08);
-      this.cam.rx=lerp(this.cam.rx,this.tgt.rx,0.08); this.cam.ry=lerp(this.cam.ry,this.tgt.ry,0.08);
-      this.hub.style.transform = `translate(-50%,-50%) scale(${this.cam.z}) translate3d(${this.cam.x}px,${this.cam.y}px,0) rotateX(${this.cam.rx}deg) rotateY(${this.cam.ry}deg)`;
-      document.getElementById('zoom').innerText = `Z: ${this.cam.z.toFixed(2)}`;
+  startLoop() {
+    const lerp = (s, e, f) => s + (e - s) * f;
+    const SVG_O = 5000;
+    const loop = () => {
+      this.cam.x = lerp(this.cam.x, this.tgt.x, 0.08); this.cam.y = lerp(this.cam.y, this.tgt.y, 0.08);
+      this.cam.z = lerp(this.cam.z, this.tgt.z, 0.08);
+      this.cam.rx = lerp(this.cam.rx, this.tgt.rx, 0.08); this.cam.ry = lerp(this.cam.ry, this.tgt.ry, 0.08);
+      
+      this.hub.style.transform = `translate(-50%, -50%) scale(${this.cam.z}) translate3d(${this.cam.x}px, ${this.cam.y}px, 0) rotateX(${this.cam.rx}deg) rotateY(${this.cam.ry}deg)`;
+      document.getElementById('zoom-level').innerText = `Z: ${this.cam.z.toFixed(2)}`;
 
       this.nodes.forEach(n => {
-        n.x=lerp(n.x||0,n.tx,0.05); n.y=lerp(n.y||0,n.ty,0.05); n.z=lerp(n.z||0,n.tz,0.05);
+        n.x = lerp(n.x, n.tx, 0.05); n.y = lerp(n.y, n.ty, 0.05); n.z = lerp(n.z, n.tz, 0.05);
         n.el.style.setProperty('--x', `${n.x}px`); n.el.style.setProperty('--y', `${n.y}px`); n.el.style.setProperty('--z', `${n.z}px`);
       });
 
       this.edges.forEach(e => {
-        if(e.s.x!==undefined && e.t.x!==undefined) {
-          const mx = (e.s.x+e.t.x)/2 - (e.t.y-e.s.y)*0.2 + O, my = (e.s.y+e.t.y)/2 + (e.t.x-e.s.x)*0.2 + O;
-          e.el.setAttribute("d", `M${e.s.x+O} ${e.s.y+O} Q${mx} ${my} ${e.t.x+O} ${e.t.y+O}`);
+        if(e.s && e.t) {
+          const mx = (e.s.x + e.t.x)/2 - (e.t.y - e.s.y)*0.2 + SVG_O;
+          const my = (e.s.y + e.t.y)/2 + (e.t.x - e.s.x)*0.2 + SVG_O;
+          e.el.setAttribute("d", `M${e.s.x+SVG_O} ${e.s.y+SVG_O} Q${mx} ${my} ${e.t.x+SVG_O} ${e.t.y+SVG_O}`);
         }
       });
-      requestAnimationFrame(tick);
+
+      if(Math.abs(this.tgt.ry - this.cam.ry) < 0.05) this.tgt.ry += 0.002; // Idle ambient spin
+
+      requestAnimationFrame(loop);
     };
-    tick();
+    loop();
   }
 };
 
-const ExtWikiLogic = {
-  async onBoot(d, os) {
-    const p = new URLSearchParams(window.location.search);
-    const title = p.get('wiki') || "Knowledge_Graph";
-    const res = await fetch(`https://kids.miraheze.org/w/api.php?action=parse&page=${title}&prop=text|links&format=json&origin=*`);
-    const data = await res.json();
-    const links = (data.parse.links||[]).filter(l=>l.ns===0).map(l=>l['*']).slice(0,12);
+// ============================================================================
+// 2. EXTENSION: Universal UI
+// ============================================================================
+const ExtUI = {
+  name: "User Interface",
+  install(os) {
+    this.addToolbarBtn('🔍', 'Search', () => { document.getElementById('search-overlay').classList.add('open'); document.getElementById('search-input').focus(); });
+    this.addToolbarBtn('🌸', 'Flower', () => os.fire('onChangeLayout', 'flower'));
+    this.addToolbarBtn('🌳', 'Tree', () => os.fire('onChangeLayout', 'tree'));
+    this.addToolbarBtn('🎨', 'Export', () => os.fire('onExportTriggered'));
     
-    const root = os.addNode({ title, icon:'🌌', color:'#38bdf8', isRoot:true, magic:'Smile and breathe!' }, 0,0,0);
-    links.forEach((l, i) => {
-      const n = os.addNode({ title: l, icon:'🧩', color:`hsl(${i*30},80%,65%)`, magic:'Drink a glass of water!' }, 0,0,0);
-      os.addEdge(root, n, n.data.color);
-    });
-    os.fire('changeLayout', 'flower');
-  },
-  onClick(n, os) {
-    document.getElementById('modal').style.setProperty('--col', n.data.color);
-    document.getElementById('m-content').innerHTML = `
-      <div style="font-size:50px">${n.data.icon}</div>
-      <h2 style="color:#fff;font-size:24px;margin:10px 0;">${n.data.title}</h2>
-      <div class="clue">${n.data.magic}</div>
-      <a href="https://kids.miraheze.org/wiki/${n.data.title}" target="_blank" style="padding:10px 20px;background:${n.data.color};color:#000;border-radius:20px;text-decoration:none;font-weight:bold;">Deep Dive</a>
-    `;
-    document.getElementById('modal').classList.add('open');
-  },
-  changeLayout(type, os) {
-    const petals = os.nodes.filter(n => !n.data.isRoot);
-    petals.forEach((n, i) => {
-      if(type==='flower') {
-        const a = i * 137.5 * (Math.PI/180), r = 150 + Math.sqrt(i)*30;
-        n.tx = Math.cos(a)*r; n.ty = Math.sin(a)*r; n.tz = Math.sin(i*0.5)*40;
-      } else {
-        n.tx = (i - petals.length/2) * 100; n.ty = 200; n.tz = 0;
+    document.getElementById('search-input').addEventListener('keypress', (e) => {
+      if(e.key === 'Enter') {
+        document.getElementById('search-overlay').classList.remove('open');
+        os.fire('onSearchTriggered', e.target.value);
       }
     });
   },
-  exportGraph(d, os) {
-    const cvs = document.getElementById('export-canvas'), ctx = cvs.getContext('2d');
-    ctx.fillStyle = '#010204'; ctx.fillRect(0,0,1920,1080);
-    os.edges.forEach(e => {
-      ctx.beginPath(); ctx.moveTo(960+e.s.tx*1.5, 540+e.s.ty*1.5); ctx.lineTo(960+e.t.tx*1.5, 540+e.t.ty*1.5);
-      ctx.strokeStyle=e.t.data.color; ctx.stroke();
-    });
-    os.nodes.forEach(n => {
-      ctx.fillStyle = n.data.color; ctx.beginPath(); ctx.arc(960+n.tx*1.5, 540+n.ty*1.5, 30, 0, 7); ctx.fill();
-      ctx.fillStyle = '#fff'; ctx.font = '20px sans-serif'; ctx.textAlign='center';
-      ctx.fillText(n.data.title, 960+n.tx*1.5, 540+n.ty*1.5+50);
-    });
-    const a = document.createElement('a'); a.download='wondergraph.png'; a.href=cvs.toDataURL(); a.click();
+  addToolbarBtn(icon, label, callback) {
+    const btn = document.createElement('div'); btn.className = 'ext-btn';
+    btn.innerHTML = `<div class="icon">${icon}</div><div class="label">${label}</div>`;
+    btn.onclick = callback;
+    document.getElementById('toolbar').appendChild(btn);
+  },
+  onNodeClick(node, os) {
+    const modal = document.getElementById('detail-modal');
+    modal.style.setProperty('--col', node.data.color);
+    
+    let html = `
+      <div style="text-align:center;">
+        <div style="font-size:60px;margin-bottom:10px;filter:drop-shadow(0 5px 15px rgba(0,0,0,0.5));">${node.data.icon}</div>
+        <h2 style="font-size:26px;color:#fff;margin-bottom:10px;font-family:'Space Grotesk'">${node.data.title}</h2>
+    `;
+    
+    if(node.data.magicClue) {
+      html += `<div class="magic-clue"><b>✨ Magic Quest:</b><br>${node.data.magicClue}</div>`;
+    }
+
+    if(node.data.url) {
+      html += `<a href="${node.data.url}" target="_blank" style="display:inline-block;padding:12px 30px;background:${node.data.color};color:#000;border-radius:30px;text-decoration:none;font-weight:bold;margin-top:20px;box-shadow:0 5px 20px ${node.data.color}80;transition:0.3s;">Read the Full Wiki 🚀</a>`;
+    }
+    
+    // Add Drill Down Button for Petals
+    if(!node.data.isRoot) {
+      html += `<div style="margin-top:15px;"><button onclick="KhelOS.fire('onSearchTriggered', '${node.data.title}')" style="background:transparent;border:1px solid #fff;color:#fff;padding:8px 20px;border-radius:20px;cursor:pointer;font-weight:bold;">Bloom Further 🌸</button></div>`;
+    }
+
+    html += `</div>`;
+    
+    document.getElementById('dm-content').innerHTML = html;
+    modal.classList.add('open');
   }
 };
 
-KhelOS.use(ExtWikiLogic);
+// ============================================================================
+// 3. EXTENSION: Safe MediaWiki Fetcher & AI Fallback
+// ============================================================================
+const ExtWikiData = {
+  name: "Wiki Fetcher & Magic Clues",
+  
+  // Custom Icon Dictionary for Kids
+  iconDict: {
+      "physic": "⚛️", "space": "🚀", "bio": "🧬", "math": "📐", "chem": "🧪", 
+      "earth": "🌍", "history": "📜", "art": "🎨", "music": "🎵", "animal": "🦁",
+      "water": "💧", "fire": "🔥", "tree": "🌳", "computer": "💻", "game": "🎮"
+  },
+  
+  habitDict: [
+      "Take a deep breath and smile before reading this!",
+      "Drink a big glass of water to refresh your brain.",
+      "Jump 3 times like a kangaroo to lock this in your memory!",
+      "Eat a piece of fruit to power up your mind.",
+      "Stand up and stretch your arms to the sky!",
+      "Share this cool fact with someone nearby!"
+  ],
+
+  getIcon(word) {
+      let w = word.toLowerCase();
+      for(let key in this.iconDict) { if(w.includes(key)) return this.iconDict[key]; }
+      const rand = ['🌟','🧩','🦋','🧸','💎','🍀','🍄','🌻'];
+      return rand[Math.floor(Math.random() * rand.length)];
+  },
+
+  async onSearchTriggered(query, os) {
+    document.getElementById('detail-modal').classList.remove('open');
+    os.showLoading(`Connecting to the Universe...<br><span style="font-size:10px;color:#fff;">${query}</span>`);
+    
+    let host = "https://kids.miraheze.org"; 
+    let title = query || "Knowledge_Graph";
+    
+    // Clean URL input if pasted
+    if(query.startsWith('http')) { 
+        try {
+            const u = new URL(query); 
+            host = u.origin; 
+            title = decodeURIComponent(u.pathname.split('/wiki/')[1] || new URLSearchParams(u.search).get('title'));
+        } catch(e) { title = query; }
+    }
+    
+    document.getElementById('target-title').innerText = `Target: ${title.replace(/_/g, ' ')}`;
+
+    try {
+      // 1. SAFE FETCHING (Handling 404s and Missing Pages properly)
+      const res = await fetch(`${host}/w/api.php?action=parse&page=${encodeURIComponent(title)}&prop=text|links&format=json&origin=*`);
+      const data = await res.json();
+      
+      if(data.error) {
+          throw new Error(data.error.info || "Page not found");
+      }
+      
+      const rawText = data.parse.text['*'].replace(/<[^>]*>?/gm, '');
+      const links = (data.parse.links||[]).filter(l=>l.ns===0).map(l=>l['*']);
+      
+      if(links.length === 0) {
+          os.showToast("Leaf Node Reached! No further links.");
+          os.hideLoading();
+          return;
+      }
+
+      // 2. DATA PROCESSING
+      let nodesData = [];
+      const cleanTitle = data.parse.title.replace(/_/g, ' ');
+
+      // Root Node
+      nodesData.push({ 
+          id: 'root', isRoot: true, title: cleanTitle, 
+          icon: this.getIcon(cleanTitle), color: '#00d4ff', 
+          url: `${host}/wiki/${encodeURIComponent(data.parse.title)}`, 
+          magicClue: "You have arrived at the center. Take a breath!" 
+      });
+
+      // Child Nodes (Take top 12)
+      links.slice(0, 12).forEach((link, i) => {
+        nodesData.push({ 
+            id: `c_${i}`, isRoot: false, title: link, 
+            icon: this.getIcon(link), 
+            color: `hsl(${i * 30}, 80%, 65%)`, 
+            url: `${host}/wiki/${encodeURIComponent(link)}`, 
+            magicClue: this.habitDict[i % this.habitDict.length] 
+        });
+      });
+
+      os.hideLoading();
+      os.fire('onBuildGraph', nodesData);
+
+    } catch(e) {
+      console.error(e);
+      os.hideLoading();
+      
+      // FALLBACK TO MAIN PAGE ON ERROR
+      if(title !== "Main_Page") {
+          os.showToast(`Error: ${e.message}. Returning to Main Page...`);
+          setTimeout(() => { this.onSearchTriggered("Main_Page", os); }, 2000);
+      } else {
+          os.showToast("Critical Error: Cannot connect to Wiki API.");
+      }
+    }
+  }
+};
+
+// ============================================================================
+// 4. EXTENSION: Layout Engine (Flower/Tree)
+// ============================================================================
+const ExtLayout = {
+  name: "Layout Engine",
+  onBuildGraph(nodesData, os) {
+    os.clear();
+    let rootNode = null;
+    
+    nodesData.forEach((d, i) => {
+      const n = os.spawnNode(d, 0, 0, 0);
+      if(d.isRoot) rootNode = n;
+      else if(rootNode) os.addEdge(rootNode, n, d.color);
+    });
+
+    os.fire('onChangeLayout', 'flower');
+    
+    // Reset Camera
+    os.tgt.x = 0; os.tgt.y = 0; os.tgt.z = window.innerWidth < 768 ? 0.35 : 0.6;
+  },
+  
+  onChangeLayout(type, os) {
+    const cx = 0, cy = 0;
+    const petals = os.nodes.filter(n => !n.data.isRoot);
+    const root = os.nodes.find(n => n.data.isRoot);
+    if(root) { root.tx = cx; root.ty = cy; root.tz = 0; }
+
+    petals.forEach((n, i) => {
+      if(type === 'flower') {
+        const a = i * 137.508 * (Math.PI/180);
+        const r = 160 + Math.sqrt(i) * 35;
+        n.tx = cx + Math.cos(a)*r; n.ty = cy + Math.sin(a)*r; n.tz = Math.sin(i*0.5)*50;
+      } else if (type === 'tree') {
+        n.tx = cx + (i - petals.length/2) * 110; n.ty = cy + 220; n.tz = 0;
+      }
+    });
+  }
+};
+
+// ============================================================================
+// 5. EXTENSION: Napkin.ai Style Exporter
+// ============================================================================
+const ExtExport = {
+  name: "Canvas Exporter",
+  onExportTriggered(_, os) {
+    if(os.nodes.length === 0) return os.showToast("Graph is empty!");
+    os.showToast("Painting Masterpiece...", false);
+    const cvs = document.getElementById('export-canvas');
+    const ctx = cvs.getContext('2d');
+    
+    ctx.fillStyle = '#010204'; ctx.fillRect(0,0, 1920, 1080);
+    const grd = ctx.createRadialGradient(960, 540, 0, 960, 540, 800);
+    grd.addColorStop(0, '#0a1128'); grd.addColorStop(1, '#010204');
+    ctx.fillStyle = grd; ctx.fillRect(0,0, 1920, 1080);
+    
+    const scale = 1.8; 
+    const mappedNodes = os.nodes.map(n => ({
+      x: 960 + n.tx * scale, y: 540 + n.ty * scale,
+      color: n.data.color, icon: n.data.icon, title: n.data.title, isRoot: n.data.isRoot
+    }));
+
+    ctx.lineWidth = 4;
+    os.edges.forEach(e => {
+      const sn = mappedNodes.find((_, i) => os.nodes[i] === e.s);
+      const tn = mappedNodes.find((_, i) => os.nodes[i] === e.t);
+      if(sn && tn) {
+        ctx.beginPath(); ctx.moveTo(sn.x, sn.y);
+        ctx.quadraticCurveTo((sn.x+tn.x)/2 - (tn.y-sn.y)*0.2, (sn.y+tn.y)/2 + (tn.x-sn.x)*0.2, tn.x, tn.y);
+        ctx.strokeStyle = tn.color; ctx.globalAlpha = 0.5; ctx.stroke();
+      }
+    });
+
+    ctx.globalAlpha = 1.0;
+    mappedNodes.forEach(n => {
+      const r = n.isRoot ? 80 : 55;
+      ctx.shadowColor = n.color; ctx.shadowBlur = 30;
+      ctx.beginPath(); ctx.arc(n.x, n.y, r, 0, Math.PI*2);
+      ctx.fillStyle = '#0f172a'; ctx.fill();
+      ctx.lineWidth = 4; ctx.strokeStyle = n.color; ctx.stroke();
+      
+      ctx.shadowBlur = 0; ctx.fillStyle = '#fff';
+      ctx.font = `${r}px sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(n.icon, n.x, n.y + r*0.1);
+
+      ctx.fillStyle = n.color; ctx.font = `bold ${r*0.35}px 'Space Grotesk', sans-serif`;
+      ctx.fillText(n.title.toUpperCase(), n.x, n.y + r + 30);
+    });
+
+    const link = document.createElement('a');
+    link.download = `wondergraph.png`; link.href = cvs.toDataURL('image/png'); link.click();
+  }
+};
+
+// ============================================================================
+// BOOT UP THE OS
+// ============================================================================
+KhelOS.use(ExtUI);
+KhelOS.use(ExtWikiData);
+KhelOS.use(ExtLayout);
+KhelOS.use(ExtExport);
+
 KhelOS.boot();
+
+// Auto-trigger on load
+window.onload = () => {
+    const params = new URLSearchParams(window.location.search);
+    const target = params.get('wiki') || 'Knowledge_Graph';
+    KhelOS.fire('onSearchTriggered', target);
+};
+
 </script>
 </body>
 </html>
