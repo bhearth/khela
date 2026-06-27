@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=no">
+<title>Khel.o · Ultimate WonderGraph</title>
+<script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{background:#010204;color:#e2e8f0;font-family:system-ui,sans-serif;overflow:hidden;height:100dvh;width:100dvw;}
+  #hud{position:fixed;top:0;left:0;right:0;display:flex;justify-content:space-between;padding:15px;z-index:50;pointer-events:none;}
+  #toolbar{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:center;gap:10px;padding:15px;z-index:50;pointer-events:auto;}
+  .btn{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:10px 15px;cursor:pointer;color:#fff;}
+  #viewport{position:absolute;inset:0;z-index:10;}
+  #hub{position:absolute;top:50%;left:50%;transform-style:preserve-3d;will-change:transform;}
+  svg{position:absolute;top:-5000px;left:-5000px;width:10000px;height:10000px;pointer-events:none;}
+  .stellar-path{fill:none;stroke-width:2;stroke-linecap:round;transition:d 1s;}
+  .jnode{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:50%;cursor:pointer;background:rgba(10,15,25,0.8);border:2px solid;transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),var(--z)) scale(var(--s, 1));transition:transform 0.8s;pointer-events:auto;}
+  .jnode:hover{background:currentColor!important;color:#000!important;--s:1.3;z-index:500;box-shadow:0 0 30px currentColor;}
+  .ji{font-size:24px;} .jl{font-size:10px;font-weight:bold;margin-top:4px;}
+  #modal{position:fixed;bottom:-100%;left:0;right:0;background:#0a0f19;border-top:2px solid var(--col);border-radius:24px 24px 0 0;padding:30px;transition:0.5s;z-index:250;text-align:center;}
+  #modal.open{bottom:0;}
+  .clue{background:rgba(236,72,153,0.1);border:1px solid #ec4899;padding:10px;border-radius:10px;color:#fbcfe8;font-size:12px;margin:15px 0;}
+  #export-canvas{display:none;}
+</style>
+</head>
+<body>
+
+<div id="hud">
+  <div style="color:#38bdf8;font-weight:bold;letter-spacing:2px;">Khel.o OS</div>
+  <div style="text-align:right;font-size:10px;color:#94a3b8;"><span id="zoom">Z: 1.0</span><br>Live Data</div>
+</div>
+
+<div id="viewport"><div id="hub"><svg id="lines"></svg></div></div>
+<canvas id="export-canvas" width="1920" height="1080"></canvas>
+
+<div id="toolbar">
+  <button class="btn" onclick="KhelOS.fire('changeLayout','flower')">🌸 Flower</button>
+  <button class="btn" onclick="KhelOS.fire('changeLayout','tree')">🌳 Tree</button>
+  <button class="btn" onclick="KhelOS.fire('exportGraph')">🎨 Export</button>
+</div>
+
+<div id="modal">
+  <div style="width:40px;height:5px;background:#334155;border-radius:5px;margin:0 auto 15px;" onclick="document.getElementById('modal').classList.remove('open')"></div>
+  <div id="m-content"></div>
+</div>
+
+<script>
+const KhelOS = {
+  hub: document.getElementById('hub'), svg: document.getElementById('lines'),
+  nodes: [], edges: [], plugins: [],
+  cam: {x:0, y:0, z:0.5, rx:0, ry:0}, tgt: {x:0, y:0, z:0.5, rx:0, ry:0},
+  
+  use(p) { this.plugins.push(p); if(p.init) p.init(this); },
+  fire(h, d) { let r = d; for(let p of this.plugins) if(p[h]) r = p[h](r, this) || r; return r; },
+  
+  boot() { this.setupGestures(); this.loop(); this.fire('onBoot'); },
+  
+  addNode(data, x, y, z) {
+    const el = document.createElement('div'); el.className = 'jnode';
+    el.style.cssText = `--x:${x}px; --y:${y}px; --z:${z}px; width:70px; height:70px; color:${data.color}; border-color:${data.color};`;
+    el.innerHTML = `<div class="ji">${data.icon}</div><div class="jl">${data.title.substring(0,12)}</div>`;
+    const n = { el, data, tx:x, ty:y, tz:z };
+    el.onclick = (e) => { e.stopPropagation(); this.tgt.x=-n.tx; this.tgt.y=-n.ty; this.tgt.z=1.2; this.fire('onClick', n); };
+    this.hub.appendChild(el); this.nodes.push(n); return n;
+  },
+  
+  addEdge(s, t, c) {
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    path.setAttribute("class", "stellar-path"); path.style.stroke = c; path.style.strokeOpacity = 0.5;
+    this.svg.appendChild(path); this.edges.push({s, t, el: path});
+  },
+
+  setupGestures() {
+    const mc = new Hammer.Manager(document.getElementById('viewport'));
+    mc.add(new Hammer.Pan({ threshold: 0 })); mc.add(new Hammer.Pinch({ enable: true })).recognizeWith(mc.get('pan'));
+    mc.add(new Hammer.Tap({ event: 'doubletap', taps: 2 }));
+    let iz = 1, pan = false, lx = 0, ly = 0;
+    
+    mc.on('doubletap', () => { this.tgt.x=0; this.tgt.y=0; this.tgt.z=0.5; this.tgt.rx=0; this.tgt.ry=0; });
+    mc.on('pinchstart', () => iz = this.tgt.z);
+    mc.on('pinch', e => this.tgt.z = Math.max(0.1, Math.min(4, iz * e.scale)));
+    mc.on('panstart', e => { pan = true; lx = e.center.x; ly = e.center.y; });
+    mc.on('panmove', e => {
+      if(!pan) return; let dx = e.center.x - lx, dy = e.center.y - ly;
+      if (e.pointers.length >= 2 || e.srcEvent.shiftKey) { this.tgt.ry += dx*0.4; this.tgt.rx -= dy*0.4; } 
+      else { this.tgt.x += dx/this.cam.z; this.tgt.y += dy/this.cam.z; }
+      lx = e.center.x; ly = e.center.y;
+    });
+    mc.on('panend', () => pan = false);
+    window.onwheel = e => this.tgt.z = Math.max(0.1, Math.min(4, this.tgt.z - e.deltaY * 0.0015));
+  },
+
+  loop() {
+    const lerp = (s,e,f) => s+(e-s)*f; const O = 5000;
+    const tick = () => {
+      this.cam.x=lerp(this.cam.x,this.tgt.x,0.08); this.cam.y=lerp(this.cam.y,this.tgt.y,0.08); this.cam.z=lerp(this.cam.z,this.tgt.z,0.08);
+      this.cam.rx=lerp(this.cam.rx,this.tgt.rx,0.08); this.cam.ry=lerp(this.cam.ry,this.tgt.ry,0.08);
+      this.hub.style.transform = `translate(-50%,-50%) scale(${this.cam.z}) translate3d(${this.cam.x}px,${this.cam.y}px,0) rotateX(${this.cam.rx}deg) rotateY(${this.cam.ry}deg)`;
+      document.getElementById('zoom').innerText = `Z: ${this.cam.z.toFixed(2)}`;
+
+      this.nodes.forEach(n => {
+        n.x=lerp(n.x||0,n.tx,0.05); n.y=lerp(n.y||0,n.ty,0.05); n.z=lerp(n.z||0,n.tz,0.05);
+        n.el.style.setProperty('--x', `${n.x}px`); n.el.style.setProperty('--y', `${n.y}px`); n.el.style.setProperty('--z', `${n.z}px`);
+      });
+
+      this.edges.forEach(e => {
+        if(e.s.x!==undefined && e.t.x!==undefined) {
+          const mx = (e.s.x+e.t.x)/2 - (e.t.y-e.s.y)*0.2 + O, my = (e.s.y+e.t.y)/2 + (e.t.x-e.s.x)*0.2 + O;
+          e.el.setAttribute("d", `M${e.s.x+O} ${e.s.y+O} Q${mx} ${my} ${e.t.x+O} ${e.t.y+O}`);
+        }
+      });
+      requestAnimationFrame(tick);
+    };
+    tick();
+  }
+};
+
+const ExtWikiLogic = {
+  async onBoot(d, os) {
+    const p = new URLSearchParams(window.location.search);
+    const title = p.get('wiki') || "Knowledge_Graph";
+    const res = await fetch(`https://kids.miraheze.org/w/api.php?action=parse&page=${title}&prop=text|links&format=json&origin=*`);
+    const data = await res.json();
+    const links = (data.parse.links||[]).filter(l=>l.ns===0).map(l=>l['*']).slice(0,12);
+    
+    const root = os.addNode({ title, icon:'🌌', color:'#38bdf8', isRoot:true, magic:'Smile and breathe!' }, 0,0,0);
+    links.forEach((l, i) => {
+      const n = os.addNode({ title: l, icon:'🧩', color:`hsl(${i*30},80%,65%)`, magic:'Drink a glass of water!' }, 0,0,0);
+      os.addEdge(root, n, n.data.color);
+    });
+    os.fire('changeLayout', 'flower');
+  },
+  onClick(n, os) {
+    document.getElementById('modal').style.setProperty('--col', n.data.color);
+    document.getElementById('m-content').innerHTML = `
+      <div style="font-size:50px">${n.data.icon}</div>
+      <h2 style="color:#fff;font-size:24px;margin:10px 0;">${n.data.title}</h2>
+      <div class="clue">${n.data.magic}</div>
+      <a href="https://kids.miraheze.org/wiki/${n.data.title}" target="_blank" style="padding:10px 20px;background:${n.data.color};color:#000;border-radius:20px;text-decoration:none;font-weight:bold;">Deep Dive</a>
+    `;
+    document.getElementById('modal').classList.add('open');
+  },
+  changeLayout(type, os) {
+    const petals = os.nodes.filter(n => !n.data.isRoot);
+    petals.forEach((n, i) => {
+      if(type==='flower') {
+        const a = i * 137.5 * (Math.PI/180), r = 150 + Math.sqrt(i)*30;
+        n.tx = Math.cos(a)*r; n.ty = Math.sin(a)*r; n.tz = Math.sin(i*0.5)*40;
+      } else {
+        n.tx = (i - petals.length/2) * 100; n.ty = 200; n.tz = 0;
+      }
+    });
+  },
+  exportGraph(d, os) {
+    const cvs = document.getElementById('export-canvas'), ctx = cvs.getContext('2d');
+    ctx.fillStyle = '#010204'; ctx.fillRect(0,0,1920,1080);
+    os.edges.forEach(e => {
+      ctx.beginPath(); ctx.moveTo(960+e.s.tx*1.5, 540+e.s.ty*1.5); ctx.lineTo(960+e.t.tx*1.5, 540+e.t.ty*1.5);
+      ctx.strokeStyle=e.t.data.color; ctx.stroke();
+    });
+    os.nodes.forEach(n => {
+      ctx.fillStyle = n.data.color; ctx.beginPath(); ctx.arc(960+n.tx*1.5, 540+n.ty*1.5, 30, 0, 7); ctx.fill();
+      ctx.fillStyle = '#fff'; ctx.font = '20px sans-serif'; ctx.textAlign='center';
+      ctx.fillText(n.data.title, 960+n.tx*1.5, 540+n.ty*1.5+50);
+    });
+    const a = document.createElement('a'); a.download='wondergraph.png'; a.href=cvs.toDataURL(); a.click();
+  }
+};
+
+KhelOS.use(ExtWikiLogic);
+KhelOS.boot();
+</script>
+</body>
+</html>
