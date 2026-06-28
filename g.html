@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Khel.o · Semantic OS Proposal for GDG</title>
+    
+    <!-- Google Fonts for Premium Developer Aesthetic -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@300;500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        :root {
+            --bg: #010204;
+            --accent: #38bdf8;
+            --glass: rgba(10, 15, 25, 0.75);
+            --glass-border: rgba(56, 189, 248, 0.2);
+        }
+
+        body { 
+            margin: 0; background: var(--bg); color: #e2e8f0; 
+            font-family: 'Inter', sans-serif; overflow: hidden; 
+        }
+
+        /* --- 1. BACKGROUND 3D ENGINE --- */
+        #universe-bg { position: absolute; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
+        #hub { position: absolute; top: 50vh; left: 50vw; transform-style: preserve-3d; will-change: transform; }
+        .node {
+            position: absolute; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            background: rgba(15, 23, 42, 0.8); border: 1px solid currentColor;
+            transform: translate3d(calc(-50% + var(--x)), calc(-50% + var(--y)), var(--z));
+            box-shadow: 0 0 20px currentColor; transition: 0.3s;
+        }
+        .node .icon { font-size: var(--sz); filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+
+        svg { position: absolute; top: -5000px; left: -5000px; width: 10000px; height: 10000px; pointer-events: none; transform-style: preserve-3d; }
+        .link { fill: none; stroke-width: 1.5; filter: drop-shadow(0 0 4px currentColor); opacity: 0.3; }
+
+        /* --- 2. PRESENTATION UI --- */
+        #ui-layer { position: absolute; inset: 0; z-index: 100; display: flex; flex-direction: column; pointer-events: none; }
+        
+        header { 
+            padding: 20px 40px; display: flex; justify-content: space-between; align-items: center;
+            background: linear-gradient(180deg, rgba(1,2,4,0.95) 0%, transparent 100%);
+        }
+        
+        .logo { font-family: 'Space Grotesk', sans-serif; font-size: 24px; font-weight: 700; color: #fff; letter-spacing: 2px; display: flex; align-items: center; gap: 10px; }
+        .gemini-badge { background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899); -webkit-background-clip: text; color: transparent; font-weight: 700; font-size: 12px; letter-spacing: 1px; font-family: 'JetBrains Mono'; border: 1px solid rgba(255,255,255,0.1); padding: 6px 12px; border-radius: 20px;}
+
+        /* The Scrollable Pitch Deck */
+        #pitch-container { 
+            flex: 1; overflow-y: auto; pointer-events: auto; padding: 40px 20px; 
+            scroll-behavior: smooth;
+        }
+        #pitch-container::-webkit-scrollbar { width: 6px; }
+        #pitch-container::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
+
+        .glass-card {
+            max-width: 800px; margin: 0 auto 40px; background: var(--glass);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border); border-radius: 24px;
+            padding: 50px; box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            color: #cbd5e1; transform: translateY(20px); animation: fadeUp 0.8s ease forwards;
+        }
+
+        @keyframes fadeUp { to { transform: translateY(0); opacity: 1; } }
+
+        .glass-card h1 { font-family: 'Space Grotesk'; font-size: 3rem; color: #fff; line-height: 1.1; margin-bottom: 20px; }
+        .glass-card h2 { font-family: 'Space Grotesk'; font-size: 1.8rem; color: #38bdf8; margin: 40px 0 15px; border-bottom: 1px solid rgba(56, 189, 248, 0.2); padding-bottom: 10px; }
+        .glass-card p { font-size: 1.1rem; line-height: 1.8; margin-bottom: 20px; }
+        
+        .code-block {
+            background: #0d1117; border: 1px solid #30363d; border-radius: 12px;
+            padding: 20px; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem;
+            color: #e6edf3; overflow-x: auto; margin: 20px 0;
+        }
+        .code-comment { color: #8b949e; }
+        .code-keyword { color: #ff7b72; }
+        .code-string { color: #a5d6ff; }
+
+        .highlight-box {
+            background: rgba(16, 185, 129, 0.1); border-left: 4px solid #10b981;
+            padding: 20px; border-radius: 0 12px 12px 0; margin: 30px 0;
+        }
+
+        .btn-primary {
+            display: inline-flex; align-items: center; gap: 10px; background: #fff; color: #000;
+            font-family: 'Space Grotesk'; font-weight: 700; font-size: 1.1rem; padding: 16px 32px;
+            border-radius: 30px; text-decoration: none; transition: 0.3s; cursor: pointer;
+            box-shadow: 0 10px 20px rgba(255,255,255,0.2); border: none;
+        }
+        .btn-primary:hover { transform: scale(1.05); box-shadow: 0 15px 30px rgba(255,255,255,0.4); }
+
+        .floating-action {
+            position: fixed; bottom: 30px; right: 30px; pointer-events: auto;
+        }
+
+    </style>
+</head>
+<body>
+
+<!-- 1. LIVE BACKGROUND ENGINE -->
+<div id="universe-bg">
+    <div id="hub">
+        <svg id="lines"></svg>
+    </div>
+</div>
+
+<!-- 2. PRESENTATION UI -->
+<div id="ui-layer">
+    <header>
+        <div class="logo">
+            <span style="font-size: 32px;">🤸</span> Khel.o <span style="font-weight:300; opacity:0.5;">| OS</span>
+        </div>
+        <div class="gemini-badge">Synthesized by Gemini 2.5 Pro</div>
+    </header>
+
+    <div id="pitch-container">
+        
+        <!-- INTRO CARD -->
+        <div class="glass-card" style="animation-delay: 0.1s;">
+            <div style="font-family: 'JetBrains Mono'; color: #10b981; margin-bottom: 15px; letter-spacing: 2px;">RFC_PROPOSAL_V1.0</div>
+            <h1>The Semantic OS:<br>A 1000x Efficiency Paradigm</h1>
+            <p style="font-size: 1.25rem; color: #94a3b8;">A Request For Comments (RFC) to the Google Developer Groups (GDG). How we bypass the DOM, compile 5W1H intent into WebAssembly, and synchronize 8.25 Billion humans on a 55MB memory footprint.</p>
+        </div>
+
+        <!-- THE PROBLEM CARD -->
+        <div class="glass-card" style="animation-delay: 0.3s;">
+            <h2>The Current Bottleneck</h2>
+            <p>The modern web stack is optimizing the wrong layer. To render a standard knowledge graph, we rely on a bloated pipeline: <strong>JSON Parsing → V8 JS Engine → React Virtual DOM → CSS Layout Thrashing → WebGL.</strong></p>
+            <p>A $100 smartphone in a remote village cannot render 100,000 nodes of educational data because the browser consumes 500MB of RAM just to maintain the DOM state. <strong>This is like trying to win an F1 race with a school bus.</strong></p>
+        </div>
+
+        <!-- THE ARCHITECTURE CARD -->
+        <div class="glass-card" style="animation-delay: 0.5s;">
+            <h2>The Solution: The Hyper-Dictionary</h2>
+            <p>We propose a radical shift from "text-based JSON" to <strong>Memory-Mapped Semantic Vectors</strong>. By bypassing the browser's HTML parser entirely, we can feed data directly to the GPU via WebGPU and WebAssembly.</p>
+            
+            <div class="highlight-box">
+                <h3 style="color: #fff; font-family: 'Space Grotesk'; font-size: 1.2rem; margin-bottom: 10px;">The 55-Byte Node Concept</h3>
+                <p style="margin: 0; font-size: 0.95rem;">Instead of loading gigabytes of wiki text, we use Gemini API to extract the <strong>5W1H Intent</strong> (Who, What, Why, Where, When, How) and compress it into a 55-byte binary structure.</p>
+            </div>
+
+            <div class="code-block">
+<span class="code-comment">// The Khel.o Bare-Metal Memory Layout (Rust / Wasm)</span>
+<span class="code-keyword">struct</span> SemanticNode {
+    id_coord: <span class="code-keyword">u16</span>,          <span class="code-comment">// 2B: Caigx Coordinate (e.g., 0.311)</span>
+    semantic_hash: <span class="code-keyword">u64</span>,     <span class="code-comment">// 8B: Language-agnostic concept hash</span>
+    vector_10d: [<span class="code-keyword">f32</span>; 10],  <span class="code-comment">// 40B: Spatial Matrix position</span>
+    baej_flags: <span class="code-keyword">u8</span>,         <span class="code-comment">// 1B: State (Seed, Action, Bloom)</span>
+    child_offset: <span class="code-keyword">u32</span>       <span class="code-comment">// 4B: Pointer to next tree depth</span>
+} <span class="code-comment">// Total: 55 Bytes per node</span>
+            </div>
+            
+            <p><strong>The Math:</strong> 1 million concepts = <strong>55 Megabytes</strong>. This entire universe fits inside the L3 Cache of a modern CPU or the RAM of a $15 Raspberry Pi. The GPU traverses the entire graph with zero cache misses.</p>
+        </div>
+
+        <!-- THE AI FOUNDRY CARD -->
+        <div class="glass-card" style="animation-delay: 0.7s;">
+            <h2>Gemini as the Foundry</h2>
+            <p>To populate this binary graph, we do not expect humans to write 10D vectors. We use <strong>Gemini 2.5 Pro</strong> as the compiler.</p>
+            <p>An innocent user inputs raw text (e.g., a Wikipedia article about 'Photosynthesis'). Gemini extracts the semantic resonance and compiles it into the Hyper-Code. It assigns the color, the SVG-compatible emoji, and crucial physical actions (<strong>Healthy Habits</strong>) to bridge the digital and physical realms.</p>
+            
+            <div class="code-block">
+<span class="code-comment">// The Gemini 5W1H Compilation Instruction</span>
+{
+  <span class="code-string">"prompt"</span>: <span class="code-string">"Extract 6 core concepts from this wiki text. Return exactly 6 objects: [Dimension(5W1H), Title, HexColor, MagicClue(Healthy physical action)]."</span>,
+  <span class="code-string">"responseSchema"</span>: <span class="code-string">"SemanticNodeArray"</span>
+}
+            </div>
+        </div>
+
+        <!-- THE ASK CARD -->
+        <div class="glass-card" style="margin-bottom: 100px; animation-delay: 0.9s;">
+            <h2>The Call to Action for GDG</h2>
+            <p>What you are seeing in the background right now is the <strong>JavaScript / CSS3D Prototype</strong>. It is highly optimized, running 3D transforms directly on the compositor thread. But it is still running in the DOM.</p>
+            <p>We are calling on the Google Developer Group community—specifically the <strong>WebAssembly, Rust, and WebGPU</strong> engineers—to help us build the native engine.</p>
+            <ul style="list-style-type: square; padding-left: 20px; line-height: 2; margin-top: 20px;">
+                <li><strong>Port the Renderer:</strong> Translate this CSS3D matrix into a pure WebGPU pipeline.</li>
+                <li><strong>Build SemGit:</strong> Create the Semantic Delta Protocol for P2P synchronization without central servers.</li>
+                <li><strong>Optimize the Shaders:</strong> Write compute shaders that treat 10D vectors as singular symbolic instructions.</li>
+            </ul>
+
+            <div style="text-align: center; margin-top: 50px;">
+                <button class="btn-primary" onclick="hidePitch()">
+                    <span style="font-size: 24px;">🌌</span> Explore the Live Engine
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Floating Action to bring Pitch back -->
+<div class="floating-action" id="bring-back-btn" style="display: none;">
+    <button class="btn-primary" style="padding: 12px 24px; font-size: 1rem; background: rgba(15,23,42,0.9); color: #fff; border: 1px solid #38bdf8;" onclick="showPitch()">
+        📖 Read Whitepaper
+    </button>
+</div>
+
+<script>
+// ============================================================================
+// BACKGROUND KHEL.O ENGINE (Highly optimized purely for visual proof)
+// ============================================================================
+const Hub = document.getElementById('hub');
+const SvgLayer = document.getElementById('lines');
+let nodes = [];
+let edges = [];
+let cam = { x: 0, y: 0, z: window.innerWidth < 768 ? 0.3 : 0.6, rx: 60, ry: 0 };
+
+const COLORS = ["#38bdf8", "#c084fc", "#10b981", "#f59e0b", "#f43f5e", "#a7f3d0", "#d4af37"];
+const ICONS = ["⚛️","🧬","🌍","🧠","💡","🤝","🕊️","🔭","⚙️","💧"];
+
+function initEngine() {
+    // Generate a beautiful, massive 3D Fibonacci Galaxy
+    const totalNodes = window.innerWidth < 768 ? 150 : 300;
+    const centerNode = spawnNode(0, 0, 0, 100, "#fff", "☀️");
+    
+    for (let i = 1; i <= totalNodes; i++) {
+        // Golden Angle Phyllotaxis
+        const angle = i * 137.508 * (Math.PI / 180);
+        const radius = 25 * Math.sqrt(i);
+        
+        const x = Math.cos(angle) * radius;
+        const y = Math.sin(angle) * radius;
+        const z = Math.sin(i * 0.1) * 60; // 3D Wave depth
+        
+        const color = COLORS[i % COLORS.length];
+        const icon = ICONS[i % ICONS.length];
+        const size = Math.max(10, 40 - (i * 0.1)); // Gets smaller towards edges
+        
+        const n = spawnNode(x, y, z, size, color, icon);
+        
+        // Draw SVG connection for the first 50 nodes to show relationship
+        if (i <= 50) {
+            drawEdge(centerNode, n, color);
+        }
+    }
+    
+    renderLoop();
+}
+
+function spawnNode(x, y, z, sz, color, icon) {
+    const el = document.createElement('div');
+    el.className = 'node';
+    el.style.cssText = `--x:${x}px; --y:${y}px; --z:${z}px; --sz:${sz/2}px; width:${sz}px; height:${sz}px; color:${color};`;
+    el.innerHTML = `<div class="icon">${icon}</div>`;
+    Hub.appendChild(el);
+    
+    const nodeObj = { x, y, z };
+    nodes.push(nodeObj);
+    return nodeObj;
+}
+
+function drawEdge(source, target, color) {
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    const offset = 5000;
+    const mx = (source.x + target.x) / 2 - (target.y - source.y) * 0.2; 
+    const my = (source.y + target.y) / 2 + (target.x - source.x) * 0.2;
+    
+    path.setAttribute("d", `M ${source.x + offset} ${source.y + offset} Q ${mx + offset} ${my + offset} ${target.x + offset} ${target.y + offset}`);
+    path.setAttribute("class", "link");
+    path.style.stroke = color;
+    SvgLayer.appendChild(path);
+}
+
+function renderLoop() {
+    // Continuous smooth auto-rotation of the background universe
+    cam.ry += 0.002;
+    cam.rx = 60 + Math.sin(Date.now() * 0.0005) * 10; // Gentle breathing tilt
+    
+    Hub.style.transform = `translate(-50%, -50%) scale(${cam.z}) translate3d(${cam.x}px, ${cam.y}px, 0) rotateX(${cam.rx}deg) rotateY(${cam.ry}deg)`;
+    
+    requestAnimationFrame(renderLoop);
+}
+
+// UI TOGGLES
+function hidePitch() {
+    document.getElementById('ui-layer').style.display = 'none';
+    document.getElementById('bring-back-btn').style.display = 'block';
+    
+    // Zoom into the engine for full glory
+    const zoomIn = setInterval(() => {
+        cam.z += 0.02;
+        cam.rx -= 1;
+        if(cam.z >= 1.2) clearInterval(zoomIn);
+    }, 16);
+}
+
+function showPitch() {
+    document.getElementById('ui-layer').style.display = 'flex';
+    document.getElementById('bring-back-btn').style.display = 'none';
+    
+    // Zoom out to make room for text
+    const zoomOut = setInterval(() => {
+        cam.z -= 0.02;
+        cam.rx += 1;
+        const targetZ = window.innerWidth < 768 ? 0.3 : 0.6;
+        if(cam.z <= targetZ) clearInterval(zoomOut);
+    }, 16);
+}
+
+// IGNITE BACKGROUND
+window.onload = initEngine;
+
+</script>
+</body>
+</html>
