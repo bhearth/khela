@@ -3,24 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Khel.o · HyperCode Universe · Final Integration</title>
-<script src="hypercode-lib.js"></script>
+<title>Khel.o · Real-Time Knowledge Universe</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/cytoscape@3.26.0/dist/cytoscape.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/compromise/14.10.0/compromise.min.js"></script>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-:root {
-  --bg: #030508;
-  --surface: rgba(255,255,255,0.04);
-  --glass: rgba(255,255,255,0.08);
-  --accent: #fbbf24;
-  --text: #f8fafc;
-  --muted: #94a3b8;
-  --success: #10b981;
-  --error: #ef4444;
-}
 body {
-  background: var(--bg);
-  color: var(--text);
+  background: #030508;
+  color: #f8fafc;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   overflow: hidden;
   height: 100vh;
@@ -37,20 +28,19 @@ body {
   pointer-events: none;
   display: flex;
   flex-direction: column;
+  padding: 20px;
 }
 .ui-layer > * { pointer-events: auto; }
-
-/* HEADER */
 .header {
-  padding: 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 20px;
 }
 .logo {
   font-size: 24px;
   font-weight: 700;
-  color: var(--accent);
+  color: #a7f3d0;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -65,42 +55,10 @@ body {
   justify-content: center;
   font-size: 20px;
 }
-.controls {
-  display: flex;
-  gap: 10px;
-}
-.btn {
-  background: var(--surface);
-  border: 1px solid var(--glass);
-  color: var(--text);
-  padding: 10px 16px;
-  border-radius: 20px;
-  cursor: pointer;
-  font-size: 13px;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.btn:hover {
-  background: rgba(255,255,255,0.1);
-  transform: translateY(-2px);
-}
-.btn-primary {
-  background: var(--accent);
-  color: #000;
-  border: none;
-}
-.btn-primary:hover {
-  background: #fcd34d;
-}
-
-/* MAIN PANELS */
 .main-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
-  padding: 0 20px 20px;
   flex: 1;
   overflow: hidden;
 }
@@ -108,8 +66,8 @@ body {
   .main-grid { grid-template-columns: 1fr; }
 }
 .panel {
-  background: var(--surface);
-  border: 1px solid var(--glass);
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
   border-radius: 16px;
   padding: 20px;
   display: flex;
@@ -119,7 +77,7 @@ body {
 .panel-title {
   font-size: 16px;
   font-weight: 700;
-  color: var(--accent);
+  color: #fbbf24;
   margin-bottom: 12px;
   display: flex;
   align-items: center;
@@ -135,19 +93,41 @@ body {
 textarea, input[type="text"] {
   width: 100%;
   background: rgba(0,0,0,0.3);
-  border: 1px solid var(--glass);
+  border: 1px solid rgba(255,255,255,0.1);
   border-radius: 10px;
   padding: 12px;
-  color: var(--text);
+  color: #fff;
   font-family: 'JetBrains Mono', monospace;
   font-size: 13px;
   resize: none;
   outline: none;
 }
 textarea:focus, input:focus {
-  border-color: var(--accent);
+  border-color: #fbbf24;
 }
 textarea { min-height: 120px; }
+.btn {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn:hover {
+  background: rgba(255,255,255,0.2);
+  transform: translateY(-2px);
+}
+.btn-primary {
+  background: linear-gradient(135deg, #fbbf24, #a371f7);
+  color: #000;
+  border: none;
+}
 .btn-row {
   display: flex;
   gap: 8px;
@@ -156,7 +136,7 @@ textarea { min-height: 120px; }
 .output {
   flex: 1;
   background: rgba(0,0,0,0.5);
-  border: 1px solid var(--glass);
+  border: 1px solid rgba(255,255,255,0.1);
   border-radius: 10px;
   padding: 14px;
   overflow-y: auto;
@@ -167,47 +147,6 @@ textarea { min-height: 120px; }
   word-break: break-all;
   color: #a7f3d0;
 }
-.stat {
-  display: inline-block;
-  margin: 6px 14px 6px 0;
-}
-.stat-val {
-  font-size: 20px;
-  color: var(--accent);
-  font-weight: 700;
-  font-family: 'JetBrains Mono', monospace;
-}
-.stat-lbl {
-  font-size: 10px;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-/* VOICE BUTTON */
-.voice-btn {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #ef4444, #dc2626);
-  border: none;
-  color: #fff;
-  font-size: 24px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.voice-btn:hover {
-  transform: scale(1.1);
-}
-.voice-btn.recording {
-  animation: pulse 1s infinite;
-}
-@keyframes pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.7); }
-  50% { box-shadow: 0 0 0 20px rgba(239,68,68,0); }
-}
-
-/* SYMBOL DISPLAY */
 .symbol-row {
   display: flex;
   flex-wrap: wrap;
@@ -229,11 +168,9 @@ textarea { min-height: 120px; }
 .symbol:hover {
   transform: scale(1.2);
 }
-
-/* IKRq DISPLAY */
 .ikr-display {
   background: linear-gradient(135deg, rgba(251,191,36,0.1), rgba(163,113,247,0.1));
-  border: 1px solid var(--accent);
+  border: 1px solid #fbbf24;
   border-radius: 12px;
   padding: 16px;
   margin: 12px 0;
@@ -241,21 +178,31 @@ textarea { min-height: 120px; }
 .ikr-title {
   font-size: 14px;
   font-weight: 700;
-  color: var(--accent);
+  color: #fbbf24;
   margin-bottom: 8px;
 }
 .ikr-score {
   font-size: 32px;
   font-weight: 700;
-  color: var(--accent);
+  color: #fbbf24;
   font-family: 'JetBrains Mono', monospace;
 }
-.ikr-level {
-  font-size: 14px;
-  margin-top: 8px;
+.stat {
+  display: inline-block;
+  margin: 6px 14px 6px 0;
 }
-
-/* TOAST */
+.stat-val {
+  font-size: 20px;
+  color: #fbbf24;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+}
+.stat-lbl {
+  font-size: 10px;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
 .toast {
   position: fixed;
   top: 80px;
@@ -273,85 +220,83 @@ textarea { min-height: 120px; }
   from { transform: translate(-50%, -20px); opacity: 0; }
   to { transform: translate(-50%, 0); opacity: 1; }
 }
-
-/* PIPELINE */
-.pipeline-step {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid var(--glass);
-  border-radius: 12px;
-  padding: 12px;
-  margin: 8px 0;
-  display: flex;
-  align-items: center;
-  gap: 12px;
+#graph-container {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: none;
 }
-.pipeline-step .icon { font-size: 24px; }
-.pipeline-step .label { flex: 1; font-size: 13px; }
-.pipeline-step .status { color: var(--muted); font-size: 11px; }
-.pipeline-step.active { border-color: var(--accent); background: rgba(251,191,36,0.05); }
-.pipeline-step.complete { border-color: var(--success); background: rgba(16,185,129,0.05); }
+#graph-container.active {
+  display: block;
+}
+.close-graph {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 10;
+  background: rgba(0,0,0,0.8);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 20px;
+  cursor: pointer;
+}
 </style>
 </head>
 <body>
 
 <div id="canvas-container"></div>
+<div id="graph-container"></div>
 
 <div class="ui-layer">
-  <!-- HEADER -->
   <div class="header">
     <div class="logo">
       <div class="logo-icon">🌌</div>
-      <span>Khel.o · HyperCode Universe</span>
+      <span>Khel.o · Real-Time Knowledge Universe</span>
     </div>
-    <div class="controls">
+    <div class="btn-row">
       <button class="btn" onclick="engine.showStats()">📊 Stats</button>
       <button class="btn" onclick="engine.exportAll()">💾 Export</button>
       <button class="btn btn-primary" onclick="engine.help()">❓ Help</button>
     </div>
   </div>
 
-  <!-- MAIN GRID -->
   <div class="main-grid">
-    <!-- LEFT: INPUT & VOICE -->
+    <!-- LEFT: Input & Essence Extraction -->
     <div class="panel">
-      <div class="panel-title">📥 Input & Voice</div>
+      <div class="panel-title">📥 Input → Essence → Symbols</div>
       <div class="input-area">
-        <textarea id="input" placeholder="Type or speak anything..."></textarea>
-        <div style="display: flex; align-items: center; gap: 12px;">
-          <button class="voice-btn" id="voice-btn" onclick="voice.toggle()">🎤</button>
-          <div style="flex: 1;">
-            <div style="font-size: 12px; color: var(--muted);">Voice Input</div>
-            <div id="voice-status" style="font-size: 11px; color: var(--accent);">Click mic to start</div>
-          </div>
-        </div>
+        <textarea id="input" placeholder="Paste any text, URL, or content..."></textarea>
+        <input type="text" id="url-input" placeholder="Or enter URL to extract (https://...)">
         <div class="btn-row">
-          <button class="btn btn-primary" onclick="engine.compress()">🗜️ Compress</button>
-          <button class="btn" onclick="engine.analyze()">🔍 Analyze</button>
-          <button class="btn" onclick="engine.loadSample()">✨ Sample</button>
-          <button class="btn" onclick="engine.clear()">🗑️ Clear</button>
+          <button class="btn btn-primary" onclick="engine.extractEssence()">✨ Extract Essence</button>
+          <button class="btn" onclick="engine.extractFromURL()">🔗 Extract from URL</button>
+          <button class="btn" onclick="engine.convertToSymbols()">🔤 Convert to Symbols</button>
         </div>
+        <div class="symbol-row" id="symbol-display"></div>
         <div>
-          <div class="stat"><div class="stat-val" id="s-original">0</div><div class="stat-lbl">Original</div></div>
-          <div class="stat"><div class="stat-val" id="s-compressed">0</div><div class="stat-lbl">Compressed</div></div>
-          <div class="stat"><div class="stat-val" id="s-ratio">1x</div><div class="stat-lbl">Ratio</div></div>
+          <div class="stat"><div class="stat-val" id="s-essence">0</div><div class="stat-lbl">Essence</div></div>
+          <div class="stat"><div class="stat-val" id="s-symbols">0</div><div class="stat-lbl">Symbols</div></div>
+          <div class="stat"><div class="stat-val" id="s-compression">1x</div><div class="stat-lbl">Compression</div></div>
         </div>
       </div>
     </div>
 
-    <!-- RIGHT: OUTPUT & IKRq -->
+    <!-- RIGHT: IKR & Knowledge Map -->
     <div class="panel">
-      <div class="panel-title">✨ Symbol Output & IKRq</div>
-      <div class="symbol-row" id="symbols"></div>
-      <div class="output" id="output">Waiting for input...</div>
-      <div class="ikr-display" id="ikr-display" style="display: none;">
-        <div class="ikr-title">🎯 IKRq Score</div>
+      <div class="panel-title">🎯 IKR · Knowledge Map · 3D View</div>
+      <div class="ikr-display" id="ikr-display">
+        <div class="ikr-title">🎯 IKR Score (Idealistic Key Result)</div>
         <div class="ikr-score" id="ikr-score">0</div>
-        <div class="ikr-level" id="ikr-level"></div>
+        <div style="margin-top: 8px; font-size: 12px; color: #94a3b8;">
+          Measures: Wisdom + Understanding + Contribution
+        </div>
       </div>
+      <div class="output" id="output">Waiting for input...</div>
       <div class="btn-row">
-        <button class="btn" onclick="engine.decompress()">📂 Decompress</button>
-        <button class="btn" onclick="engine.speak()">🔊 Speak</button>
-        <button class="btn" onclick="engine.visualize()">🌊 Visualize</button>
+        <button class="btn" onclick="engine.view3D()">🌊 View in 3D</button>
+        <button class="btn" onclick="engine.addToMap()">🗺️ Add to Knowledge Map</button>
+        <button class="btn" onclick="engine.share()">🔗 Share</button>
       </div>
     </div>
   </div>
@@ -359,139 +304,21 @@ textarea { min-height: 120px; }
 
 <script>
 // ============================================
-// VOICE ENGINE (Web Speech API)
-// ============================================
-const voice = {
-  recognition: null,
-  isRecording: false,
-  
-  toggle() {
-    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-      engine.showToast('Voice not supported');
-      return;
-    }
-    
-    if (this.isRecording) {
-      this.recognition.stop();
-      this.isRecording = false;
-      document.getElementById('voice-btn').classList.remove('recording');
-      document.getElementById('voice-status').textContent = 'Click mic to start';
-      return;
-    }
-    
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    this.recognition = new SpeechRecognition();
-    this.recognition.continuous = false;
-    this.recognition.interimResults = true;
-    this.recognition.lang = 'en-US';
-    
-    this.recognition.onstart = () => {
-      this.isRecording = true;
-      document.getElementById('voice-btn').classList.add('recording');
-      document.getElementById('voice-status').textContent = 'Listening...';
-    };
-    
-    this.recognition.onresult = (event) => {
-      let transcript = '';
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        transcript += event.results[i][0].transcript;
-      }
-      document.getElementById('input').value = transcript;
-      document.getElementById('voice-status').textContent = transcript;
-    };
-    
-    this.recognition.onerror = (event) => {
-      engine.showToast('Voice error: ' + event.error);
-      this.isRecording = false;
-      document.getElementById('voice-btn').classList.remove('recording');
-    };
-    
-    this.recognition.onend = () => {
-      this.isRecording = false;
-      document.getElementById('voice-btn').classList.remove('recording');
-      document.getElementById('voice-status').textContent = 'Click mic to start';
-    };
-    
-    this.recognition.start();
-  },
-  
-  speak(text) {
-    if (!('speechSynthesis' in window)) {
-      engine.showToast('Speech not supported');
-      return;
-    }
-    
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 0.9;
-    utterance.pitch = 1;
-    utterance.volume = 1;
-    speechSynthesis.speak(utterance);
-  }
-};
-
-// ============================================
-// IKRq SCORING ENGINE
-// ============================================
-const ikrq = {
-  signals: {
-    empathy: ['help','child','blind','feel','heart','love','care','kind','compassion','together','we','us','everyone','all'],
-    wisdom: ['why','how','meaning','truth','understand','wisdom','learn','know','see','witness','remember'],
-    scope: ['planet','earth','universe','all','every','whole','infinite','cosmic','eternal','always'],
-    action: ['build','create','heal','grow','become','transform','evolve','awaken','liberate','serve'],
-    nature: ['water','soil','tree','sun','moon','star','river','mountain','seed','flower','earth','air','fire'],
-    depth: ['silent','deep','root','ancient','sacred','hidden','still','quiet','pure','essential']
-  },
-  
-  score(text) {
-    const lower = text.toLowerCase();
-    const scores = {};
-    let total = 0;
-    
-    for (const [cat, signals] of Object.entries(this.signals)) {
-      let count = 0;
-      signals.forEach(s => { if (lower.includes(s)) count++; });
-      scores[cat] = Math.min(1, count / 3);
-      total += scores[cat];
-    }
-    
-    const maxPossible = Object.keys(this.signals).length;
-    const score = Math.round((total / maxPossible) * 100);
-    
-    let level = 1;
-    if (score >= 15) level = 2;
-    if (score >= 30) level = 3;
-    if (score >= 45) level = 5;
-    if (score >= 60) level = 8;
-    if (score >= 75) level = 13;
-    if (score >= 88) level = 21;
-    
-    return { score, level, breakdown: scores };
-  }
-};
-
-// ============================================
-// MAIN ENGINE
+// KHÉL.O ENGINE
 // ============================================
 const engine = {
   scene: null,
   camera: null,
   renderer: null,
   particles: null,
-  compressedData: null,
-  binaryData: null,
+  cy: null,
+  essenceData: null,
   symbolData: null,
+  ikrScore: 0,
   
   init() {
     this.init3D();
     this.animate();
-    
-    // Check if hypercode-lib.js loaded
-    if (window.Q) {
-      console.log('✓ HyperCode Library loaded');
-      console.log(`✓ ${Object.keys(window.Q.lib).length} symbols available`);
-    } else {
-      console.warn('⚠ HyperCode Library not found');
-    }
   },
   
   init3D() {
@@ -543,231 +370,346 @@ const engine = {
     });
   },
   
-  async compress() {
+  async extractEssence() {
     const input = document.getElementById('input').value;
     if (!input.trim()) {
       this.showToast('Please enter content');
       return;
     }
     
-    this.showToast('🗜️ Compressing...');
+    this.showToast('✨ Extracting essence...');
+    
+    // Use compromise.js for linguistic analysis
+    const doc = compromise(input);
+    
+    // Extract entities
+    const people = doc.people().out('array');
+    const places = doc.places().out('array');
+    const organizations = doc.organizations().out('array');
+    
+    // Extract keywords (nouns with high frequency)
+    const nouns = doc.nouns().out('array');
+    const keywords = [...new Set(nouns)].slice(0, 20);
+    
+    // Extract topics (sentences with key concepts)
+    const topics = doc.sentences().out('array').slice(0, 10);
+    
+    // Calculate essence vector
+    const essence = {
+      type: this.detectType(input),
+      entities: { people, places, organizations },
+      keywords,
+      topics,
+      wordCount: doc.words().length,
+      sentenceCount: doc.sentences().length
+    };
+    
+    this.essenceData = essence;
+    
+    // Calculate IKR score
+    this.calculateIKR(essence);
+    
+    // Display essence
+    this.displayEssence(essence);
+    
+    // Convert to symbols
+    this.convertToSymbols();
+    
+    this.showToast('✓ Essence extracted');
+  },
+  
+  async extractFromURL() {
+    const url = document.getElementById('url-input').value;
+    if (!url.trim()) {
+      this.showToast('Please enter URL');
+      return;
+    }
+    
+    this.showToast('🔗 Extracting from URL...');
     
     try {
-      const encoder = new TextEncoder();
-      const data = encoder.encode(input);
+      // Use a CORS proxy for demo
+      const proxy = 'https://api.allorigins.win/get?url=';
+      const response = await fetch(proxy + encodeURIComponent(url));
+      const data = await response.json();
       
-      const cs = new CompressionStream('deflate');
-      const writer = cs.writable.getWriter();
-      writer.write(data);
-      writer.close();
+      // Extract text from HTML
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(data.contents, 'text/html');
       
-      const compressedStream = cs.readable;
-      const reader = compressedStream.getReader();
-      const chunks = [];
+      // Remove scripts and styles
+      doc.querySelectorAll('script, style').forEach(el => el.remove());
       
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        chunks.push(value);
-      }
+      const text = doc.body.innerText;
+      document.getElementById('input').value = text;
       
-      const compressed = new Uint8Array(chunks.reduce((acc, chunk) => acc + chunk.length, 0));
-      let offset = 0;
-      for (const chunk of chunks) {
-        compressed.set(chunk, offset);
-        offset += chunk.length;
-      }
+      // Extract essence
+      await this.extractEssence();
       
-      this.compressedData = compressed;
-      this.binaryData = Array.from(compressed).map(byte => byte.toString(2).padStart(8, '0')).join('');
-      
-      // Convert to symbols using hypercode
-      this.convertToSymbols();
-      
-      // Calculate IKRq score
-      const ikrResult = ikrq.score(input);
-      this.showIKRq(ikrResult);
-      
-      // Update stats
-      document.getElementById('s-original').textContent = data.length;
-      document.getElementById('s-compressed').textContent = compressed.length;
-      document.getElementById('s-ratio').textContent = (data.length / compressed.length).toFixed(2) + 'x';
-      
-      this.showToast('✓ Compressed');
+      this.showToast('✓ URL extracted');
     } catch (e) {
-      this.showToast('Compression error: ' + e.message);
+      this.showToast('Error extracting URL: ' + e.message);
     }
   },
   
+  detectType(input) {
+    if (input.includes('function') || input.includes('const ')) return 'code';
+    if (input.startsWith('http')) return 'url';
+    if (input.includes('{') && input.includes('}')) {
+      try {
+        JSON.parse(input);
+        return 'json';
+      } catch(e) {}
+    }
+    return 'text';
+  },
+  
+  calculateIKR(essence) {
+    // IKR calculation based on:
+    // - Wisdom (depth of content)
+    // - Understanding (clarity)
+    // - Contribution (value to others)
+    
+    const wisdom = Math.min(100, essence.keywords.length * 5);
+    const understanding = Math.min(100, essence.topics.length * 10);
+    const contribution = Math.min(100, essence.entities.people.length * 10 + essence.entities.places.length * 10);
+    
+    this.ikrScore = Math.round((wisdom + understanding + contribution) / 3);
+    
+    document.getElementById('ikr-score').textContent = this.ikrScore;
+  },
+  
+  displayEssence(essence) {
+    const output = document.getElementById('output');
+    output.innerHTML = `
+<strong style="color: #fbbf24;">Essence Extracted</strong>
+
+<strong style="color: #a7f3d0;">Type:</strong> ${essence.type}
+<strong style="color: #a7f3d0;">Words:</strong> ${essence.wordCount}
+<strong style="color: #a7f3d0;">Sentences:</strong> ${essence.sentenceCount}
+
+<strong style="color: #fbbf24;">Keywords (${essence.keywords.length}):</strong>
+${essence.keywords.join(', ')}
+
+<strong style="color: #fbbf24;">Entities:</strong>
+People: ${essence.entities.people.length}
+Places: ${essence.entities.places.length}
+Organizations: ${essence.entities.organizations.length}
+
+<strong style="color: #fbbf24;">Topics:</strong>
+${essence.topics.map(t => '• ' + t).join('\n')}
+`;
+    
+    document.getElementById('s-essence').textContent = essence.keywords.length;
+  },
+  
   convertToSymbols() {
-    if (!this.binaryData) return;
+    if (!this.essenceData) {
+      this.showToast('Please extract essence first');
+      return;
+    }
     
-    const lib = window.Q ? window.Q.lib : null;
+    this.showToast('🔤 Converting to symbols...');
+    
+    // Use hypercode library if available
+    const lib = window.Q ? window.Q.lib : (window.KHELO ? window.KHELO.lib : null);
+    
     const symbols = [];
-    const display = document.getElementById('symbols');
+    const display = document.getElementById('symbol-display');
     
-    // Map binary chunks to symbols
-    const chunkSize = 8;
-    for (let i = 0; i < this.binaryData.length; i += chunkSize) {
-      const chunk = this.binaryData.substring(i, i + chunkSize);
-      const value = parseInt(chunk, 2);
-      
+    // Map keywords to symbols
+    this.essenceData.keywords.forEach((keyword, i) => {
       let symbol;
       if (lib) {
         const keys = Object.keys(lib);
-        symbol = keys[value % keys.length];
+        symbol = keys[i % keys.length];
       } else {
-        symbol = String.fromCharCode(65 + (value % 26));
+        // Fallback: use emoji based on keyword
+        const emojis = ['🌱', '', '🔥', '🌍', '☀️', '🌙', '⭐', '🌸', '🍃', '🎨'];
+        symbol = emojis[i % emojis.length];
       }
-      
       symbols.push(symbol);
-    }
+    });
     
     this.symbolData = symbols;
     
     // Display symbols
-    display.innerHTML = symbols.slice(0, 100).map(s => {
+    display.innerHTML = symbols.map((s, i) => {
       const lib = window.Q ? window.Q.lib : null;
       const data = lib && lib[s] ? lib[s] : { col: '#888' };
-      return `<div class="symbol" style="background:${data.col}20; color:${data.col}; border:2px solid ${data.col};" title="${s}">${s}</div>`;
-    }).join('') + (symbols.length > 100 ? '<div style="color:var(--muted);padding:8px;">... and ' + (symbols.length - 100) + ' more</div>' : '');
+      return `<div class="symbol" style="background:${data.col}20; color:${data.col}; border:2px solid ${data.col};" 
+              title="${this.essenceData.keywords[i]}" onclick="engine.view3DNode(${i})">${s}</div>`;
+    }).join('');
     
-    document.getElementById('output').textContent = symbols.join('');
+    document.getElementById('s-symbols').textContent = symbols.length;
+    
+    const compression = (this.essenceData.wordCount / symbols.length).toFixed(1);
+    document.getElementById('s-compression').textContent = compression + 'x';
+    
+    this.showToast('✓ Symbols generated');
   },
   
-  async decompress() {
-    if (!this.compressedData) {
-      this.showToast('No data to decompress');
+  view3D() {
+    if (!this.essenceData) {
+      this.showToast('Please extract essence first');
       return;
     }
     
-    this.showToast('📂 Decompressing...');
+    this.showToast('🌊 Opening 3D view...');
     
-    try {
-      const ds = new DecompressionStream('deflate');
-      const writer = ds.writable.getWriter();
-      writer.write(this.compressedData);
-      writer.close();
-      
-      const reader = ds.readable.getReader();
-      const chunks = [];
-      
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        chunks.push(value);
+    const container = document.getElementById('graph-container');
+    container.classList.add('active');
+    
+    // Initialize Cytoscape
+    this.cy = cytoscape({
+      container: container,
+      elements: this.buildGraphElements(),
+      style: [
+        {
+          selector: 'node',
+          style: {
+            'label': 'data(label)',
+            'background-color': '#fbbf24',
+            'color': '#000',
+            'text-valign': 'center',
+            'text-halign': 'center',
+            'width': 40,
+            'height': 40,
+            'font-size': '12px'
+          }
+        },
+        {
+          selector: 'edge',
+          style: {
+            'width': 2,
+            'line-color': '#a371f7',
+            'target-arrow-color': '#a371f7',
+            'target-arrow-shape': 'triangle'
+          }
+        }
+      ],
+      layout: {
+        name: 'cose',
+        animate: true,
+        animationDuration: 1000
       }
-      
-      const decompressed = new Uint8Array(chunks.reduce((acc, chunk) => acc + chunk.length, 0));
-      let offset = 0;
-      for (const chunk of chunks) {
-        decompressed.set(chunk, offset);
-        offset += chunk.length;
-      }
-      
-      const decoder = new TextDecoder();
-      const text = decoder.decode(decompressed);
-      
-      document.getElementById('output').textContent = text;
-      this.showToast('✓ Decompressed');
-    } catch (e) {
-      this.showToast('Decompression error: ' + e.message);
-    }
-  },
-  
-  showIKRq(result) {
-    const display = document.getElementById('ikr-display');
-    display.style.display = 'block';
+    });
     
-    document.getElementById('ikr-score').textContent = result.score;
-    
-    const fibColors = {1:'#FF0000',2:'#FF7F00',3:'#FFFF00',5:'#00FF00',8:'#0000FF',13:'#9400D3',21:'#FFFFFF'};
-    const fibNames = {1:'Seed',2:'Connection',3:'Integration',5:'Elements',8:'Directions',13:'Cycles',21:'Completion'};
-    const col = fibColors[result.level];
-    
-    document.getElementById('ikr-level').innerHTML = `<span style="color:${col};">Level ${result.level} · ${fibNames[result.level]}</span>`;
-  },
-  
-  speak() {
-    const output = document.getElementById('output').textContent;
-    if (!output || output === 'Waiting for input...') {
-      this.showToast('No output to speak');
-      return;
-    }
-    voice.speak(output);
-  },
-  
-  visualize() {
-    this.showToast('🌊 Graph Wonder activated');
-    // Animate camera
-    const targetZ = this.camera.position.z === 50 ? 30 : 50;
-    const animate = () => {
-      const diff = targetZ - this.camera.position.z;
-      if (Math.abs(diff) > 0.1) {
-        this.camera.position.z += diff * 0.05;
-        requestAnimationFrame(animate);
-      }
+    // Add close button
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'close-graph';
+    closeBtn.textContent = '✕ Close 3D View';
+    closeBtn.onclick = () => {
+      container.classList.remove('active');
+      container.innerHTML = '';
+      this.cy = null;
     };
-    animate();
+    container.appendChild(closeBtn);
   },
   
-  analyze() {
-    const input = document.getElementById('input').value;
-    if (!input.trim()) {
-      this.showToast('Please enter content');
+  view3DNode(index) {
+    if (!this.cy) {
+      this.view3D();
+    }
+    
+    // Focus on specific node
+    setTimeout(() => {
+      const nodes = this.cy.nodes();
+      if (nodes[index]) {
+        this.cy.center(nodes[index]);
+        this.cy.zoom(2);
+      }
+    }, 500);
+  },
+  
+  buildGraphElements() {
+    const elements = [];
+    
+    // Add center node (essence)
+    elements.push({
+      data: { id: 'center', label: 'Essence' }
+    });
+    
+    // Add keyword nodes
+    this.essenceData.keywords.forEach((keyword, i) => {
+      elements.push({
+        data: { id: `keyword-${i}`, label: keyword }
+      });
+      elements.push({
+        data: { source: 'center', target: `keyword-${i}` }
+      });
+    });
+    
+    // Add entity nodes
+    this.essenceData.entities.places.forEach((place, i) => {
+      elements.push({
+        data: { id: `place-${i}`, label: place }
+      });
+      elements.push({
+        data: { source: 'center', target: `place-${i}` }
+      });
+    });
+    
+    return elements;
+  },
+  
+  addToMap() {
+    if (!this.essenceData) {
+      this.showToast('Please extract essence first');
       return;
     }
     
-    const words = input.split(/\s+/).length;
-    const chars = input.length;
-    const lines = input.split('\n').length;
+    this.showToast('🗺️ Adding to knowledge map...');
     
-    const output = `Analysis:
-Words: ${words}
-Characters: ${chars}
-Lines: ${lines}
-Compression: ${(chars / (this.compressedData?.length || chars)).toFixed(2)}x`;
+    // Store in localStorage for now
+    const map = JSON.parse(localStorage.getItem('khelo-map') || '[]');
+    map.push({
+      timestamp: Date.now(),
+      essence: this.essenceData,
+      ikr: this.ikrScore,
+      symbols: this.symbolData
+    });
+    localStorage.setItem('khelo-map', JSON.stringify(map));
     
-    document.getElementById('output').textContent = output;
-    this.showToast('✓ Analysis complete');
+    this.showToast('✓ Added to knowledge map');
   },
   
-  loadSample() {
-    document.getElementById('input').value = 'The individual self encompasses body, mind, and spirit. Society and community form the fabric of human connection. Econology integrates ecological sustainability with economic systems. Earth engineering shapes our physical environment through architecture and infrastructure. Discovery drives scientific exploration and understanding. Innovation creates new possibilities through art, technology, and creativity. Co-creation and collaboration amplify collective potential. Liberation represents the ultimate freedom of consciousness.';
-    this.showToast('✓ Sample loaded');
-  },
-  
-  clear() {
-    document.getElementById('input').value = '';
-    document.getElementById('output').textContent = 'Waiting for input...';
-    document.getElementById('symbols').innerHTML = '';
-    document.getElementById('ikr-display').style.display = 'none';
-    this.compressedData = null;
-    this.binaryData = null;
-    this.symbolData = null;
-    this.showToast('✓ Cleared');
-  },
-  
-  showStats() {
-    const lib = window.Q ? window.Q.lib : null;
-    const symbolCount = lib ? Object.keys(lib).length : 0;
-    this.showToast(`📊 ${symbolCount} symbols available`);
-  },
-  
-  exportAll() {
+  share() {
+    if (!this.essenceData) {
+      this.showToast('Nothing to share');
+      return;
+    }
+    
     const data = {
-      input: document.getElementById('input').value,
-      output: document.getElementById('output').textContent,
+      essence: this.essenceData,
+      ikr: this.ikrScore,
       symbols: this.symbolData,
-      compressed: this.compressedData ? Array.from(this.compressedData) : null,
-      timestamp: new Date().toISOString()
+      timestamp: Date.now()
     };
     
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `khelo-export-${Date.now()}.json`;
+    a.download = `khelo-essence-${Date.now()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    
+    this.showToast('✓ Shared');
+  },
+  
+  showStats() {
+    const map = JSON.parse(localStorage.getItem('khelo-map') || '[]');
+    this.showToast(`📊 ${map.length} contributions in knowledge map`);
+  },
+  
+  exportAll() {
+    const map = JSON.parse(localStorage.getItem('khelo-map') || '[]');
+    const blob = new Blob([JSON.stringify(map, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `khelo-knowledge-map-${Date.now()}.json`;
     a.click();
     URL.revokeObjectURL(url);
     
@@ -775,7 +717,7 @@ Compression: ${(chars / (this.compressedData?.length || chars)).toFixed(2)}x`;
   },
   
   help() {
-    this.showToast('🌌 Khel.o: Type/speak → Compress → Symbols → IKRq → Decompress');
+    this.showToast('🌌 Paste content → Extract essence → Convert to symbols → View in 3D');
   },
   
   showToast(msg) {
