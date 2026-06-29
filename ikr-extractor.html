@@ -3,721 +3,400 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Khel.o · Real-Time Knowledge Universe</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/cytoscape@3.26.0/dist/cytoscape.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/compromise/14.10.0/compromise.min.js"></script>
+<title>Khel.o · Chunk Compiler · WonderGraph</title>
+<script src="hypercode-lib.js"></script>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body {
-  background: #030508;
-  color: #f8fafc;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  overflow: hidden;
-  height: 100vh;
-}
-#canvas-container {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-}
-.ui-layer {
-  position: absolute;
-  inset: 0;
-  z-index: 10;
-  pointer-events: none;
-  display: flex;
-  flex-direction: column;
-  padding: 20px;
-}
-.ui-layer > * { pointer-events: auto; }
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-.logo {
-  font-size: 24px;
-  font-weight: 700;
-  color: #a7f3d0;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.logo-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #fbbf24, #a371f7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-}
-.main-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  flex: 1;
-  overflow: hidden;
-}
-@media (max-width: 900px) {
-  .main-grid { grid-template-columns: 1fr; }
-}
-.panel {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 16px;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-.panel-title {
-  font-size: 16px;
-  font-weight: 700;
-  color: #fbbf24;
-  margin-bottom: 12px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.input-area {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  overflow: hidden;
-}
-textarea, input[type="text"] {
-  width: 100%;
-  background: rgba(0,0,0,0.3);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 10px;
-  padding: 12px;
-  color: #fff;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 13px;
-  resize: none;
-  outline: none;
-}
-textarea:focus, input:focus {
-  border-color: #fbbf24;
-}
-textarea { min-height: 120px; }
-.btn {
-  background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.2);
-  color: #fff;
-  padding: 10px 16px;
-  border-radius: 20px;
-  cursor: pointer;
-  font-size: 13px;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.btn:hover {
-  background: rgba(255,255,255,0.2);
-  transform: translateY(-2px);
-}
-.btn-primary {
-  background: linear-gradient(135deg, #fbbf24, #a371f7);
-  color: #000;
-  border: none;
-}
-.btn-row {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-.output {
-  flex: 1;
-  background: rgba(0,0,0,0.5);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 10px;
-  padding: 14px;
-  overflow-y: auto;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
-  line-height: 1.6;
-  white-space: pre-wrap;
-  word-break: break-all;
-  color: #a7f3d0;
-}
-.symbol-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin: 10px 0;
-}
-.symbol {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 16px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.symbol:hover {
-  transform: scale(1.2);
-}
-.ikr-display {
-  background: linear-gradient(135deg, rgba(251,191,36,0.1), rgba(163,113,247,0.1));
-  border: 1px solid #fbbf24;
-  border-radius: 12px;
-  padding: 16px;
-  margin: 12px 0;
-}
-.ikr-title {
-  font-size: 14px;
-  font-weight: 700;
-  color: #fbbf24;
-  margin-bottom: 8px;
-}
-.ikr-score {
-  font-size: 32px;
-  font-weight: 700;
-  color: #fbbf24;
-  font-family: 'JetBrains Mono', monospace;
-}
-.stat {
-  display: inline-block;
-  margin: 6px 14px 6px 0;
-}
-.stat-val {
-  font-size: 20px;
-  color: #fbbf24;
-  font-weight: 700;
-  font-family: 'JetBrains Mono', monospace;
-}
-.stat-lbl {
-  font-size: 10px;
-  color: #94a3b8;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-.toast {
-  position: fixed;
-  top: 80px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(16,185,129,0.95);
-  color: #fff;
-  padding: 12px 24px;
-  border-radius: 24px;
-  font-weight: 700;
-  z-index: 1000;
-  animation: slideDown 0.3s;
-}
-@keyframes slideDown {
-  from { transform: translate(-50%, -20px); opacity: 0; }
-  to { transform: translate(-50%, 0); opacity: 1; }
-}
-#graph-container {
-  position: absolute;
-  inset: 0;
-  z-index: 5;
-  display: none;
-}
-#graph-container.active {
-  display: block;
-}
-.close-graph {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  z-index: 10;
-  background: rgba(0,0,0,0.8);
-  border: 1px solid rgba(255,255,255,0.2);
-  color: #fff;
-  padding: 10px 20px;
-  border-radius: 20px;
-  cursor: pointer;
-}
+body { background: #030508; color: #f8fafc; font-family: -apple-system, sans-serif; padding: 20px; }
+.container { max-width: 1400px; margin: 0 auto; }
+h1 { color: #fbbf24; margin-bottom: 20px; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+.panel { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 20px; }
+.panel h2 { color: #fbbf24; font-size: 16px; margin-bottom: 12px; }
+textarea, input { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 12px; color: #fff; font-family: monospace; font-size: 13px; }
+textarea { min-height: 200px; resize: vertical; }
+.btn { background: #fbbf24; color: #000; border: none; padding: 10px 18px; border-radius: 20px; font-weight: 700; cursor: pointer; margin: 4px; }
+.btn:hover { background: #fcd34d; }
+.btn.alt { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); }
+.chunk { background: rgba(0,0,0,0.3); border-left: 3px solid #fbbf24; padding: 12px; margin: 10px 0; border-radius: 8px; }
+.chunk-title { color: #fbbf24; font-weight: 700; margin-bottom: 6px; }
+.chunk-text { font-size: 13px; line-height: 1.6; color: #94a3b8; }
+.chunk-symbols { margin-top: 8px; font-size: 18px; }
+.graph { background: rgba(0,0,0,0.5); border-radius: 12px; padding: 20px; min-height: 400px; position: relative; }
+.node { position: absolute; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; cursor: pointer; transition: all 0.3s; }
+.node:hover { transform: scale(1.2); }
+.edge { position: absolute; height: 2px; background: rgba(251,191,36,0.3); transform-origin: left center; }
+.stats { display: flex; gap: 20px; margin: 20px 0; flex-wrap: wrap; }
+.stat { background: rgba(255,255,255,0.05); padding: 12px 20px; border-radius: 12px; }
+.stat-val { font-size: 24px; font-weight: 700; color: #fbbf24; }
+.stat-lbl { font-size: 11px; color: #94a3b8; text-transform: uppercase; }
+.toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(16,185,129,0.95); color: #fff; padding: 12px 24px; border-radius: 24px; font-weight: 700; z-index: 1000; }
 </style>
 </head>
 <body>
+<div class="container">
+  <h1>🌌 Khel.o · Chunk Compiler · WonderGraph</h1>
+  <p style="color:#94a3b8;margin-bottom:20px;">Input → Chunk → Extract Essence → Map Symbols → WonderGraph</p>
 
-<div id="canvas-container"></div>
-<div id="graph-container"></div>
-
-<div class="ui-layer">
-  <div class="header">
-    <div class="logo">
-      <div class="logo-icon">🌌</div>
-      <span>Khel.o · Real-Time Knowledge Universe</span>
+  <div class="grid">
+    <div class="panel">
+      <h2>📥 Input (Text, URL, or Paste)</h2>
+      <textarea id="input" placeholder="Paste text, enter URL, or upload file..."></textarea>
+      <div style="margin-top:12px;">
+        <button class="btn" onclick="compiler.chunkAndExtract()">🔪 Chunk & Extract</button>
+        <button class="btn" onclick="compiler.loadWiki()">📚 Load Wiki Page</button>
+        <button class="btn alt" onclick="compiler.loadSample()">✨ Sample</button>
+        <button class="btn alt" onclick="compiler.clear()">🗑️ Clear</button>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="stat-val" id="s-chunks">0</div><div class="stat-lbl">Chunks</div></div>
+        <div class="stat"><div class="stat-val" id="s-essence">0</div><div class="stat-lbl">Essence</div></div>
+        <div class="stat"><div class="stat-val" id="s-symbols">0</div><div class="stat-lbl">Symbols</div></div>
+        <div class="stat"><div class="stat-val" id="s-connections">0</div><div class="stat-lbl">Connections</div></div>
+      </div>
     </div>
-    <div class="btn-row">
-      <button class="btn" onclick="engine.showStats()">📊 Stats</button>
-      <button class="btn" onclick="engine.exportAll()">💾 Export</button>
-      <button class="btn btn-primary" onclick="engine.help()">❓ Help</button>
+
+    <div class="panel">
+      <h2>🌊 WonderGraph Visualization</h2>
+      <div class="graph" id="graph"></div>
+      <div style="margin-top:12px;">
+        <button class="btn" onclick="compiler.exportGraph()">💾 Export Graph</button>
+        <button class="btn alt" onclick="compiler.showConnections()">🔗 Show Connections</button>
+      </div>
     </div>
   </div>
 
-  <div class="main-grid">
-    <!-- LEFT: Input & Essence Extraction -->
-    <div class="panel">
-      <div class="panel-title">📥 Input → Essence → Symbols</div>
-      <div class="input-area">
-        <textarea id="input" placeholder="Paste any text, URL, or content..."></textarea>
-        <input type="text" id="url-input" placeholder="Or enter URL to extract (https://...)">
-        <div class="btn-row">
-          <button class="btn btn-primary" onclick="engine.extractEssence()">✨ Extract Essence</button>
-          <button class="btn" onclick="engine.extractFromURL()">🔗 Extract from URL</button>
-          <button class="btn" onclick="engine.convertToSymbols()">🔤 Convert to Symbols</button>
-        </div>
-        <div class="symbol-row" id="symbol-display"></div>
-        <div>
-          <div class="stat"><div class="stat-val" id="s-essence">0</div><div class="stat-lbl">Essence</div></div>
-          <div class="stat"><div class="stat-val" id="s-symbols">0</div><div class="stat-lbl">Symbols</div></div>
-          <div class="stat"><div class="stat-val" id="s-compression">1x</div><div class="stat-lbl">Compression</div></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- RIGHT: IKR & Knowledge Map -->
-    <div class="panel">
-      <div class="panel-title">🎯 IKR · Knowledge Map · 3D View</div>
-      <div class="ikr-display" id="ikr-display">
-        <div class="ikr-title">🎯 IKR Score (Idealistic Key Result)</div>
-        <div class="ikr-score" id="ikr-score">0</div>
-        <div style="margin-top: 8px; font-size: 12px; color: #94a3b8;">
-          Measures: Wisdom + Understanding + Contribution
-        </div>
-      </div>
-      <div class="output" id="output">Waiting for input...</div>
-      <div class="btn-row">
-        <button class="btn" onclick="engine.view3D()">🌊 View in 3D</button>
-        <button class="btn" onclick="engine.addToMap()">🗺️ Add to Knowledge Map</button>
-        <button class="btn" onclick="engine.share()">🔗 Share</button>
-      </div>
-    </div>
+  <div class="panel">
+    <h2>📊 Extracted Chunks with Essence & Symbols</h2>
+    <div id="chunks-output"></div>
   </div>
 </div>
 
 <script>
-// ============================================
-// KHÉL.O ENGINE
-// ============================================
-const engine = {
-  scene: null,
-  camera: null,
-  renderer: null,
-  particles: null,
-  cy: null,
-  essenceData: null,
-  symbolData: null,
-  ikrScore: 0,
+const compiler = {
+  chunks: [],
+  essence: [],
+  symbols: [],
+  connections: [],
   
-  init() {
-    this.init3D();
-    this.animate();
-  },
-  
-  init3D() {
-    const container = document.getElementById('canvas-container');
-    this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color(0x030508);
-    
-    this.camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-    this.camera.position.z = 50;
-    
-    this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
-    container.appendChild(this.renderer.domElement);
-    
-    // Create particle universe
-    const geometry = new THREE.BufferGeometry();
-    const vertices = [];
-    const colors = [];
-    
-    for (let i = 0; i < 5000; i++) {
-      vertices.push(
-        (Math.random() - 0.5) * 200,
-        (Math.random() - 0.5) * 200,
-        (Math.random() - 0.5) * 200
-      );
-      
-      const color = new THREE.Color();
-      color.setHSL(Math.random() * 0.2 + 0.1, 0.8, 0.6);
-      colors.push(color.r, color.g, color.b);
-    }
-    
-    geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-    geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-    
-    const material = new THREE.PointsMaterial({
-      size: 0.5,
-      vertexColors: true,
-      transparent: true,
-      opacity: 0.6
-    });
-    
-    this.particles = new THREE.Points(geometry, material);
-    this.scene.add(this.particles);
-    
-    window.addEventListener('resize', () => {
-      this.camera.aspect = window.innerWidth / window.innerHeight;
-      this.camera.updateProjectionMatrix();
-      this.renderer.setSize(window.innerWidth, window.innerHeight);
-    });
-  },
-  
-  async extractEssence() {
+  chunkAndExtract() {
     const input = document.getElementById('input').value;
     if (!input.trim()) {
       this.showToast('Please enter content');
       return;
     }
     
-    this.showToast('✨ Extracting essence...');
+    this.showToast('🔪 Chunking & Extracting...');
     
-    // Use compromise.js for linguistic analysis
-    const doc = compromise(input);
+    // Step 1: Chunk into paragraphs
+    this.chunks = this.chunkText(input);
     
-    // Extract entities
-    const people = doc.people().out('array');
-    const places = doc.places().out('array');
-    const organizations = doc.organizations().out('array');
+    // Step 2: Extract essence from each chunk
+    this.essence = this.chunks.map((chunk, i) => this.extractEssence(chunk, i));
     
-    // Extract keywords (nouns with high frequency)
-    const nouns = doc.nouns().out('array');
-    const keywords = [...new Set(nouns)].slice(0, 20);
+    // Step 3: Map to symbols using hypercode
+    this.symbols = this.essence.map(e => this.mapToSymbols(e));
     
-    // Extract topics (sentences with key concepts)
-    const topics = doc.sentences().out('array').slice(0, 10);
+    // Step 4: Find connections between chunks
+    this.connections = this.findConnections();
     
-    // Calculate essence vector
-    const essence = {
-      type: this.detectType(input),
-      entities: { people, places, organizations },
-      keywords,
-      topics,
-      wordCount: doc.words().length,
-      sentenceCount: doc.sentences().length
+    // Step 5: Render
+    this.renderChunks();
+    this.renderGraph();
+    this.updateStats();
+    
+    this.showToast('✓ Compiled successfully');
+  },
+  
+  chunkText(text) {
+    // Split by paragraphs, sentences, or semantic breaks
+    const paragraphs = text.split(/\n\n+/).filter(p => p.trim().length > 20);
+    
+    // If too few paragraphs, split by sentences
+    if (paragraphs.length < 3) {
+      return text.split(/[.!?]+/).filter(s => s.trim().length > 10).map(s => s.trim());
+    }
+    
+    return paragraphs.map(p => p.trim());
+  },
+  
+  extractEssence(chunk, index) {
+    // Extract keywords, entities, and semantic meaning
+    const words = chunk.split(/\s+/);
+    const keywords = this.extractKeywords(chunk);
+    const entities = this.extractEntities(chunk);
+    
+    // Calculate semantic vector (simplified)
+    const vector = this.calculateVector(keywords);
+    
+    return {
+      id: index,
+      text: chunk,
+      words: words.length,
+      keywords: keywords,
+      entities: entities,
+      vector: vector,
+      essence: keywords.slice(0, 3).join(' + ')
     };
-    
-    this.essenceData = essence;
-    
-    // Calculate IKR score
-    this.calculateIKR(essence);
-    
-    // Display essence
-    this.displayEssence(essence);
-    
-    // Convert to symbols
-    this.convertToSymbols();
-    
-    this.showToast('✓ Essence extracted');
   },
   
-  async extractFromURL() {
-    const url = document.getElementById('url-input').value;
-    if (!url.trim()) {
-      this.showToast('Please enter URL');
-      return;
-    }
-    
-    this.showToast('🔗 Extracting from URL...');
-    
-    try {
-      // Use a CORS proxy for demo
-      const proxy = 'https://api.allorigins.win/get?url=';
-      const response = await fetch(proxy + encodeURIComponent(url));
-      const data = await response.json();
-      
-      // Extract text from HTML
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(data.contents, 'text/html');
-      
-      // Remove scripts and styles
-      doc.querySelectorAll('script, style').forEach(el => el.remove());
-      
-      const text = doc.body.innerText;
-      document.getElementById('input').value = text;
-      
-      // Extract essence
-      await this.extractEssence();
-      
-      this.showToast('✓ URL extracted');
-    } catch (e) {
-      this.showToast('Error extracting URL: ' + e.message);
-    }
+  extractKeywords(text) {
+    const stops = new Set(['the','and','is','of','to','in','for','with','a','an','on','at','by','from','as','that','this','it','are','was','be','or','but','not','you','all','can','had','her','was','one','our','out']);
+    const words = text.toLowerCase().replace(/[^\w\s]/g,' ').split(/\s+/);
+    const freq = {};
+    words.forEach(w => {
+      if (w.length > 3 && !stops.has(w)) freq[w] = (freq[w] || 0) + 1;
+    });
+    return Object.entries(freq).sort((a,b) => b[1]-a[1]).slice(0, 10).map(e => e[0]);
   },
   
-  detectType(input) {
-    if (input.includes('function') || input.includes('const ')) return 'code';
-    if (input.startsWith('http')) return 'url';
-    if (input.includes('{') && input.includes('}')) {
-      try {
-        JSON.parse(input);
-        return 'json';
-      } catch(e) {}
-    }
-    return 'text';
+  extractEntities(text) {
+    const entities = {
+      people: (text.match(/\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\b/g) || []).slice(0, 5),
+      places: (text.match(/\b(?:New York|London|Paris|Tokyo|India|China|USA)\b/gi) || []),
+      numbers: (text.match(/\b\d+(?:\.\d+)?(?:%|k|m|b)?\b/g) || []).slice(0, 5)
+    };
+    return entities;
   },
   
-  calculateIKR(essence) {
-    // IKR calculation based on:
-    // - Wisdom (depth of content)
-    // - Understanding (clarity)
-    // - Contribution (value to others)
-    
-    const wisdom = Math.min(100, essence.keywords.length * 5);
-    const understanding = Math.min(100, essence.topics.length * 10);
-    const contribution = Math.min(100, essence.entities.people.length * 10 + essence.entities.places.length * 10);
-    
-    this.ikrScore = Math.round((wisdom + understanding + contribution) / 3);
-    
-    document.getElementById('ikr-score').textContent = this.ikrScore;
+  calculateVector(keywords) {
+    // Map keywords to 10D semantic space
+    const vector = new Array(10).fill(0);
+    keywords.forEach((kw, i) => {
+      const hash = kw.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
+      vector[i % 10] += hash / 1000;
+    });
+    // Normalize
+    const mag = Math.sqrt(vector.reduce((sum, v) => sum + v * v, 0));
+    return vector.map(v => v / (mag || 1));
   },
   
-  displayEssence(essence) {
-    const output = document.getElementById('output');
-    output.innerHTML = `
-<strong style="color: #fbbf24;">Essence Extracted</strong>
-
-<strong style="color: #a7f3d0;">Type:</strong> ${essence.type}
-<strong style="color: #a7f3d0;">Words:</strong> ${essence.wordCount}
-<strong style="color: #a7f3d0;">Sentences:</strong> ${essence.sentenceCount}
-
-<strong style="color: #fbbf24;">Keywords (${essence.keywords.length}):</strong>
-${essence.keywords.join(', ')}
-
-<strong style="color: #fbbf24;">Entities:</strong>
-People: ${essence.entities.people.length}
-Places: ${essence.entities.places.length}
-Organizations: ${essence.entities.organizations.length}
-
-<strong style="color: #fbbf24;">Topics:</strong>
-${essence.topics.map(t => '• ' + t).join('\n')}
-`;
-    
-    document.getElementById('s-essence').textContent = essence.keywords.length;
-  },
-  
-  convertToSymbols() {
-    if (!this.essenceData) {
-      this.showToast('Please extract essence first');
-      return;
-    }
-    
-    this.showToast('🔤 Converting to symbols...');
-    
+  mapToSymbols(essence) {
     // Use hypercode library if available
     const lib = window.Q ? window.Q.lib : (window.KHELO ? window.KHELO.lib : null);
     
-    const symbols = [];
-    const display = document.getElementById('symbol-display');
-    
-    // Map keywords to symbols
-    this.essenceData.keywords.forEach((keyword, i) => {
-      let symbol;
-      if (lib) {
-        const keys = Object.keys(lib);
-        symbol = keys[i % keys.length];
-      } else {
-        // Fallback: use emoji based on keyword
-        const emojis = ['🌱', '', '🔥', '🌍', '☀️', '🌙', '⭐', '🌸', '🍃', '🎨'];
-        symbol = emojis[i % emojis.length];
-      }
-      symbols.push(symbol);
-    });
-    
-    this.symbolData = symbols;
-    
-    // Display symbols
-    display.innerHTML = symbols.map((s, i) => {
-      const lib = window.Q ? window.Q.lib : null;
-      const data = lib && lib[s] ? lib[s] : { col: '#888' };
-      return `<div class="symbol" style="background:${data.col}20; color:${data.col}; border:2px solid ${data.col};" 
-              title="${this.essenceData.keywords[i]}" onclick="engine.view3DNode(${i})">${s}</div>`;
-    }).join('');
-    
-    document.getElementById('s-symbols').textContent = symbols.length;
-    
-    const compression = (this.essenceData.wordCount / symbols.length).toFixed(1);
-    document.getElementById('s-compression').textContent = compression + 'x';
-    
-    this.showToast('✓ Symbols generated');
-  },
-  
-  view3D() {
-    if (!this.essenceData) {
-      this.showToast('Please extract essence first');
-      return;
+    if (!lib) {
+      // Fallback: use emoji based on keywords
+      const emojis = ['🌱', '💧', '🔥', '🌍', '☀️', '🌙', '⭐', '🌸', '🍃', '🎨'];
+      return essence.keywords.slice(0, 5).map((kw, i) => emojis[i % emojis.length]);
     }
     
-    this.showToast('🌊 Opening 3D view...');
+    // Map keywords to hypercode symbols
+    const keys = Object.keys(lib);
+    return essence.keywords.slice(0, 5).map((kw, i) => {
+      const hash = kw.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
+      return keys[hash % keys.length];
+    });
+  },
+  
+  findConnections() {
+    const connections = [];
     
-    const container = document.getElementById('graph-container');
-    container.classList.add('active');
-    
-    // Initialize Cytoscape
-    this.cy = cytoscape({
-      container: container,
-      elements: this.buildGraphElements(),
-      style: [
-        {
-          selector: 'node',
-          style: {
-            'label': 'data(label)',
-            'background-color': '#fbbf24',
-            'color': '#000',
-            'text-valign': 'center',
-            'text-halign': 'center',
-            'width': 40,
-            'height': 40,
-            'font-size': '12px'
-          }
-        },
-        {
-          selector: 'edge',
-          style: {
-            'width': 2,
-            'line-color': '#a371f7',
-            'target-arrow-color': '#a371f7',
-            'target-arrow-shape': 'triangle'
-          }
+    // Connect chunks with similar keywords
+    for (let i = 0; i < this.essence.length; i++) {
+      for (let j = i + 1; j < this.essence.length; j++) {
+        const similarity = this.cosineSimilarity(this.essence[i].vector, this.essence[j].vector);
+        if (similarity > 0.3) {
+          connections.push({
+            from: i,
+            to: j,
+            strength: similarity
+          });
         }
-      ],
-      layout: {
-        name: 'cose',
-        animate: true,
-        animationDuration: 1000
       }
-    });
-    
-    // Add close button
-    const closeBtn = document.createElement('button');
-    closeBtn.className = 'close-graph';
-    closeBtn.textContent = '✕ Close 3D View';
-    closeBtn.onclick = () => {
-      container.classList.remove('active');
-      container.innerHTML = '';
-      this.cy = null;
-    };
-    container.appendChild(closeBtn);
-  },
-  
-  view3DNode(index) {
-    if (!this.cy) {
-      this.view3D();
     }
     
-    // Focus on specific node
-    setTimeout(() => {
-      const nodes = this.cy.nodes();
-      if (nodes[index]) {
-        this.cy.center(nodes[index]);
-        this.cy.zoom(2);
+    return connections;
+  },
+  
+  cosineSimilarity(v1, v2) {
+    let dot = 0, n1 = 0, n2 = 0;
+    for (let i = 0; i < v1.length; i++) {
+      dot += v1[i] * v2[i];
+      n1 += v1[i] * v1[i];
+      n2 += v2[i] * v2[i];
+    }
+    return dot / (Math.sqrt(n1) * Math.sqrt(n2) || 1);
+  },
+  
+  renderChunks() {
+    const output = document.getElementById('chunks-output');
+    output.innerHTML = this.essence.map((e, i) => `
+      <div class="chunk">
+        <div class="chunk-title">Chunk ${i + 1} · ${e.words} words</div>
+        <div class="chunk-text">${e.text.substring(0, 200)}${e.text.length > 200 ? '...' : ''}</div>
+        <div style="margin-top:8px;font-size:12px;color:#a7f3d0;">
+          <strong>Keywords:</strong> ${e.keywords.join(', ')}
+        </div>
+        <div style="margin-top:6px;font-size:12px;color:#94a3b8;">
+          <strong>Entities:</strong> People: ${e.entities.people.length}, Places: ${e.entities.places.length}, Numbers: ${e.entities.numbers.length}
+        </div>
+        <div class="chunk-symbols">${this.symbols[i].join(' ')}</div>
+        <div style="margin-top:6px;font-size:11px;color:#64748b;">
+          <strong>Essence:</strong> ${e.essence}
+        </div>
+      </div>
+    `).join('');
+  },
+  
+  renderGraph() {
+    const graph = document.getElementById('graph');
+    graph.innerHTML = '';
+    
+    const width = graph.offsetWidth;
+    const height = graph.offsetHeight;
+    const centerX = width / 2;
+    const centerY = height / 2;
+    const radius = Math.min(width, height) / 3;
+    
+    // Render nodes in circular layout
+    this.essence.forEach((e, i) => {
+      const angle = (i / this.essence.length) * Math.PI * 2;
+      const x = centerX + Math.cos(angle) * radius;
+      const y = centerY + Math.sin(angle) * radius;
+      
+      const node = document.createElement('div');
+      node.className = 'node';
+      node.style.left = (x - 30) + 'px';
+      node.style.top = (y - 30) + 'px';
+      node.style.background = `rgba(${Math.random()*255},${Math.random()*255},${Math.random()*255},0.2)`;
+      node.style.border = `2px solid #fbbf24`;
+      node.textContent = this.symbols[i][0] || '◉';
+      node.title = `Chunk ${i + 1}: ${e.essence}`;
+      node.onclick = () => this.highlightChunk(i);
+      
+      graph.appendChild(node);
+    });
+    
+    // Render edges
+    this.connections.forEach(conn => {
+      const node1 = graph.children[conn.from];
+      const node2 = graph.children[conn.to];
+      
+      const x1 = parseInt(node1.style.left) + 30;
+      const y1 = parseInt(node1.style.top) + 30;
+      const x2 = parseInt(node2.style.left) + 30;
+      const y2 = parseInt(node2.style.top) + 30;
+      
+      const length = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+      const angle = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+      
+      const edge = document.createElement('div');
+      edge.className = 'edge';
+      edge.style.left = x1 + 'px';
+      edge.style.top = y1 + 'px';
+      edge.style.width = length + 'px';
+      edge.style.transform = `rotate(${angle}deg)`;
+      edge.style.opacity = conn.strength;
+      
+      graph.appendChild(edge);
+    });
+  },
+  
+  highlightChunk(index) {
+    const chunks = document.querySelectorAll('.chunk');
+    chunks.forEach((c, i) => {
+      c.style.borderLeftColor = i === index ? '#10b981' : '#fbbf24';
+    });
+  },
+  
+  updateStats() {
+    document.getElementById('s-chunks').textContent = this.chunks.length;
+    document.getElementById('s-essence').textContent = this.essence.reduce((sum, e) => sum + e.keywords.length, 0);
+    document.getElementById('s-symbols').textContent = this.symbols.flat().length;
+    document.getElementById('s-connections').textContent = this.connections.length;
+  },
+  
+  async loadWiki() {
+    const url = prompt('Enter Wiki URL (e.g., https://kids.miraheze.org/wiki/Water):');
+    if (!url) return;
+    
+    this.showToast('📚 Fetching Wiki page...');
+    
+    try {
+      // Extract page title from URL
+      const title = url.split('/wiki/')[1]?.replace(/_/g, ' ') || 'Water';
+      
+      // Fetch from MediaWiki API
+      const apiUrl = `https://kids.miraheze.org/w/api.php?action=parse&page=${encodeURIComponent(title)}&prop=text&format=json&origin=*`;
+      const response = await fetch(apiUrl);
+      const data = await response.json();
+      
+      if (data.parse) {
+        // Extract text from HTML
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(data.parse.text['*'], 'text/html');
+        const text = doc.body.innerText;
+        
+        document.getElementById('input').value = text;
+        this.showToast('✓ Wiki page loaded');
+      } else {
+        this.showToast('❌ Page not found');
       }
-    }, 500);
-  },
-  
-  buildGraphElements() {
-    const elements = [];
-    
-    // Add center node (essence)
-    elements.push({
-      data: { id: 'center', label: 'Essence' }
-    });
-    
-    // Add keyword nodes
-    this.essenceData.keywords.forEach((keyword, i) => {
-      elements.push({
-        data: { id: `keyword-${i}`, label: keyword }
-      });
-      elements.push({
-        data: { source: 'center', target: `keyword-${i}` }
-      });
-    });
-    
-    // Add entity nodes
-    this.essenceData.entities.places.forEach((place, i) => {
-      elements.push({
-        data: { id: `place-${i}`, label: place }
-      });
-      elements.push({
-        data: { source: 'center', target: `place-${i}` }
-      });
-    });
-    
-    return elements;
-  },
-  
-  addToMap() {
-    if (!this.essenceData) {
-      this.showToast('Please extract essence first');
-      return;
+    } catch (e) {
+      this.showToast('❌ Error: ' + e.message);
     }
-    
-    this.showToast('🗺️ Adding to knowledge map...');
-    
-    // Store in localStorage for now
-    const map = JSON.parse(localStorage.getItem('khelo-map') || '[]');
-    map.push({
-      timestamp: Date.now(),
-      essence: this.essenceData,
-      ikr: this.ikrScore,
-      symbols: this.symbolData
-    });
-    localStorage.setItem('khelo-map', JSON.stringify(map));
-    
-    this.showToast('✓ Added to knowledge map');
   },
   
-  share() {
-    if (!this.essenceData) {
-      this.showToast('Nothing to share');
-      return;
-    }
-    
+  loadSample() {
+    document.getElementById('input').value = `Water is essential for all known forms of life. Only 3% of Earth's water is fresh, yet it sustains all terrestrial ecosystems. The water cycle involves evaporation, condensation, and precipitation.
+
+Human civilization has always developed around water sources. Ancient cities like Mohenjo-daro and Mesopotamia were built near rivers. Today, water scarcity affects over 2 billion people globally.
+
+Climate change is altering precipitation patterns worldwide. Glaciers are melting at unprecedented rates, affecting freshwater supplies. Conservation and sustainable water management are critical for future survival.`;
+    this.showToast('✓ Sample loaded');
+  },
+  
+  exportGraph() {
     const data = {
-      essence: this.essenceData,
-      ikr: this.ikrScore,
-      symbols: this.symbolData,
-      timestamp: Date.now()
+      chunks: this.chunks,
+      essence: this.essence,
+      symbols: this.symbols,
+      connections: this.connections,
+      timestamp: new Date().toISOString()
     };
     
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `khelo-essence-${Date.now()}.json`;
+    a.download = `khelo-graph-${Date.now()}.json`;
     a.click();
     URL.revokeObjectURL(url);
     
-    this.showToast('✓ Shared');
+    this.showToast('✓ Graph exported');
   },
   
-  showStats() {
-    const map = JSON.parse(localStorage.getItem('khelo-map') || '[]');
-    this.showToast(`📊 ${map.length} contributions in knowledge map`);
+  showConnections() {
+    const output = document.getElementById('chunks-output');
+    output.innerHTML = '<h3 style="color:#fbbf24;margin-bottom:12px;">🔗 Connections Between Chunks</h3>';
+    output.innerHTML += this.connections.map(conn => `
+      <div class="chunk">
+        <div class="chunk-title">Chunk ${conn.from + 1} ↔ Chunk ${conn.to + 1}</div>
+        <div class="chunk-text">Similarity: ${(conn.strength * 100).toFixed(1)}%</div>
+        <div style="margin-top:8px;font-size:12px;color:#a7f3d0;">
+          <strong>Shared Keywords:</strong> ${this.findSharedKeywords(conn.from, conn.to).join(', ')}
+        </div>
+      </div>
+    `).join('');
   },
   
-  exportAll() {
-    const map = JSON.parse(localStorage.getItem('khelo-map') || '[]');
-    const blob = new Blob([JSON.stringify(map, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `khelo-knowledge-map-${Date.now()}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-    
-    this.showToast('✓ Exported');
+  findSharedKeywords(i, j) {
+    const kw1 = new Set(this.essence[i].keywords);
+    const kw2 = this.essence[j].keywords;
+    return kw2.filter(kw => kw1.has(kw));
   },
   
-  help() {
-    this.showToast('🌌 Paste content → Extract essence → Convert to symbols → View in 3D');
+  clear() {
+    document.getElementById('input').value = '';
+    document.getElementById('chunks-output').innerHTML = '';
+    document.getElementById('graph').innerHTML = '';
+    this.chunks = [];
+    this.essence = [];
+    this.symbols = [];
+    this.connections = [];
+    this.updateStats();
+    this.showToast('✓ Cleared');
   },
   
   showToast(msg) {
@@ -726,25 +405,15 @@ ${essence.topics.map(t => '• ' + t).join('\n')}
     toast.textContent = msg;
     document.body.appendChild(toast);
     setTimeout(() => toast.remove(), 2500);
-  },
-  
-  animate() {
-    requestAnimationFrame(() => this.animate());
-    
-    if (this.particles) {
-      this.particles.rotation.x += 0.0005;
-      this.particles.rotation.y += 0.001;
-    }
-    
-    this.renderer.render(this.scene, this.camera);
   }
 };
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
-  engine.init();
+  console.log('🌌 Khel.o Chunk Compiler initialized');
+  if (window.Q) console.log('✓ HyperCode Library loaded');
+  else console.warn('⚠ HyperCode Library not found - using fallback symbols');
 });
 </script>
-
 </body>
 </html>
