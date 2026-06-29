@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IKR Extractor · Khel.o</title>
+<script src="hypercode-lib.js"></script>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#030508; color:#f8fafc; font-family:-apple-system,sans-serif; padding:20px; min-height:100vh; }
+.wrap { max-width:1200px; margin:0 auto; }
+h1 { color:#fbbf24; font-size:24px; margin-bottom:8px; }
+.sub { color:#94a3b8; font-size:13px; margin-bottom:20px; }
+.grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+@media(max-width:800px){ .grid{grid-template-columns:1fr;} }
+.panel { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:20px; }
+.panel h2 { color:#fbbf24; font-size:14px; margin-bottom:12px; text-transform:uppercase; letter-spacing:1px; }
+textarea, input { width:100%; background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.1); border-radius:10px; padding:12px; color:#fff; font-family:'JetBrains Mono',monospace; font-size:13px; resize:vertical; outline:none; }
+textarea:focus, input:focus { border-color:#fbbf24; }
+textarea { min-height:200px; }
+.btn { background:#fbbf24; color:#000; border:none; padding:10px 18px; border-radius:20px; font-weight:700; cursor:pointer; margin:4px; font-size:13px; }
+.btn:hover { background:#fcd34d; }
+.btn.alt { background:rgba(255,255,255,0.1); color:#fff; border:1px solid rgba(255,255,255,0.2); }
+.output { background:rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.1); border-radius:10px; padding:14px; min-height:120px; font-family:'JetBrains Mono',monospace; font-size:12px; line-height:1.6; white-space:pre-wrap; word-break:break-all; color:#a7f3d0; }
+.symbol-row { display:flex; flex-wrap:wrap; gap:6px; margin:10px 0; }
+.symbol { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:16px; cursor:pointer; transition:0.2s; }
+.symbol:hover { transform:scale(1.2); }
+.stat { display:inline-block; margin:6px 14px 6px 0; }
+.stat-val { font-size:20px; color:#fbbf24; font-weight:700; font-family:'JetBrains Mono',monospace; }
+.stat-lbl { font-size:10px; color:#94a3b8; text-transform:uppercase; letter-spacing:1px; }
+.git-box { background:#000; border:1px solid #fbbf24; border-radius:8px; padding:12px; font-family:'JetBrains Mono',monospace; font-size:11px; color:#a7f3d0; margin-top:10px; white-space:pre; overflow-x:auto; }
+.toast { position:fixed; top:20px; left:50%; transform:translateX(-50%); background:rgba(16,185,129,0.95); color:#fff; padding:10px 20px; border-radius:20px; font-weight:700; z-index:1000; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🌌 IKR Extractor · Symbol Synthesizer</h1>
+  <div class="sub">Paste anything → extract → convert to IKR → synthesize as symbols → upload to git</div>
+
+  <div class="grid">
+    <!-- INPUT -->
+    <div class="panel">
+      <h2>① Input (paste anything)</h2>
+      <textarea id="input" placeholder="Paste text, code, JSON, URL, or any content here..."></textarea>
+      <div style="margin-top:10px;">
+        <button class="btn" onclick="extract()">🔍 Extract</button>
+        <button class="btn" onclick="convertToIKR()">🎯 Convert to IKR</button>
+        <button class="btn" onclick="synthesize()">🌸 Synthesize Symbols</button>
+        <button class="btn alt" onclick="loadSample()">✨ Load Sample</button>
+      </div>
+    </div>
+
+    <!-- OUTPUT -->
+    <div class="panel">
+      <h2>② Output (symbols + IKR)</h2>
+      <div class="symbol-row" id="symbols"></div>
+      <div class="output" id="output">Waiting for input...</div>
+      <div style="margin-top:14px;">
+        <div class="stat"><div class="stat-val" id="s-chars">0</div><div class="stat-lbl">Symbols</div></div>
+        <div class="stat"><div class="stat-val" id="s-ikr">0</div><div class="stat-lbl">IKR</div></div>
+        <div class="stat"><div class="stat-val" id="s-compress">1x</div><div class="stat-lbl">Compression</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GIT UPLOAD -->
+  <div class="panel" style="margin-top:20px;">
+    <h2>③ Upload to Git (khelp repo)</h2>
+    <button class="btn" onclick="generateGitCommands()">📦 Generate Git Commands</button>
+    <button class="btn" onclick="downloadOutput()">💾 Download Output</button>
+    <div class="git-box" id="git-commands" style="display:none;"></div>
+  </div>
+</div>
+
+<script>
+// ============================================
+// IKR EXTRACTOR · SYMBOL SYNTHESIZER
+// Uses QWEN HYPER-CODE LIBRARY (hypercode-lib.js)
+// ============================================
+
+const IKR_EXTRACTOR = {
+  // IKR signal keywords for scoring
+  signals: {
+    empathy: ['help','child','blind','feel','heart','love','care','kind','compassion','together','we','us','everyone','all'],
+    wisdom: ['why','how','meaning','truth','understand','wisdom','learn','know','see','witness','remember'],
+    scope: ['planet','earth','universe','all','every','whole','infinite','cosmic','eternal','always'],
+    action: ['build','create','heal','grow','become','transform','evolve','awaken','liberate','serve'],
+    nature: ['water','soil','tree','sun','moon','star','river','mountain','seed','flower','earth','air','fire'],
+    depth: ['silent','deep','root','ancient','sacred','hidden','still','quiet','pure','essential']
+  },
+
+  // Extract meaningful content from any input
+  extract(input) {
+    const result = {
+      type: this.detectType(input),
+      raw: input,
+      words: input.split(/\s+/).filter(w => w.length > 0),
+      sentences: input.split(/[.!?]+/).filter(s => s.trim().length > 0),
+      keywords: this.extractKeywords(input),
+      urls: input.match(/https?:\/\/[^\s]+/g) || [],
+      codeBlocks: input.match(/```[\s\S]*?```/g) || [],
+      json: null
+    };
+
+    // Try JSON parse
+    try { result.json = JSON.parse(input); } catch(e) {}
+
+    return result;
+  },
+
+  detectType(input) {
+    if (input.trim().startsWith('{') || input.trim().startsWith('[')) {
+      try { JSON.parse(input); return 'json'; } catch(e) {}
+    }
+    if (input.includes('function') || input.includes('const ') || input.includes('class ')) return 'code';
+    if (input.startsWith('http')) return 'url';
+    if (input.match(/[◉◎◈⬢◇✦⊕∞]/)) return 'symbol';
+    return 'text';
+  },
+
+  extractKeywords(text) {
+    const stops = new Set(['the','and','is','of','to','in','for','with','a','an','on','at','by','from','as','that','this','it','are','was','be','or','but','not','you','all','can','had','her','was','one','our','out']);
+    const words = text.toLowerCase().replace(/[^\w\s]/g,' ').split(/\s+/);
+    const freq = {};
+    words.forEach(w => {
+      if (w.length > 3 && !stops.has(w)) freq[w] = (freq[w] || 0) + 1;
+    });
+    return Object.entries(freq).sort((a,b) => b[1]-a[1]).slice(0,12).map(e => e[0]);
+  },
+
+  // Convert extracted content to IKR score
+  toIKR(extracted) {
+    const text = extracted.raw.toLowerCase();
+    const scores = {};
+    let total = 0;
+
+    for (const [cat, signals] of Object.entries(this.signals)) {
+      let count = 0;
+      signals.forEach(s => { if (text.includes(s)) count++; });
+      scores[cat] = Math.min(1, count / 3);
+      total += scores[cat];
+    }
+
+    const maxPossible = Object.keys(this.signals).length;
+    const score = Math.round((total / maxPossible) * 100);
+
+    // Fibonacci level
+    let level = 1;
+    if (score >= 15) level = 2;
+    if (score >= 30) level = 3;
+    if (score >= 45) level = 5;
+    if (score >= 60) level = 8;
+    if (score >= 75) level = 13;
+    if (score >= 88) level = 21;
+
+    return { score, level, breakdown: scores };
+  },
+
+  // Synthesize to hyper-code symbols
+  synthesize(extracted, ikr) {
+    const lib = window.Q ? window.Q.lib : (window.KHELO ? window.KHELO.lib : null);
+    if (!lib) return { symbols: [], compressed: extracted.raw };
+
+    let compressed = extracted.raw;
+    const symbolsUsed = new Set();
+
+    // Pattern → symbol replacement
+    const patterns = {
+      'display:flex;align-items:center;justify-content:center;': 'z',
+      'position:absolute;top:50%;left:50%;': 'a',
+      'background:linear-gradient': 'b',
+      'display:grid': 'c',
+      'border-radius:50%': 'd',
+      'font-weight:bold': 'e',
+      'position:fixed': 'f',
+      'flex-direction:column': 'g',
+      'width:100%;height:100vh': 'h',
+      'node': 'i',
+      'edge': 'j',
+      'layout': 'k',
+      'line': 'l',
+      'animation': 'm',
+      'center': 'n',
+      'group': 'o',
+      'view': 'p',
+      'drag': 'q',
+      'reset': 'r',
+      'search': 's',
+      'parse': 't',
+      'compress': 'u',
+      'expand': 'v',
+      'link': 'w',
+      'filter': 'x',
+      'query': 'y'
+    };
+
+    for (const [pattern, symbol] of Object.entries(patterns)) {
+      if (compressed.toLowerCase().includes(pattern.toLowerCase())) {
+        symbolsUsed.add(symbol);
+      }
+    }
+
+    // Add domain-specific symbols based on IKR
+    if (ikr.breakdown.empathy > 0.5) symbolsUsed.add('a'); // self/heart
+    if (ikr.breakdown.wisdom > 0.5) symbolsUsed.add('e'); // one/unity
+    if (ikr.breakdown.nature > 0.5) symbolsUsed.add('g'); // growth
+    if (ikr.breakdown.action > 0.5) symbolsUsed.add('d'); // point/seed
+    if (ikr.score >= 75) symbolsUsed.add('z'); // cycle/completion
+
+    return {
+      symbols: Array.from(symbolsUsed),
+      compressed: compressed,
+      compressionRatio: (extracted.raw.length / (symbolsUsed.size * 10 + 100)).toFixed(1)
+    };
+  }
+};
+
+// ============================================
+// UI FUNCTIONS
+// ============================================
+
+let lastExtracted = null;
+let lastIKR = null;
+let lastSynthesized = null;
+
+function extract() {
+  const input = document.getElementById('input').value;
+  if (!input.trim()) { showToast('Please paste content first'); return; }
+
+  lastExtracted = IKR_EXTRACTOR.extract(input);
+
+  const out = document.getElementById('output');
+  out.innerHTML = `<div style="color:#fbbf24;">🔍 Extracted (${lastExtracted.type})</div>
+<div style="color:#94a3b8; margin-top:8px;">
+Words: ${lastExtracted.words.length}
+Sentences: ${lastExtracted.sentences.length}
+URLs: ${lastExtracted.urls.length}
+Code blocks: ${lastExtracted.codeBlocks.length}
+</div>
+<div style="margin-top:10px;">
+<strong style="color:#a7f3d0;">Keywords:</strong> ${lastExtracted.keywords.join(', ')}
+</div>`;
+
+  document.getElementById('s-chars').textContent = lastExtracted.keywords.length;
+  showToast('✓ Extracted');
+}
+
+function convertToIKR() {
+  if (!lastExtracted) { extract(); }
+  lastIKR = IKR_EXTRACTOR.toIKR(lastExtracted);
+
+  const fibColors = {1:'#FF0000',2:'#FF7F00',3:'#FFFF00',5:'#00FF00',8:'#0000FF',13:'#9400D3',21:'#FFFFFF'};
+  const fibNames = {1:'Seed',2:'Connection',3:'Integration',5:'Elements',8:'Directions',13:'Cycles',21:'Completion'};
+  const col = fibColors[lastIKR.level];
+
+  const out = document.getElementById('output');
+  out.innerHTML = `<div style="color:#fbbf24;">🎯 IKR Analysis</div>
+<div style="font-size:32px; color:${col}; font-weight:700; margin:10px 0;">${lastIKR.score}/100</div>
+<div style="color:${col}; font-size:14px; margin-bottom:12px;">Level ${lastIKR.level} · ${fibNames[lastIKR.level]}</div>
+<div style="color:#94a3b8; font-size:12px;">
+Empathy: ${Math.round(lastIKR.breakdown.empathy*100)}%<br>
+Wisdom: ${Math.round(lastIKR.breakdown.wisdom*100)}%<br>
+Scope: ${Math.round(lastIKR.breakdown.scope*100)}%<br>
+Action: ${Math.round(lastIKR.breakdown.action*100)}%<br>
+Nature: ${Math.round(lastIKR.breakdown.nature*100)}%<br>
+Depth: ${Math.round(lastIKR.breakdown.depth*100)}%
+</div>`;
+
+  document.getElementById('s-ikr').textContent = lastIKR.score;
+  showToast(`✓ IKR Level ${lastIKR.level}`);
+}
+
+function synthesize() {
+  if (!lastExtracted) extract();
+  if (!lastIKR) convertToIKR();
+
+  lastSynthesized = IKR_EXTRACTOR.synthesize(lastExtracted, lastIKR);
+
+  // Render symbols
+  const symRow = document.getElementById('symbols');
+  const lib = window.Q ? window.Q.lib : (window.KHELO ? window.KHELO.lib : {});
+
+  symRow.innerHTML = lastSynthesized.symbols.map(s => {
+    const data = lib[s] || { col: '#888', sa: '', zh: '' };
+    return `<div class="symbol" style="background:${data.col}20; color:${data.col}; border:2px solid ${data.col};" title="${data.sa || ''} · ${data.zh || ''}">${s}</div>`;
+  }).join('');
+
+  const out = document.getElementById('output');
+  out.innerHTML = `<div style="color:#fbbf24;">🌸 Synthesized</div>
+<div style="margin-top:8px; color:#a7f3d0;">${lastSynthesized.symbols.join(' ')}</div>
+<div style="color:#94a3b8; margin-top:12px; font-size:12px;">
+${lastSynthesized.symbols.length} symbols generated
+Compression: ${lastSynthesized.compressionRatio}x
+</div>
+<div style="margin-top:12px; padding:10px; background:rgba(0,0,0,0.3); border-radius:8px; font-size:11px; color:#94a3b8;">
+<details><summary style="cursor:pointer; color:#fbbf24;">View compressed output</summary>
+<div style="margin-top:8px; white-space:pre-wrap;">${escapeHtml(lastSynthesized.compressed.substring(0, 500))}${lastSynthesized.compressed.length > 500 ? '...' : ''}</div>
+</details>
+</div>`;
+
+  document.getElementById('s-compress').textContent = lastSynthesized.compressionRatio + 'x';
+  showToast('✓ Synthesized');
+}
+
+function loadSample() {
+  document.getElementById('input').value = `Water is the breath of the planet. Only 3% of Earth's water is fresh, yet it sustains all terrestrial life. The architecture of hydration is the first engineering. How can we help every child understand the water cycle? Why do we need clean water for planetary synchronization? Where can we find the silent roots of rivers?`;
+  showToast('✓ Sample loaded');
+}
+
+function generateGitCommands() {
+  const box = document.getElementById('git-commands');
+  box.style.display = 'block';
+
+  const timestamp = Date.now();
+  const filename = `ikr-output-${timestamp}.json`;
+
+  const output = {
+    timestamp: new Date().toISOString(),
+    input: lastExtracted?.raw.substring(0, 200) || '',
+    type: lastExtracted?.type || 'unknown',
+    keywords: lastExtracted?.keywords || [],
+    ikr: lastIKR,
+    symbols: lastSynthesized?.symbols || [],
+    compression: lastSynthesized?.compressionRatio || '1x'
+  };
+
+  const json = JSON.stringify(output, null, 2);
+
+  box.textContent = `# Run these commands in your terminal:
+
+# 1. Clone your khelp repo (if not already)
+git clone https://github.com/YOUR_USERNAME/khelp.git
+cd khelp
+
+# 2. Save the output
+cat > ${filename} << 'EOF'
+${json}
+EOF
+
+# 3. Commit and push
+git add ${filename}
+git commit -m "IKR extract: ${lastIKR?.score || 0}/100 · Level ${lastIKR?.level || 1}"
+git push origin main
+
+# 4. Done! Check https://github.com/YOUR_USERNAME/khelp`;
+
+  showToast('✓ Git commands ready');
+}
+
+function downloadOutput() {
+  if (!lastExtracted) { showToast('Nothing to download'); return; }
+
+  const output = {
+    timestamp: new Date().toISOString(),
+    extracted: lastExtracted,
+    ikr: lastIKR,
+    synthesized: lastSynthesized
+  };
+
+  const blob = new Blob([JSON.stringify(output, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `ikr-${Date.now()}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('✓ Downloaded');
+}
+
+function escapeHtml(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+function showToast(msg) {
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2500);
+}
+
+// Check if hypercode-lib.js loaded
+window.addEventListener('load', () => {
+  if (window.Q) console.log('✓ QWEN Hyper-Code Library loaded');
+  else if (window.KHELO) console.log('✓ KHELO Library loaded');
+  else console.warn('⚠ No hypercode library found - place hypercode-lib.js in same folder');
+});
+</script>
+</body>
+</html>
