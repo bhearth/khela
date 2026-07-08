@@ -1,210 +1,85 @@
 {
-  "meta": {
-    "version": "1.0",
-    "name": "CAIGx Root Domains",
-    "description": "Immutable top-level semantic coordinates for human experience",
-    "license": "CC0 – Public Domain"
-  },
   "domains": {
     "0.1": {
-      "name": "individual",
-      "description": "The sovereign self: body, mind, spirit, potential",
-      "root_language": "sa",
-      "culture_weight": "high",
+      "name": "Individual",
       "vector": [0.75, 0.82, -0.33, 0.65, 0.44, -0.22, 0.55, 0.91, 0.67, 0.33],
       "languages": {
         "en": "Individual",
         "hi": "व्यक्ति",
-        "zh": "个体",
-        "ar": "فرد",
-        "es": "Individuo",
-        "fr": "Individu",
-        "sw": "Mtu binafsi",
-        "ta": "தனி மனிதன்"
-      },
-      "baej_layers": [
-        "🌱 Beej: Innate potential",
-        "🍚 Bhojy: Time, energy, attention",
-        "🔥 Bhaji: Self-discipline",
-        "👑 Bazi: Ego vs. service",
-        "🌸 Flower: Self-realization"
-      ],
-      "w3_mantra": "pull individual"
+        "zh": "个体"
+      }
     },
     "0.2": {
-      "name": "samajh",
-      "description": "Society, relationships, community, culture",
-      "root_language": "sa",
-      "culture_weight": "high",
+      "name": "Samajh",
       "vector": [0.88, 0.44, 0.22, 0.77, 0.89, 0.66, 0.33, 0.55, 0.44, 0.91],
       "languages": {
-        "en": "Society",
-        "hi": "समाज",
-        "zh": "社会",
-        "ar": "مجتمع",
-        "es": "Sociedad",
-        "fr": "Société",
-        "sw": "Jamii",
-        "ta": "சமூகம்"
-      },
-      "baej_layers": [
-        "🌱 Beej: Need for belonging",
-        "🍚 Bhojy: Social capital",
-        "🔥 Bhaji: Cultural norms",
-        "👑 Bazi: Power structures",
-        "🌸 Flower: Collective harmony"
-      ],
-      "w3_mantra": "pull samajh"
+        "en": "Understanding",
+        "hi": "समझ",
+        "zh": "理解"
+      }
     },
     "0.3": {
-      "name": "econology",
-      "description": "Ecology + economy: sustainable systems, resources, ethics",
-      "root_language": "en",
-      "culture_weight": "high",
+      "name": "Econology",
       "vector": [0.91, 0.66, -0.44, 0.95, 0.88, 0.22, 0.11, 0.77, 0.55, 0.82],
       "languages": {
         "en": "Econology",
-        "hi": "अर्थपारिस्थितिकी",
-        "zh": "生态经济",
-        "ar": "اقتصاد بيئي",
-        "es": "Econología",
-        "fr": "Éconologie",
-        "sw": "Uchumi wa mazingira",
-        "ta": "சூழல் பொருளாதாரம்"
-      },
-      "baej_layers": [
-        "🌱 Beej: Resource flow",
-        "🍚 Bhojy: Material needs",
-        "🔥 Bhaji: Production systems",
-        "👑 Bazi: Exploitation vs. regeneration",
-        "🌸 Flower: Circular abundance"
-      ],
-      "w3_mantra": "pull econology"
+        "hi": "अर्थ-प्रकृति",
+        "zh": "生态经济"
+      }
     },
     "0.4": {
-      "name": "earth_engineering",
-      "description": "Built environment: architecture, infrastructure, materials",
-      "root_language": "en",
-      "culture_weight": "medium",
+      "name": "Earth Engineering",
       "vector": [0.85, 0.55, -0.22, 0.88, 0.77, 0.33, 0.44, 0.66, 0.50, 0.75],
       "languages": {
         "en": "Earth Engineering",
         "hi": "पृथ्वी अभियांत्रिकी",
-        "zh": "地球工程",
-        "ar": "هندسة الأرض",
-        "es": "Ingeniería Terrestre",
-        "fr": "Ingénierie Terrestre",
-        "sw": "Uhandisi wa Ardhi",
-        "ta": "பூமி பொறியியல்"
-      },
-      "baej_layers": [
-        "🌱 Beej: Shelter and safety",
-        "🍚 Bhojy: Space and structure",
-        "🔥 Bhaji: Construction ethics",
-        "👑 Bazi: Concrete vs. organic",
-        "🌸 Flower: Living buildings"
-      ],
-      "w3_mantra": "pull earth-engineering"
+        "zh": "地球工程"
+      }
     },
     "0.5": {
-      "name": "discovery",
-      "description": "Science, math, stats, space, physics, curiosity",
-      "root_language": "en",
-      "culture_weight": "medium",
+      "name": "Discovery",
       "vector": [0.82, 0.91, 0.11, 0.65, 0.77, 0.88, 0.95, 0.89, 0.66, 0.55],
       "languages": {
         "en": "Discovery",
         "hi": "खोज",
-        "zh": "发现",
-        "ar": "اكتشاف",
-        "es": "Descubrimiento",
-        "fr": "Découverte",
-        "sw": "Ugunduzi",
-        "ta": "கண்டுபிடிப்பு"
-      },
-      "baej_layers": [
-        "🌱 Beej: Wonder and inquiry",
-        "🍚 Bhojy: Data and tools",
-        "🔥 Bhaji: Scientific method",
-        "👑 Bazi: Truth vs. funding",
-        "🌸 Flower: Cosmic understanding"
-      ],
-      "w3_mantra": "pull discovery"
+        "zh": "发现"
+      }
     },
     "0.6": {
-      "name": "innovation",
-      "description": "Tech, art, music, creativity, invention, games",
-      "root_language": "en",
-      "culture_weight": "high",
+      "name": "Innovation",
       "vector": [0.77, 0.66, 0.33, 0.55, 0.65, 0.91, 0.88, 0.82, 0.75, 0.95],
       "languages": {
         "en": "Innovation",
         "hi": "नवाचार",
-        "zh": "创新",
-        "ar": "ابتكار",
-        "es": "Innovación",
-        "fr": "Innovation",
-        "sw": "Ubunifu",
-        "ta": "புதுமை"
-      },
-      "baej_layers": [
-        "🌱 Beej: Creative spark",
-        "🍚 Bhojy: Skill and craft",
-        "🔥 Bhaji: Iteration and failure",
-        "👑 Bazi: Ownership vs. sharing",
-        "🌸 Flower: Beauty that serves"
-      ],
-      "w3_mantra": "pull innovation"
+        "zh": "创新"
+      }
+    },
+    "0.7": {
+      "name": "Play",
+      "vector": [0.95, 0.85, 0.75, 0.65, 0.55, 0.45, 0.35, 0.25, 0.15, 0.05],
+      "languages": {
+        "en": "Play",
+        "hi": "खेल",
+        "zh": "游戏"
+      }
     },
     "0.8": {
-      "name": "sahyog",
-      "description": "Co-creation, collaboration, union, synthesis, teamwork",
-      "root_language": "sa",
-      "culture_weight": "high",
+      "name": "Sahyog",
       "vector": [0.95, 0.77, 0.44, 0.82, 0.89, 0.75, 0.66, 0.55, 0.88, 0.91],
       "languages": {
-        "en": "Co-Creation",
+        "en": "Cooperation",
         "hi": "सहयोग",
-        "zh": "协同创造",
-        "ar": "تعاون إبداعي",
-        "es": "Co-Creación",
-        "fr": "Co-Création",
-        "sw": "Ushirikiano wa Uumbaji",
-        "ta": "இணை படைப்பு"
-      },
-      "baej_layers": [
-        "🌱 Beej: Shared purpose",
-        "🍚 Bhojy: Mutual trust",
-        "🔥 Bhaji: Communication clarity",
-        "👑 Bazi: Credit and control",
-        "🌸 Flower: Emergent wisdom"
-      ],
-      "w3_mantra": "pull sahyog"
+        "zh": "协同"
+      }
     },
     "0.9": {
-      "name": "mukti",
-      "description": "Liberation, freedom, expression, consciousness, stillness",
-      "root_language": "sa",
-      "culture_weight": "high",
+      "name": "Mukti",
       "vector": [0.89, 0.55, 0.88, 0.77, 0.91, 0.44, 0.33, 0.66, 0.95, 0.82],
       "languages": {
         "en": "Liberation",
         "hi": "मुक्ति",
-        "zh": "解脱",
-        "ar": "تحرير",
-        "es": "Liberación",
-        "fr": "Libération",
-        "sw": "Uhuru",
-        "ta": "விடுதலை"
-      },
-      "baej_layers": [
-        "🌱 Beej: Inner longing",
-        "🍚 Bhojy: Letting go",
-        "🔥 Bhaji: Discernment",
-        "👑 Bazi: Illusion of separation",
-        "🌸 Flower: Union with all"
-      ],
-      "w3_mantra": "pull mukti"
+        "zh": "解脱"
+      }
     }
   }
 }
