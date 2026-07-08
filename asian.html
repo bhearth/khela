@@ -1,581 +1,695 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>e/arth · The Infinite Mandala</title>
-    <!-- Neo4j Web Driver for Global Graph Sync -->
-    <script src="https://unpkg.com/neo4j-driver@5.12.0/lib/browser/neo4j-web.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=no">
+    <title>Khel.o · Neo-Graph Integration OS</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
+
     <style>
         :root {
-            --bg-void: #020204;
-            --core-glow: #fbbf24;
-            --text-main: #e2e8f0;
-            --text-muted: #64748b;
-            --glass: rgba(15, 23, 42, 0.75);
-            --border: rgba(255, 255, 255, 0.08);
+            --bg-void: #020306;
+            --accent: #38bdf8;
+            --gold: #fbbf24;
+            --neo4j-blue: #018bff;
+            --github-dark: #24292e;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            background: var(--bg-void);
-            color: var(--text-main);
-            font-family: 'Inter', system-ui, sans-serif;
-            overflow: hidden;
-            height: 100vh;
-            width: 100vw;
-        }
-
-        /* =========================================
-           THE CANVAS UNIVERSE
-           ========================================= */
-        #universe-canvas {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: 1;
-            cursor: crosshair;
-        }
-
-        /* =========================================
-           HUD & OVERLAYS
-           ========================================= */
-        .hud {
-            position: absolute;
-            z-index: 10;
-            pointer-events: none;
-        }
-        .hud > * { pointer-events: auto; }
-
-        /* Top Left: Brand & Status */
-        .hud-top-left {
-            top: 24px; left: 24px;
-            display: flex; flex-direction: column; gap: 12px;
-        }
-        .brand {
-            font-size: 1.5rem; font-weight: 800; letter-spacing: -0.5px;
-            background: linear-gradient(135deg, #fbbf24, #38bdf8);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        }
-        .status-pill {
-            display: inline-flex; align-items: center; gap: 8px;
-            background: var(--glass); backdrop-filter: blur(10px);
-            border: 1px solid var(--border);
-            padding: 6px 14px; border-radius: 20px;
-            font-size: 0.75rem; color: var(--text-muted);
-        }
-        .status-dot { width: 6px; height: 6px; border-radius: 50%; background: #10b981; box-shadow: 0 0 8px #10b981; }
-        .status-dot.offline { background: #ef4444; box-shadow: 0 0 8px #ef4444; }
-
-        /* Top Right: Controls */
-        .hud-top-right {
-            top: 24px; right: 24px;
-            display: flex; gap: 10px;
-        }
-        .btn-glass {
-            background: var(--glass); backdrop-filter: blur(10px);
-            border: 1px solid var(--border); color: var(--text-main);
-            padding: 8px 16px; border-radius: 8px; font-size: 0.8rem;
-            cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 6px;
-        }
-        .btn-glass:hover { background: rgba(56, 189, 248, 0.2); border-color: #38bdf8; color: #fff; }
-
-        /* Bottom: Inspector Panel */
-        .inspector {
-            position: absolute;
-            bottom: 24px; left: 50%; transform: translateX(-50%);
-            width: 90%; max-width: 600px;
-            background: var(--glass); backdrop-filter: blur(20px);
-            border: 1px solid var(--border);
-            border-radius: 16px; padding: 20px;
-            z-index: 10;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            opacity: 0; pointer-events: none;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-        }
-        .inspector.active { opacity: 1; pointer-events: auto; transform: translateX(-50%) translateY(0); }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
-        .inspector-header { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
-        .inspector-icon { font-size: 2.5rem; filter: drop-shadow(0 0 10px currentColor); }
-        .inspector-title { font-size: 1.25rem; font-weight: 700; }
-        .inspector-code { font-family: monospace; font-size: 0.8rem; color: var(--text-muted); }
+        body { 
+            background: var(--bg-void); color: #e2e8f0; font-family: 'Inter', sans-serif; 
+            overflow: hidden; touch-action: none; overscroll-behavior: none;
+            height: 100vh; width: 100vw;
+            background-image: radial-gradient(circle at 50% 50%, #080c16 0%, #010205 100%);
+        }
+
+        .font-disp { font-family: 'Space Grotesk', sans-serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* --- THE FRACTAL CANVAS --- */
+        #omniverse-canvas {
+            position: absolute; inset: 0; width: 100%; height: 100%;
+            z-index: 1; cursor: grab; background: transparent;
+        }
+        #omniverse-canvas:active { cursor: grabbing; }
+
+        /* --- UI LAYER --- */
+        #ui-layer {
+            position: absolute; inset: 0; z-index: 100; pointer-events: none;
+            display: flex; flex-direction: column; justify-content: space-between; padding: 20px;
+        }
+        .interactive { pointer-events: auto; }
+
+        .glass-panel {
+            background: rgba(6, 11, 20, 0.75); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        /* Top HUD */
+        .top-hud { display: flex; justify-content: space-between; align-items: flex-start; }
+        .brand { font-family: 'Space Grotesk'; font-size: 24px; font-weight: 800; display: flex; align-items: center; gap: 10px; color: #fff; letter-spacing: 1px; }
+        .brand span { background: linear-gradient(135deg, var(--gold), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         
-        .vector-grid {
-            display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 16px;
+        .db-status-bar { display: flex; gap: 10px; margin-top: 10px; }
+        .db-badge { 
+            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); 
+            color: #cbd5e1; padding: 6px 14px; border-radius: 20px; font-family: 'JetBrains Mono'; 
+            font-size: 10px; font-weight: bold; letter-spacing: 1px; display: inline-flex; align-items: center; gap: 6px; 
+            cursor: pointer; transition: 0.3s;
         }
-        .vector-bar {
-            height: 30px; background: rgba(255,255,255,0.05); border-radius: 4px;
-            position: relative; overflow: hidden;
-        }
-        .vector-fill {
-            position: absolute; bottom: 0; left: 0; width: 100%;
-            background: linear-gradient(to top, #38bdf8, #818cf8);
-            transition: height 0.5s ease;
-        }
-        .vector-label {
-            position: absolute; top: 2px; left: 4px; font-size: 0.6rem; color: #fff; font-weight: 600;
-        }
+        .db-badge.active.github { background: rgba(36, 41, 46, 0.8); border-color: #fff; color: #fff; box-shadow: 0 0 15px rgba(255,255,255,0.2); }
+        .db-badge.active.neo4j { background: rgba(1, 139, 255, 0.15); border-color: var(--neo4j-blue); color: var(--neo4j-blue); box-shadow: 0 0 15px rgba(1,139,255,0.4); }
 
-        .connections-list { font-size: 0.8rem; color: var(--text-muted); line-height: 1.6; }
-        .connections-list strong { color: #fbbf24; }
+        .telemetry { text-align: right; }
+        .scale-indicator { font-family: 'JetBrains Mono'; font-size: 12px; color: var(--accent); font-weight: bold; letter-spacing: 1px; }
+        .layer-name { font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 2px; margin-top: 4px; }
 
-        /* Loading Overlay */
-        #loader {
-            position: absolute; inset: 0; z-index: 100;
-            background: var(--bg-void);
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            transition: opacity 1s ease;
+        /* Search Box */
+        .search-box {
+            display: flex; align-items: center; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 30px; padding: 12px 24px; width: 100%; max-width: 500px; margin: 0 auto;
+            backdrop-filter: blur(10px); transition: 0.3s;
         }
-        #loader.hidden { opacity: 0; pointer-events: none; }
-        .loader-text { font-family: monospace; color: #38bdf8; letter-spacing: 4px; font-size: 0.9rem; margin-top: 20px; }
-        .spinner { width: 40px; height: 40px; border: 3px solid rgba(56, 189, 248, 0.2); border-top-color: #38bdf8; border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        .search-box:focus-within { border-color: var(--neo4j-blue); box-shadow: 0 0 20px rgba(1, 139, 255, 0.3); background: rgba(15, 23, 42, 0.9); }
+        .search-box input { flex: 1; background: transparent; border: none; color: #fff; font-size: 14px; outline: none; margin-left: 10px; font-family: 'Inter'; }
+
+        /* Controls */
+        .bottom-hud { display: flex; justify-content: space-between; align-items: flex-end; }
+        .zoom-controls { display: flex; gap: 8px; }
+        .btn {
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff;
+            width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: 0.2s; font-size: 20px;
+        }
+        .btn:hover { background: var(--accent); color: #000; border-color: var(--accent); }
+        .btn.rect { width: auto; padding: 0 20px; border-radius: 20px; font-family: 'Space Grotesk'; font-weight: bold; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* --- MODALS --- */
+        .modal {
+            position: fixed; inset: 0; background: rgba(1, 2, 4, 0.95); backdrop-filter: blur(20px);
+            z-index: 500; display: none; align-items: center; justify-content: center; padding: 20px;
+            opacity: 0; transition: opacity 0.4s ease;
+        }
+        .modal.active { display: flex; opacity: 1; }
+        .modal-card {
+            background: #0d1117; border: 1px solid rgba(255,255,255,0.1); border-radius: 24px;
+            max-width: 800px; width: 100%; max-height: 85vh; overflow-y: auto; padding: 40px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.9); transform: translateY(20px); transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+        }
+        .modal.active .modal-card { transform: translateY(0); }
+        .close-btn {
+            position: absolute; top: 20px; right: 20px; width: 40px; height: 40px; border-radius: 50%;
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #94a3b8;
+            display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s;
+        }
+        .close-btn:hover { background: #ef4444; color: #fff; transform: rotate(90deg); }
+
+        /* Node Inspector (Neo4j Card) */
+        #inspector-icon { font-size: 64px; text-align: center; margin-bottom: 10px; filter: drop-shadow(0 0 20px currentColor); }
+        #inspector-title { font-family: 'Space Grotesk'; font-size: 32px; font-weight: 800; text-align: center; margin-bottom: 5px; }
+        #inspector-type { font-family: 'JetBrains Mono'; font-size: 10px; color: var(--neo4j-blue); text-align: center; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; border: 1px solid var(--neo4j-blue); padding: 4px 12px; border-radius: 20px; display: inline-block; margin-left: 50%; transform: translateX(-50%); }
+        #inspector-desc { font-size: 14px; color: #94a3b8; text-align: center; margin-bottom: 30px; line-height: 1.6; }
+        
+        .cypher-query { background: #000; border: 1px solid #334155; padding: 15px; border-radius: 12px; font-family: 'JetBrains Mono'; font-size: 11px; color: #10b981; margin-bottom: 20px; overflow-x: auto; }
+        
+        .action-row { display: flex; justify-content: center; gap: 15px; }
+        .neo-action-btn { background: rgba(1, 139, 255, 0.1); border: 1px solid rgba(1, 139, 255, 0.4); padding: 12px 24px; border-radius: 12px; color: #38bdf8; font-size: 13px; font-weight: 600; text-align: center; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 8px;}
+        .neo-action-btn:hover { background: rgba(1, 139, 255, 0.2); box-shadow: 0 0 15px rgba(1, 139, 255, 0.3); transform: translateY(-2px); }
+
+        /* Toast */
+        #toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(16, 185, 129, 0.95); color: #fff; padding: 12px 24px; border-radius: 30px; font-weight: 700; font-size: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 2000; opacity: 0; pointer-events: none; transition: 0.3s; backdrop-filter: blur(10px); }
+        #toast.show { opacity: 1; transform: translateX(-50%) translateY(10px); }
+
+        /* ARIA Live Region */
+        .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0; }
     </style>
 </head>
 <body>
 
-    <!-- THE RENDER ENGINE -->
-    <canvas id="universe-canvas"></canvas>
+<div aria-live="polite" id="a11y-speaker" class="sr-only">Khel.o Neo-Graph Initialized. Connecting to repositories.</div>
 
-    <!-- HUD: TOP LEFT -->
-    <div class="hud hud-top-left">
-        <div class="brand">e/arth · Mandala</div>
-        <div class="status-pill">
-            <div class="status-dot" id="mesh-status"></div>
-            <span id="mesh-status-text">Initializing Mesh...</span>
-        </div>
-        <div class="status-pill">
-            <div class="status-dot offline" id="neo4j-status"></div>
-            <span id="neo4j-status-text">Neo4j: Standby</span>
-        </div>
-    </div>
+<canvas id="omniverse-canvas" class="interactive" role="application" aria-label="Interactive Neo4j Knowledge Graph"></canvas>
 
-    <!-- HUD: TOP RIGHT -->
-    <div class="hud hud-top-right">
-        <button class="btn-glass" onclick="MeshEngine.fetchDeepMesh()">🌌 Expand Universe</button>
-        <button class="btn-glass" onclick="Neo4jEngine.connect()">🔗 Sync Neo4j</button>
-        <button class="btn-glass" onclick="toggleInspector()">ℹ️ Toggle Panel</button>
-    </div>
-
-    <!-- INSPECTOR PANEL -->
-    <div class="inspector" id="inspector">
-        <div class="inspector-header">
-            <div class="inspector-icon" id="insp-icon">✨</div>
-            <div>
-                <div class="inspector-title" id="insp-title">Select a Node</div>
-                <div class="inspector-code" id="insp-code">Code: ---</div>
+<div id="ui-layer">
+    <div class="top-hud">
+        <div>
+            <div class="brand"><span>Khel.o</span> OS</div>
+            <div class="db-status-bar">
+                <div class="db-badge active github interactive" id="badge-github" onclick="DataAdapter.syncGitHub()">
+                    <span class="material-symbols-rounded" style="font-size: 14px;">sync</span> GitHub Sync
+                </div>
+                <div class="db-badge active neo4j interactive" id="badge-neo4j" onclick="App.showToast('Graph DB Connection Active')">
+                    <span class="material-symbols-rounded" style="font-size: 14px;">hub</span> Neo4j Aura
+                </div>
             </div>
         </div>
-        <div class="vector-grid" id="vector-grid">
-            <!-- Vector bars injected here -->
-        </div>
-        <div class="connections-list" id="connections-list">
-            Click a glowing dot in the universe to reveal its semantic DNA, 10D Vector, and resonant connections.
+
+        <div class="telemetry glass-panel">
+            <div class="scale-indicator" id="scale-display">Scale: 1.0000x</div>
+            <div class="layer-name" id="layer-display">L0: Graph Roots</div>
+            <div class="layer-name mt-2 text-emerald-400">DSP: <span id="dsp-status">Sargam Synth Active</span></div>
         </div>
     </div>
 
-    <!-- LOADER -->
-    <div id="loader">
-        <div class="spinner"></div>
-        <div class="loader-text">WEAVING THE MESH...</div>
+    <div class="search-box interactive">
+        <span class="material-symbols-rounded" style="color: var(--neo4j-blue);">search</span>
+        <input type="text" id="omni-search" placeholder="Cypher Search (e.g., Water, Books, Ecology)..." onkeypress="if(event.key==='Enter') App.executeSearch(this.value)">
     </div>
 
-    <script>
-        // ==========================================
-        // 1. THE MESH ENGINE (Embedded mesh.js)
-        // ==========================================
-        const MeshEngine = {
-            baseUrl: 'https://bhearth.github.io/khela/',
-            cache: {},
-            nodes: [],
-            connections: [],
+    <div class="bottom-hud">
+        <div class="zoom-controls interactive">
+            <button class="btn" onclick="FractalEngine.zoom(-1)" aria-label="Zoom Out"><span class="material-symbols-rounded">remove</span></button>
+            <button class="btn" onclick="FractalEngine.resetCam()" aria-label="Reset View"><span class="material-symbols-rounded">my_location</span></button>
+            <button class="btn" onclick="FractalEngine.zoom(1)" aria-label="Zoom In"><span class="material-symbols-rounded">add</span></button>
+        </div>
+        <button class="btn rect interactive" onclick="DataAdapter.clearGraph()">Clear Graph</button>
+    </div>
+</div>
 
-            async loadJSON(filename) {
-                if (this.cache[filename]) return this.cache[filename];
-                try {
-                    const res = await fetch(`${this.baseUrl}${filename}`);
-                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                    const data = await res.json();
-                    this.cache[filename] = data;
-                    return data;
-                } catch (e) {
-                    console.warn(`[Mesh] Failed to load ${filename}:`, e);
-                    return null;
-                }
-            },
+<!-- Node Inspector Modal (Graph Entity) -->
+<div class="modal interactive" id="inspector-modal">
+    <div class="modal-card">
+        <button class="close-btn" onclick="App.closeModal('inspector-modal')"><span class="material-symbols-rounded">close</span></button>
+        <div id="inspector-icon" style="color: #38bdf8;">✨</div>
+        <h2 id="inspector-title">Concept</h2>
+        <div id="inspector-type">(:Concept)</div>
+        <p id="inspector-desc">Description goes here.</p>
+        
+        <div class="cypher-query" id="inspector-cypher">
+            MATCH (n:Concept {name: 'Target'})-[:RELATES_TO]->(m) RETURN n, m
+        </div>
 
-            // 10D Vector Math: Dot Product for Resonance
-            calculateResonance(v1, v2) {
-                if (!v1 || !v2 || v1.length !== 10) return 0;
-                let dot = 0;
-                for (let i = 0; i < 10; i++) dot += (v1[i] * v2[i]);
-                return dot;
-            },
+        <div class="action-row" id="inspector-actions">
+            <!-- Dynamic Actions (Expand Graph, Read Book, etc.) injected here -->
+        </div>
+    </div>
+</div>
 
-            // 10D Vector to Color Mapping (Millions of Shades)
-            vectorToColor(vector) {
-                if (!vector) return '#ffffff';
-                // Map specific dimensions to RGB for unique semantic colors
-                // Prakriti (Nature/Green), Shaurya (Courage/Red), Viveka (Wisdom/Blue)
-                const r = Math.floor((Math.abs(vector[6]) * 0.5 + 0.5) * 255);
-                const g = Math.floor((Math.abs(vector[3]) * 0.5 + 0.5) * 255);
-                const b = Math.floor((Math.abs(vector[7]) * 0.5 + 0.5) * 255);
-                return `rgb(${r}, ${g}, ${b})`;
-            },
+<div id="toast"></div>
 
-            async init() {
-                updateStatus('mesh', 'Fetching Root Domains...', true);
-                const rootData = await this.loadJSON('1.json');
-                const symbolData = await this.loadJSON('symbol1.json');
+<script>
+/**
+ * STREAMING_CHUNK: The Data Adapter Layer (GitHub + Neo4j Sim)
+ */
+const DataAdapter = {
+    githubUrl: 'https://raw.githubusercontent.com/bhearth/khela/main/symbol1.json',
+    db: [], // The local graph memory
+    
+    // Fallback data if GitHub is unreachable or CORS blocked
+    fallbackTaxonomy: [
+        { n: "Marine Ecosystems", i: "🐋", type: "Concept", group: "Ecology" },
+        { n: "Terrestrial Zoology", i: "🐾", type: "Concept", group: "Ecology" },
+        { n: "Water Purity", i: "💧", type: "Concept", group: "Ecology" },
+        { n: "Supply Chain (SCM)", i: "🔗", type: "Concept", group: "Infrastructure" },
+        { n: "Organic Electricity", i: "⚡", type: "Concept", group: "Infrastructure" },
+        { n: "Cognitive Psychology", i: "🧠", type: "Concept", group: "Mind" },
+        { n: "Addiction Breaking", i: "🛑", type: "Concept", group: "Mind" },
+        { n: "Economics & Value", i: "📈", type: "Concept", group: "Society" },
+        { n: "Disability First", i: "🦽", type: "Concept", group: "Society" },
+        { n: "The Water Will Come", i: "📘", type: "Book", group: "Water Purity", author: "Jeff Goodell" },
+        { n: "Thinking, Fast and Slow", i: "📕", type: "Book", group: "Cognitive Psychology", author: "Daniel Kahneman" }
+    ],
 
-                if (rootData && rootData.domains) {
-                    let idx = 0;
-                    for (const [code, domain] of Object.entries(rootData.domains)) {
-                        this.nodes.push({
-                            id: code,
-                            name: domain.name,
-                            vector: domain.vector,
-                            color: this.vectorToColor(domain.vector),
-                            icon: this.findIcon(domain.name, symbolData),
-                            x: 0, y: 0, // Calculated in RenderEngine
-                            radius: 0,
-                            angle: 0
-                        });
-                        idx++;
-                    }
-                    
-                    // Calculate Connections (Resonance > Threshold)
-                    for (let i = 0; i < this.nodes.length; i++) {
-                        for (let j = i + 1; j < this.nodes.length; j++) {
-                            const res = this.calculateResonance(this.nodes[i].vector, this.nodes[j].vector);
-                            if (res > 6.5) { // High resonance threshold
-                                this.connections.push({ source: i, target: j, strength: res });
-                            }
-                        }
-                    }
-                    updateStatus('mesh', `Mesh Active: ${this.nodes.length} Nodes`, true);
-                } else {
-                    updateStatus('mesh', 'Mesh Offline (Fallback)', false);
-                    this.generateFallbackMesh();
-                }
-            },
-
-            findIcon(name, symbolData) {
-                if (!symbolData || !symbolData.categories) return '✨';
-                for (const cat of Object.values(symbolData.categories)) {
-                    for (const sym of cat.symbols) {
-                        if (sym.name.toLowerCase() === name.toLowerCase() || 
-                            (sym.tags && sym.tags.some(t => t.toLowerCase() === name.toLowerCase()))) {
-                            return sym.icon;
-                        }
-                    }
-                }
-                return '✨';
-            },
-
-            generateFallbackMesh() {
-                // Fallback if GitHub is unreachable
-                const fallback = [
-                    { id: '0.1', name: 'Individual', vector: [0.8,0.9,0.5,0.6,0.7,0.8,0.6,0.9,0.7,0.8] },
-                    { id: '0.8', name: 'Sahyog', vector: [0.95,0.77,0.44,0.82,0.89,0.75,0.66,0.55,0.88,0.91] },
-                    { id: '0.9', name: 'Mukti', vector: [0.9,0.95,0.9,0.8,0.95,0.9,0.5,0.95,0.99,0.8] }
-                ];
-                fallback.forEach(d => {
-                    this.nodes.push({
-                        id: d.id, name: d.name, vector: d.vector,
-                        color: this.vectorToColor(d.vector), icon: '✨',
-                        x: 0, y: 0, radius: 0, angle: 0
-                    });
-                });
-            },
-
-            async fetchDeepMesh() {
-                updateStatus('mesh', 'Expanding to Level 2...', true);
-                const level2 = await this.loadJSON('2.json');
-                if (level2 && level2.tree) {
-                    // Add children to the visual mesh
-                    Object.entries(level2.tree).forEach(([code, name]) => {
-                        if (!this.nodes.find(n => n.id === code)) {
-                            const vec = Array(10).fill().map(() => Math.random() * 2 - 1); // Randomized vector for demo
-                            this.nodes.push({
-                                id: code, name: typeof name === 'string' ? name : code,
-                                vector: vec, color: this.vectorToColor(vec), icon: '🌿',
-                                x: 0, y: 0, radius: 0, angle: 0
-                            });
-                        }
-                    });
-                    updateStatus('mesh', `Universe Expanded: ${this.nodes.length} Nodes`, true);
-                    RenderEngine.layoutNodes();
-                }
-            }
-        };
-
-        // ==========================================
-        // 2. NEO4J ENGINE (Global Graph Sync)
-        // ==========================================
-        const Neo4jEngine = {
-            driver: null,
-            // NOTE: In production, NEVER expose credentials in frontend. 
-            // Use a backend proxy or environment variables.
-            config: {
-                uri: 'neo4j+s://613c286a.databases.neo4j.io',
-                user: '613c286a',
-                password: 'vkKL9AvmRjeV3Y71iTvAmVzMr96t7zI1-7gxU_Ueius'
-            },
-
-            async connect() {
-                updateStatus('neo4j', 'Connecting to AuraDB...', true);
-                try {
-                    this.driver = neo4j.driver(
-                        this.config.uri,
-                        neo4j.auth.basic(this.config.user, this.config.password)
-                    );
-                    await this.driver.verifyConnectivity();
-                    updateStatus('neo4j', 'Neo4j: Connected', true);
-                    
-                    // Example Query: Fetch nodes from the global graph
-                    const session = this.driver.session();
-                    const result = await session.run('MATCH (n:Domain) RETURN n LIMIT 5');
-                    console.log('[Neo4j] Fetched Global Nodes:', result.records);
-                    session.close();
-                    
-                } catch (e) {
-                    console.error('[Neo4j] Connection Failed:', e);
-                    updateStatus('neo4j', 'Neo4j: Connection Failed', false);
-                }
-            }
-        };
-
-        // ==========================================
-        // 3. RENDER ENGINE (The Blooming Flower)
-        // ==========================================
-        const RenderEngine = {
-            canvas: null, ctx: null,
-            width: 0, height: 0,
-            centerX: 0, centerY: 0,
-            time: 0,
-            hoveredNode: null,
-
-            init() {
-                this.canvas = document.getElementById('universe-canvas');
-                this.ctx = this.canvas.getContext('2d');
-                this.resize();
-                window.addEventListener('resize', () => this.resize());
-                
-                // Interaction
-                this.canvas.addEventListener('mousemove', (e) => this.handleHover(e));
-                this.canvas.addEventListener('click', (e) => this.handleClick(e));
-
-                this.layoutNodes();
-                this.animate();
-            },
-
-            resize() {
-                this.width = window.innerWidth;
-                this.height = window.innerHeight;
-                this.canvas.width = this.width * window.devicePixelRatio;
-                this.canvas.height = this.height * window.devicePixelRatio;
-                this.canvas.style.width = `${this.width}px`;
-                this.canvas.style.height = `${this.height}px`;
-                this.ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-                
-                this.centerX = this.width / 2;
-                this.centerY = this.height / 2;
-                this.layoutNodes();
-            },
-
-            layoutNodes() {
-                // Phyllotaxis (Golden Angle) for perfect blooming flower
-                const goldenAngle = Math.PI * (3 - Math.sqrt(5)); // ~137.5 degrees
-                const scale = Math.min(this.width, this.height) * 0.04;
-
-                MeshEngine.nodes.forEach((node, i) => {
-                    node.angle = i * goldenAngle;
-                    node.radius = scale * Math.sqrt(i + 1);
-                    node.x = this.centerX + Math.cos(node.angle) * node.radius;
-                    node.y = this.centerY + Math.sin(node.angle) * node.radius;
-                });
-            },
-
-            animate() {
-                this.time += 0.01;
-                this.ctx.clearRect(0, 0, this.width, this.height);
-
-                // Draw Cosmic Background (Millions of Shades representation)
-                this.drawCosmicDust();
-
-                // Draw Connections (Semantic Resonance)
-                this.drawConnections();
-
-                // Draw Nodes (The Dots)
-                this.drawNodes();
-
-                requestAnimationFrame(() => this.animate());
-            },
-
-            drawCosmicDust() {
-                // Procedural background representing the Zetta-byte mesh
-                const ctx = this.ctx;
-                for (let i = 0; i < 200; i++) {
-                    const x = (Math.sin(i * 0.1 + this.time * 0.2) * 0.5 + 0.5) * this.width;
-                    const y = (Math.cos(i * 0.15 + this.time * 0.1) * 0.5 + 0.5) * this.height;
-                    const alpha = Math.sin(i + this.time) * 0.1 + 0.1;
-                    ctx.fillStyle = `rgba(56, 189, 248, ${alpha})`;
-                    ctx.beginPath();
-                    ctx.arc(x, y, 1, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-            },
-
-            drawConnections() {
-                const ctx = this.ctx;
-                MeshEngine.connections.forEach(conn => {
-                    const source = MeshEngine.nodes[conn.source];
-                    const target = MeshEngine.nodes[conn.target];
-                    if (!source || !target) return;
-
-                    ctx.beginPath();
-                    ctx.moveTo(source.x, source.y);
-                    ctx.lineTo(target.x, target.y);
-                    
-                    // Glow effect based on strength
-                    const alpha = (conn.strength - 6.5) * 0.2; 
-                    ctx.strokeStyle = `rgba(251, 191, 36, ${Math.min(alpha, 0.4)})`;
-                    ctx.lineWidth = 1;
-                    ctx.stroke();
-                });
-            },
-
-            drawNodes() {
-                const ctx = this.ctx;
-                MeshEngine.nodes.forEach((node, i) => {
-                    const isHovered = this.hoveredNode === i;
-                    const baseSize = 8 + (node.vector ? Math.abs(node.vector[9]) * 10 : 5); // Seva vector determines size
-                    const size = isHovered ? baseSize * 1.5 : baseSize;
-                    const pulse = Math.sin(this.time * 2 + i) * 2;
-
-                    // Outer Glow
-                    const gradient = ctx.createRadialGradient(node.x, node.y, 0, node.x, node.y, size + 15 + pulse);
-                    gradient.addColorStop(0, node.color);
-                    gradient.addColorStop(1, 'transparent');
-                    ctx.fillStyle = gradient;
-                    ctx.beginPath();
-                    ctx.arc(node.x, node.y, size + 15 + pulse, 0, Math.PI * 2);
-                    ctx.fill();
-
-                    // Core Dot
-                    ctx.fillStyle = node.color;
-                    ctx.beginPath();
-                    ctx.arc(node.x, node.y, size, 0, Math.PI * 2);
-                    ctx.fill();
-
-                    // Label (if hovered or core)
-                    if (isHovered || i === 0) {
-                        ctx.fillStyle = '#fff';
-                        ctx.font = isHovered ? 'bold 14px Inter' : '12px Inter';
-                        ctx.textAlign = 'center';
-                        ctx.fillText(node.name, node.x, node.y + size + 20);
-                        if (isHovered) {
-                            ctx.font = '10px monospace';
-                            ctx.fillStyle = '#94a3b8';
-                            ctx.fillText(node.id, node.x, node.y + size + 35);
-                        }
-                    }
-                });
-            },
-
-            handleHover(e) {
-                const rect = this.canvas.getBoundingClientRect();
-                const mx = e.clientX - rect.left;
-                const my = e.clientY - rect.top;
-
-                let found = -1;
-                MeshEngine.nodes.forEach((node, i) => {
-                    const dist = Math.hypot(node.x - mx, node.y - my);
-                    if (dist < 20) found = i;
-                });
-
-                this.hoveredNode = found === -1 ? null : found;
-                this.canvas.style.cursor = found === -1 ? 'crosshair' : 'pointer';
-            },
-
-            handleClick(e) {
-                if (this.hoveredNode !== null) {
-                    const node = MeshEngine.nodes[this.hoveredNode];
-                    showInspector(node);
-                }
-            }
-        };
-
-        // ==========================================
-        // 4. UI & UTILITIES
-        // ==========================================
-        function updateStatus(type, text, isOnline) {
-            const dot = document.getElementById(`${type}-status`);
-            const txt = document.getElementById(`${type}-status-text`);
-            if (dot) {
-                dot.className = isOnline ? 'status-dot' : 'status-dot offline';
-            }
-            if (txt) txt.innerText = text;
-        }
-
-        function showInspector(node) {
-            const panel = document.getElementById('inspector');
-            document.getElementById('insp-icon').innerText = node.icon;
-            document.getElementById('insp-icon').style.color = node.color;
-            document.getElementById('insp-title').innerText = node.name;
-            document.getElementById('insp-code').innerText = `Code: ${node.id} · Resonance Active`;
-
-            // Render 10D Vector Bars
-            const grid = document.getElementById('vector-grid');
-            const dims = ['Ahimsa', 'Satya', 'Aparigraha', 'Prakriti', 'Rta', 'Vinaya', 'Shaurya', 'Viveka', 'Mukti', 'Seva'];
-            grid.innerHTML = '';
-            if (node.vector) {
-                node.vector.forEach((val, i) => {
-                    const height = Math.abs(val) * 100;
-                    grid.innerHTML += `
-                        <div class="vector-bar">
-                            <div class="vector-fill" style="height: ${height}%; background: ${node.color};"></div>
-                            <div class="vector-label">${dims[i].substring(0,3)}</div>
-                        </div>
-                    `;
-                });
-            }
-
-            // Find Resonant Connections
-            const connList = document.getElementById('connections-list');
-            const resonantNodes = MeshEngine.nodes
-                .map((n, i) => ({ node: n, index: i, res: MeshEngine.calculateResonance(node.vector, n.vector) }))
-                .filter(c => c.index !== MeshEngine.nodes.indexOf(node) && c.res > 5)
-                .sort((a, b) => b.res - a.res)
-                .slice(0, 3);
-
-            if (resonantNodes.length > 0) {
-                connList.innerHTML = `<strong>Semantic Resonance:</strong><br>` + 
-                    resonantNodes.map(c => `→ ${c.node.icon} ${c.node.name} (Score: ${c.res.toFixed(2)})`).join('<br>');
-            } else {
-                connList.innerHTML = `<strong>Semantic Resonance:</strong><br>This node is exploring new dimensions. Expand the universe to find connections.`;
-            }
-
-            panel.classList.add('active');
-        }
-
-        function toggleInspector() {
-            document.getElementById('inspector').classList.toggle('active');
-        }
-
-        // ==========================================
-        // 5. INITIALIZATION
-        // ==========================================
-        window.addEventListener('DOMContentLoaded', async () => {
-            await MeshEngine.init();
-            RenderEngine.init();
+    async syncGitHub() {
+        App.showToast("Syncing with GitHub Repository...");
+        document.getElementById('badge-github').classList.add('animate-pulse');
+        
+        try {
+            const response = await fetch(this.githubUrl);
+            if (!response.ok) throw new Error("Network response was not ok");
+            const data = await response.json();
             
-            // Hide Loader
-            setTimeout(() => {
-                document.getElementById('loader').classList.add('hidden');
-            }, 1000);
+            // Map raw JSON array to our Graph format if needed
+            this.db = data.map(item => ({
+                n: item.word || item.n || "Unknown",
+                i: item.emoji || item.i || "✨",
+                type: item.type || "Concept",
+                group: item.category || item.group || "General"
+            }));
+            
+            App.showToast("GitHub Sync Successful: Loaded " + this.db.length + " nodes.");
+        } catch (error) {
+            console.warn("GitHub fetch failed, using internal Neo4j fallback DB.", error);
+            App.showToast("GitHub Unreachable. Using Internal Graph DB.");
+            this.db = [...this.fallbackTaxonomy];
+        }
+
+        document.getElementById('badge-github').classList.remove('animate-pulse');
+        this.initializeGraph();
+    },
+
+    initializeGraph() {
+        FractalEngine.nodes = [];
+        FractalEngine.edges = [];
+        
+        // Spawn Root Concept Nodes
+        const rootConcepts = this.db.filter(n => n.type === 'Concept');
+        
+        const cx = 0, cy = 0;
+        // Level 0 Core
+        const coreNode = { id: 'neo4j_core', n: 'Knowledge Graph', i: '🌐', x: cx, y: cy, z: 1.0, level: 0, hue: 200, color: '#018bff', size: 120, type: 'Database' };
+        FractalEngine.nodes.push(coreNode);
+
+        rootConcepts.forEach((concept, idx) => {
+            const angle = (idx / rootConcepts.length) * Math.PI * 2;
+            const radius = 2000; 
+            const dx = cx + Math.cos(angle) * radius;
+            const dy = cy + Math.sin(angle) * radius;
+            const baseHue = FractalEngine.hashStr(concept.n) % 360;
+
+            const node = {
+                id: `c_${idx}`, n: concept.n, i: concept.i,
+                x: dx, y: dy, z: 1.0, level: 1, hue: baseHue, color: `hsl(${baseHue}, 80%, 60%)`, 
+                size: 300, type: concept.type, group: concept.group
+            };
+            
+            FractalEngine.nodes.push(node);
+            // Draw Edge from Core to Concept
+            FractalEngine.edges.push({ source: coreNode, target: node, color: '#018bff' });
         });
-    </script>
+    },
+
+    // Simulating a Neo4j Cypher Query expanding a node
+    expandNode(parentNode) {
+        // Query: MATCH (n)-[:RELATES_TO]->(m) WHERE n.name = parentNode.n RETURN m
+        const relatedNodes = this.db.filter(item => item.group === parentNode.n && item.n !== parentNode.n);
+        
+        if (relatedNodes.length === 0) {
+            App.showToast("End of Graph Branch.");
+            return;
+        }
+
+        App.showToast(`Cypher: MATCH (n {name:'${parentNode.n}'})-->(m) RETURN m`);
+        
+        relatedNodes.forEach((rel, idx) => {
+            // Check if already in graph to avoid duplicates
+            if (FractalEngine.nodes.find(n => n.n === rel.n)) return;
+
+            const angle = (idx / relatedNodes.length) * Math.PI * 2 + Math.random();
+            const radius = 800; // Orbit around parent
+            const dx = parentNode.x + Math.cos(angle) * radius;
+            const dy = parentNode.y + Math.sin(angle) * radius;
+            const hue = (parentNode.hue + 30) % 360; // Slightly shifted color
+
+            const childNode = {
+                id: `sub_${Date.now()}_${idx}`, n: rel.n, i: rel.i,
+                x: dx, y: dy, z: 1.0, level: 2, hue: hue, color: `hsl(${hue}, 80%, 70%)`, 
+                size: 150, type: rel.type, author: rel.author
+            };
+
+            FractalEngine.nodes.push(childNode);
+            FractalEngine.edges.push({ source: parentNode, target: childNode, color: parentNode.color });
+        });
+    },
+
+    clearGraph() {
+        this.initializeGraph();
+        FractalEngine.resetCam();
+        App.showToast("Graph Reset to Root state.");
+    }
+};
+
+/**
+ * STREAMING_CHUNK: Integrating Sargam Flute Synthesizer (Web Audio API)
+ */
+const Hardware = {
+    ctx: null, panner: null, ready: false, lastPlayTime: 0,
+    sargamFreqs: [261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, 523.25],
+    sargamNames: ['Sa', 'Re', 'Ga', 'Ma', 'Pa', 'Dha', 'Ni', "Sa'"],
+
+    init() {
+        if (this.ready) return;
+        this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        this.panner = this.ctx.createStereoPanner();
+        this.panner.connect(this.ctx.destination);
+        this.ready = true;
+    },
+
+    playSargamFlute(x, y, hue) {
+        if (!this.ready) return null;
+        
+        const nowTime = Date.now();
+        if (nowTime - this.lastPlayTime < 300) return null; 
+        this.lastPlayTime = nowTime;
+
+        const pan = Math.max(-1, Math.min(1, (x - window.innerWidth/2) / (window.innerWidth/2)));
+        this.panner.pan.value = pan;
+        
+        const index = Math.floor((hue / 360) * 8) % 8;
+        const freq = this.sargamFreqs[index];
+
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        
+        osc.type = 'sine'; // Softer for UI feedback
+        osc.frequency.value = freq;
+
+        osc.connect(this.panner);
+        this.panner.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        const now = this.ctx.currentTime;
+        gain.gain.setValueAtTime(0, now);
+        gain.gain.linearRampToValueAtTime(0.1, now + 0.05); 
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35); 
+
+        osc.start(now);
+        osc.stop(now + 0.4);
+
+        if(navigator.vibrate) navigator.vibrate(10);
+        return this.sargamNames[index];
+    },
+
+    speak(txt) {
+        document.getElementById('a11y-speaker').innerText = txt;
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            window.speechSynthesis.speak(new SpeechSynthesisUtterance(txt));
+        }
+    }
+};
+
+/**
+ * STREAMING_CHUNK: Implementing Dynamic 3D Graph Canvas Engine
+ */
+const FractalEngine = {
+    canvas: document.getElementById('omniverse-canvas'),
+    ctx: null, width: 0, height: 0,
+    cam: { x: 0, y: 0, scale: 0.05 }, tgt: { x: 0, y: 0, scale: 0.05 },
+    nodes: [], edges: [], hoveredNode: null,
+    
+    hashStr(str) {
+        let h = 0x811c9dc5;
+        for (let i = 0; i < str.length; i++) h = Math.imul(h ^ str.charCodeAt(i), 0x01000193);
+        return Math.abs(h >>> 0);
+    },
+
+    init() {
+        this.ctx = this.canvas.getContext('2d', { alpha: false, desynchronized: true });
+        this.resize();
+        window.addEventListener('resize', () => this.resize());
+        
+        this.setupGestures();
+        this.renderLoop();
+        document.body.addEventListener('pointerdown', () => Hardware.init(), { once: true });
+        
+        // Start Sync
+        DataAdapter.syncGitHub();
+    },
+
+    resize() {
+        this.width = window.innerWidth;
+        this.height = window.innerHeight;
+        this.canvas.width = this.width * window.devicePixelRatio;
+        this.canvas.height = this.height * window.devicePixelRatio;
+        this.ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    },
+
+    setupGestures() {
+        const mc = new Hammer.Manager(this.canvas);
+        mc.add(new Hammer.Pan({ threshold: 0 }));
+        mc.add(new Hammer.Pinch({ enable: true })).recognizeWith(mc.get('pan'));
+        mc.add(new Hammer.Tap({ taps: 1 }));
+
+        let isPan = false, lx = 0, ly = 0, initScale = 1;
+
+        mc.on('pinchstart', () => initScale = this.tgt.scale);
+        mc.on('pinch', e => this.zoomTo(initScale * e.scale));
+
+        mc.on('panstart', e => { isPan = true; lx = e.center.x; ly = e.center.y; });
+        mc.on('panmove', e => {
+            if(!isPan) return;
+            const dx = e.center.x - lx;
+            const dy = e.center.y - ly;
+            this.tgt.x -= dx / this.cam.scale;
+            this.tgt.y -= dy / this.cam.scale;
+            lx = e.center.x; ly = e.center.y;
+            this.checkHover(e.center.x, e.center.y);
+        });
+        mc.on('panend', () => isPan = false);
+
+        mc.on('tap', (e) => {
+            this.checkHover(e.center.x, e.center.y);
+            if(this.hoveredNode) {
+                this.tgt.x = this.hoveredNode.x;
+                this.tgt.y = this.hoveredNode.y;
+                
+                let targetScale = 1;
+                if(this.hoveredNode.level === 0) targetScale = 0.1;
+                if(this.hoveredNode.level === 1) targetScale = 0.6;
+                if(this.hoveredNode.level === 2) targetScale = 1.5;
+                
+                this.zoomTo(targetScale);
+                App.openInspector(this.hoveredNode);
+            }
+        });
+
+        window.addEventListener('wheel', e => {
+            const factor = e.deltaY > 0 ? 0.85 : 1.15;
+            this.zoomTo(this.tgt.scale * factor);
+        }, {passive:true});
+        
+        this.canvas.addEventListener('mousemove', e => {
+            if(!isPan) this.checkHover(e.clientX, e.clientY);
+        });
+    },
+
+    checkHover(screenX, screenY) {
+        const worldX = (screenX - this.width/2) / this.cam.scale + this.cam.x;
+        const worldY = (screenY - this.height/2) / this.cam.scale + this.cam.y;
+        
+        let nearest = null;
+        let minDist = Infinity;
+
+        for(let n of this.nodes) {
+            const dx = n.x - worldX;
+            const dy = n.y - worldY;
+            const dist = Math.sqrt(dx*dx + dy*dy);
+            
+            if(dist < n.size * 1.5 && dist < minDist) {
+                minDist = dist;
+                nearest = n;
+            }
+        }
+
+        if (nearest !== this.hoveredNode) {
+            this.hoveredNode = nearest;
+            if(nearest) {
+                this.canvas.style.cursor = 'pointer';
+                Hardware.playSargamFlute(screenX, screenY, nearest.hue);
+            } else {
+                this.canvas.style.cursor = 'grab';
+            }
+        }
+    },
+
+    zoom(dir) { this.zoomTo(this.tgt.scale * (dir > 0 ? 1.5 : 0.6)); },
+    zoomTo(s) { this.tgt.scale = Math.max(0.01, Math.min(20, s)); },
+    resetCam() { this.tgt = { x: 0, y: 0, scale: 0.05 }; },
+    lerp(s, e, f) { return s + (e - s) * f; },
+
+    renderLoop() {
+        this.cam.x = this.lerp(this.cam.x, this.tgt.x, 0.15);
+        this.cam.y = this.lerp(this.cam.y, this.tgt.y, 0.15);
+        this.cam.scale = this.lerp(this.cam.scale, this.tgt.scale, 0.15);
+
+        // Clear Deep Space
+        this.ctx.fillStyle = '#020306';
+        this.ctx.fillRect(0, 0, this.width, this.height);
+
+        const viewW = this.width / this.cam.scale;
+        const viewH = this.height / this.cam.scale;
+        const viewL = this.cam.x - viewW/2;
+        const viewR = this.cam.x + viewW/2;
+        const viewT = this.cam.y - viewH/2;
+        const viewB = this.cam.y + viewH/2;
+
+        this.ctx.save();
+        this.ctx.translate(this.width / 2, this.height / 2);
+        this.ctx.scale(this.cam.scale, this.cam.scale);
+        this.ctx.translate(-this.cam.x, -this.cam.y);
+
+        // Draw Neural Edges
+        this.ctx.lineWidth = 4 / this.cam.scale; 
+        this.edges.forEach(edge => {
+            // Frustum Culling for lines (basic bounding box check)
+            const minX = Math.min(edge.source.x, edge.target.x);
+            const maxX = Math.max(edge.source.x, edge.target.x);
+            const minY = Math.min(edge.source.y, edge.target.y);
+            const maxY = Math.max(edge.source.y, edge.target.y);
+            if (maxX < viewL || minX > viewR || maxY < viewT || minY > viewB) return;
+
+            this.ctx.beginPath();
+            this.ctx.moveTo(edge.source.x, edge.source.y);
+            // Curvy organic lines
+            const midX = (edge.source.x + edge.target.x) / 2 - (edge.target.y - edge.source.y) * 0.2;
+            const midY = (edge.source.y + edge.target.y) / 2 + (edge.target.x - edge.source.x) * 0.2;
+            this.ctx.quadraticCurveTo(midX, midY, edge.target.x, edge.target.y);
+            
+            this.ctx.strokeStyle = edge.color;
+            this.ctx.globalAlpha = 0.4;
+            this.ctx.stroke();
+        });
+
+        this.ctx.globalAlpha = 1.0;
+
+        // Draw Nodes
+        for (let n of this.nodes) {
+            if (n.x + n.size < viewL || n.x - n.size > viewR || n.y + n.size < viewT || n.y - n.size > viewB) continue;
+            // LOD Culling
+            if (n.level === 2 && this.cam.scale < 0.1) continue; 
+
+            const isHovered = n === this.hoveredNode;
+            
+            this.ctx.beginPath();
+            this.ctx.arc(n.x, n.y, n.size, 0, Math.PI * 2);
+            this.ctx.fillStyle = 'rgba(10, 15, 25, 0.95)';
+            this.ctx.fill();
+            
+            this.ctx.lineWidth = isHovered ? (8 / this.cam.scale) : (3 / this.cam.scale);
+            this.ctx.strokeStyle = n.color;
+            this.ctx.stroke();
+
+            if (isHovered) {
+                this.ctx.shadowColor = n.color;
+                this.ctx.shadowBlur = 60 / this.cam.scale;
+                this.ctx.fill();
+                this.ctx.shadowBlur = 0; 
+            }
+
+            // Draw Icon & Text
+            if ((n.level === 0) || (n.level === 1 && this.cam.scale > 0.03) || (n.level === 2 && this.cam.scale > 0.4)) {
+                this.ctx.fillStyle = n.color;
+                this.ctx.textAlign = 'center';
+                this.ctx.textBaseline = 'middle';
+                
+                // Adjust typography for Books vs Concepts
+                if(n.type === 'Book') {
+                    this.ctx.font = `${n.size * 0.6}px sans-serif`;
+                    this.ctx.fillText(n.i, n.x, n.y - n.size*0.1);
+                    this.ctx.font = `bold ${n.size * 0.2}px 'Inter', sans-serif`;
+                    this.ctx.fillStyle = '#fff';
+                    this.ctx.fillText(n.author, n.x, n.y + n.size*0.4);
+                } else {
+                    this.ctx.font = `${n.size * 0.8}px sans-serif`;
+                    this.ctx.fillText(n.i, n.x, n.y - (n.level===0?0:n.size*0.2));
+                }
+                
+                if (this.cam.scale > 0.1 || isHovered) {
+                    this.ctx.font = `bold ${n.size * 0.25}px 'Space Grotesk', sans-serif`;
+                    this.ctx.fillStyle = isHovered ? '#fff' : n.color;
+                    this.ctx.fillText(n.n.toUpperCase(), n.x, n.y + n.size + (n.size*0.3));
+                }
+            }
+        }
+
+        this.ctx.restore();
+
+        App.updateTelemetry(this.cam.scale);
+        requestAnimationFrame(() => this.renderLoop());
+    },
+
+    highlightSearch(query) {
+        const q = query.toLowerCase();
+        let match = null;
+        for (let n of this.nodes) {
+            if(n.n.toLowerCase().includes(q) || (n.group && n.group.toLowerCase().includes(q))) {
+                if(!match) match = n;
+            }
+        }
+
+        if(match) {
+            this.tgt.x = match.x;
+            this.tgt.y = match.y;
+            this.tgt.scale = match.level === 1 ? 0.6 : 1.5;
+            App.showToast(`Found Match via Cypher Sim`);
+            App.openInspector(match);
+        } else {
+            App.showToast(`Concept not in current Graph View.`);
+        }
+    }
+};
+
+/**
+ * STREAMING_CHUNK: UI CONTROLLER (Neo4j Modals)
+ */
+const App = {
+    init() {
+        FractalEngine.init();
+    },
+
+    openInspector(node) {
+        document.getElementById('inspector-modal').classList.add('active');
+        document.getElementById('inspector-icon').innerText = node.i;
+        document.getElementById('inspector-icon').style.color = node.color;
+        document.getElementById('inspector-title').innerText = node.n;
+        document.getElementById('inspector-title').style.color = node.color;
+        
+        document.getElementById('inspector-type').innerText = `(:${node.type})`;
+        document.getElementById('inspector-type').style.color = node.color;
+        document.getElementById('inspector-type').style.borderColor = node.color;
+        
+        document.getElementById('inspector-desc').innerText = node.author ? `Authored by: ${node.author}` : `Belongs to Group: ${node.group || 'Core'}`;
+        
+        // Dynamic Cypher Query Generation for HUD
+        document.getElementById('inspector-cypher').innerText = `MATCH (n:${node.type} {name: '${node.n}'})-[r]->(m)\nRETURN n, r, m`;
+        document.getElementById('inspector-cypher').style.color = node.color;
+
+        // Dynamic Actions based on Node Type
+        const actionsBox = document.getElementById('inspector-actions');
+        actionsBox.innerHTML = '';
+        
+        if (node.type === 'Concept' && node.level === 1) {
+            actionsBox.innerHTML = `
+                <button class="neo-action-btn" style="color: ${node.color}; border-color: ${node.color}" onclick="DataAdapter.expandNode(FractalEngine.hoveredNode); App.closeModal('inspector-modal');">
+                    <span class="material-symbols-rounded">account_tree</span> Expand Sub-Graph
+                </button>
+            `;
+        } else if (node.type === 'Book') {
+            actionsBox.innerHTML = `
+                <button class="neo-action-btn" style="color: #fbbf24; border-color: #fbbf24" onclick="window.open('https://openlibrary.org/search?q=${encodeURIComponent(node.n)}', '_blank')">
+                    <span class="material-symbols-rounded">menu_book</span> Find in Library
+                </button>
+            `;
+        }
+        
+        Hardware.speak(`${node.type} node selected: ${node.n}.`);
+    },
+
+    closeModal(id) {
+        document.getElementById(id).classList.remove('active');
+    },
+
+    executeSearch(query) {
+        if(!query.trim()) return;
+        document.getElementById('omni-search').blur();
+        FractalEngine.highlightSearch(query.trim());
+    },
+
+    showToast(msg) {
+        const t = document.getElementById('toast');
+        t.innerText = msg;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 3000);
+    },
+
+    updateTelemetry(scale) {
+        document.getElementById('scale-display').innerText = `Scale: ${scale.toFixed(4)}x`;
+        let layer = "L0: Core Engine";
+        if (scale > 0.05) layer = "L1: Taxonomy Roots";
+        if (scale > 0.5) layer = "L2: Entity/Book Nodes";
+        document.getElementById('layer-display').innerText = layer;
+    }
+};
+
+window.onload = () => App.init();
+</script>
 </body>
 </html>
