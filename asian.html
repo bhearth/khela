@@ -1,761 +1,581 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-<script src="https://bhearth.github.io/khela/mesh.js"></script>
-  <title>Khel.o · Fractal Universe 2086</title>
-<style>
-/* ── Reset & Base ── */
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{
-  background:#010204;color:#e2e8f0;
-  font-family:'Space Grotesk',system-ui,sans-serif;
-  overflow:hidden;touch-action:none;user-select:none;
-  height:100dvh;width:100dvw;
-  background-image:radial-gradient(circle at center,#0a1128 0%,#010204 100%);
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>e/arth · The Infinite Mandala</title>
+    <!-- Neo4j Web Driver for Global Graph Sync -->
+    <script src="https://unpkg.com/neo4j-driver@5.12.0/lib/browser/neo4j-web.min.js"></script>
+    <style>
+        :root {
+            --bg-void: #020204;
+            --core-glow: #fbbf24;
+            --text-main: #e2e8f0;
+            --text-muted: #64748b;
+            --glass: rgba(15, 23, 42, 0.75);
+            --border: rgba(255, 255, 255, 0.08);
+        }
 
-/* ── HUD ── */
-#hud{
-  position:fixed;top:0;left:0;right:0;
-  display:flex;justify-content:space-between;align-items:flex-start;
-  padding:clamp(10px,3vw,18px);
-  pointer-events:none;z-index:50;
-  background:linear-gradient(180deg,rgba(1,2,4,0.94) 60%,transparent);
-}
-.telemetry{font-size:clamp(10px,2.5vw,13px);letter-spacing:3px;text-transform:uppercase;color:#38bdf8;text-shadow:0 0 10px rgba(56,189,248,0.6);font-weight:700;line-height:1.6;}
-.coords{font-size:clamp(9px,2vw,11px);color:#94a3b8;text-align:right;letter-spacing:2px;line-height:1.7;}
-.hint{font-size:clamp(8px,1.8vw,10px);color:#475569;letter-spacing:1px;}
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: var(--bg-void);
+            color: var(--text-main);
+            font-family: 'Inter', system-ui, sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
 
-/* ── Level Indicator ── */
-#level-indicator{
-  position:fixed;top:80px;left:50%;transform:translateX(-50%);
-  background:rgba(56,189,248,0.15);border:1px solid rgba(56,189,248,0.3);
-  border-radius:24px;padding:8px 20px;font-size:11px;
-  letter-spacing:2px;text-transform:uppercase;color:#38bdf8;
-  backdrop-filter:blur(10px);z-index:40;pointer-events:auto;cursor:pointer;
-  transition:all .3s;
-}
-#level-indicator:hover{background:rgba(56,189,248,0.25);transform:translateX(-50%) scale(1.05);}
+        /* =========================================
+           THE CANVAS UNIVERSE
+           ========================================= */
+        #universe-canvas {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 1;
+            cursor: crosshair;
+        }
 
-/* ── Fractal Levels Nav ── */
-#fractal-nav{
-  position:fixed;bottom:100px;left:50%;transform:translateX(-50%);
-  display:flex;gap:6px;background:rgba(1,2,4,0.85);
-  padding:10px 16px;border-radius:32px;backdrop-filter:blur(15px);
-  border:1px solid rgba(255,255,255,0.1);z-index:40;
-}
-.f-level{
-  padding:6px 12px;border-radius:20px;font-size:9px;
-  font-weight:700;letter-spacing:1px;text-transform:uppercase;
-  background:rgba(255,255,255,0.05);color:#64748b;
-  border:1px solid rgba(255,255,255,0.1);cursor:pointer;
-  transition:all .2s;
-}
-.f-level.active{background:rgba(56,189,248,0.2);color:#38bdf8;border-color:#38bdf8;}
-.f-level:hover{background:rgba(255,255,255,0.1);color:#fff;}
+        /* =========================================
+           HUD & OVERLAYS
+           ========================================= */
+        .hud {
+            position: absolute;
+            z-index: 10;
+            pointer-events: none;
+        }
+        .hud > * { pointer-events: auto; }
 
-/* ── Toolbar ── */
-#toolbar{
-  position:fixed;bottom:0;left:0;right:0;
-  display:flex;justify-content:space-around;align-items:center;
-  padding:clamp(8px,2.5vw,12px) 8px clamp(12px,4vw,22px);
-  background:linear-gradient(0deg,rgba(1,2,4,0.97) 75%,transparent);
-  z-index:50;gap:4px;pointer-events:auto;
-}
-.tb{
-  display:flex;flex-direction:column;align-items:center;gap:3px;
-  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);
-  border-radius:18px;padding:8px 10px;cursor:pointer;flex:1;max-width:80px;
-  transition:background .2s,transform .2s cubic-bezier(0.34,1.56,0.64,1);backdrop-filter:blur(10px);
-}
-.tb:active{background:rgba(255,255,255,0.12);transform:scale(0.85);}
-.tb .em{font-size:clamp(20px,5.5vw,28px);line-height:1;}
-.tb .lb{font-size:clamp(7px,1.8vw,9px);color:#94a3b8;letter-spacing:.5px;text-transform:uppercase;font-weight:700;}
+        /* Top Left: Brand & Status */
+        .hud-top-left {
+            top: 24px; left: 24px;
+            display: flex; flex-direction: column; gap: 12px;
+        }
+        .brand {
+            font-size: 1.5rem; font-weight: 800; letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #fbbf24, #38bdf8);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .status-pill {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            padding: 6px 14px; border-radius: 20px;
+            font-size: 0.75rem; color: var(--text-muted);
+        }
+        .status-dot { width: 6px; height: 6px; border-radius: 50%; background: #10b981; box-shadow: 0 0 8px #10b981; }
+        .status-dot.offline { background: #ef4444; box-shadow: 0 0 8px #ef4444; }
 
-/* ── 3D Viewport ── */
-#viewport{position:absolute;top:50dvh;left:50dvw;z-index:10;}
-#hub{position:absolute;top:0;left:0;transform-style:preserve-3d;will-change:transform;}
+        /* Top Right: Controls */
+        .hud-top-right {
+            top: 24px; right: 24px;
+            display: flex; gap: 10px;
+        }
+        .btn-glass {
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--border); color: var(--text-main);
+            padding: 8px 16px; border-radius: 8px; font-size: 0.8rem;
+            cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 6px;
+        }
+        .btn-glass:hover { background: rgba(56, 189, 248, 0.2); border-color: #38bdf8; color: #fff; }
 
-/* ── SVG Constellation lines ── */
-svg{position:absolute;top:-10000px;left:-10000px;width:20000px;height:20000px;pointer-events:none;}
-.stellar-path{fill:none;stroke-width:2;stroke-linecap:round;filter:drop-shadow(0 0 5px currentColor);stroke-dasharray:2000;stroke-dashoffset:2000;animation:growVine 1.4s cubic-bezier(0.25,1,0.5,1) forwards;}
-@keyframes growVine{to{stroke-dashoffset:0}}
+        /* Bottom: Inspector Panel */
+        .inspector {
+            position: absolute;
+            bottom: 24px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 600px;
+            background: var(--glass); backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 16px; padding: 20px;
+            z-index: 10;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            opacity: 0; pointer-events: none;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+        .inspector.active { opacity: 1; pointer-events: auto; transform: translateX(-50%) translateY(0); }
+        
+        .inspector-header { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
+        .inspector-icon { font-size: 2.5rem; filter: drop-shadow(0 0 10px currentColor); }
+        .inspector-title { font-size: 1.25rem; font-weight: 700; }
+        .inspector-code { font-family: monospace; font-size: 0.8rem; color: var(--text-muted); }
+        
+        .vector-grid {
+            display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 16px;
+        }
+        .vector-bar {
+            height: 30px; background: rgba(255,255,255,0.05); border-radius: 4px;
+            position: relative; overflow: hidden;
+        }
+        .vector-fill {
+            position: absolute; bottom: 0; left: 0; width: 100%;
+            background: linear-gradient(to top, #38bdf8, #818cf8);
+            transition: height 0.5s ease;
+        }
+        .vector-label {
+            position: absolute; top: 2px; left: 4px; font-size: 0.6rem; color: #fff; font-weight: 600;
+        }
 
-/* ── Universe Flower Dots ── */
-.dot{
-  position:absolute;border-radius:50%;cursor:pointer;
-  transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),var(--z));
-  transition:transform .4s cubic-bezier(.34,1.56,.64,1),box-shadow .3s;
-  will-change:transform;pointer-events:auto;min-width:44px;min-height:44px;
-  display:flex;align-items:center;justify-content:center;
-}
-.dot .hit{border-radius:50%;background:var(--col);width:var(--sz);height:var(--sz);box-shadow:0 0 12px var(--col);transition:transform .3s cubic-bezier(0.34,1.56,0.64,1),box-shadow .3s;}
-.dot:hover .hit,.dot:active .hit{transform:scale(2.6);box-shadow:0 0 28px var(--col),0 0 55px var(--col);z-index:100;}
-.dot .title-label{position:absolute;top:16px;font-size:9px;font-weight:bold;color:#fff;opacity:0;pointer-events:none;white-space:nowrap;text-shadow:0 2px 5px #000,0 0 10px var(--col);transition:opacity .3s;}
-.dot:hover .title-label{opacity:1;}
-.dot.dimmed{opacity:0.08;filter:grayscale(100%);pointer-events:none;}
+        .connections-list { font-size: 0.8rem; color: var(--text-muted); line-height: 1.6; }
+        .connections-list strong { color: #fbbf24; }
 
-/* ── Bloom / Drill-down Petals ── */
-.jnode{
-  position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  border-radius:50%;cursor:pointer;text-align:center;
-  background:rgba(10,15,25,0.75);border:2px solid;backdrop-filter:blur(10px);
-  transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),var(--z)) scale(0);
-  animation:supernova 0.75s cubic-bezier(.34,1.56,.64,1) forwards;
-  will-change:transform;pointer-events:auto;
-}
-.jnode:hover,.jnode:active{background:currentColor!important;color:#000!important;box-shadow:0 0 36px currentColor,inset 0 0 18px #fff;z-index:500;transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),calc(var(--z) + 50px)) scale(1.3)!important;}
-.jnode .ji{font-size:clamp(18px,4.5vw,28px);filter:drop-shadow(0 4px 6px rgba(0,0,0,.6));transition:transform .3s cubic-bezier(0.34,1.56,0.64,1);line-height:1;}
-.jnode:hover .ji{transform:scale(1.3) rotate(10deg);}
-.jnode .jl{font-size:clamp(7px,1.8vw,10px);font-weight:800;text-transform:uppercase;letter-spacing:.8px;margin-top:5px;pointer-events:none;text-shadow:0 1px 3px rgba(0,0,0,0.8);}
-@keyframes supernova{0%{transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),var(--z)) scale(0) rotate(-45deg);}100%{transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),var(--z)) scale(1) rotate(0deg);}}
-
-/* ── Loading ─ */
-#loading{position:fixed;inset:0;background:rgba(1,2,4,0.97);z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 0.5s;backdrop-filter:blur(5px);}
-.spinner{width:56px;height:56px;border:4px solid rgba(255,255,255,0.08);border-top-color:#f59e0b;border-radius:50%;animation:spin 0.9s cubic-bezier(0.68,-0.55,0.265,1.55) infinite;margin-bottom:18px;}
-@keyframes spin{to{transform:rotate(360deg)}}
-#loading-msg{color:#f59e0b;font-family:monospace;letter-spacing:3px;text-transform:uppercase;font-size:13px;font-weight:bold;}
-#loading-sub{color:#475569;font-size:10px;letter-spacing:2px;margin-top:8px;}
-
-/* ── Detail / Kundali Sheet ── */
-#detail{
-  position:fixed;bottom:-100%;left:0;right:0;
-  background:rgba(8,16,32,0.97);border-top:2px solid rgba(56,189,248,.5);
-  border-radius:32px 32px 0 0;z-index:250;
-  padding:clamp(16px,4vw,28px);
-  transition:bottom .5s cubic-bezier(.34,1.56,.64,1);
-  max-height:82vh;overflow-y:auto;backdrop-filter:blur(25px);
-  box-shadow:0 -10px 40px rgba(0,0,0,0.6);
-}
-#detail.open{bottom:0;}
-#detail .handle{width:48px;height:5px;background:rgba(255,255,255,.18);border-radius:6px;margin:0 auto 16px;cursor:pointer;}
-#d-icon{font-size:clamp(42px,12vw,68px);text-align:center;margin-bottom:8px;animation:bounce 2.5s infinite;}
-@keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
-#d-title{font-size:clamp(16px,5vw,24px);color:#fff;font-weight:800;text-align:center;margin:0 0 5px;line-height:1.2;}
-#d-desc{font-size:clamp(11px,3vw,13px);color:#64748b;text-align:center;line-height:1.5;margin:0 0 16px;}
-.d-close{position:absolute;top:18px;right:22px;width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.08);color:#fff;border:none;font-size:16px;font-weight:bold;cursor:pointer;transition:.3s;}
-.d-close:hover{background:#ef4444;}
-
-/* ── KUNDALI TABS ── */
-#k-tabs{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;padding-bottom:2px;}
-.k-tab{
-  flex-shrink:0;padding:7px 14px;border-radius:20px;font-size:10px;font-weight:800;
-  text-transform:uppercase;letter-spacing:.8px;cursor:pointer;
-  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:#64748b;
-  transition:all .2s;
-}
-.k-tab.on{background:rgba(56,189,248,.15);border-color:#38bdf8;color:#38bdf8;}
-
-/* ── Kundali Grid (Stats) ── */
-.k-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:18px;}
-.k-box{background:rgba(255,255,255,0.03);padding:12px;border-radius:14px;text-align:center;border:1px solid rgba(255,255,255,0.07);transition:.3s;cursor:default;}
-.k-box:hover{transform:translateY(-4px);background:rgba(255,255,255,0.07);}
-.k-val{font-size:clamp(20px,6vw,26px);font-weight:800;line-height:1.1;}
-.k-lbl{font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.8px;margin-top:4px;}
-.k-icon{font-size:16px;margin-bottom:3px;}
-
-/* ── Launch button ── */
-#d-links{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:16px;}
-.d-link{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#38bdf8,#818cf8);border-radius:18px;padding:13px 24px;color:#000;text-decoration:none;font-size:clamp(12px,3.5vw,14px);font-weight:800;text-transform:uppercase;transition:transform .2s cubic-bezier(0.34,1.56,0.64,1),box-shadow .2s;box-shadow:0 8px 18px rgba(56,189,248,0.35);}
-.d-link:active{transform:scale(0.9);}
-.d-link-sec{background:linear-gradient(135deg,#10b981,#06b6d4);}
-
-/* ── Search overlay ── */
-#search-overlay{position:fixed;inset:0;background:rgba(1,2,4,.97);backdrop-filter:blur(16px);z-index:300;display:none;flex-direction:column;padding:clamp(16px,5vw,28px);animation:fadeUp .25s ease;}
-#search-overlay.active{display:flex;}
-#search-wrap{display:flex;gap:10px;align-items:center;margin-bottom:14px;}
-#search-input{flex:1;background:rgba(255,255,255,0.05);border:2px solid rgba(56,189,248,.35);border-radius:50px;padding:clamp(11px,3.5vw,15px) 18px;color:#fff;font-size:clamp(15px,4.5vw,19px);outline:none;font-family:inherit;font-weight:600;}
-#search-close{width:clamp(44px,12vw,52px);height:clamp(44px,12vw,52px);border-radius:50%;background:rgba(255,255,255,0.07);border:none;color:#94a3b8;font-size:19px;cursor:pointer;flex-shrink:0;}
-#search-results{overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:8px;}
-.s-card{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:clamp(10px,3.5vw,16px);cursor:pointer;animation:fadeUp .3s both;transition:background .2s;}
-.s-card:active{background:rgba(255,255,255,0.09);}
-.s-em{font-size:clamp(22px,5.5vw,28px);flex-shrink:0;}
-.s-body h3{margin:0 0 2px;font-size:clamp(13px,3.8vw,16px);color:#fff;font-weight:700;}
-.s-body p{font-size:10px;color:#64748b;}
-@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
-
-/* ── Error toast ── */
-#toast{position:fixed;top:60px;left:50%;transform:translateX(-50%);background:#ef4444;color:#fff;padding:10px 20px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:1px;z-index:400;display:none;animation:fadeUp .3s;}
-#toast.show{display:block;}
-
-/* ── Zoom Controls ── */
-#zoom-controls{
-  position:fixed;right:20px;top:50%;transform:translateY(-50%);
-  display:flex;flex-direction:column;gap:8px;z-index:40;
-}
-.zoom-btn{
-  width:42px;height:42px;border-radius:50%;
-  background:rgba(1,2,4,0.85);border:1px solid rgba(255,255,255,0.15);
-  color:#38bdf8;font-size:20px;cursor:pointer;
-  backdrop-filter:blur(10px);transition:all .2s;
-  display:flex;align-items:center;justify-content:center;
-}
-.zoom-btn:hover{background:rgba(56,189,248,0.2);transform:scale(1.1);}
-</style>
+        /* Loading Overlay */
+        #loader {
+            position: absolute; inset: 0; z-index: 100;
+            background: var(--bg-void);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 1s ease;
+        }
+        #loader.hidden { opacity: 0; pointer-events: none; }
+        .loader-text { font-family: monospace; color: #38bdf8; letter-spacing: 4px; font-size: 0.9rem; margin-top: 20px; }
+        .spinner { width: 40px; height: 40px; border: 3px solid rgba(56, 189, 248, 0.2); border-top-color: #38bdf8; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
 </head>
 <body>
 
-<!-- HUD -->
-<div id="hud">
-  <div class="telemetry">
-    <div id="status">✨ Awakening Universe</div>
-    <div id="path-log" style="font-size:9px;color:#64748b;letter-spacing:2px;margin-top:3px;">Fractal Level 0</div>
-  </div>
-  <div class="coords">
-    <div id="coord-display">Z: 1.000</div>
-    <div class="hint">DOUBLE-TAP TO RESET</div>
-  </div>
-</div>
+    <!-- THE RENDER ENGINE -->
+    <canvas id="universe-canvas"></canvas>
 
-<!-- Level Indicator -->
-<div id="level-indicator" onclick="Engine.showLevelInfo()">Level 0: Pixel/Dot</div>
+    <!-- HUD: TOP LEFT -->
+    <div class="hud hud-top-left">
+        <div class="brand">e/arth · Mandala</div>
+        <div class="status-pill">
+            <div class="status-dot" id="mesh-status"></div>
+            <span id="mesh-status-text">Initializing Mesh...</span>
+        </div>
+        <div class="status-pill">
+            <div class="status-dot offline" id="neo4j-status"></div>
+            <span id="neo4j-status-text">Neo4j: Standby</span>
+        </div>
+    </div>
 
-<!-- Fractal Navigation -->
-<div id="fractal-nav">
-  <div class="f-level active" onclick="Engine.jumpToLevel(0)">0. Dot</div>
-  <div class="f-level" onclick="Engine.jumpToLevel(1)">1. Symbol</div>
-  <div class="f-level" onclick="Engine.jumpToLevel(2)">2. Object</div>
-  <div class="f-level" onclick="Engine.jumpToLevel(3)">3. Earth</div>
-  <div class="f-level" onclick="Engine.jumpToLevel(4)">4. Solar</div>
-  <div class="f-level" onclick="Engine.jumpToLevel(5)">5. Galaxy</div>
-  <div class="f-level" onclick="Engine.jumpToLevel(6)">6. Cosmic</div>
-  <div class="f-level" onclick="Engine.jumpToLevel(7)">7. Infinite</div>
-</div>
+    <!-- HUD: TOP RIGHT -->
+    <div class="hud hud-top-right">
+        <button class="btn-glass" onclick="MeshEngine.fetchDeepMesh()">🌌 Expand Universe</button>
+        <button class="btn-glass" onclick="Neo4jEngine.connect()">🔗 Sync Neo4j</button>
+        <button class="btn-glass" onclick="toggleInspector()">ℹ️ Toggle Panel</button>
+    </div>
 
-<!-- Zoom Controls -->
-<div id="zoom-controls">
-  <button class="zoom-btn" onclick="Engine.zoomIn()">+</button>
-  <button class="zoom-btn" onclick="Engine.zoomOut()">−</button>
-  <button class="zoom-btn" onclick="Engine.resetZoom()" style="font-size:14px;">⟲</button>
-</div>
+    <!-- INSPECTOR PANEL -->
+    <div class="inspector" id="inspector">
+        <div class="inspector-header">
+            <div class="inspector-icon" id="insp-icon">✨</div>
+            <div>
+                <div class="inspector-title" id="insp-title">Select a Node</div>
+                <div class="inspector-code" id="insp-code">Code: ---</div>
+            </div>
+        </div>
+        <div class="vector-grid" id="vector-grid">
+            <!-- Vector bars injected here -->
+        </div>
+        <div class="connections-list" id="connections-list">
+            Click a glowing dot in the universe to reveal its semantic DNA, 10D Vector, and resonant connections.
+        </div>
+    </div>
 
-<!-- 3D Viewport -->
-<div id="viewport"><div id="hub"><svg id="lines"></svg></div></div>
+    <!-- LOADER -->
+    <div id="loader">
+        <div class="spinner"></div>
+        <div class="loader-text">WEAVING THE MESH...</div>
+    </div>
 
-<!-- Loading -->
-<div id="loading">
-  <div class="spinner"></div>
-  <div id="loading-msg">Initializing Fractal Universe…</div>
-  <div id="loading-sub">Loading JSON Mesh (1-9)</div>
-</div>
+    <script>
+        // ==========================================
+        // 1. THE MESH ENGINE (Embedded mesh.js)
+        // ==========================================
+        const MeshEngine = {
+            baseUrl: 'https://bhearth.github.io/khela/',
+            cache: {},
+            nodes: [],
+            connections: [],
 
-<!-- Toast -->
-<div id="toast"></div>
+            async loadJSON(filename) {
+                if (this.cache[filename]) return this.cache[filename];
+                try {
+                    const res = await fetch(`${this.baseUrl}${filename}`);
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    const data = await res.json();
+                    this.cache[filename] = data;
+                    return data;
+                } catch (e) {
+                    console.warn(`[Mesh] Failed to load ${filename}:`, e);
+                    return null;
+                }
+            },
 
-<!-- Toolbar -->
-<div id="toolbar">
-  <div class="tb" onclick="openSearch()"><span class="em">🔍</span><span class="lb">Search</span></div>
-  <div class="tb" onclick="Engine.resetUniverse()"><span class="em">🌸</span><span class="lb">Reset</span></div>
-  <div class="tb" onclick="Engine.rollSurprise()"><span class="em">🎲</span><span class="lb">Jump</span></div>
-  <div class="tb" onclick="Engine.toggleView()"><span class="em" id="view-icon">🕸️</span><span class="lb" id="view-lb">Graph</span></div>
-  <div class="tb" onclick="Engine.shareCurrent()"><span class="em">📤</span><span class="lb">Share</span></div>
-</div>
+            // 10D Vector Math: Dot Product for Resonance
+            calculateResonance(v1, v2) {
+                if (!v1 || !v2 || v1.length !== 10) return 0;
+                let dot = 0;
+                for (let i = 0; i < 10; i++) dot += (v1[i] * v2[i]);
+                return dot;
+            },
 
-<!-- Search -->
-<div id="search-overlay">
-  <div id="search-wrap">
-    <input id="search-input" type="search" placeholder="Search Knowledge Mesh…" autocomplete="off" oninput="runSearch(this.value)">
-    <button id="search-close" onclick="closeSearch()">✕</button>
-  </div>
-  <div id="search-results"></div>
-</div>
+            // 10D Vector to Color Mapping (Millions of Shades)
+            vectorToColor(vector) {
+                if (!vector) return '#ffffff';
+                // Map specific dimensions to RGB for unique semantic colors
+                // Prakriti (Nature/Green), Shaurya (Courage/Red), Viveka (Wisdom/Blue)
+                const r = Math.floor((Math.abs(vector[6]) * 0.5 + 0.5) * 255);
+                const g = Math.floor((Math.abs(vector[3]) * 0.5 + 0.5) * 255);
+                const b = Math.floor((Math.abs(vector[7]) * 0.5 + 0.5) * 255);
+                return `rgb(${r}, ${g}, ${b})`;
+            },
 
-<!-- Detail / Kundali Sheet -->
-<div id="detail">
-  <div class="handle" onclick="closeDetail()"></div>
-  <button class="d-close" onclick="closeDetail()">✕</button>
-  <div id="d-icon">📄</div>
-  <div id="d-title">Node Title</div>
-  <div id="d-desc">Loading data…</div>
+            async init() {
+                updateStatus('mesh', 'Fetching Root Domains...', true);
+                const rootData = await this.loadJSON('1.json');
+                const symbolData = await this.loadJSON('symbol1.json');
 
-  <!-- Kundali Tabs -->
-  <div id="k-tabs">
-    <div class="k-tab on" onclick="KD.tab('stats')">📊 Stats</div>
-    <div class="k-tab" onclick="KD.tab('children')">🌱 Children</div>
-    <div class="k-tab" onclick="KD.tab('vector')">🧬 Vector</div>
-    <div class="k-tab" onclick="KD.tab('links')">🔗 Links</div>
-  </div>
+                if (rootData && rootData.domains) {
+                    let idx = 0;
+                    for (const [code, domain] of Object.entries(rootData.domains)) {
+                        this.nodes.push({
+                            id: code,
+                            name: domain.name,
+                            vector: domain.vector,
+                            color: this.vectorToColor(domain.vector),
+                            icon: this.findIcon(domain.name, symbolData),
+                            x: 0, y: 0, // Calculated in RenderEngine
+                            radius: 0,
+                            angle: 0
+                        });
+                        idx++;
+                    }
+                    
+                    // Calculate Connections (Resonance > Threshold)
+                    for (let i = 0; i < this.nodes.length; i++) {
+                        for (let j = i + 1; j < this.nodes.length; j++) {
+                            const res = this.calculateResonance(this.nodes[i].vector, this.nodes[j].vector);
+                            if (res > 6.5) { // High resonance threshold
+                                this.connections.push({ source: i, target: j, strength: res });
+                            }
+                        }
+                    }
+                    updateStatus('mesh', `Mesh Active: ${this.nodes.length} Nodes`, true);
+                } else {
+                    updateStatus('mesh', 'Mesh Offline (Fallback)', false);
+                    this.generateFallbackMesh();
+                }
+            },
 
-  <!-- Stats panel -->
-  <div id="kd-stats">
-    <div class="k-grid" id="k-grid"></div>
-  </div>
+            findIcon(name, symbolData) {
+                if (!symbolData || !symbolData.categories) return '✨';
+                for (const cat of Object.values(symbolData.categories)) {
+                    for (const sym of cat.symbols) {
+                        if (sym.name.toLowerCase() === name.toLowerCase() || 
+                            (sym.tags && sym.tags.some(t => t.toLowerCase() === name.toLowerCase()))) {
+                            return sym.icon;
+                        }
+                    }
+                }
+                return '✨';
+            },
 
-  <!-- Children panel -->
-  <div id="kd-children" style="display:none">
-    <div id="children-list"></div>
-  </div>
+            generateFallbackMesh() {
+                // Fallback if GitHub is unreachable
+                const fallback = [
+                    { id: '0.1', name: 'Individual', vector: [0.8,0.9,0.5,0.6,0.7,0.8,0.6,0.9,0.7,0.8] },
+                    { id: '0.8', name: 'Sahyog', vector: [0.95,0.77,0.44,0.82,0.89,0.75,0.66,0.55,0.88,0.91] },
+                    { id: '0.9', name: 'Mukti', vector: [0.9,0.95,0.9,0.8,0.95,0.9,0.5,0.95,0.99,0.8] }
+                ];
+                fallback.forEach(d => {
+                    this.nodes.push({
+                        id: d.id, name: d.name, vector: d.vector,
+                        color: this.vectorToColor(d.vector), icon: '✨',
+                        x: 0, y: 0, radius: 0, angle: 0
+                    });
+                });
+            },
 
-  <!-- Vector panel -->
-  <div id="kd-vector" style="display:none">
-    <div id="vector-display"></div>
-  </div>
+            async fetchDeepMesh() {
+                updateStatus('mesh', 'Expanding to Level 2...', true);
+                const level2 = await this.loadJSON('2.json');
+                if (level2 && level2.tree) {
+                    // Add children to the visual mesh
+                    Object.entries(level2.tree).forEach(([code, name]) => {
+                        if (!this.nodes.find(n => n.id === code)) {
+                            const vec = Array(10).fill().map(() => Math.random() * 2 - 1); // Randomized vector for demo
+                            this.nodes.push({
+                                id: code, name: typeof name === 'string' ? name : code,
+                                vector: vec, color: this.vectorToColor(vec), icon: '🌿',
+                                x: 0, y: 0, radius: 0, angle: 0
+                            });
+                        }
+                    });
+                    updateStatus('mesh', `Universe Expanded: ${this.nodes.length} Nodes`, true);
+                    RenderEngine.layoutNodes();
+                }
+            }
+        };
 
-  <!-- Links panel -->
-  <div id="kd-links" style="display:none">
-    <div id="ext-links-list"></div>
-  </div>
+        // ==========================================
+        // 2. NEO4J ENGINE (Global Graph Sync)
+        // ==========================================
+        const Neo4jEngine = {
+            driver: null,
+            // NOTE: In production, NEVER expose credentials in frontend. 
+            // Use a backend proxy or environment variables.
+            config: {
+                uri: 'neo4j+s://613c286a.databases.neo4j.io',
+                user: '613c286a',
+                password: 'vkKL9AvmRjeV3Y71iTvAmVzMr96t7zI1-7gxU_Ueius'
+            },
 
-  <div id="d-links"></div>
-</div>
+            async connect() {
+                updateStatus('neo4j', 'Connecting to AuraDB...', true);
+                try {
+                    this.driver = neo4j.driver(
+                        this.config.uri,
+                        neo4j.auth.basic(this.config.user, this.config.password)
+                    );
+                    await this.driver.verifyConnectivity();
+                    updateStatus('neo4j', 'Neo4j: Connected', true);
+                    
+                    // Example Query: Fetch nodes from the global graph
+                    const session = this.driver.session();
+                    const result = await session.run('MATCH (n:Domain) RETURN n LIMIT 5');
+                    console.log('[Neo4j] Fetched Global Nodes:', result.records);
+                    session.close();
+                    
+                } catch (e) {
+                    console.error('[Neo4j] Connection Failed:', e);
+                    updateStatus('neo4j', 'Neo4j: Connection Failed', false);
+                }
+            }
+        };
 
-<script>
-// ============================================================================
-// KHELA FRACTAL UNIVERSE — JSON Mesh + Phyllotaxis + Hierarchical Navigation
-// ============================================================================
+        // ==========================================
+        // 3. RENDER ENGINE (The Blooming Flower)
+        // ==========================================
+        const RenderEngine = {
+            canvas: null, ctx: null,
+            width: 0, height: 0,
+            centerX: 0, centerY: 0,
+            time: 0,
+            hoveredNode: null,
 
-const BASE_URL = 'https://bhearth.github.io/khela/';
-const WIKI_BASE = 'https://kids.miraheze.org/wiki/';
-const SVG_O = 10000;
+            init() {
+                this.canvas = document.getElementById('universe-canvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.resize();
+                window.addEventListener('resize', () => this.resize());
+                
+                // Interaction
+                this.canvas.addEventListener('mousemove', (e) => this.handleHover(e));
+                this.canvas.addEventListener('click', (e) => this.handleClick(e));
 
-const LEVELS = [
-  {name:'Pixel/Dot', file:'1.json', scale:1},
-  {name:'Symbol Cluster', file:'2.json', scale:2.5},
-  {name:'Object/Concept', file:'3.json', scale:6},
-  {name:'Earth (e/arth)', file:'4.json', scale:15},
-  {name:'Solar System', file:'5.json', scale:40},
-  {name:'Galaxy', file:'6.json', scale:100},
-  {name:'Cosmic Web', file:'7.json', scale:250},
-  {name:'Infinite Universe', file:'8.json', scale:600}
-];
+                this.layoutNodes();
+                this.animate();
+            },
 
-const ICONS = ['🌟','','🎈','🎨','','🍎','','🧩','','🧸','','🛸','','🌻','','🐠','','💎','','🎭','','🎯','','🔥','','🎪','🏔️','🌺','🦚',''];
+            resize() {
+                this.width = window.innerWidth;
+                this.height = window.innerHeight;
+                this.canvas.width = this.width * window.devicePixelRatio;
+                this.canvas.height = this.height * window.devicePixelRatio;
+                this.canvas.style.width = `${this.width}px`;
+                this.canvas.style.height = `${this.height}px`;
+                this.ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+                
+                this.centerX = this.width / 2;
+                this.centerY = this.height / 2;
+                this.layoutNodes();
+            },
 
-// ============================================================================
-// KUNDALI DISPLAY CONTROLLER
-// ============================================================================
-const KD = {
-  current: null,
-  activeTab: 'stats',
-  
-  tab(name) {
-    this.activeTab = name;
-    document.querySelectorAll('.k-tab').forEach((t,i) => {
-      t.classList.toggle('on', ['stats','children','vector','links'][i] === name);
-    });
-    document.getElementById('kd-stats').style.display   = name==='stats'    ? '' : 'none';
-    document.getElementById('kd-children').style.display= name==='children' ? '' : 'none';
-    document.getElementById('kd-vector').style.display  = name==='vector'   ? '' : 'none';
-    document.getElementById('kd-links').style.display   = name==='links'    ? '' : 'none';
-  },
+            layoutNodes() {
+                // Phyllotaxis (Golden Angle) for perfect blooming flower
+                const goldenAngle = Math.PI * (3 - Math.sqrt(5)); // ~137.5 degrees
+                const scale = Math.min(this.width, this.height) * 0.04;
 
-  render(data, type='json') {
-    this.current = data;
-    
-    if(type === 'json') {
-      // JSON Node stats
-      const statDefs = [
-        { val: data.code || '?', lbl:'Code', col:'#38bdf8', icon:'🔢' },
-        { val: data.name || 'Unknown', lbl:'Name', col:'#10b981', icon:'📛' },
-        { val: data.vector ? '10D' : 'N/A', lbl:'Vector', col:'#f59e0b', icon:'🧬' },
-        { val: data.children || 0, lbl:'Children', col:'#818cf8', icon:'🌱' },
-        { val: data.depth || 0, lbl:'Depth', col:'#a78bfa', icon:'📊' },
-        { val: data.resonance?.toFixed(2) || '0', lbl:'Resonance', col:'#34d399', icon:'⚡' },
-      ];
+                MeshEngine.nodes.forEach((node, i) => {
+                    node.angle = i * goldenAngle;
+                    node.radius = scale * Math.sqrt(i + 1);
+                    node.x = this.centerX + Math.cos(node.angle) * node.radius;
+                    node.y = this.centerY + Math.sin(node.angle) * node.radius;
+                });
+            },
 
-      document.getElementById('k-grid').innerHTML = statDefs.map(d =>
-        `<div class="k-box">
-          <div class="k-icon">${d.icon}</div>
-          <div class="k-val" style="color:${d.col}">${d.val}</div>
-          <div class="k-lbl">${d.lbl}</div>
-        </div>`
-      ).join('');
+            animate() {
+                this.time += 0.01;
+                this.ctx.clearRect(0, 0, this.width, this.height);
 
-      // Vector display
-      if(data.vector) {
-        document.getElementById('vector-display').innerHTML = 
-          `<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;">
-            ${data.vector.map((v,i) => `
-              <div style="background:rgba(255,255,255,0.05);padding:10px;border-radius:10px;text-align:center;">
-                <div style="font-size:16px;margin-bottom:4px;">${['Ahimsa','Satya','Aparigraha','Prakriti','Rta','Vinaya','Shaurya','Viveka','Mukti','Seva'][i]}</div>
-                <div style="font-size:18px;font-weight:bold;color:#38bdf8;">${v.toFixed(2)}</div>
-              </div>
-            `).join('')}
-          </div>`;
-      }
+                // Draw Cosmic Background (Millions of Shades representation)
+                this.drawCosmicDust();
 
-      // Children list
-      if(data.childrenData && data.childrenData.length) {
-        document.getElementById('children-list').innerHTML = data.childrenData.map(child =>
-          `<div class="s-card" onclick="Engine.loadNode('${child.code}')">
-            <div class="s-em">📄</div>
-            <div class="s-body"><h3>${child.name}</h3><p>Code: ${child.code}</p></div>
-          </div>`
-        ).join('');
-      } else {
-        document.getElementById('children-list').innerHTML = '<div style="color:#64748b;padding:20px;text-align:center;">No children found</div>';
-      }
-    }
+                // Draw Connections (Semantic Resonance)
+                this.drawConnections();
 
-    document.getElementById('d-links').innerHTML = 
-      `<a class="d-link" href="${data.url || '#'}" target="_blank">🚀 Open Resource</a>
-       <a class="d-link d-link-sec" onclick="Engine.drillDown('${data.code}')">🔽 Drill Down</a>`;
-  }
-};
+                // Draw Nodes (The Dots)
+                this.drawNodes();
 
-// ============================================================================
-// MAIN ENGINE
-// ============================================================================
-const Engine = {
-  hub: document.getElementById('hub'),
-  svg: document.getElementById('lines'),
-  currentLevel: 0,
-  currentNode: null,
-  dots: [],
-  jnodes: [],
-  cam: { x:0, y:0, z:1, rx:0, ry:0 },
-  tgt: { x:0, y:0, z:1, rx:0, ry:0 },
-  isMobile: window.innerWidth < 768,
-  jsonData: {},
+                requestAnimationFrame(() => this.animate());
+            },
 
-  async init() {
-    this.isMobile = window.innerWidth < 768;
-    this.setupGestures();
-    this.startRenderLoop();
-    await this.loadRootLevel();
-  },
+            drawCosmicDust() {
+                // Procedural background representing the Zetta-byte mesh
+                const ctx = this.ctx;
+                for (let i = 0; i < 200; i++) {
+                    const x = (Math.sin(i * 0.1 + this.time * 0.2) * 0.5 + 0.5) * this.width;
+                    const y = (Math.cos(i * 0.15 + this.time * 0.1) * 0.5 + 0.5) * this.height;
+                    const alpha = Math.sin(i + this.time) * 0.1 + 0.1;
+                    ctx.fillStyle = `rgba(56, 189, 248, ${alpha})`;
+                    ctx.beginPath();
+                    ctx.arc(x, y, 1, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            },
 
-  async loadRootLevel() {
-    try {
-      setLoadMsg('Loading Root Domains…', 'Fetching 1.json');
-      const data = await KhelaMesh.initBigBang();
-      
-      if(data && data.length) {
-        this.jsonData['root'] = data;
-        this.renderLevel(data, 0);
-        document.getElementById('loading').style.opacity = '0';
-        setTimeout(() => document.getElementById('loading').style.display='none', 600);
-        this.updateStatus(`🌌 ${data.length} Root Domains Loaded`);
-      }
-    } catch(e) {
-      console.error(e);
-      document.getElementById('loading-msg').innerText = '⚠️ Failed to load JSON mesh';
-      document.getElementById('loading-sub').innerText = e.message;
-    }
-  },
+            drawConnections() {
+                const ctx = this.ctx;
+                MeshEngine.connections.forEach(conn => {
+                    const source = MeshEngine.nodes[conn.source];
+                    const target = MeshEngine.nodes[conn.target];
+                    if (!source || !target) return;
 
-  async loadNode(code) {
-    try {
-      this.updateStatus(`📡 Loading node ${code}…`);
-      const data = await KhelaMesh.drillDown(code);
-      
-      if(data) {
-        this.jsonData[code] = data;
-        this.renderLevel(data, this.getLevelFromCode(code));
-        this.updateStatus(`📂 ${data.length} children loaded`);
-      }
-    } catch(e) {
-      console.error(e);
-      showToast(`Failed to load node ${code}`);
-    }
-  },
+                    ctx.beginPath();
+                    ctx.moveTo(source.x, source.y);
+                    ctx.lineTo(target.x, target.y);
+                    
+                    // Glow effect based on strength
+                    const alpha = (conn.strength - 6.5) * 0.2; 
+                    ctx.strokeStyle = `rgba(251, 191, 36, ${Math.min(alpha, 0.4)})`;
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                });
+            },
 
-  getLevelFromCode(code) {
-    const depth = code.split('.').length;
-    return Math.min(depth, 7);
-  },
+            drawNodes() {
+                const ctx = this.ctx;
+                MeshEngine.nodes.forEach((node, i) => {
+                    const isHovered = this.hoveredNode === i;
+                    const baseSize = 8 + (node.vector ? Math.abs(node.vector[9]) * 10 : 5); // Seva vector determines size
+                    const size = isHovered ? baseSize * 1.5 : baseSize;
+                    const pulse = Math.sin(this.time * 2 + i) * 2;
 
-  renderLevel(nodes, level) {
-    this.clearExpansion();
-    this.dots.forEach(d=>d.remove()); 
-    this.dots.length=0;
-    
-    const c = this.isMobile ? 25 : 40;
-    const scale = LEVELS[level]?.scale || 1;
-    
-    nodes.forEach((node,i) => {
-      const angle = i * 137.508 * (Math.PI/180);
-      const r = c * Math.sqrt(i+1) * scale;
-      const x = r * Math.cos(angle);
-      const y = r * Math.sin(angle);
-      const z = Math.sin(i*0.1)*60;
-      const hue = (i*13.5)%360;
-      const color = `hsl(${hue},85%,62%)`;
-      const sz = Math.max(4, Math.min(10, 4 + i/80));
+                    // Outer Glow
+                    const gradient = ctx.createRadialGradient(node.x, node.y, 0, node.x, node.y, size + 15 + pulse);
+                    gradient.addColorStop(0, node.color);
+                    gradient.addColorStop(1, 'transparent');
+                    ctx.fillStyle = gradient;
+                    ctx.beginPath();
+                    ctx.arc(node.x, node.y, size + 15 + pulse, 0, Math.PI * 2);
+                    ctx.fill();
 
-      const el = document.createElement('div');
-      el.className = 'dot';
-      el.style.cssText = `--x:${x}px;--y:${y}px;--z:${z}px;--col:${color};--sz:${sz}px;`;
-      el.innerHTML = `<div class="hit"></div><div class="title-label" style="--col:${color}">${node.name}</div>`;
-      el.onclick = e => { 
-        e.stopPropagation(); 
-        this.selectNode(el, node, x, y, z, color, hue); 
-      };
-      this.hub.appendChild(el);
-      this.dots.push(el);
-    });
+                    // Core Dot
+                    ctx.fillStyle = node.color;
+                    ctx.beginPath();
+                    ctx.arc(node.x, node.y, size, 0, Math.PI * 2);
+                    ctx.fill();
 
-    // Update level indicator
-    document.getElementById('level-indicator').innerText = `Level ${level}: ${LEVELS[level]?.name || 'Custom'}`;
-    document.querySelectorAll('.f-level').forEach((el,i) => {
-      el.classList.toggle('active', i === level);
-    });
-    document.getElementById('path-log').innerText = LEVELS[level]?.name || `Level ${level}`;
-  },
+                    // Label (if hovered or core)
+                    if (isHovered || i === 0) {
+                        ctx.fillStyle = '#fff';
+                        ctx.font = isHovered ? 'bold 14px Inter' : '12px Inter';
+                        ctx.textAlign = 'center';
+                        ctx.fillText(node.name, node.x, node.y + size + 20);
+                        if (isHovered) {
+                            ctx.font = '10px monospace';
+                            ctx.fillStyle = '#94a3b8';
+                            ctx.fillText(node.id, node.x, node.y + size + 35);
+                        }
+                    }
+                });
+            },
 
-  async selectNode(dotEl, nodeData, px, py, pz, pColor, baseHue) {
-    this.clearExpansion();
-    this.dots.forEach(d => { if(d!==dotEl) d.classList.add('dimmed'); });
-    
-    this.tgt.x = -px;
-    this.tgt.y = -py;
-    this.tgt.z = this.isMobile ? 1.2 : 2;
-    
-    this.currentNode = nodeData;
-    this.updateStatus(`📄 ${nodeData.name}`);
-    
-    // Show detail sheet
-    document.getElementById('d-icon').innerText = '📄';
-    document.getElementById('d-title').innerText = nodeData.name;
-    document.getElementById('d-desc').innerText = `Code: ${nodeData.code} · Loading children…`;
-    document.getElementById('detail').classList.add('open');
-    KD.tab('stats');
+            handleHover(e) {
+                const rect = this.canvas.getBoundingClientRect();
+                const mx = e.clientX - rect.left;
+                const my = e.clientY - rect.top;
 
-    // Load children
-    try {
-      const children = await KhelaMesh.drillDown(nodeData.code);
-      const enrichedData = {
-        ...nodeData,
-        children: children?.length || 0,
-        childrenData: children || [],
-        depth: nodeData.code.split('.').length,
-        resonance: nodeData.vector ? 0.85 : 0
-      };
-      
-      KD.render(enrichedData, 'json');
-      document.getElementById('d-desc').innerText = `${children?.length || 0} children · Code: ${nodeData.code}`;
-      
-      // Bloom children as petals
-      if(children && children.length) {
-        this.bloomPetals(children.slice(0,24), px, py, pz, baseHue);
-      }
-    } catch(e) {
-      console.error(e);
-      KD.render(nodeData, 'json');
-    }
-  },
+                let found = -1;
+                MeshEngine.nodes.forEach((node, i) => {
+                    const dist = Math.hypot(node.x - mx, node.y - my);
+                    if (dist < 20) found = i;
+                });
 
-  bloomPetals(children, px, py, pz, baseHue) {
-    const cScale = this.isMobile ? 45 : 65;
-    
-    children.forEach((child, i) => {
-      const angle  = i * 137.508 * (Math.PI/180);
-      const r      = cScale * Math.sqrt(i+1) + (this.isMobile ? 65 : 110);
-      const x      = px + Math.cos(angle)*r;
-      const y      = py + Math.sin(angle)*r;
-      const z      = pz + Math.sin(i*0.6)*45;
-      const sz     = this.isMobile ? 60 : 80;
-      const petalH = (baseHue + i*15)%360;
-      const col    = `hsl(${petalH},90%,64%)`;
-      const icon   = ICONS[i%ICONS.length];
+                this.hoveredNode = found === -1 ? null : found;
+                this.canvas.style.cursor = found === -1 ? 'crosshair' : 'pointer';
+            },
 
-      // SVG vine
-      const path = document.createElementNS("http://www.w3.org/2000/svg","path");
-      const mx=(px+x)/2-(y-py)*0.2+SVG_O, my=(py+y)/2+(x-px)*0.2+SVG_O;
-      path.setAttribute("d",`M${px+SVG_O} ${py+SVG_O} Q${mx} ${my} ${x+SVG_O} ${y+SVG_O}`);
-      path.setAttribute("class","stellar-path");
-      path.style.stroke=col; 
-      path.style.strokeOpacity="0.55";
-      path.style.animationDelay=`${i*0.045}s`;
-      this.svg.appendChild(path);
+            handleClick(e) {
+                if (this.hoveredNode !== null) {
+                    const node = MeshEngine.nodes[this.hoveredNode];
+                    showInspector(node);
+                }
+            }
+        };
 
-      // Petal node
-      const name  = child.name || child.code;
-      const short = name.length>16 ? name.slice(0,14)+'..' : name;
-      const el    = document.createElement('div');
-      el.className='jnode';
-      el.style.cssText=`--x:${x}px;--y:${y}px;--z:${z}px;width:${sz}px;height:${sz}px;color:${col};border-color:${col};animation-delay:${i*0.055}s;`;
-      el.innerHTML=`<div class="ji">${icon}</div><div class="jl" style="color:${col}">${short}</div>`;
-      el.onclick=e=>{
-        e.stopPropagation();
-        this.selectNode(el, child, x, y, z, col, petalH);
-      };
-      this.hub.appendChild(el);
-      this.jnodes.push(el);
-    });
-  },
+        // ==========================================
+        // 4. UI & UTILITIES
+        // ==========================================
+        function updateStatus(type, text, isOnline) {
+            const dot = document.getElementById(`${type}-status`);
+            const txt = document.getElementById(`${type}-status-text`);
+            if (dot) {
+                dot.className = isOnline ? 'status-dot' : 'status-dot offline';
+            }
+            if (txt) txt.innerText = text;
+        }
 
-  async drillDown(code) {
-    if(this.currentNode) {
-      await this.loadNode(code);
-    }
-  },
+        function showInspector(node) {
+            const panel = document.getElementById('inspector');
+            document.getElementById('insp-icon').innerText = node.icon;
+            document.getElementById('insp-icon').style.color = node.color;
+            document.getElementById('insp-title').innerText = node.name;
+            document.getElementById('insp-code').innerText = `Code: ${node.id} · Resonance Active`;
 
-  clearExpansion() {
-    this.jnodes.forEach(n=>n.remove()); 
-    this.jnodes.length=0;
-    this.svg.innerHTML='';
-    this.dots.forEach(d=>d.classList.remove('dimmed'));
-  },
+            // Render 10D Vector Bars
+            const grid = document.getElementById('vector-grid');
+            const dims = ['Ahimsa', 'Satya', 'Aparigraha', 'Prakriti', 'Rta', 'Vinaya', 'Shaurya', 'Viveka', 'Mukti', 'Seva'];
+            grid.innerHTML = '';
+            if (node.vector) {
+                node.vector.forEach((val, i) => {
+                    const height = Math.abs(val) * 100;
+                    grid.innerHTML += `
+                        <div class="vector-bar">
+                            <div class="vector-fill" style="height: ${height}%; background: ${node.color};"></div>
+                            <div class="vector-label">${dims[i].substring(0,3)}</div>
+                        </div>
+                    `;
+                });
+            }
 
-  resetUniverse() {
-    this.clearExpansion(); 
-    closeDetail();
-    this.tgt={x:0,y:0,z:1,rx:0,ry:0};
-    this.currentLevel = 0;
-    this.updateStatus(`🌌 Fractal Universe`);
-    document.getElementById('path-log').innerText='Root Level';
-    this.loadRootLevel();
-  },
+            // Find Resonant Connections
+            const connList = document.getElementById('connections-list');
+            const resonantNodes = MeshEngine.nodes
+                .map((n, i) => ({ node: n, index: i, res: MeshEngine.calculateResonance(node.vector, n.vector) }))
+                .filter(c => c.index !== MeshEngine.nodes.indexOf(node) && c.res > 5)
+                .sort((a, b) => b.res - a.res)
+                .slice(0, 3);
 
-  jumpToLevel(level) {
-    if(level === this.currentLevel) return;
-    this.currentLevel = level;
-    this.updateStatus(`🔄 Jumping to Level ${level}…`);
-    // In a full implementation, this would load the specific level's JSON
-    showToast(`Level ${level}: ${LEVELS[level]?.name}`);
-  },
+            if (resonantNodes.length > 0) {
+                connList.innerHTML = `<strong>Semantic Resonance:</strong><br>` + 
+                    resonantNodes.map(c => `→ ${c.node.icon} ${c.node.name} (Score: ${c.res.toFixed(2)})`).join('<br>');
+            } else {
+                connList.innerHTML = `<strong>Semantic Resonance:</strong><br>This node is exploring new dimensions. Expand the universe to find connections.`;
+            }
 
-  rollSurprise() {
-    if(!this.dots.length) return;
-    this.dots[Math.floor(Math.random()*this.dots.length)].click();
-  },
+            panel.classList.add('active');
+        }
 
-  toggleView() {
-    showToast('View toggle coming soon');
-  },
+        function toggleInspector() {
+            document.getElementById('inspector').classList.toggle('active');
+        }
 
-  shareCurrent() {
-    if(!this.currentNode) { 
-      showToast('Select a node first'); 
-      return; 
-    }
-    const text = `${this.currentNode.name}\nCode: ${this.currentNode.code}`;
-    if(navigator.share) { 
-      navigator.share({title:this.currentNode.name, text}).catch(()=>{}); 
-    } else { 
-      navigator.clipboard?.writeText(text).then(()=>showToast('Copied!')).catch(()=>{}); 
-    }
-  },
-
-  zoomIn() {
-    this.tgt.z = Math.min(10, this.tgt.z * 1.5);
-  },
-
-  zoomOut() {
-    this.tgt.z = Math.max(0.1, this.tgt.z / 1.5);
-  },
-
-  resetZoom() {
-    this.tgt.z = 1;
-    this.tgt.x = 0;
-    this.tgt.y = 0;
-  },
-
-  showLevelInfo() {
-    const level = LEVELS[this.currentLevel];
-    showToast(`Level ${this.currentLevel}: ${level?.name}\nScale: ${level?.scale}x`);
-  },
-
-  // ── Gestures ──────────────────────────────────────────────────────────
-  setupGestures() {
-    const vp = document.getElementById('viewport');
-    let drag=false, lx, ly, sx, sy, lastTap=0, pinchD=0;
-
-    vp.onpointerdown = e => {
-      const now=Date.now();
-      if(now-lastTap<300){ this.resetUniverse(); lastTap=0; return; }
-      lastTap=now; drag=true; lx=e.clientX; ly=e.clientY; sx=lx; sy=ly;
-    };
-    vp.onpointermove = e => {
-      if(!drag) return;
-      const dx=e.clientX-lx, dy=e.clientY-ly;
-      const moved=Math.abs(e.clientX-sx)>5||Math.abs(e.clientY-sy)>5;
-      if(moved){
-        if(e.shiftKey||e.buttons===2){ this.tgt.ry+=dx*.3; this.tgt.rx-=dy*.3; }
-        else{ this.tgt.x+=dx/this.cam.z; this.tgt.y+=dy/this.cam.z; }
-      }
-      lx=e.clientX; ly=e.clientY;
-    };
-    vp.onpointerup=()=>{ drag=false; };
-    vp.oncontextmenu=e=>e.preventDefault();
-    vp.onwheel=e=>{ this.tgt.z=Math.max(0.04,Math.min(10,this.tgt.z-e.deltaY*.0012)); };
-
-    vp.addEventListener('touchstart',e=>{
-      if(e.touches.length===2){ drag=false; pinchD=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY); }
-    },{passive:true});
-    vp.addEventListener('touchmove',e=>{
-      if(e.touches.length===2){
-        const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
-        this.tgt.z=Math.max(0.04,Math.min(10,this.tgt.z+(d-pinchD)*0.004)); pinchD=d;
-      }
-    },{passive:true});
-  },
-
-  lerp(a,b,t){ return a+(b-a)*t; },
-
-  startRenderLoop() {
-    const loop=()=>{
-      const f=0.075;
-      this.cam.x=this.lerp(this.cam.x,this.tgt.x,f);
-      this.cam.y=this.lerp(this.cam.y,this.tgt.y,f);
-      this.cam.z=this.lerp(this.cam.z,this.tgt.z,f);
-      this.cam.rx=this.lerp(this.cam.rx,this.tgt.rx,f);
-      this.cam.ry=this.lerp(this.cam.ry,this.tgt.ry,f);
-      this.hub.style.transform=`translate(-50%,-50%) scale(${this.cam.z}) translate3d(${this.cam.x}px,${this.cam.y}px,0) rotateX(${this.cam.rx}deg) rotateY(${this.cam.ry}deg)`;
-      document.getElementById('coord-display').innerText=`Z:${this.cam.z.toFixed(3)}`;
-      if(Math.abs(this.cam.ry-this.tgt.ry)<0.01) this.tgt.ry+=0.004;
-      requestAnimationFrame(loop);
-    };
-    loop();
-  }
-};
-
-// ============================================================================
-// SEARCH
-// ============================================================================
-function openSearch() {
-  document.getElementById('search-overlay').classList.add('active');
-  setTimeout(()=>document.getElementById('search-input').focus(),100);
-  runSearch('');
-}
-function closeSearch() { document.getElementById('search-overlay').classList.remove('active'); }
-function closeDetail() { document.getElementById('detail').classList.remove('open'); }
-
-function runSearch(q) {
-  const c=document.getElementById('search-results');
-  // Search through loaded JSON data
-  const results = [];
-  Object.values(Engine.jsonData).flat().forEach(node => {
-    if(node.name?.toLowerCase().includes(q.toLowerCase()) || node.code?.includes(q)) {
-      results.push(node);
-    }
-  });
-  
-  if(!results.length){ 
-    c.innerHTML=`<div style="text-align:center;padding:20px;color:#64748b">No nodes found 🍄</div>`; 
-    return; 
-  }
-  
-  c.innerHTML=results.slice(0,20).map((item,i)=>`
-    <div class="s-card" style="animation-delay:${i*25}ms" onclick="jumpToNode('${item.code}')">
-      <div class="s-em">📄</div>
-      <div class="s-body"><h3>${item.name}</h3><p>Code: ${item.code}</p></div>
-    </div>`).join('');
-}
-
-function jumpToNode(code) {
-  closeSearch();
-  Engine.loadNode(code);
-}
-
-// ── Toast ─────────────────────────────────────────────────────────────────
-function showToast(msg) {
-  const t=document.getElementById('toast');
-  t.innerText=msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),3000);
-}
-
-// ── Loading text ──────────────────────────────────────────────────────────
-function setLoadMsg(main,sub) {
-  document.getElementById('loading-msg').innerText=main;
-  document.getElementById('loading-sub').innerText=sub||'';
-}
-
-// ── IGNITION ──────────────────────────────────────────────────────────────
-window.onload=()=>Engine.init();
-</script>
+        // ==========================================
+        // 5. INITIALIZATION
+        // ==========================================
+        window.addEventListener('DOMContentLoaded', async () => {
+            await MeshEngine.init();
+            RenderEngine.init();
+            
+            // Hide Loader
+            setTimeout(() => {
+                document.getElementById('loader').classList.add('hidden');
+            }, 1000);
+        });
+    </script>
 </body>
 </html>
