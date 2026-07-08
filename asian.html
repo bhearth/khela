@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Khel.o · The Recursive Universe</title>
+<style>
+    :root { --gold: #fbbf24; --teal: #14b8a6; --bg: #030406; --glass: rgba(15, 20, 30, 0.7); }
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body { background: var(--bg); color: #fff; font-family: 'Inter', system-ui, sans-serif; overflow: hidden; height: 100vh; }
+    
+    #canvas-container { position: absolute; inset: 0; z-index: 1; }
+    
+    /* UI Layer */
+    #ui-layer { position: absolute; inset: 0; z-index: 10; pointer-events: none; display: flex; flex-direction: column; justify-content: space-between; padding: 20px; }
+    .interactive { pointer-events: auto; }
+    
+    /* The Dot Trigger */
+    #dot-trigger {
+        position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        width: 12px; height: 12px; background: var(--gold); border-radius: 50%;
+        box-shadow: 0 0 30px 10px rgba(251, 191, 36, 0.6);
+        cursor: pointer; z-index: 20; animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0%, 100% { transform: translate(-50%, -50%) scale(1); } 50% { transform: translate(-50%, -50%) scale(1.3); } }
+    
+    /* HUD */
+    .hud-top { display: flex; justify-content: space-between; align-items: flex-start; }
+    .logo { font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; font-weight: 700; background: linear-gradient(90deg, var(--gold), var(--teal)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .jumbler { font-family: monospace; font-size: 0.8rem; color: var(--teal); margin-top: 5px; min-height: 1.2em; }
+    
+    /* Singularity Card */
+    #singularity-card {
+        position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(150%);
+        background: var(--glass); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 24px; padding: 24px; width: 90%; max-width: 500px;
+        transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); pointer-events: auto;
+    }
+    #singularity-card.active { transform: translateX(-50%) translateY(0); }
+    .card-title { font-size: 1.2rem; font-weight: 700; color: var(--gold); margin-bottom: 8px; }
+    .card-desc { font-size: 0.9rem; color: #cbd5e1; line-height: 1.5; margin-bottom: 16px; }
+    .card-actions { display: flex; gap: 10px; }
+    .btn { padding: 10px 20px; border-radius: 20px; border: none; font-weight: 600; cursor: pointer; font-size: 0.85rem; }
+    .btn-primary { background: var(--gold); color: #000; }
+    .btn-ghost { background: rgba(255,255,255,0.1); color: #fff; }
+</style>
+</head>
+<body>
+
+<div id="canvas-container"></div>
+
+<div id="ui-layer">
+    <div class="hud-top interactive">
+        <div>
+            <div class="logo">Khel.o</div>
+            <div class="jumbler" id="jumbler-text">Initializing...</div>
+        </div>
+    </div>
+    
+    <div id="singularity-card">
+        <div class="card-title" id="card-title">Node Name</div>
+        <div class="card-desc" id="card-desc">Description goes here.</div>
+        <div class="card-actions">
+            <button class="btn btn-primary" onclick="expandCurrentNode()">Explore Deeper</button>
+            <button class="btn btn-ghost" onclick="closeCard()">Close</button>
+        </div>
+    </div>
+</div>
+
+<div id="dot-trigger" class="interactive"></div>
+
+<!-- Libraries -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+<script>
+/**
+ * 1. RECURSIVE MESH ENGINE (KhelaMesh)
+ * Fetches JSON recursively and calculates 10D vector resonance.
+ */
+const KhelaMesh = {
+    baseUrl: 'https://bhearth.github.io/khela/',
+    cache: {},
+    
+    async fetchNode(code) {
+        if (this.cache[code]) return this.cache[code];
+        // Fallback mock data if GitHub isn't ready
+        const mockData = {
+            '0': { name: 'Root', children: ['0.1', '0.2', '0.8'], vector: [1,1,1,1,1,1,1,1,1,1] },
+            '0.1': { name: 'Individual', children: ['0.11', '0.12'], vector: [0.8,0.9,0.7,0.6,0.8,0.7,0.8,0.9,0.7,0.8] },
+            '0.2': { name: 'Samajh', children: ['0.21', '0.22'], vector: [0.9,0.8,0.8,0.7,0.9,0.8,0.7,0.8,0.9,0.9] },
+            '0.8': { name: 'Sahyog', children: ['0.81', '0.88'], vector: [0.95,0.77,0.44,0.82,0.89,0.75,0.66,0.55,0.88,0.91] },
+            '0.81': { name: 'Collaboration', children: [], vector: [0.9,0.8,0.5,0.8,0.9,0.8,0.7,0.6,0.8,0.9] },
+            '0.88': { name: 'Sanyog', children: [], vector: [0.9,0.8,0.5,0.8,0.9,0.8,0.7,0.6,0.9,0.9] }
+        };
+        
+        try {
+            // In production, uncomment this:
+            // const res = await fetch(`${this.baseUrl}${code.replace('.','')}.json`);
+            // const data = await res.json();
+            // this.cache[code] = data; return data;
+            return mockData[code] || { name: code, children: [], vector: Array(10).fill(0.5) };
+        } catch (e) { return mockData[code] || { name: code, children: [], vector: Array(10).fill(0.5) }; }
+    }
+};
+
+/**
+ * 2. 3D SCENE CONTROLLER
+ * Handles Three.js, recursive node generation, and camera fly-throughs.
+ */
+const Scene = {
+    scene: null, camera: null, renderer: null, controls: null,
+    nodes: [], edges: [], selectedNode: null,
+
+    init() {
+        this.scene = new THREE.Scene();
+        this.camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+        this.camera.position.set(0, 0, 20);
+        
+        this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        document.getElementById('canvas-container').appendChild(this.renderer.domElement);
+        
+        this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
+        this.controls.enableDamping = true;
+        
+        // Starfield
+        const starsGeo = new THREE.BufferGeometry();
+        const starsCount = 2000;
+        const posArray = new Float32Array(starsCount * 3);
+        for(let i=0; i<starsCount*3; i++) posArray[i] = (Math.random() - 0.5) * 100;
+        starsGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        const starsMat = new THREE.PointsMaterial({ size: 0.05, color: 0xffffff });
+        this.scene.add(new THREE.Points(starsGeo, starsMat));
+
+        this.animate();
+        window.addEventListener('resize', () => {
+            this.camera.aspect = window.innerWidth / window.innerHeight;
+            this.camera.updateProjectionMatrix();
+            this.renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    },
+
+    async createNode(data, position, parentMesh = null) {
+        // Vector to Color mapping (Prakriti=Green, Shaurya=Red, Viveka=Blue)
+        const v = data.vector || Array(10).fill(0.5);
+        const color = new THREE.Color(v[3]*0.5, v[6]*0.5, v[7]*0.5).lerp(new THREE.Color(1,1,1), 0.2);
+        
+        const geo = new THREE.SphereGeometry(0.4, 32, 32);
+        const mat = new THREE.MeshStandardMaterial({ color: color, emissive: color, emissiveIntensity: 0.3 });
+        const mesh = new THREE.Mesh(geo, mat);
+        mesh.position.copy(position);
+        mesh.userData = { code: data.code || '0', data: data };
+        
+        this.scene.add(mesh);
+        this.nodes.push(mesh);
+
+        // Draw edge to parent
+        if (parentMesh) {
+            const lineGeo = new THREE.BufferGeometry().setFromPoints([parentMesh.position, position]);
+            const lineMat = new THREE.LineBasicMaterial({ color: 0xfbbf24, transparent: true, opacity: 0.4 });
+            const line = new THREE.Line(lineGeo, lineMat);
+            this.scene.add(line);
+            this.edges.push(line);
+        }
+
+        // Click interaction
+        mesh.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.selectNode(mesh);
+        });
+
+        // Animate entry
+        mesh.scale.set(0,0,0);
+        gsap.to(mesh.scale, { x:1, y:1, z:1, duration: 0.8, ease: "back.out(1.7)" });
+    },
+
+    async expandNode(parentMesh) {
+        const data = parentMesh.userData.data;
+        if (!data.children || data.children.length === 0) return;
+
+        const radius = 3;
+        const angleStep = 137.5 * (Math.PI / 180); // Golden Angle
+
+        for (let i = 0; i < data.children.length; i++) {
+            const childCode = data.children[i];
+            const childData = await KhelaMesh.fetchNode(childCode);
+            
+            // Fibonacci Spiral positioning
+            const angle = i * angleStep;
+            const r = Math.sqrt(i + 1) * 1.5;
+            const pos = new THREE.Vector3(
+                parentMesh.position.x + Math.cos(angle) * r,
+                parentMesh.position.y + (Math.random()-0.5),
+                parentMesh.position.z + Math.sin(angle) * r
+            );
+            
+            await this.createNode(childData, pos, parentMesh);
+        }
+    },
+
+    selectNode(mesh) {
+        this.selectedNode = mesh;
+        const data = mesh.userData.data;
+        
+        // Fly camera
+        gsap.to(this.camera.position, {
+            x: mesh.position.x + 5, y: mesh.position.y + 2, z: mesh.position.z + 5,
+            duration: 1.5, ease: "power3.inOut"
+        });
+        this.controls.target.copy(mesh.position);
+
+        // Update UI
+        document.getElementById('card-title').innerText = data.name;
+        document.getElementById('card-desc').innerText = `Code: ${mesh.userData.code} | Vector Resonance Active.`;
+        document.getElementById('singularity-card').classList.add('active');
+    },
+
+    animate() {
+        requestAnimationFrame(() => this.animate());
+        this.controls.update();
+        this.renderer.render(this.scene, this.camera);
+    }
+};
+
+/**
+ * 3. UI CONTROLLER (Jumbler & Interactions)
+ */
+const UI = {
+    words: ['khel.o', 'sa.hyog', 'ba.ej', 'dis-play', 'e/arth'],
+    idx: 0,
+    
+    initJumbler() {
+        const el = document.getElementById('jumbler-text');
+        const chars = '!<>-_\\/[]{}—=+*^?#~';
+        
+        const run = () => {
+            const target = this.words[this.idx];
+            this.idx = (this.idx + 1) % this.words.length;
+            let frame = 0;
+            
+            const int = setInterval(() => {
+                let out = '';
+                for(let i=0; i<target.length; i++) {
+                    if(i < frame) out += target[i];
+                    else out += chars[Math.floor(Math.random() * chars.length)];
+                }
+                el.innerText = out;
+                frame += 0.5;
+                if(frame >= target.length) { clearInterval(int); setTimeout(run, 2000); }
+            }, 50);
+        };
+        run();
+    }
+};
+
+/**
+ * 4. INITIALIZATION & BIG BANG
+ */
+window.expandCurrentNode = async () => {
+    if(Scene.selectedNode) {
+        await Scene.expandNode(Scene.selectedNode);
+        closeCard();
+    }
+};
+window.closeCard = () => document.getElementById('singularity-card').classList.remove('active');
+
+document.getElementById('dot-trigger').addEventListener('click', async () => {
+    // Big Bang Animation
+    gsap.to('#dot-trigger', { scale: 0, opacity: 0, duration: 0.5 });
+    
+    // Fetch Root and Create First Nodes
+    const rootData = await KhelaMesh.fetchNode('0');
+    await Scene.createNode(rootData, new THREE.Vector3(0,0,0));
+    await Scene.expandNode(Scene.nodes[0]);
+    
+    UI.initJumbler();
+});
+
+// Boot
+Scene.init();
+</script>
+</body>
+</html>
