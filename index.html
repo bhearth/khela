@@ -1,428 +1,811 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-<title>Khel.o · Wiki Explorer OS</title>
-<script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-<style>
-/* ── Reset & Base ── */
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{
-  background:#010204;color:#e2e8f0;
-  font-family:'Inter',system-ui,sans-serif;
-  overflow:hidden;touch-action:none;user-select:none;
-  height:100dvh;width:100dvw;
-  background-image:radial-gradient(circle at center,#0a1128 0%,#010204 100%);
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=no">
+    <title>Khel.o · Infinite Wiki Matrix</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700;800&family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
 
-/* ── HUD ── */
-#hud{
-  position:fixed;top:0;left:0;right:0;
-  display:flex;justify-content:space-between;align-items:flex-start;
-  padding:clamp(10px,3vw,18px);
-  pointer-events:none;z-index:50;
-  background:linear-gradient(180deg,rgba(1,2,4,0.94) 60%,transparent);
-}
-.brand{font-family:'Space Grotesk', sans-serif; font-size:1.2rem; font-weight:700; color:#38bdf8; text-shadow:0 0 10px rgba(56,189,248,0.6);}
-.telemetry{font-size:10px; color:#94a3b8; text-align:right; letter-spacing:1px;}
+    <style>
+        :root {
+            --bg-void: #010204;
+            --glass-bg: rgba(6, 11, 20, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --accent-c: #a371f7;
+            --accent-sky: #38bdf8;
+            --accent-gold: #fbbf24;
+        }
 
-/* ── Toolbar ── */
-#toolbar{
-  position:fixed;bottom:0;left:0;right:0;
-  display:flex;justify-content:center;align-items:center;
-  padding:15px; background:linear-gradient(0deg,rgba(1,2,4,0.97) 75%,transparent);
-  z-index:50;gap:10px;pointer-events:auto;
-}
-.btn{
-  background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);
-  border-radius:20px;padding:10px 20px;cursor:pointer;color:#fff;
-  font-family:'Space Grotesk', sans-serif; font-weight:600; font-size:12px;
-  backdrop-filter:blur(10px); transition:0.2s; display:flex; align-items:center; gap:6px;
-}
-.btn:active{transform:scale(0.92);background:rgba(255,255,255,0.15);}
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            background: var(--bg-void); color: #e2e8f0; font-family: 'Inter', sans-serif; 
+            overflow: hidden; touch-action: none; overscroll-behavior: none;
+            height: 100vh; width: 100vw;
+            background-image: radial-gradient(circle at center, #0a1128 0%, #010204 100%);
+        }
 
-/* ── 3D Viewport ── */
-#viewport{position:absolute;top:50dvh;left:50dvw;z-index:10;}
-#hub{position:absolute;top:0;left:0;transform-style:preserve-3d;will-change:transform;}
-svg{position:absolute;top:-5000px;left:-5000px;width:10000px;height:10000px;pointer-events:none;}
-.stellar-path{fill:none;stroke-width:2;stroke-linecap:round;filter:drop-shadow(0 0 5px currentColor);transition:d 1s cubic-bezier(0.34,1.56,0.64,1);}
+        .font-disp { font-family: 'Space Grotesk', sans-serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
 
-/* ── Universe Nodes ── */
-.jnode{
-  position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  border-radius:50%;cursor:pointer;text-align:center;
-  background:rgba(10,15,25,0.85);border:2px solid;backdrop-filter:blur(10px);
-  transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),var(--z)) scale(0);
-  animation:supernova 0.75s cubic-bezier(.34,1.56,.64,1) forwards;
-  will-change:transform;pointer-events:auto;
-  transition: transform 0.6s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s;
-}
-.jnode:hover, .jnode:active {
-  background:currentColor!important;color:#000!important;
-  box-shadow:0 0 30px currentColor,inset 0 0 15px #fff;z-index:500;
-  transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),calc(var(--z) + 40px)) scale(1.2)!important;
-}
-.jnode .ji{font-size:clamp(20px,5vw,32px);filter:drop-shadow(0 4px 6px rgba(0,0,0,.6));transition:0.3s;line-height:1;}
-.jnode:hover .ji{transform:scale(1.2);}
-.jnode .jl{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1px;margin-top:6px;pointer-events:none;text-shadow:0 1px 3px rgba(0,0,0,0.8);}
-@keyframes supernova{to{transform:translate3d(calc(-50% + var(--x)),calc(-50% + var(--y)),var(--z)) scale(1);}}
+        /* --- 3D HYBRID ENGINE --- */
+        #canvas-bg { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+        
+        /* Interactive overlay for the selected dot */
+        #selection-ring {
+            position: absolute; width: 40px; height: 40px; border-radius: 50%;
+            border: 2px solid #fff; pointer-events: none; z-index: 10;
+            transform: translate(-50%, -50%) scale(0); opacity: 0;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
+            box-shadow: 0 0 20px rgba(255,255,255,0.8), inset 0 0 10px rgba(255,255,255,0.5);
+        }
+        #selection-ring.active { transform: translate(-50%, -50%) scale(1); opacity: 1; animation: spin 4s linear infinite; border-style: dashed; }
+        @keyframes spin { 100% { transform: translate(-50%, -50%) scale(1) rotate(360deg); } }
 
-/* ── Loading ── */
-#loading{position:fixed;inset:0;background:rgba(1,2,4,0.97);z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 0.5s;backdrop-filter:blur(5px);}
-.spinner{width:50px;height:50px;border:3px solid rgba(255,255,255,0.1);border-top-color:#38bdf8;border-radius:50%;animation:spin 1s linear infinite;margin-bottom:15px;}
-@keyframes spin{to{transform:rotate(360deg)}}
-#loading-msg{color:#38bdf8;font-family:'Space Grotesk', sans-serif;letter-spacing:2px;text-transform:uppercase;font-size:14px;font-weight:bold;}
+        /* --- HUD UI --- */
+        #hud-layer { position: absolute; inset: 0; pointer-events: none; z-index: 100; display: flex; flex-direction: column; justify-content: space-between; padding: 20px; }
+        .glass-panel { background: var(--glass-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--glass-border); border-radius: 16px; padding: 12px 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); pointer-events: auto; }
+        
+        .brand { font-family: 'Space Grotesk'; font-size: 22px; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .jumble-text { font-variant-numeric: tabular-nums; display: inline-block; color: var(--accent-sky); }
+        
+        .search-box { display: flex; align-items: center; background: rgba(0,0,0,0.4); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 30px; padding: 8px 16px; transition: 0.3s; width: 100%; max-width: 400px; }
+        .search-box:focus-within { border-color: var(--accent-sky); box-shadow: 0 0 20px rgba(56, 189, 248, 0.2); background: rgba(0,0,0,0.8); }
+        .search-input { flex: 1; background: transparent; border: none; color: #fff; font-family: 'Inter'; font-size: 13px; outline: none; margin-left: 8px; }
+        
+        /* --- WIKI KUNDALI SHEET (Mobile First) --- */
+        #kundali-sheet {
+            position: fixed; bottom: -100%; left: 0; right: 0; background: rgba(8, 12, 20, 0.98);
+            border-top: 2px solid var(--col, var(--accent-sky)); border-radius: 30px 30px 0 0; padding: 25px 30px;
+            transition: bottom 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); z-index: 300;
+            backdrop-filter: blur(25px); box-shadow: 0 -20px 60px rgba(0,0,0,0.9);
+            max-height: 85vh; overflow-y: auto; pointer-events: auto;
+        }
+        #kundali-sheet.active { bottom: 0; }
+        .k-handle { width: 50px; height: 6px; background: rgba(255,255,255,0.2); border-radius: 6px; margin: 0 auto 20px; cursor: pointer; }
+        
+        .k-header { display:flex; align-items:center; gap:15px; margin-bottom: 20px;}
+        .k-icon { font-size:40px; background:rgba(255,255,255,0.05); padding:10px; border-radius:16px; border:1px solid rgba(255,255,255,0.1); filter:drop-shadow(0 0 10px rgba(255,255,255,0.2));}
+        .k-title { font-family:'Space Grotesk'; font-size:24px; font-weight:800; color:#fff; line-height:1.1;}
+        .k-vector { font-size:10px; color:#94a3b8; font-weight:bold; text-transform:uppercase; letter-spacing:1px; margin-top:4px;}
+        
+        .k-summary { font-size:14px; color:#cbd5e1; line-height:1.6; margin-bottom:20px; max-height:150px; overflow-y:auto; padding-right:10px;}
+        .k-summary::-webkit-scrollbar { width:4px; }
+        .k-summary::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.2); border-radius:4px; }
 
-/* ── Wiki Details Sheet (Mobile First) ── */
-#modal{
-  position:fixed;bottom:-100%;left:0;right:0;
-  background:rgba(8,12,20,0.98);border-top:2px solid var(--col, #38bdf8);
-  border-radius:30px 30px 0 0;padding:25px;transition:0.5s cubic-bezier(.34,1.56,.64,1);
-  z-index:250;backdrop-filter:blur(25px);box-shadow:0 -10px 40px rgba(0,0,0,0.8);
-  max-height:85vh;overflow-y:auto;pointer-events:auto; display:flex; flex-direction:column;
-}
-#modal.open{bottom:0;}
-.m-handle{width:40px;height:5px;background:rgba(255,255,255,.2);border-radius:5px;margin:0 auto 20px;cursor:pointer;}
-.m-header { display:flex; align-items:center; gap:15px; margin-bottom: 20px;}
-.m-icon { font-size:40px; background:rgba(255,255,255,0.05); padding:10px; border-radius:16px; border:1px solid rgba(255,255,255,0.1);}
-.m-title { font-family:'Space Grotesk'; font-size:24px; font-weight:800; color:#fff; line-height:1.1;}
-.m-summary { font-size:14px; color:#cbd5e1; line-height:1.6; margin-bottom:20px; max-height:150px; overflow-y:auto; padding-right:10px;}
-.m-summary::-webkit-scrollbar { width:4px; }
-.m-summary::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.2); border-radius:4px; }
+        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+        .stat-box { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); padding: 12px; border-radius: 12px; text-align: center; }
+        .stat-val { font-family: 'Space Grotesk'; font-size: 20px; font-weight: 800; color:var(--col, #38bdf8);}
+        .stat-lbl { font-size: 9px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; font-weight: bold; }
 
-.stats-grid { display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; margin-bottom:20px;}
-.stat-box { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:12px; text-align:center;}
-.stat-val { font-size:20px; font-weight:bold; font-family:'Space Grotesk'; color:var(--col, #38bdf8);}
-.stat-lbl { font-size:9px; color:#94a3b8; text-transform:uppercase; letter-spacing:1px; margin-top:2px; font-weight:600;}
+        .tags-row { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:25px;}
+        .tag { padding:4px 10px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:12px; font-size:10px; color:#94a3b8; font-weight:600;}
 
-.tags-row { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:25px;}
-.tag { padding:4px 10px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:12px; font-size:10px; color:#94a3b8; font-weight:600;}
+        .btn-launch { background:var(--col, #38bdf8); color:#000; font-family:'Space Grotesk'; font-size:16px; font-weight:800; text-transform:uppercase; letter-spacing:1px; padding:16px; border-radius:30px; text-align:center; text-decoration:none; display:block; box-shadow:0 10px 20px rgba(0,0,0,0.3); transition:0.2s;}
+        .btn-launch:active { transform:scale(0.95); }
 
-.btn-launch { background:var(--col, #38bdf8); color:#000; font-family:'Space Grotesk'; font-size:16px; font-weight:800; text-transform:uppercase; letter-spacing:1px; padding:16px; border-radius:30px; text-align:center; text-decoration:none; display:block; box-shadow:0 10px 20px rgba(0,0,0,0.3); transition:0.2s;}
-.btn-launch:active { transform:scale(0.95); }
+        /* --- TOAST --- */
+        #toast-container { position: fixed; top: 30px; left: 50%; transform: translateX(-50%); z-index: 1000; pointer-events: none; display: flex; flex-direction: column; gap: 8px; }
+        .toast { background: rgba(16, 185, 129, 0.95); color: #fff; padding: 12px 24px; border-radius: 30px; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); animation: slideDown 0.3s ease forwards; backdrop-filter: blur(10px); display: flex; align-items: center; gap: 8px;}
+        @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-#export-canvas{display:none;}
-</style>
+        /* Layout Buttons */
+        .layout-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #94a3b8; padding: 8px 16px; border-radius: 20px; font-family: 'Space Grotesk'; font-weight: 600; font-size: 11px; cursor: pointer; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px; }
+        .layout-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .layout-btn.active { background: rgba(56, 189, 248, 0.15); border-color: var(--accent-sky); color: var(--accent-sky); }
+
+        /* Loading Overlay */
+        #loading { position:fixed; inset:0; background:rgba(1,2,4,0.97); z-index:500; display:none; flex-direction:column; align-items:center; justify-content:center; transition:opacity 0.5s; backdrop-filter:blur(5px); }
+        .spinner { width:50px; height:50px; border:3px solid rgba(255,255,255,0.1); border-top-color:#38bdf8; border-radius:50%; animation:spin 1s linear infinite; margin-bottom:15px; }
+    </style>
 </head>
 <body>
 
-<div id="hud">
-  <div class="brand">Khel.o Matrix</div>
-  <div class="telemetry">
-      <span id="zoom">Z: 1.00</span><br>
-      <span id="wiki-host" style="color:#64748b;">Awaiting Data</span>
-  </div>
-</div>
-
-<div id="viewport"><div id="hub"><svg id="lines"></svg></div></div>
-<canvas id="export-canvas" width="1920" height="1080"></canvas>
-
-<div id="toolbar">
-  <button class="btn" onclick="KhelOS.fire('changeLayout','flower')">🌸 Flower</button>
-  <button class="btn" onclick="KhelOS.fire('changeLayout','radial')">🎯 Orbit</button>
-  <button class="btn" onclick="KhelOS.fire('exportGraph')">🎨 Export</button>
-</div>
-
-<!-- Detailed Mobile-First Wiki Modal -->
-<div id="modal">
-  <div class="m-handle" onclick="document.getElementById('modal').classList.remove('open')"></div>
-  
-  <div class="m-header">
-      <div class="m-icon" id="m-icon">📄</div>
-      <div class="m-title" id="m-title">Loading...</div>
-  </div>
-  
-  <div class="m-summary" id="m-summary">
-      Extracting knowledge from the matrix...
-  </div>
-  
-  <div class="stats-grid">
-      <div class="stat-box"><div class="stat-val" id="m-words">0</div><div class="stat-lbl">Words</div></div>
-      <div class="stat-box"><div class="stat-val" id="m-links">0</div><div class="stat-lbl">Links</div></div>
-      <div class="stat-box"><div class="stat-val" id="m-cats">0</div><div class="stat-lbl">Categories</div></div>
-  </div>
-
-  <div class="tags-row" id="m-tags"></div>
-
-  <a href="#" id="m-link" target="_blank" class="btn-launch">Read Full Article</a>
-</div>
-
 <div id="loading">
-  <div class="spinner"></div>
-  <div id="loading-msg">Connecting to Wiki...</div>
+    <div class="spinner"></div>
+    <div id="loading-msg" class="text-sky-400 font-mono tracking-widest uppercase font-bold text-sm">Querying Matrix...</div>
 </div>
+
+<!-- 3D BACKGROUND LAYER -->
+<div id="canvas-bg"></div>
+
+<!-- SELECTION RING (Mapped from 3D to 2D) -->
+<div id="selection-ring"></div>
+
+<!-- HUD LAYER -->
+<div id="hud-layer">
+    <div class="flex justify-between items-start">
+        <div class="brand" onclick="SpectrumOS.resetUniverse()">
+            <span style="font-size: 28px; filter: drop-shadow(0 0 10px rgba(56,189,248,0.5));">🤸</span>
+            <div>
+                <div id="jumble-logo" class="jumble-text">KHEL.O</div>
+                <div class="text-[9px] text-slate-400 uppercase tracking-widest font-mono mt-1">Wiki Matrix Engine</div>
+            </div>
+        </div>
+        
+        <div class="glass-panel" style="padding: 8px 16px; cursor: pointer;" onclick="window.open('https://kids.miraheze.org', '_blank')">
+            <div class="text-[9px] text-emerald-400 font-bold uppercase tracking-widest font-mono flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> kids.miraheze.org
+            </div>
+        </div>
+    </div>
+
+    <!-- Layout & Search Controls -->
+    <div class="flex justify-between items-end w-full gap-4">
+        <div class="glass-panel search-box interactive">
+            <span class="material-symbols-rounded text-sky-400">search</span>
+            <input type="text" id="omni-search" class="search-input" placeholder="Search the Wiki Matrix..." autocomplete="off" onkeypress="if(event.key==='Enter') SpectrumOS.executeSearch(this.value)">
+        </div>
+
+        <div class="glass-panel flex gap-2 interactive" style="padding: 8px;">
+            <button class="layout-btn active" id="btn-flower" onclick="SpectrumOS.switchLayout('flower')">🌸 Flower</button>
+            <button class="layout-btn" id="btn-radial" onclick="SpectrumOS.switchLayout('radial')">🎯 Orbit</button>
+            <button class="layout-btn" id="btn-matrix" onclick="SpectrumOS.switchLayout('matrix')">🧮 Matrix</button>
+        </div>
+
+        <div class="glass-panel text-right">
+            <div id="telemetry-z" class="text-sky-400 font-mono text-xs font-bold">SCALE: 1.000x</div>
+            <div class="text-[8px] text-slate-500 uppercase tracking-widest mt-1">Pinch to Zoom · Drag to Pan</div>
+        </div>
+    </div>
+</div>
+
+<!-- WIKI KUNDALI DETAIL SHEET -->
+<div id="kundali-sheet">
+    <div class="k-handle" onclick="SpectrumOS.closeKundali()"></div>
+    <div class="max-w-2xl mx-auto">
+        
+        <div class="k-header">
+            <div class="k-icon" id="k-icon">📄</div>
+            <div>
+                <h2 id="k-title" class="k-title">Concept Name</h2>
+                <div id="k-vector" class="k-vector">Domain > Category</div>
+            </div>
+        </div>
+        
+        <div class="k-summary" id="k-summary">
+            Extracting knowledge from the matrix...
+        </div>
+
+        <div class="stat-grid">
+            <div class="stat-box"><div class="stat-val" id="k-words">0</div><div class="stat-lbl">Words</div></div>
+            <div class="stat-box"><div class="stat-val" id="k-links">0</div><div class="stat-lbl">Links</div></div>
+            <div class="stat-box"><div class="stat-val" id="k-cats">0</div><div class="stat-lbl">Categories</div></div>
+        </div>
+
+        <div class="tags-row" id="k-tags"></div>
+
+        <a id="k-link" href="#" target="_blank" class="btn-launch">Explore Full Wiki Page</a>
+    </div>
+</div>
+
+<div id="toast-container"></div>
 
 <script>
 /**
- * STREAMING_CHUNK: Core Engine Initialization
+ * STREAMING_CHUNK: Initializing AudioDSP (Sargam Synthesis)
  */
-const ICONS = ['🌟','🚀','🎈','🎨','🦁','🍎','🌈','🧩','🦋','🧸','🦖','🛸','🌞','🌻','🍄','🐠'];
+const AudioDSP = {
+    ctx: null, panner: null, ready: false, lastPlay: 0,
+    freqs: [261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, 523.25], // Sa, Re, Ga, Ma, Pa, Dha, Ni, Sa'
+    names: ['Sa', 'Re', 'Ga', 'Ma', 'Pa', 'Dha', 'Ni', "Sa'"],
 
-const KhelOS = {
-  hub: document.getElementById('hub'), svg: document.getElementById('lines'),
-  nodes: [], edges: [], plugins: [],
-  cam: {x:0, y:0, z:0.5, rx:0, ry:0}, tgt: {x:0, y:0, z:0.5, rx:0, ry:0},
-  isMobile: window.innerWidth < 768,
-  
-  use(p) { this.plugins.push(p); if(p.init) p.init(this); },
-  fire(h, d) { let r = d; for(let p of this.plugins) if(p[h]) r = p[h](r, this) || r; return r; },
-  
-  boot() { 
-      this.setupGestures(); 
-      this.loop(); 
-      this.fire('onBoot'); 
-  },
-  
-  addNode(data, x, y, z) {
-    const el = document.createElement('div'); el.className = 'jnode';
-    const sz = data.isRoot ? (this.isMobile ? 80 : 100) : (this.isMobile ? 60 : 70);
-    el.style.cssText = `--x:${x}px; --y:${y}px; --z:${z}px; width:${sz}px; height:${sz}px; color:${data.color}; border-color:${data.color};`;
-    el.innerHTML = `<div class="ji">${data.icon}</div><div class="jl" style="color:${data.color}">${data.title.substring(0,14)}</div>`;
-    
-    const n = { el, data, tx:x, ty:y, tz:z };
-    el.onclick = (e) => { 
-        e.stopPropagation(); 
+    init() {
+        if(this.ready) return;
+        this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        this.panner = this.ctx.createStereoPanner();
+        this.panner.connect(this.ctx.destination);
+        this.ready = true;
+    },
+
+    playTone(hue, screenX) {
+        if (!this.ready) return null;
+        
+        const now = Date.now();
+        if (now - this.lastPlay < 200) return null; 
+        this.lastPlay = now;
+
+        const pan = Math.max(-1, Math.min(1, (screenX - window.innerWidth/2) / (window.innerWidth/2)));
+        this.panner.pan.value = pan;
+
+        const idx = Math.floor((hue / 360) * 8) % 8;
+        const freq = this.freqs[idx];
+
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        const lfo = this.ctx.createOscillator(); 
+
+        osc.type = 'triangle'; 
+        osc.frequency.value = freq;
+
+        lfo.type = 'sine';
+        lfo.frequency.value = 5; 
+        const lfoGain = this.ctx.createGain();
+        lfoGain.gain.value = 3;
+        lfo.connect(lfoGain);
+        lfoGain.connect(osc.frequency);
+
+        osc.connect(this.panner);
+        this.panner.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        const currTime = this.ctx.currentTime;
+        const duration = 0.35; 
+        
+        gain.gain.setValueAtTime(0, currTime);
+        gain.gain.linearRampToValueAtTime(0.1, currTime + 0.05); 
+        gain.gain.exponentialRampToValueAtTime(0.001, currTime + duration); 
+
+        osc.start(currTime);
+        lfo.start(currTime);
+        osc.stop(currTime + duration + 0.1);
+        lfo.stop(currTime + duration + 0.1);
+
         if(navigator.vibrate) navigator.vibrate(15);
-        this.tgt.x = -n.tx; this.tgt.y = -n.ty; this.tgt.z = this.isMobile ? 1.0 : 1.4; 
-        this.fire('onClick', n); 
-    };
-    this.hub.appendChild(el); this.nodes.push(n); return n;
-  },
-  
-  addEdge(s, t, c) {
-    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-    path.setAttribute("class", "stellar-path"); path.style.stroke = c; path.style.strokeOpacity = 0.5;
-    this.svg.appendChild(path); this.edges.push({s, t, el: path});
-  },
-
-  setupGestures() {
-    const mc = new Hammer.Manager(document.getElementById('viewport'));
-    mc.add(new Hammer.Pan({ threshold: 0 })); mc.add(new Hammer.Pinch({ enable: true })).recognizeWith(mc.get('pan'));
-    mc.add(new Hammer.Tap({ event: 'doubletap', taps: 2 }));
-    let iz = 1, pan = false, lx = 0, ly = 0;
-    
-    mc.on('doubletap', () => { this.tgt.x=0; this.tgt.y=0; this.tgt.z=this.isMobile ? 0.3 : 0.6; this.tgt.rx=0; this.tgt.ry=0; });
-    mc.on('pinchstart', () => iz = this.tgt.z);
-    mc.on('pinch', e => this.tgt.z = Math.max(0.05, Math.min(4, iz * e.scale)));
-    mc.on('panstart', e => { pan = true; lx = e.center.x; ly = e.center.y; });
-    mc.on('panmove', e => {
-      if(!pan) return; let dx = e.center.x - lx, dy = e.center.y - ly;
-      if (e.pointers.length >= 2 || e.srcEvent.shiftKey) { this.tgt.ry += dx*0.4; this.tgt.rx -= dy*0.4; } 
-      else { this.tgt.x += dx/this.cam.z; this.tgt.y += dy/this.cam.z; }
-      lx = e.center.x; ly = e.center.y;
-    });
-    mc.on('panend', () => pan = false);
-    window.onwheel = e => this.tgt.z = Math.max(0.05, Math.min(4, this.tgt.z - e.deltaY * 0.0015));
-  },
-
-  loop() {
-    const lerp = (s,e,f) => s+(e-s)*f; const O = 5000;
-    const tick = () => {
-      this.cam.x=lerp(this.cam.x,this.tgt.x,0.08); this.cam.y=lerp(this.cam.y,this.tgt.y,0.08); this.cam.z=lerp(this.cam.z,this.tgt.z,0.08);
-      this.cam.rx=lerp(this.cam.rx,this.tgt.rx,0.08); this.cam.ry=lerp(this.cam.ry,this.tgt.ry,0.08);
-      
-      this.hub.style.transform = `translate(-50%,-50%) scale(${this.cam.z}) translate3d(${this.cam.x}px,${this.cam.y}px,0) rotateX(${this.cam.rx}deg) rotateY(${this.cam.ry}deg)`;
-      document.getElementById('zoom').innerText = `Z: ${this.cam.z.toFixed(2)}`;
-      
-      // Auto gentle rotation
-      if(Math.abs(this.cam.ry - this.tgt.ry) < 0.01 && this.nodes.length > 1) this.tgt.ry += 0.002;
-
-      this.nodes.forEach(n => {
-        n.x=lerp(n.x||0,n.tx,0.05); n.y=lerp(n.y||0,n.ty,0.05); n.z=lerp(n.z||0,n.tz,0.05);
-        n.el.style.setProperty('--x', `${n.x}px`); n.el.style.setProperty('--y', `${n.y}px`); n.el.style.setProperty('--z', `${n.z}px`);
-      });
-
-      this.edges.forEach(e => {
-        if(e.s.x!==undefined && e.t.x!==undefined) {
-          const mx = (e.s.x+e.t.x)/2 - (e.t.y-e.s.y)*0.2 + O, my = (e.s.y+e.t.y)/2 + (e.t.x-e.s.x)*0.2 + O;
-          e.el.setAttribute("d", `M${e.s.x+O} ${e.s.y+O} Q${mx} ${my} ${e.t.x+O} ${e.t.y+O}`);
-        }
-      });
-      requestAnimationFrame(tick);
-    };
-    tick();
-  }
+        return this.names[idx];
+    }
 };
 
 /**
- * STREAMING_CHUNK: MediaWiki Integration Plugin
- * Uses the native API extracts to get perfect summaries without regex scraping.
+ * STREAMING_CHUNK: The MediaWiki Fetch Engine
+ * Directly hooks into Miraheze without iframes.
  */
-const ExtWikiLogic = {
-  host: "https://kids.miraheze.org",
-  
-  async onBoot(d, os) {
-    const p = new URLSearchParams(window.location.search);
-    const title = p.get('wiki') || "Earth";
-    if (p.get('host')) this.host = p.get('host');
+const WikiEngine = {
+    host: "https://kids.miraheze.org",
     
-    document.getElementById('wiki-host').innerText = this.host.replace('https://', '');
+    // Core SPU Hashing for Color Generation
+    hashStr(str) {
+        let h = 0x811c9dc5;
+        for (let i = 0; i < str.length; i++) h = Math.imul(h ^ str.charCodeAt(i), 0x01000193);
+        return Math.abs(h >>> 0);
+    },
 
-    try {
-        // Fetch standard links for the graph layout
-        const res = await fetch(`${this.host}/w/api.php?action=parse&page=${encodeURIComponent(title)}&prop=links&format=json&origin=*`);
+    getIcon(title) {
+        const w = title.toLowerCase();
+        if (/(physic|quantum|atom|energy|mass|gravity)/.test(w)) return '⚛️';
+        if (/(bio|cell|life|dna|gene|plant|animal)/.test(w)) return '🧬';
+        if (/(chem|molecule|reaction|acid)/.test(w)) return '🧪';
+        if (/(math|number|calc|algebra|geometry)/.test(w)) return '🧮';
+        if (/(tech|computer|code|data|software|web)/.test(w)) return '💻';
+        if (/(space|star|planet|galaxy|moon|sun)/.test(w)) return '🚀';
+        if (/(history|time|ancient|century|war)/.test(w)) return '📜';
+        if (/(art|music|paint|culture|dance)/.test(w)) return '🎨';
+        if (/(money|econ|bank|trade|market)/.test(w)) return '📈';
+        const randomIcons = ['🌟','🔮','🧩','💡','🔥','🌊','🍀','💎'];
+        return randomIcons[this.hashStr(w) % randomIcons.length];
+    },
+
+    async searchWiki(query) {
+        const url = `${this.host}/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&srlimit=20&format=json&origin=*`;
+        const res = await fetch(url);
         const data = await res.json();
-        if(data.error) throw new Error();
-
-        const links = (data.parse.links||[]).filter(l=>l.ns===0).map(l=>l['*']).slice(0,24); // Up to 24 petals
         
-        // Spawn Graph
-        const root = os.addNode({ title: data.parse.title, icon:'🌌', color:'#38bdf8', isRoot:true }, 0,0,0);
-        links.forEach((l, i) => {
-            const hue = (i * 15) % 360;
-            const col = `hsl(${hue}, 80%, 65%)`;
-            const n = os.addNode({ title: l, icon: ICONS[i%ICONS.length], color: col }, 0,0,0);
-            os.addEdge(root, n, col);
+        if (!data.query || data.query.search.length === 0) return [];
+        
+        // Map to our NeoGraph Node format
+        return data.query.search.map((item, i) => {
+            const hash = this.hashStr(item.title);
+            const hue = hash % 360;
+            return {
+                id: item.pageid,
+                title: item.title,
+                snippet: item.snippet.replace(/<[^>]*>?/gm, ''), // Clean HTML
+                icon: this.getIcon(item.title),
+                hue: hue,
+                color: `hsl(${hue}, 80%, 65%)`,
+                isResult: true
+            };
         });
-        
-        os.fire('changeLayout', 'flower');
-        os.tgt.z = os.isMobile ? 0.25 : 0.6;
-        
-        document.getElementById('loading').style.opacity = 0;
-        setTimeout(() => document.getElementById('loading').style.display = 'none', 500);
+    },
 
-    } catch(e) {
-        document.getElementById('loading-msg').innerText = "Failed to load Wiki data.";
-    }
-  },
-
-  async onClick(n, os) {
-    const modal = document.getElementById('modal');
-    modal.style.setProperty('--col', n.data.color);
-    
-    // UI Loading State
-    document.getElementById('m-title').innerText = n.data.title;
-    document.getElementById('m-icon').innerText = "⏳";
-    document.getElementById('m-icon').style.animation = "spin 2s linear infinite";
-    document.getElementById('m-summary').innerText = "Extracting knowledge...";
-    document.getElementById('m-words').innerText = "-";
-    document.getElementById('m-links').innerText = "-";
-    document.getElementById('m-cats').innerText = "-";
-    document.getElementById('m-tags').innerHTML = "";
-    
-    modal.classList.add('open');
-
-    try {
-        // The Magic API Call: "exintro=1&explaintext=1" gets just the clean summary text!
-        const extractApi = `${this.host}/w/api.php?action=query&prop=extracts|links|categories&exintro=1&explaintext=1&titles=${encodeURIComponent(n.data.title)}&format=json&origin=*`;
-        
+    async getPageDetails(title) {
+        const extractApi = `${this.host}/w/api.php?action=query&prop=extracts|links|categories&exintro=1&explaintext=1&titles=${encodeURIComponent(title)}&format=json&origin=*`;
         const res = await fetch(extractApi);
         const data = await res.json();
         
         const pages = data.query.pages;
         const pageId = Object.keys(pages)[0];
-        const pageData = pages[pageId];
-
         if(pageId == "-1") throw new Error("Page not found");
-
-        // Populate Modal with Clean Data
-        document.getElementById('m-icon').style.animation = "none";
-        document.getElementById('m-icon').innerText = n.data.icon;
         
-        const summary = pageData.extract || "No summary available for this topic. Click below to explore the full page.";
-        document.getElementById('m-summary').innerText = summary;
+        return pages[pageId];
+    }
+};
 
-        // Stats
+/**
+ * STREAMING_CHUNK: The Infinite Spectrum WebGL Engine
+ */
+const SpectrumOS = {
+    TOTAL_DOTS: 4800,
+    scene: null, camera: null, renderer: null, 
+    universeGroup: null, instancedMesh: null,
+    
+    layouts: { flower: [], radial: [], matrix: [] },
+    currentPositions: [],
+    nodeData: [], // Stores mapping for raycaster
+    dummy: null, colorObj: null,
+    
+    raycaster: null, mouse: null,
+    activeDotIndex: -1,
+    selectionRing: document.getElementById('selection-ring'),
+    
+    cam: { rx:0, ry:0, z: window.innerWidth<768 ? 1.0 : 1.5 },
+    tgt: { rx:0, ry:0, z: window.innerWidth<768 ? 1.0 : 1.5 },
+    
+    layoutMode: 'flower',
+
+    init() {
+        document.body.addEventListener('pointerdown', () => AudioDSP.init(), {once:true});
+        this.initWebGL();
+        this.calculateLayouts();
+        this.buildInstancedMesh();
+        this.setupGestures();
+        this.startRenderLoop();
+        this.startJumbleText();
+        
+        // Check if URL has a ?wiki= parameter
+        const params = new URLSearchParams(window.location.search);
+        const startWiki = params.get('wiki');
+        if (startWiki) {
+            this.executeSearch(startWiki);
+        }
+    },
+
+    initWebGL() {
+        const container = document.getElementById('canvas-bg');
+        this.scene = new THREE.Scene();
+        this.scene.fog = new THREE.FogExp2(0x010204, 0.002);
+
+        this.camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 2000);
+        this.camera.position.z = 100;
+
+        this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        container.appendChild(this.renderer.domElement);
+
+        this.universeGroup = new THREE.Group();
+        this.scene.add(this.universeGroup);
+
+        this.dummy = new THREE.Object3D();
+        this.colorObj = new THREE.Color();
+        this.raycaster = new THREE.Raycaster();
+        this.mouse = new THREE.Vector2();
+
+        // Background Stardust
+        const geo = new THREE.BufferGeometry();
+        const pts = [];
+        for(let i=0; i<800; i++) pts.push((Math.random()-0.5)*800, (Math.random()-0.5)*800, (Math.random()-0.5)*800);
+        geo.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
+        const mat = new THREE.PointsMaterial({ color: 0x38bdf8, size: 0.8, transparent: true, opacity: 0.2, blending: THREE.AdditiveBlending });
+        this.universeGroup.add(new THREE.Points(geo, mat));
+
+        window.addEventListener('resize', () => {
+            this.camera.aspect = window.innerWidth / window.innerHeight;
+            this.camera.updateProjectionMatrix();
+            this.renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Click Event for Raycasting
+        window.addEventListener('pointerdown', (e) => this.onPointerDown(e));
+    },
+
+    calculateLayouts() {
+        const total = this.TOTAL_DOTS;
+        
+        // 1. FLOWER (3D Fibonacci Sphere)
+        const phi = Math.PI * (3 - Math.sqrt(5));
+        const flowerRadius = 120;
+        for(let i=0; i<total; i++) {
+            const y = 1 - (i / (total - 1)) * 2;
+            const r = Math.sqrt(1 - y*y) * flowerRadius;
+            const theta = phi * i;
+            this.layouts.flower.push(new THREE.Vector3(Math.cos(theta) * r, y * flowerRadius, Math.sin(theta) * r));
+        }
+
+        // 2. RADIAL (Concentric Orbits)
+        const rings = 20;
+        const dotsPerRing = total / rings;
+        for(let i=0; i<total; i++) {
+            const ringIdx = Math.floor(i / dotsPerRing);
+            const idxInRing = i % dotsPerRing;
+            const ringAngle = (idxInRing / dotsPerRing) * Math.PI * 2;
+            const r = 50 + (ringIdx * 10); 
+            
+            const x = Math.cos(ringAngle) * r;
+            const y = Math.sin(ringAngle) * r;
+            const z = (ringIdx % 2 === 0 ? 10 : -10);
+
+            this.layouts.radial.push(new THREE.Vector3(x, y, z));
+        }
+
+        // 3. MATRIX (Periodic Table Wall)
+        const cols = 80;
+        const rows = total / cols;
+        const spacing = 2.5;
+        for(let i=0; i<total; i++) {
+            const c = i % cols;
+            const r = Math.floor(i / cols);
+            this.layouts.matrix.push(new THREE.Vector3((c - cols/2) * spacing, (rows/2 - r) * spacing, 0));
+        }
+
+        // Initialize current positions & baseline node data
+        for(let i=0; i<total; i++) {
+            this.currentPositions.push(this.layouts.flower[i].clone());
+            
+            // Generate procedural background data for the infinite nodes
+            const hue = (i / total) * 360;
+            this.nodeData.push({
+                isResult: false,
+                hue: hue,
+                color: `hsl(${hue}, 40%, 30%)`, // Dim procedural nodes
+                scale: 0.6
+            });
+        }
+    },
+
+    buildInstancedMesh() {
+        const geometry = new THREE.SphereGeometry(1, 8, 8);
+        const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        
+        this.instancedMesh = new THREE.InstancedMesh(geometry, material, this.TOTAL_DOTS);
+        this.instancedMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+        this.instancedMesh.instanceColor.setUsage(THREE.DynamicDrawUsage);
+        
+        this.updateMeshAttributes();
+        this.universeGroup.add(this.instancedMesh);
+    },
+
+    updateMeshAttributes() {
+        for(let i=0; i<this.TOTAL_DOTS; i++) {
+            const data = this.nodeData[i];
+            
+            this.colorObj.setStyle(data.color);
+            this.instancedMesh.setColorAt(i, this.colorObj);
+            
+            this.dummy.position.copy(this.currentPositions[i]);
+            // Apply scale based on whether it's a search result
+            this.dummy.scale.setScalar(data.scale);
+            this.dummy.updateMatrix();
+            this.instancedMesh.setMatrixAt(i, this.dummy.matrix);
+        }
+        this.instancedMesh.instanceColor.needsUpdate = true;
+        this.instancedMesh.instanceMatrix.needsUpdate = true;
+    },
+
+    switchLayout(type) {
+        if(navigator.vibrate) navigator.vibrate(10);
+        this.layoutMode = type;
+        
+        document.querySelectorAll('.layout-btn').forEach(b => b.classList.remove('active'));
+        if(document.getElementById(`btn-${type}`)) document.getElementById(`btn-${type}`).classList.add('active');
+        
+        if (type === 'matrix') { this.tgt.rx = 0; this.tgt.ry = 0; this.tgt.z = window.innerWidth<768 ? 1.5 : 2.0; }
+        else if (type === 'flower') { this.tgt.rx = 0.3; this.tgt.z = window.innerWidth<768 ? 1.0 : 1.5; }
+        else if (type === 'radial') { this.tgt.rx = 0.2; this.tgt.z = window.innerWidth<768 ? 0.8 : 1.2; }
+    },
+
+    onPointerDown(e) {
+        if(e.target.closest('#hud-layer') || e.target.closest('#kundali-sheet')) return;
+
+        this.mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+        this.mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+
+        this.raycaster.setFromCamera(this.mouse, this.camera);
+        const intersects = this.raycaster.intersectObject(this.instancedMesh);
+
+        if (intersects.length > 0) {
+            const instanceId = intersects[0].instanceId;
+            this.activateDot(instanceId, e.clientX, e.clientY);
+        } else {
+            this.selectionRing.classList.remove('active');
+            this.activeDotIndex = -1;
+            this.closeKundali();
+        }
+    },
+
+    async executeSearch(query) {
+        if(!query.trim()) return;
+        this.showToast(`Querying Miraheze: ${query}`);
+        this.showLoading();
+        
+        // 1. Reset all nodes to background state
+        this.nodeData.forEach((data, i) => {
+            data.isResult = false;
+            data.color = `hsl(${(i / this.TOTAL_DOTS) * 360}, 40%, 30%)`;
+            data.scale = 0.6;
+            data.wikiData = null;
+        });
+
+        // 2. Fetch actual results from Kids Wiki
+        const results = await WikiEngine.searchWiki(query);
+        this.hideLoading();
+
+        if (results.length === 0) {
+            this.showToast("No pages found.");
+            this.updateMeshAttributes();
+            return;
+        }
+
+        this.showToast(`Found ${results.length} pages.`);
+
+        // 3. Map results to specific dots (evenly spaced across the 4800 index)
+        const step = Math.floor(this.TOTAL_DOTS / results.length);
+        let firstResultIdx = -1;
+
+        results.forEach((res, i) => {
+            const targetIdx = i * step;
+            if (firstResultIdx === -1) firstResultIdx = targetIdx;
+            
+            // Override the procedural dot with Real Wiki Data
+            this.nodeData[targetIdx].isResult = true;
+            this.nodeData[targetIdx].color = res.color;
+            this.nodeData[targetIdx].scale = 3.0; // Make results huge
+            this.nodeData[targetIdx].wikiData = res;
+        });
+
+        // 4. Update WebGL Colors & Scales
+        this.updateMeshAttributes();
+        
+        // 5. Force layout to Flower and auto-activate the top result
+        this.switchLayout('flower');
+        if (firstResultIdx !== -1) {
+            this.activateDot(firstResultIdx, window.innerWidth/2, window.innerHeight/2);
+        }
+    },
+
+    async activateDot(index, screenX, screenY) {
+        this.activeDotIndex = index;
+        const node = this.nodeData[index];
+        
+        AudioDSP.playTone(node.hue, screenX);
+
+        if (!node.isResult || !node.wikiData) {
+            this.showToast("Procedural Space Dust. Search a topic to populate knowledge.");
+            return;
+        }
+
+        const wikiData = node.wikiData;
+
+        // Visual Feedback (2D Ring tracking 3D dot)
+        this.selectionRing.style.borderColor = wikiData.color;
+        this.selectionRing.style.boxShadow = `0 0 20px ${wikiData.color}, inset 0 0 10px ${wikiData.color}`;
+        this.selectionRing.classList.add('active');
+        
+        // Open Kundali (Detail Sheet) with Loading State
+        this.openKundaliLoading(wikiData);
+
+        try {
+            // Fetch the REAL extract and stats from Miraheze API
+            const pageDetails = await WikiEngine.getPageDetails(wikiData.title);
+            this.populateKundali(wikiData, pageDetails);
+        } catch (e) {
+            this.showToast("Failed to fetch full page details.");
+        }
+    },
+
+    openKundaliLoading(wikiData) {
+        const sheet = document.getElementById('kundali-sheet');
+        sheet.style.setProperty('--col', wikiData.color);
+        
+        document.getElementById('k-title').innerText = wikiData.title;
+        document.getElementById('k-icon').innerText = "⏳";
+        document.getElementById('k-icon').style.animation = "spin 2s linear infinite";
+        document.getElementById('k-vector').innerText = `Miraheze > Knowledge Matrix`;
+        document.getElementById('k-summary').innerText = wikiData.snippet + "..."; // Show search snippet temporarily
+        
+        document.getElementById('k-words').innerText = "-";
+        document.getElementById('k-links').innerText = "-";
+        document.getElementById('k-cats').innerText = "-";
+        document.getElementById('k-tags').innerHTML = "";
+        
+        document.getElementById('k-link').href = `${WikiEngine.host}/wiki/${encodeURIComponent(wikiData.title.replace(/ /g, '_'))}`;
+        document.getElementById('k-link').style.backgroundColor = wikiData.color;
+
+        sheet.classList.add('active');
+    },
+
+    populateKundali(wikiData, pageDetails) {
+        document.getElementById('k-icon').style.animation = "none";
+        document.getElementById('k-icon').innerText = wikiData.icon;
+        
+        const summary = pageDetails.extract || "No summary available. Click explore to read the full page.";
+        document.getElementById('k-summary').innerText = summary;
+
+        // Calculate Stats
         const wordCount = summary.split(/\s+/).filter(w => w.length > 2).length;
-        const linkCount = pageData.links ? pageData.links.length : 0;
-        const catCount = pageData.categories ? pageData.categories.length : 0;
+        const linkCount = pageDetails.links ? pageDetails.links.length : 0;
+        const catCount = pageDetails.categories ? pageDetails.categories.length : 0;
 
-        document.getElementById('m-words').innerText = wordCount > 0 ? `~${wordCount * 10}` : "0"; // Estimate total based on intro
-        document.getElementById('m-links').innerText = linkCount;
-        document.getElementById('m-cats').innerText = catCount;
+        document.getElementById('k-words').innerText = wordCount > 0 ? `~${wordCount * 10}` : "0"; // Estimate total
+        document.getElementById('k-links').innerText = linkCount;
+        document.getElementById('k-cats').innerText = catCount;
 
         // Categories as Tags
-        if (pageData.categories) {
-            document.getElementById('m-tags').innerHTML = pageData.categories
+        if (pageDetails.categories) {
+            document.getElementById('k-tags').innerHTML = pageDetails.categories
                 .slice(0, 5)
                 .map(c => `<span class="tag">${c.title.replace('Category:', '')}</span>`)
                 .join('');
         }
+    },
 
-        // Link
-        document.getElementById('m-link').href = `${this.host}/wiki/${encodeURIComponent(n.data.title.replace(/ /g, '_'))}`;
-        document.getElementById('m-link').style.backgroundColor = n.data.color;
+    closeKundali() {
+        document.getElementById('kundali-sheet').classList.remove('active');
+        this.selectionRing.classList.remove('active');
+        this.activeDotIndex = -1;
+    },
 
-    } catch (e) {
-        document.getElementById('m-icon').style.animation = "none";
-        document.getElementById('m-icon').innerText = n.data.icon;
-        document.getElementById('m-summary').innerText = "Detailed summary unavailable via API. Open the full page to explore.";
-        document.getElementById('m-link').href = `${this.host}/wiki/${encodeURIComponent(n.data.title.replace(/ /g, '_'))}`;
-        document.getElementById('m-link').style.backgroundColor = n.data.color;
-    }
-  },
+    resetUniverse() {
+        this.nodeData.forEach((data, i) => {
+            data.isResult = false;
+            data.color = `hsl(${(i / this.TOTAL_DOTS) * 360}, 60%, 50%)`; // Make spectrum bright again
+            data.scale = 1.0;
+            data.wikiData = null;
+        });
+        this.updateMeshAttributes();
+        this.switchLayout('flower');
+        this.closeKundali();
+        this.tgt.rx = 0.3; this.tgt.ry = 0;
+    },
 
-  changeLayout(type, os) {
-    const petals = os.nodes.filter(n => !n.data.isRoot);
-    const root = os.nodes.find(n => n.data.isRoot);
-    if(root) { root.tx = 0; root.ty = 0; root.tz = 0; }
+    showToast(msg) {
+        const c = document.getElementById('toast-container');
+        const t = document.createElement('div'); t.className = 'toast';
+        t.innerHTML = `<span class="material-symbols-rounded">bolt</span> ${msg}`;
+        c.appendChild(t);
+        setTimeout(() => { t.style.animation = 'slideDown 0.3s ease reverse forwards'; setTimeout(() => t.remove(), 300); }, 3000);
+    },
 
-    petals.forEach((n, i) => {
-      if(type==='flower') {
-        const a = i * 137.508 * (Math.PI/180);
-        const r = (os.isMobile ? 100 : 150) + Math.sqrt(i)*30;
-        n.tx = Math.cos(a)*r; n.ty = Math.sin(a)*r; n.tz = Math.sin(i*0.5)*40;
-      } else if (type === 'radial') {
-        const a = (i / petals.length) * Math.PI * 2;
-        const r = os.isMobile ? 200 : 300;
-        n.tx = Math.cos(a)*r; n.ty = Math.sin(a)*r; n.tz = (i%2===0 ? 30 : -30);
-      } else { // tree
-        const cols = Math.ceil(Math.sqrt(petals.length));
-        const c = i % cols, r = Math.floor(i / cols);
-        const sp = os.isMobile ? 100 : 120;
-        n.tx = (c - cols/2 + 0.5) * sp; n.ty = (r + 1) * sp; n.tz = 0;
-        if(root) root.ty = -sp;
-      }
-    });
-  },
-
-  exportGraph(d, os) {
-    const cvs = document.getElementById('export-canvas'), ctx = cvs.getContext('2d');
-    ctx.fillStyle = '#010204'; ctx.fillRect(0,0,1920,1080);
+    showLoading() {
+        document.getElementById('loading').style.display = 'flex';
+        document.getElementById('loading').style.opacity = 1;
+    },
     
-    // Background gradient
-    const grd = ctx.createRadialGradient(960, 540, 0, 960, 540, 800);
-    grd.addColorStop(0, '#0a1128'); grd.addColorStop(1, '#010204');
-    ctx.fillStyle = grd; ctx.fillRect(0,0,1920,1080);
+    hideLoading() {
+        document.getElementById('loading').style.opacity = 0;
+        setTimeout(() => document.getElementById('loading').style.display = 'none', 500);
+    },
 
-    const scale = os.isMobile ? 2.5 : 1.5;
+    startJumbleText() {
+        const words = ['e/arth OS', 'ba.che', 'khe.lo', 'kru.shi'];
+        let idx = 0; const el = document.getElementById('jumble-logo'); const chars = '!<>-_\\/[]{}—=+*^?#~';
+        setInterval(() => {
+            idx = (idx + 1) % words.length; const final = words[idx];
+            let frame = 0, queue = [];
+            for(let i=0; i<final.length; i++) {
+                const from = final[i] === ' ' ? ' ' : chars[Math.floor(Math.random()*chars.length)];
+                queue.push({ from, to: final[i], start: Math.floor(Math.random()*15), end: 15 + Math.floor(Math.random()*15) });
+            }
+            const animate = () => {
+                let out = '', complete = 0;
+                for(let i=0; i<queue.length; i++) {
+                    let q = queue[i];
+                    if(frame >= q.end) { complete++; out += q.to; }
+                    else if(frame >= q.start) { out += `<span style="color:#fbbf24">${chars[Math.floor(Math.random()*chars.length)]}</span>`; }
+                    else { out += q.from; }
+                }
+                el.innerHTML = out;
+                if(complete === queue.length) return;
+                frame++; requestAnimationFrame(animate);
+            };
+            animate();
+        }, 4000);
+    },
 
-    ctx.lineWidth = 3;
-    os.edges.forEach(e => {
-      ctx.beginPath(); ctx.moveTo(960+e.s.tx*scale, 540+e.s.ty*scale); 
-      const nx = 960+e.t.tx*scale, ny = 540+e.t.ty*scale;
-      ctx.quadraticCurveTo((960+e.s.tx*scale+nx)/2 - (ny-(540+e.s.ty*scale))*0.2, ((540+e.s.ty*scale)+ny)/2 + (nx-(960+e.s.tx*scale))*0.2, nx, ny);
-      ctx.strokeStyle=e.t.data.color; ctx.globalAlpha = 0.5; ctx.stroke();
-    });
+    setupGestures() {
+        const mc = new Hammer.Manager(document.body);
+        mc.add(new Hammer.Pan({ direction: Hammer.DIRECTION_ALL, threshold: 0 }));
+        mc.add(new Hammer.Pinch({ enable: true })).recognizeWith(mc.get('pan'));
+        mc.add(new Hammer.Tap({ event: 'doubletap', taps: 2 }));
 
-    ctx.globalAlpha = 1.0;
-    os.nodes.forEach(n => {
-      const r = n.data.isRoot ? 70 : 45;
-      const x = 960+n.tx*scale, y = 540+n.ty*scale;
-      
-      ctx.shadowColor = n.data.color; ctx.shadowBlur = 30;
-      ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fillStyle = '#0f172a'; ctx.fill();
-      ctx.lineWidth = 4; ctx.strokeStyle = n.data.color; ctx.stroke();
-      
-      ctx.shadowBlur = 0; ctx.fillStyle = '#fff'; ctx.font = `${r*0.8}px sans-serif`; ctx.textAlign='center'; ctx.textBaseline='middle';
-      ctx.fillText(n.data.icon, x, y);
-      
-      ctx.fillStyle = n.data.color; ctx.font = `bold ${r*0.35}px 'Space Grotesk', sans-serif`;
-      ctx.fillText(n.data.title.toUpperCase(), x, y+r+25);
-    });
+        let initZ = 1, isPanning = false, lx = 0, ly = 0;
+        
+        mc.on('doubletap', () => { this.switchLayout('flower'); this.tgt.rx=0.3; this.tgt.ry=0; });
+        mc.on('pinchstart', () => initZ = this.tgt.z);
+        mc.on('pinch', e => this.tgt.z = Math.max(0.1, Math.min(4, initZ * (1/e.scale)))); 
+        
+        mc.on('panstart', e => { isPanning = true; lx = e.center.x; ly = e.center.y; });
+        mc.on('panmove', e => {
+            if(!isPanning) return;
+            let dx = e.center.x - lx, dy = e.center.y - ly;
+            // Map Pan to Universe Rotation
+            this.tgt.ry += dx * 0.005; 
+            this.tgt.rx += dy * 0.005; 
+            lx = e.center.x; ly = e.center.y;
+        });
+        mc.on('panend', () => isPanning = false);
+        window.onwheel = e => this.tgt.z = Math.max(0.1, Math.min(4, this.tgt.z + e.deltaY * 0.0015));
+    },
 
-    const root = os.nodes.find(n => n.data.isRoot);
-    ctx.fillStyle = '#94a3b8'; ctx.font = '24px Inter'; ctx.textAlign = 'left';
-    ctx.fillText(`Khel.o Infinite Knowledge Map · ${root ? root.data.title : 'Export'}`, 40, 1040);
+    lerp(a, b, t) { return a + (b - a) * t; },
 
-    const a = document.createElement('a'); a.download='wondergraph.png'; a.href=cvs.toDataURL(); a.click();
-  }
+    startRenderLoop() {
+        const loop = () => {
+            // Camera Physics
+            this.cam.z = this.lerp(this.cam.z, this.tgt.z, 0.08);
+            this.cam.rx = this.lerp(this.cam.rx, this.tgt.rx, 0.08); 
+            this.cam.ry = this.lerp(this.cam.ry, this.tgt.ry, 0.08);
+            
+            this.universeGroup.rotation.x = this.cam.rx;
+            this.universeGroup.rotation.y = this.cam.ry;
+            this.camera.position.z = 100 * this.cam.z;
+            
+            document.getElementById('telemetry-z').innerText = `SCALE: ${(1/this.cam.z).toFixed(3)}x`;
+
+            // Mass Interpolation of 4800 Matrices
+            let needsMatrixUpdate = false;
+            const targetPositions = this.layouts[this.layoutMode];
+            
+            for(let i=0; i<this.TOTAL_DOTS; i++) {
+                const cur = this.currentPositions[i];
+                const tar = targetPositions[i];
+                
+                // Only lerp if distance is significant to save CPU
+                if (cur.distanceToSquared(tar) > 0.01) {
+                    cur.lerp(tar, 0.05);
+                    this.dummy.position.copy(cur);
+                    
+                    // Maintain scale
+                    this.dummy.scale.setScalar(this.nodeData[i].scale);
+                    
+                    this.dummy.updateMatrix();
+                    this.instancedMesh.setMatrixAt(i, this.dummy.matrix);
+                    needsMatrixUpdate = true;
+                }
+            }
+            if (needsMatrixUpdate) this.instancedMesh.instanceMatrix.needsUpdate = true;
+
+            // Tracking the active dot with the 2D HTML Selection Ring
+            if (this.activeDotIndex !== -1) {
+                const curPos = this.currentPositions[this.activeDotIndex].clone();
+                // Apply group rotation
+                curPos.applyEuler(this.universeGroup.rotation);
+                // Project to 2D Screen Space
+                curPos.project(this.camera);
+                
+                if (curPos.z < 1 && curPos.z > -1) {
+                    const x = (curPos.x * 0.5 + 0.5) * window.innerWidth;
+                    const y = (curPos.y * -0.5 + 0.5) * window.innerHeight;
+                    
+                    // Adjust ring size based on dot scale
+                    const scaleFactor = this.nodeData[this.activeDotIndex].scale;
+                    this.selectionRing.style.width = `${40 * scaleFactor}px`;
+                    this.selectionRing.style.height = `${40 * scaleFactor}px`;
+                    
+                    this.selectionRing.style.left = `${x}px`;
+                    this.selectionRing.style.top = `${y}px`;
+                }
+            }
+
+            // Ambient Drift
+            if(Math.abs(this.tgt.ry - this.cam.ry) < 0.01) {
+                this.tgt.ry += 0.001;
+            }
+
+            this.renderer.render(this.scene, this.camera);
+            requestAnimationFrame(loop);
+        };
+        loop();
+    }
 };
 
-KhelOS.use(ExtWikiLogic);
-KhelOS.boot();
+window.onload = () => {
+    // Start with a full color spectrum
+    for(let i=0; i<SpectrumOS.TOTAL_DOTS; i++) {
+        SpectrumOS.nodeData.push({
+            isResult: false,
+            hue: (i / SpectrumOS.TOTAL_DOTS) * 360,
+            color: `hsl(${(i / SpectrumOS.TOTAL_DOTS) * 360}, 60%, 50%)`,
+            scale: 1.0
+        });
+    }
+    SpectrumOS.init();
+};
 </script>
 </body>
 </html>
