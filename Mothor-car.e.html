@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+  <title>Khel.o · WonderGraph · CHETNA — Collaboration with Motorola</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0a0e1a;
+      color: #eaeef2;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      line-height: 1.7;
+      padding: 20px;
+    }
+    .container {
+      max-width: 1300px;
+      margin: 0 auto;
+      background: rgba(14, 20, 38, 0.75);
+      backdrop-filter: blur(10px);
+      border-radius: 48px;
+      padding: 40px 30px;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.8);
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    /* header */
+    .header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 30px;
+      border-bottom: 1px solid rgba(255,215,0,0.15);
+      padding-bottom: 20px;
+    }
+    .logo {
+      font-size: 2.4rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #f9d976, #e67e22);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 1px;
+    }
+    .logo small {
+      font-size: 0.8rem;
+      font-weight: 400;
+      -webkit-text-fill-color: rgba(255,255,255,0.5);
+      display: block;
+      background: none;
+    }
+    .tagline {
+      font-size: 1.1rem;
+      color: #a0b4d0;
+      max-width: 480px;
+      text-align: right;
+    }
+    .tagline span { display: block; font-size: 0.9rem; color: #7a8aa0; margin-top: 4px; }
+
+    /* typography */
+    h1, h2, h3 { font-weight: 600; }
+    .section {
+      margin: 50px 0;
+    }
+    .section-title {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 24px;
+      background: linear-gradient(135deg, #f0e68c, #f39c12);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: inline-block;
+      border-left: 5px solid #f1c40f;
+      padding-left: 20px;
+      letter-spacing: 0.5px;
+    }
+    .section-sub {
+      color: #b0c4dd;
+      font-size: 1.1rem;
+      margin-bottom: 20px;
+      padding-left: 25px;
+      border-left: 2px solid rgba(255,215,0,0.2);
+    }
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 25px;
+      margin: 30px 0;
+    }
+    .card {
+      background: rgba(26, 36, 66, 0.5);
+      backdrop-filter: blur(4px);
+      padding: 24px 22px;
+      border-radius: 28px;
+      border: 1px solid rgba(255,255,255,0.06);
+      transition: transform 0.25s ease, box-shadow 0.25s;
+    }
+    .card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 14px 35px rgba(0,0,0,0.5);
+      border-color: rgba(255,215,0,0.2);
+    }
+    .card .icon { font-size: 2.6rem; margin-bottom: 12px; display: block; }
+    .card h3 { font-size: 1.3rem; margin-bottom: 8px; color: #f5e6b0; }
+    .card p { color: #b8c9e0; font-size: 0.95rem; }
+
+    .highlight-box {
+      background: rgba(255,215,0,0.06);
+      border-left: 4px solid #f1c40f;
+      padding: 22px 28px;
+      border-radius: 20px;
+      margin: 30px 0;
+      backdrop-filter: blur(2px);
+    }
+    .highlight-box p { margin-bottom: 8px; }
+    .highlight-box strong { color: #f1c40f; }
+
+    .pill {
+      display: inline-block;
+      background: rgba(255,215,0,0.12);
+      padding: 6px 18px;
+      border-radius: 40px;
+      font-size: 0.8rem;
+      border: 1px solid rgba(255,215,0,0.15);
+      margin: 4px 6px 4px 0;
+      color: #f5e6b0;
+      font-weight: 500;
+    }
+    .pill i { font-style: normal; margin-right: 4px; }
+
+    /* special matrix preview */
+    .matrix-preview {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      padding: 20px 0;
+    }
+    .matrix-item {
+      background: rgba(255,215,0,0.05);
+      border-radius: 16px;
+      padding: 12px 16px;
+      border: 1px solid rgba(255,255,255,0.04);
+      text-align: center;
+      min-width: 70px;
+      font-size: 0.8rem;
+      color: #c0d0e8;
+    }
+    .matrix-item .sym { font-size: 1.6rem; display: block; margin-bottom: 4px; }
+
+    .collab-section {
+      background: linear-gradient(145deg, rgba(20,30,60,0.7), rgba(10,15,30,0.9));
+      border-radius: 36px;
+      padding: 45px 35px;
+      margin-top: 50px;
+      border: 1px solid rgba(255,215,0,0.15);
+      box-shadow: inset 0 0 50px rgba(255,215,0,0.02);
+    }
+    .btn {
+      display: inline-block;
+      background: linear-gradient(135deg, #f1c40f, #e67e22);
+      border: none;
+      padding: 16px 48px;
+      border-radius: 60px;
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: #0b0e1a;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 6px 24px rgba(241,196,15,0.3);
+      cursor: pointer;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .btn:hover { transform: scale(1.03); box-shadow: 0 10px 36px rgba(241,196,15,0.5); }
+
+    .footer {
+      margin-top: 60px;
+      padding-top: 25px;
+      border-top: 1px solid rgba(255,255,255,0.04);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      color: #6a7a90;
+      font-size: 0.9rem;
+    }
+    .footer a { color: #b0c8e0; text-decoration: none; border-bottom: 1px dotted rgba(255,255,255,0.1); }
+    .footer a:hover { color: #f1c40f; }
+
+    /* responsive */
+    @media (max-width: 700px) {
+      .container { padding: 24px 16px; }
+      .header { flex-direction: column; align-items: flex-start; gap: 8px; }
+      .tagline { text-align: left; max-width: 100%; }
+      .section-title { font-size: 1.6rem; }
+      .collab-section { padding: 30px 20px; }
+    }
+
+    /* animated background particles */
+    #bgCanvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -2;
+      pointer-events: none;
+      opacity: 0.12;
+    }
+    .bg-glow {
+      position: fixed;
+      top: 10%; left: 5%;
+      width: 60%; height: 60%;
+      background: radial-gradient(ellipse, rgba(241,196,15,0.03) 0%, transparent 70%);
+      z-index: -1;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="bgCanvas"></canvas>
+  <div class="bg-glow"></div>
+
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div class="logo">
+        Khel.o
+        <small>🌱 WonderGraph · CHETNA · Know‑Ledger</small>
+      </div>
+      <div class="tagline">
+        “अक्षरं ब्रह्म, चिह्नं मोक्षः”<br>
+        <span>Glyph is the Universe · Symbol is Liberation</span>
+        <span style="font-size:0.85rem; color:#6a7a90; margin-top:6px;">A living knowledge ecosystem for human evolution</span>
+      </div>
+    </div>
+
+    <!-- 1. The Vision -->
+    <div class="section">
+      <div class="section-title">🌅 The Vision — Uday · Display · Air</div>
+      <div class="section-sub">From static mirrors to a living, evolutionary river of consciousness</div>
+      <div class="highlight-box">
+        <p style="font-size:1.2rem; font-weight:300; color:#d4e0f0;">
+          <strong>Khel.o</strong> is not a screen, not a diamond — it is a <strong>living river</strong>, a growing seed, an unfolding path.
+          It operates on the four pillars of human purpose: <strong>Dharma, Artha, Kāma, Moksha</strong>.
+        </p>
+        <p>
+          <span class="pill">🌱 धर्म — evolving duty, not stone</span>
+          <span class="pill">💰 अर्थ — continuous learning & earning</span>
+          <span class="pill">💞 काम — fertile creativity, not mere desire</span>
+          <span class="pill">🕊️ मोक्ष — journey, not destination</span>
+        </p>
+      </div>
+      <div class="card-grid">
+        <div class="card"><span class="icon">🌅</span><h3>Uday (Rise)</h3><p>Awakening, clarity, purity, wisdom, creativity, relevance — the ascent of consciousness.</p></div>
+        <div class="card"><span class="icon">🖥️</span><h3>Display</h3><p>Not just a screen — the visible expression of a civilization’s values: air quality, water, forests, community well-being.</p></div>
+        <div class="card"><span class="icon">🌬️</span><h3>Air</h3><p>The invisible thread that connects all life. The highest display is the display of clean air, shared by every being.</p></div>
+      </div>
+      <div style="background: rgba(255,215,0,0.03); border-radius: 20px; padding: 18px 24px; margin-top: 10px;">
+        <p style="font-style: italic; color: #b8c9e0;">
+          “When Air becomes Pure, Display becomes Beautiful. When Display becomes Beautiful, Play becomes Meaningful. When Play becomes Meaningful, Uday leads to Pūrṇatā (Wholeness).”
+        </p>
+      </div>
+    </div>
+
+    <!-- 2. The Know-Ledger & WonderGraph -->
+    <div class="section">
+      <div class="section-title">🧬 Know‑Ledger · WonderGraph</div>
+      <div class="section-sub">A self‑organizing, chromatic knowledge matrix for all human domains</div>
+      <p style="margin-bottom: 16px; color: #b8c9e0;">
+        Built on a <strong>48×10 grid</strong> — 6 core domains (Biosphere, Science, Infrastructure, Economics, Mind, Heart) × 10 evolutionary vectors (5W1H). Each concept is a <strong>color‑coded dot</strong> that blooms into a Fibonacci tree, connecting everything from physics to poetry.
+      </p>
+      <div class="matrix-preview">
+        <div class="matrix-item"><span class="sym">🔴◉</span>0.1 Individual</div>
+        <div class="matrix-item"><span class="sym">🟠◎</span>0.2 Society</div>
+        <div class="matrix-item"><span class="sym">🟡◈</span>0.3 Econology</div>
+        <div class="matrix-item"><span class="sym">🟢⬢</span>0.4 Earth Eng.</div>
+        <div class="matrix-item"><span class="sym">🔵◈</span>0.5 Discovery</div>
+        <div class="matrix-item"><span class="sym">🟣◈</span>0.6 Innovation</div>
+        <div class="matrix-item"><span class="sym">⚪◎</span>0.8 Co‑creation</div>
+        <div class="matrix-item"><span class="sym">🌌∞</span>0.9 Liberation</div>
+      </div>
+      <div class="card-grid">
+        <div class="card"><span class="icon">🌸</span><h3>Fibonacci Bloom</h3><p>Nodes arrange in golden spiral (phyllotaxis) for organic exploration, or switch to radial, tree, or matrix layouts.</p></div>
+        <div class="card"><span class="icon">🎯</span><h3>5W1H Vectors</h3><p>Every concept is placed in 10‑dimensional semantic space — Who, What, Where, When, Why, How, and beyond.</p></div>
+        <div class="card"><span class="icon">🔗</span><h3>Semantic Bonds</h3><p>Connections (parent, cause, similarity, opposite, evolution) automatically execute logic and unlock new branches.</p></div>
+      </div>
+    </div>
+
+    <!-- 3. The Technology: Hyper-Code & Symbolic Computing -->
+    <div class="section">
+      <div class="section-title">⚡ Hyper‑Code · Symbolic Computing</div>
+      <div class="section-sub">Encoding everything into dots — achieving 1000x efficiency</div>
+      <div class="highlight-box">
+        <p><strong>One dot = one concept.</strong> Each dot is a 32‑bit ChromaByte — carrying domain, vector, and evolutionary state. No text parsing. No JSON bloat. The GPU processes colors as hardware instructions.</p>
+        <p><span class="pill">🌈 24‑bit RGB = 16 million meanings</span> <span class="pill">🌀 Sanskrit roots + Chinese ideograms</span> <span class="pill">⚛️ 55‑byte binary memory‑mapped nodes</span></p>
+      </div>
+      <div class="card-grid">
+        <div class="card"><span class="icon">🧮</span><h3>SPU Hash</h3><p>Deterministic mapping from any word/phrase to a unique color + symbol + sound, using <code>Math.imul</code> and Unicode glyphs.</p></div>
+        <div class="card"><span class="icon">📦</span><h3>Semantic Compression</h3><p>ZIP‑like LZW applied to meaning: 1KB of text collapses to a few symbols, and expands back perfectly via AI reasoning.</p></div>
+        <div class="card"><span class="icon">🧠</span><h3>Auto‑Learning (AI Chip)</h3><p>Built‑in genetic algorithm + Hebbian learning — the code mutates, tests accuracy, and evolves its own dictionary. Any silicon becomes an AI chip.</p></div>
+      </div>
+    </div>
+
+    <!-- 4. The Ecosystem: Wiki, Extensions, SemGit -->
+    <div class="section">
+      <div class="section-title">🌐 Ecosystem · MediaWiki · SemGit</div>
+      <div class="section-sub">Open, decentralized, evolving — like a living organism</div>
+      <div class="card-grid">
+        <div class="card"><span class="icon">📖</span><h3>Universal Wiki Bridge</h3><p>Fetches any MediaWiki page (kids.miraheze, Wikipedia, etc.) and extracts essence via client‑side NLP — blooms as new nodes.</p></div>
+        <div class="card"><span class="icon">🧩</span><h3>Extension System</h3><p>Core base file (200 lines) + drop‑in extensions (visual, infographic, kundali, SEO) — admin‑approved, open collective.</p></div>
+        <div class="card"><span class="icon">🔄</span><h3>Semantic Delta (SemGit)</h3><p>Syncs only semantic state changes (add/delete/modify nodes) as tiny binary vectors — not text diffs. P2P, offline‑first.</p></div>
+      </div>
+      <div style="background: rgba(255,215,0,0.03); border-radius: 20px; padding: 18px 24px; margin-top: 10px;">
+        <p style="color: #b8c9e0;">
+          <strong>15‑day Fibonacci Evolution:</strong> Cache expires every 15 days; the engine fetches only new edits, merges them as new branches, and never rewrites history — the graph grows like a tree.
+        </p>
+      </div>
+    </div>
+
+    <!-- 5. Human Development Arc -->
+    <div class="section">
+      <div class="section-title">🌱 Human Development · From Baby to Divine</div>
+      <div class="section-sub">The physical, mental, and spiritual evolution encoded in the graph</div>
+      <div class="card-grid">
+        <div class="card"><span class="icon">👶</span><h3>Baby & Child</h3><p>Natural smiles, high movement, curiosity. The OS amplifies play, sports, art, music — keeping the body active and mind calm.</p></div>
+        <div class="card"><span class="icon">🧑‍🤝‍🧑</span><h3>Youth & Adult</h3><p>Skill development, nomadic learning, community contribution. Shifts from consumption to co‑creation, from ego to stewardship.</p></div>
+        <div class="card"><span class="icon">🧓</span><h3>Elder & Liberation</h3><p>Healthy aging, deep care, conscious farewell to the body. The graph guides through Dharma, Artha, Kāma, and Moksha — complete human fulfilment.</p></div>
+      </div>
+      <div class="highlight-box">
+        <p><strong>Earth Culture:</strong> Organic living, grass‑cow‑manure cycles, fresh food, better soil, renewable energy — all connected to the knowledge graph as practical actions.</p>
+      </div>
+    </div>
+
+    <!-- 6. The Collaboration with Motorola -->
+    <div class="collab-section">
+      <div style="display: flex; flex-wrap: wrap; gap: 30px; align-items: center;">
+        <div style="flex: 2; min-width: 280px;">
+          <h2 style="color: #f5e6b0; font-size: 2rem; margin-bottom: 12px;">🤝 Proposal to Motorola</h2>
+          <p style="font-size: 1.1rem; color: #d4e0f0;">
+            We invite Motorola to co‑create the <strong>next‑generation multi‑purpose display</strong> — a living canvas that embodies the Khel.o vision:
+          </p>
+          <ul style="list-style: none; padding: 0; margin: 16px 0; color: #b8c9e0;">
+            <li style="padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.04);">🔹 <strong>Unbreakable</strong> — shatter‑resistant core with replaceable layers (glossy, matte, e‑ink)</li>
+            <li style="padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.04);">🔹 <strong>Eye‑health</strong> — e‑ink and paper‑matte modes for zero‑strain reading</li>
+            <li style="padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.04);">🔹 <strong>Glasses‑free 3D</strong> — cylindrical lens grating, vector‑based 3D rendering</li>
+            <li style="padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.04);">🔹 <strong>Expandable</strong> — magnify to any screen size via vector scaling</li>
+            <li style="padding: 8px 0;">🔹 <strong>Symbol‑driven UI</strong> — the display itself becomes a semantic node, responding to color‑coded interactions</li>
+          </ul>
+          <p style="color: #c0d0e8; margin: 16px 0;">
+            Together, we can build the <strong>first display that evolves with the user</strong> — not just a screen, but a portal to universal knowledge and human liberation.
+          </p>
+          <a href="#" class="btn" onclick="alert('📩 Collaboration inquiry sent! (demo)')">Let’s Co‑Create →</a>
+        </div>
+        <div style="flex: 1; min-width: 180px; background: rgba(255,215,0,0.04); border-radius: 28px; padding: 24px; border: 1px dashed rgba(255,215,0,0.2); text-align: center;">
+          <div style="font-size: 3.2rem;">◉</div>
+          <p style="color: #f5e6b0; font-weight: 600; margin-top: 8px;">The Living Dot</p>
+          <p style="font-size: 0.8rem; color: #7a8aa0;">One pixel. Infinite meaning.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. Closing & Dharma -->
+    <div class="section" style="margin-top: 20px;">
+      <div style="text-align: center; padding: 20px 0;">
+        <p style="font-size: 1.2rem; color: #c0d0e8; max-width: 800px; margin: 0 auto;">
+          “यंत्र नहीं, उत्क्रांति का यंत्र है – आपके धर्म, अर्थ, काम, और मोक्ष की अनवरत गति।”
+        </p>
+        <p style="color: #7a8aa0; margin-top: 8px;">
+          “Not a machine, but a machine of evolution — the continuous flow of your Dharma, Artha, Kāma, and Moksha.”
+        </p>
+        <div style="margin-top: 24px;">
+          <span class="pill">🌿 Open Source</span>
+          <span class="pill">🔄 P2P</span>
+          <span class="pill">🧠 AI‑Native</span>
+          <span class="pill">🌍 Earth‑Centric</span>
+          <span class="pill">🙏 Human‑Liberation</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <div>
+        <span style="font-weight: 600; color: #b0c4dd;">Khel.o · WonderGraph · CHETNA</span><br>
+        <span style="font-size: 0.8rem;">A project for civilizational intelligence</span>
+      </div>
+      <div>
+        <a href="https://kids.miraheze.org/wiki/Knowledger_Graph" target="_blank">📚 Knowledge Graph Wiki</a> &nbsp;·&nbsp;
+        <a href="#" onclick="alert('🚀 Full codebase & documentation available upon request.')">📄 Request Access</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Background animation (particles) -->
+  <script>
+    (function() {
+      const canvas = document.getElementById('bgCanvas');
+      const ctx = canvas.getContext('2d');
+      let w, h;
+      const resize = () => {
+        w = canvas.width = window.innerWidth;
+        h = canvas.height = window.innerHeight;
+      };
+      window.addEventListener('resize', resize);
+      resize();
+
+      const dots = [];
+      const count = 60;
+      for (let i = 0; i < count; i++) {
+        dots.push({
+          x: Math.random() * w,
+          y: Math.random() * h,
+          r: Math.random() * 2 + 0.5,
+          dx: (Math.random() - 0.5) * 0.4,
+          dy: (Math.random() - 0.5) * 0.4,
+          color: `hsla(${40 + Math.random() * 20}, 80%, 70%, ${0.1 + Math.random() * 0.2})`
+        });
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, w, h);
+        dots.forEach(d => {
+          d.x += d.dx;
+          d.y += d.dy;
+          if (d.x < 0 || d.x > w) d.dx *= -1;
+          if (d.y < 0 || d.y > h) d.dy *= -1;
+          ctx.beginPath();
+          ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+          ctx.fillStyle = d.color;
+          ctx.fill();
+        });
+        requestAnimationFrame(draw);
+      }
+      draw();
+    })();
+  </script>
+</body>
+</html>
