@@ -1,776 +1,668 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=no">
-    <title>Khel.o · Dis-play Humanity OS</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0" />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.4/gsap.min.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Khel·o</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Atkinson+Hyperlegible:wght@400;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
-    <style>
-        :root { 
-            --bg: #010204; 
-            --accent: #38bdf8; 
-            --gold: #fbbf24; 
-            --emerald: #10b981;
-            --rose: #f43f5e;
-            --purple: #a78bfa;
-            --surface: rgba(10, 15, 25, 0.6); 
-            --border: rgba(255, 255, 255, 0.1); 
-        }
-        
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        
-        body { 
-            background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; 
-            overflow: hidden; touch-action: none; overscroll-behavior: none;
-            background-image: radial-gradient(circle at center, #0a1128 0%, #010204 100%);
-        }
+  :root{
+    --bg:#0B0F1A; --panel:#121A29; --panel-edge:#232E45;
+    --text:#F2EFE9; --muted:#A9B0C0;
+    --gold:#E8A33D; --coral:#FF7A5C; --violet:#9C8CF0; --teal:#4FD1C5; --green:#6FCF97;
+    --focus:#FFD166; --radius:14px; --sidebar-w:224px;
+  }
+  [data-motion="reduced"] *{ animation-duration:0.001s !important; transition-duration:0.001s !important; }
+  [data-contrast="high"]{
+    --bg:#000; --panel:#0A0A0A; --panel-edge:#FFF; --text:#FFF; --muted:#DDD;
+    --gold:#FFC94A; --coral:#FF9478; --violet:#C2B4FF; --teal:#7BEFE2; --green:#8BEFAE;
+  }
+  [data-textsize="lg"]{ font-size:112%; } [data-textsize="xl"]{ font-size:126%; }
 
-        /* --- 3D CANVAS LAYER --- */
-        #canvas-container { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
-        #svg-layer { position: absolute; top: -5000px; left: -5000px; width: 10000px; height: 10000px; pointer-events: none; z-index: 2; }
-        .stellar-path { fill: none; stroke-width: 1.5; stroke-linecap: round; filter: drop-shadow(0 0 6px currentColor); transition: d 1s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{ background:var(--bg); color:var(--text); font-family:'Atkinson Hyperlegible',system-ui,sans-serif; min-height:100vh; }
+  h1,h2,h3,.display{ font-family:'Space Grotesk',sans-serif; }
+  .mono{ font-family:'IBM Plex Mono',monospace; }
+  button{ cursor:pointer; background:none; border:none; color:inherit; font-family:inherit; }
+  :focus-visible{ outline:3px solid var(--focus); outline-offset:2px; border-radius:4px; }
+  .sr-only{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); }
+  .skip-link{ position:absolute; left:-999px; top:0; background:var(--gold); color:#0B0F1A; padding:10px 16px; z-index:999; font-weight:700; }
+  .skip-link:focus{ left:0; }
 
-        #dom-matrix { position: absolute; top: 50vh; left: 50vw; transform-style: preserve-3d; will-change: transform; z-index: 5; }
+  /* ============ SHELL ============ */
+  .app-shell{ display:flex; min-height:100vh; }
 
-        /* --- 3D NODES --- */
-        .os-node {
-            position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            transform: translate(-50%, -50%); pointer-events: auto; cursor: pointer;
-            border-radius: 50%; background: rgba(10, 15, 25, 0.85); border: 2px solid currentColor;
-            backdrop-filter: blur(10px); outline: none;
-            transition: transform 1s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-        }
-        .os-node:hover, .os-node:focus-visible { background: currentColor !important; color: #000 !important; box-shadow: 0 0 40px currentColor; z-index: 100; transform: translate(-50%, -50%) scale(1.25) !important; }
-        .node-icon { font-size: clamp(24px, 5vw, 36px); filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); transition: 0.3s; }
-        .os-node:hover .node-icon { transform: scale(1.1); }
-        .node-label { font-family: 'Space Grotesk'; font-size: 10px; font-weight: bold; margin-top: 6px; text-transform: uppercase; letter-spacing: 1px; color: #fff; text-shadow: 0 2px 4px #000; pointer-events: none; white-space: nowrap;}
-        .os-node:hover .node-label { color: #000; text-shadow: none; }
+  .sidebar{
+    width: var(--sidebar-w); flex-shrink:0; background:var(--panel);
+    border-right:1px solid var(--panel-edge); display:flex; flex-direction:column;
+    padding: 18px 14px; gap: 18px; position:sticky; top:0; height:100vh;
+  }
+  .wordmark{ font-size:1.25rem; font-weight:700; padding:0 6px; }
+  .wordmark .dot{ color:var(--gold); }
+  .evod-nav{ display:flex; flex-direction:column; gap:4px; }
+  .nav-item{
+    display:flex; align-items:center; gap:10px; text-align:left;
+    padding:11px 12px; border-radius:10px; font-weight:700; font-size:0.92rem;
+    color:var(--muted); min-height:44px;
+  }
+  .nav-item .n{
+    width:22px; height:22px; border-radius:50%; background:var(--panel-edge); color:var(--text);
+    display:flex; align-items:center; justify-content:center; font-family:'IBM Plex Mono',monospace; font-size:0.7rem; flex-shrink:0;
+  }
+  .nav-item:hover{ background: rgba(255,255,255,0.04); }
+  .nav-item.active{ color:var(--text); background: rgba(232,163,61,0.12); }
+  .nav-item.active .n{ background:var(--gold); color:#0B0F1A; }
+  .nav-item.done .n{ background:var(--green); color:#0B0F1A; }
+  .sidebar-bottom{ margin-top:auto; display:flex; flex-direction:column; gap:8px; }
+  .access-btn{
+    display:flex; align-items:center; gap:8px; padding:10px 12px; border-radius:10px;
+    border:1.5px solid var(--teal); font-size:0.85rem; font-weight:700; min-height:44px;
+  }
 
-        /* --- UI OVERLAYS --- */
-        .ui-layer { position: absolute; inset: 0; z-index: 100; pointer-events: none; display: flex; flex-direction: column; justify-content: space-between; }
-        .interactive { pointer-events: auto; }
+  .sidebar-toggle{ display:none; }
+  @media (max-width: 760px){
+    .sidebar{ position:fixed; z-index:90; left:0; transform: translateX(-100%); transition: transform 0.25s; box-shadow: 20px 0 40px rgba(0,0,0,0.4); }
+    .sidebar.open{ transform: translateX(0); }
+    .sidebar-toggle{ display:flex; align-items:center; gap:8px; min-height:44px; padding:8px 14px; border:1.5px solid var(--panel-edge); border-radius:10px; font-weight:700; }
+  }
 
-        /* --- TOP SEARCH & VOICE --- */
-        .top-bar { padding: 20px; display: flex; justify-content: center; width: 100%; transition: 0.5s; z-index: 110; }
-        .search-box {
-            width: 100%; max-width: 600px; display: flex; align-items: center;
-            background: var(--surface); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--border); border-radius: 40px;
-            padding: 12px 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); transition: 0.3s;
-        }
-        .search-box:focus-within { border-color: var(--accent); box-shadow: 0 0 30px rgba(56, 189, 248, 0.4); background: rgba(15, 23, 42, 0.95); transform: translateY(-2px); }
-        .search-input { flex: 1; background: transparent; border: none; color: #fff; font-family: 'Inter'; font-size: 1.1rem; outline: none; margin: 0 12px; }
-        
-        .voice-btn { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: #fff; cursor: pointer; transition: 0.3s; flex-shrink: 0; }
-        .voice-btn:hover { background: rgba(255,255,255,0.15); color: var(--accent); }
-        .voice-btn.recording { background: rgba(244, 63, 94, 0.2); color: var(--rose); border-color: var(--rose); animation: pulseRecord 1.5s infinite; }
-        @keyframes pulseRecord { 0% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.4); } 70% { box-shadow: 0 0 0 15px rgba(244, 63, 94, 0); } 100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); } }
+  main{ flex:1; min-width:0; padding: 20px 26px 60px; max-width: 980px; }
 
-        /* --- DYNAMIC SYMBOL RIBBON (The Evolution) --- */
-        .symbol-ribbon-wrapper {
-            position: absolute; bottom: 90px; left: 0; right: 0;
-            padding: 20px 0; overflow: hidden;
-            display: flex; flex-direction: column; align-items: center;
-        }
-        .ribbon-title { font-family: 'Space Grotesk'; font-size: 10px; color: var(--emerald); text-transform: uppercase; letter-spacing: 3px; font-weight: bold; margin-bottom: 12px; text-shadow: 0 2px 4px #000; }
-        
-        .symbol-ribbon {
-            display: flex; gap: 16px; overflow-x: auto; padding: 10px 40px;
-            width: 100%; scrollbar-width: none; -ms-overflow-style: none; scroll-behavior: smooth;
-            align-items: center; justify-content: center;
-        }
-        .symbol-ribbon::-webkit-scrollbar { display: none; }
-        
-        .ribbon-node {
-            flex-shrink: 0; width: 64px; height: 64px; border-radius: 50%;
-            background: rgba(10, 15, 25, 0.8); border: 2px solid;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            cursor: pointer; backdrop-filter: blur(10px); transition: 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.5); opacity: 0; transform: translateY(20px) scale(0.8);
-        }
-        .ribbon-node.visible { opacity: 1; transform: translateY(0) scale(1); }
-        .ribbon-node:hover { transform: translateY(-10px) scale(1.2); z-index: 10; box-shadow: 0 15px 30px currentColor; background: currentColor; color: #000 !important; }
-        .ribbon-node .r-icon { font-size: 26px; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.6)); }
-        .ribbon-node .r-label { position: absolute; bottom: -24px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #fff; text-shadow: 0 2px 4px #000; white-space: nowrap; opacity: 0; transition: 0.3s; }
-        .ribbon-node:hover .r-label { opacity: 1; bottom: -28px; }
+  /* ============ TOPBAR: small cosmos accent, decoupled from content ============ */
+  .topbar{ display:flex; align-items:center; gap:16px; margin-bottom: 18px; }
+  #cosmos{ width:96px; height:96px; flex-shrink:0; border-radius:50%; }
+  .topbar-copy h1{ font-size:1.3rem; margin:0 0 2px; }
+  .topbar-copy p{ margin:0; color:var(--muted); font-size:0.85rem; }
 
-        /* --- THE JOURNEY BAR (Bottom) --- */
-        .journey-wrapper {
-            position: fixed; bottom: 0; left: 0; right: 0;
-            background: rgba(3, 5, 8, 0.95); backdrop-filter: blur(20px); border-top: 1px solid var(--border);
-            padding: 16px 24px; display: flex; align-items: center; justify-content: center; z-index: 200;
-        }
-        .flow-track {
-            display: flex; align-items: center; gap: 8px; overflow-x: auto; scrollbar-width: none; max-width: 1000px; width: 100%;
-        }
-        .flow-track::-webkit-scrollbar { display: none; }
-        .flow-step {
-            font-family: 'Space Grotesk'; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
-            color: #64748b; padding: 8px 16px; border-radius: 20px; transition: 0.3s; cursor: pointer; white-space: nowrap;
-            border: 1px solid transparent; background: transparent;
-        }
-        .flow-step:hover { color: #e2e8f0; background: rgba(255,255,255,0.05); }
-        .flow-step.active { color: var(--emerald); background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.3); box-shadow: 0 0 15px rgba(16, 185, 129, 0.2); }
-        .flow-arrow { color: #334155; font-size: 14px; font-weight: bold; }
+  .panel{ display:none; }
+  .panel.active{ display:block; }
+  .panel h2{ font-size:1.15rem; margin:0 0 4px; }
+  .panel .lede{ color:var(--muted); font-size:0.88rem; margin: 0 0 16px; }
 
-        /* --- 6D COSMIC DRILL-DOWN PANEL --- */
-        .cosmic-panel {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: rgba(10, 15, 25, 0.98); backdrop-filter: blur(30px);
-            border: 1px solid var(--border); border-radius: 32px; padding: 40px;
-            max-width: 800px; width: 92%; max-height: 85vh; overflow-y: auto;
-            z-index: 300; display: none; opacity: 0; box-shadow: 0 30px 80px rgba(0,0,0,0.9);
-        }
-        .cosmic-panel.active { display: block; animation: panelIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
-        @keyframes panelIn { from { opacity: 0; transform: translate(-50%, -45%) scale(0.95); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
-        
-        .cp-header { text-align: center; margin-bottom: 2rem; position: relative; }
-        .cp-icon { font-size: 5rem; filter: drop-shadow(0 0 30px rgba(56,189,248,0.5)); margin-bottom: 10px; }
-        .cp-title { font-family: 'Space Grotesk'; font-size: 2.5rem; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: 2px; }
-        .cp-subtitle { font-size: 0.9rem; color: var(--accent); letter-spacing: 4px; text-transform: uppercase; font-weight: 600; margin-top: 5px; }
-        
-        .res-badges { display: flex; justify-content: center; gap: 12px; margin-top: 15px; }
-        .badge { padding: 6px 16px; border-radius: 30px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 6px; }
-        .badge.phase { background: rgba(245, 158, 11, 0.1); color: var(--gold); border: 1px solid rgba(245, 158, 11, 0.3); }
-        .badge.disc { background: rgba(167, 139, 250, 0.1); color: var(--purple); border: 1px solid rgba(167, 139, 250, 0.3); }
+  /* ============ WORD ORBIT (kept, compact) ============ */
+  .word-orbit{ display:flex; flex-wrap:wrap; gap:10px; margin: 0 0 18px; }
+  .word-item{
+    font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:1rem;
+    padding:8px 14px; border-radius:10px; border:2px solid var(--panel-edge); background:var(--panel); min-height:40px;
+  }
+  .word-item .wb{ opacity:0.85; }
 
-        .discipline-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 2rem; }
-        .discipline-card { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 20px; transition: 0.3s; border-left: 3px solid var(--c); }
-        .discipline-card:hover { transform: translateY(-4px); background: rgba(255,255,255,0.05); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
-        .d-header { display: flex; align-items: center; gap: 8px; font-family: 'Space Grotesk'; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--c); margin-bottom: 12px; }
-        .d-concept { font-size: 14px; color: #e2e8f0; line-height: 1.6; }
+  /* ============ TABS + SEARCH ============ */
+  .controls-row{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:14px; }
+  .tabs{ display:flex; gap:6px; flex-wrap:wrap; }
+  .tab{ padding:7px 14px; border-radius:999px; border:2px solid var(--panel-edge); background:var(--panel); font-weight:700; font-size:0.82rem; min-height:36px; }
+  .tab.active{ border-color:var(--gold); background:rgba(232,163,61,0.12); }
+  .search-wrap{ display:flex; align-items:center; gap:6px; background:var(--panel); border:2px solid var(--panel-edge); border-radius:999px; padding:5px 8px 5px 14px; flex:1; min-width:180px; max-width:280px; }
+  .search-wrap input{ flex:1; background:transparent; border:none; color:var(--text); font-size:0.85rem; min-height:30px; outline:none; }
+  .mic-btn{ min-width:32px; min-height:32px; border-radius:50%; border:1.5px solid var(--panel-edge); }
+  .mic-btn.listening{ border-color:var(--coral); }
 
-        .close-btn { position: absolute; top: 24px; right: 24px; width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; font-size: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
-        .close-btn:hover { background: rgba(244,63,94,0.2); color: var(--rose); border-color: var(--rose); transform: rotate(90deg); }
+  /* ============ WIKI PREVIEW CARDS ============ */
+  .card-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:12px; }
+  .preview-card{ background:var(--panel); border:2px solid var(--panel-edge); border-radius:var(--radius); padding:14px; display:flex; flex-direction:column; gap:6px; text-align:left; width:100%; }
+  .preview-card:hover{ border-color:var(--gold); }
+  .preview-card .row1{ display:flex; align-items:center; gap:8px; }
+  .preview-card .glyph{ font-size:1.3rem; }
+  .preview-card h3{ margin:0; font-size:0.98rem; }
+  .preview-card .extract{ margin:0; font-size:0.82rem; color:var(--muted); line-height:1.4; }
+  .preview-card .wiki-link{ font-size:0.76rem; color:var(--teal); font-weight:700; margin-top:2px; }
 
-        /* --- TOAST --- */
-        #toast-container { position: fixed; top: 30px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
-        .toast { background: rgba(16, 185, 129, 0.95); color: #fff; padding: 12px 24px; border-radius: 30px; font-weight: bold; font-family: 'Space Grotesk'; font-size: 13px; letter-spacing: 1px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); animation: slideDown 0.3s ease forwards; display: flex; align-items: center; gap: 10px; backdrop-filter: blur(10px);}
-        @keyframes slideDown { from { transform: translateY(-20px) scale(0.9); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
+  /* ============ VIEWER (slide-over) ============ */
+  .viewer-overlay{ position:fixed; inset:0; background:rgba(5,7,12,0.6); z-index:80; display:none; }
+  .viewer-overlay.open{ display:block; }
+  .viewer{
+    position:fixed; top:0; right:0; height:100vh; width:min(380px,92vw); background:var(--panel);
+    border-left:1px solid var(--panel-edge); z-index:90; padding:22px; overflow-y:auto;
+    transform: translateX(100%); transition: transform 0.25s;
+  }
+  .viewer.open{ transform:translateX(0); }
+  .viewer-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
+  .viewer .glyph-big{ font-size:2rem; }
+  .viewer h2{ font-size:1.2rem; margin:8px 0 4px; }
+  .viewer .status-pill{ display:inline-block; font-size:0.72rem; font-weight:700; padding:3px 9px; border-radius:999px; border:1.5px solid currentColor; margin-bottom:8px; }
+  .viewer p.extract{ font-size:0.9rem; line-height:1.5; color:var(--text); }
+  .viewer-actions{ display:flex; flex-direction:column; gap:8px; margin-top:14px; }
+  .viewer-btn{ display:flex; align-items:center; gap:8px; padding:11px 14px; border-radius:10px; border:2px solid var(--teal); font-weight:700; font-size:0.86rem; text-decoration:none; min-height:44px; justify-content:center; }
+  .viewer-btn.primary{ border-color:var(--gold); background:rgba(232,163,61,0.1); }
+  .close-viewer{ min-width:40px; min-height:40px; border-radius:50%; border:2px solid var(--panel-edge); }
 
-        /* --- LOADER --- */
-        #ai-loader { position: fixed; inset: 0; background: rgba(1, 2, 4, 0.85); z-index: 5000; display: none; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
-        .spinner { width: 60px; height: 60px; border: 4px solid rgba(56, 189, 248, 0.1); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .loading-text { margin-top: 24px; font-family: 'Space Grotesk'; color: var(--accent); letter-spacing: 4px; text-transform: uppercase; font-size: 14px; font-weight: bold; }
-    </style>
+  /* ============ EXPERIENCE / COLLABORATE / CONTRIBUTE lists ============ */
+  .simple-list{ display:flex; flex-direction:column; gap:10px; }
+  .simple-item{ background:var(--panel); border:2px solid var(--panel-edge); border-radius:12px; padding:14px; display:flex; gap:12px; align-items:flex-start; }
+  .simple-item input[type="checkbox"]{ width:20px; height:20px; margin-top:2px; flex-shrink:0; }
+  .simple-item .t{ font-weight:700; font-size:0.92rem; margin-bottom:2px; }
+  .simple-item .d{ font-size:0.84rem; color:var(--muted); }
+  .simple-item.done .t{ text-decoration: line-through; color:var(--muted); }
+
+  .connect-row{ display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+  .connect-row .from{ font-weight:700; font-size:0.9rem; min-width:110px; }
+  .chip{ font-size:0.78rem; padding:5px 11px; border-radius:999px; border:1.5px solid var(--violet); color:var(--violet); }
+
+  .contribute-item{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .contribute-btn{ display:flex; align-items:center; gap:6px; padding:9px 14px; border-radius:999px; border:2px solid var(--green); font-weight:700; font-size:0.82rem; text-decoration:none; min-height:40px; }
+
+  /* ============ EVOLVE ============ */
+  .progress-ring{ display:flex; align-items:center; gap:16px; margin-bottom: 14px; }
+  .ring-num{ font-family:'Space Grotesk'; font-size:2.4rem; font-weight:700; color:var(--gold); }
+  .ring-label{ color:var(--muted); font-size:0.85rem; }
+
+  /* ============ ACCESS PANEL ============ */
+  .access-panel{ position:fixed; bottom:70px; left:14px; z-index:95; background:var(--panel); border:2px solid var(--panel-edge); border-radius:var(--radius); padding:16px; width:260px; display:none; flex-direction:column; gap:12px; }
+  .access-panel.open{ display:flex; }
+  .access-row{ display:flex; align-items:center; justify-content:space-between; gap:8px; font-size:0.85rem; }
+  .access-row span{ font-weight:700; }
+  .seg{ display:flex; border:2px solid var(--panel-edge); border-radius:999px; overflow:hidden; }
+  .seg button{ padding:6px 10px; font-size:0.78rem; min-height:32px; }
+  .seg button[aria-pressed="true"]{ background:var(--gold); color:#0B0F1A; font-weight:700; }
+</style>
 </head>
-<body>
+<body data-motion="full" data-contrast="normal" data-textsize="base">
+<a href="#main" class="skip-link">Skip to main content</a>
 
-<!-- 1. THE 3D VOID -->
-<div id="canvas-container"></div>
-<div id="dom-matrix"><svg id="svg-layer"></svg></div>
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="wordmark">Khel<span class="dot">·</span>o</div>
+    <nav class="evod-nav" aria-label="Your path through Khel·o">
+      <button class="nav-item active" data-panel="discover"><span class="n">1</span> Discover</button>
+      <button class="nav-item" data-panel="learn"><span class="n">2</span> Learn</button>
+      <button class="nav-item" data-panel="experience"><span class="n">3</span> Experience</button>
+      <button class="nav-item" data-panel="collaborate"><span class="n">4</span> Collaborate</button>
+      <button class="nav-item" data-panel="contribute"><span class="n">5</span> Contribute</button>
+      <button class="nav-item" data-panel="evolve"><span class="n">6</span> Evolve</button>
+    </nav>
+    <div class="sidebar-bottom">
+      <button class="access-btn" id="accessToggle" aria-expanded="false" aria-controls="accessPanel">◐ Access</button>
+    </div>
+  </aside>
 
-<!-- 2. THE UI OVERLAY -->
-<div class="ui-layer">
-    
-    <!-- Top Search & Voice -->
-    <div class="top-bar interactive">
-        <div class="search-box">
-            <span class="material-symbols-rounded text-sky-400">auto_awesome</span>
-            <input type="text" id="omni-input" class="search-input" placeholder="What shall we explore today?" autocomplete="off">
-            <button class="voice-btn" id="voice-btn" onclick="SystemCore.toggleVoice()" title="Voice Search">
-                <span class="material-symbols-rounded">mic</span>
-            </button>
-            <span class="material-symbols-rounded text-slate-400 hover:text-sky-400 cursor-pointer ml-3 transition-colors" onclick="SemanticEngine.processQuery()" title="Synthesize">search</span>
+  <main id="main">
+    <button class="sidebar-toggle" id="sidebarToggle" aria-expanded="false" aria-controls="sidebar">☰ Menu</button>
+
+    <div class="topbar">
+      <canvas id="cosmos" aria-hidden="true"></canvas>
+      <div class="topbar-copy">
+        <h1>Khel·o</h1>
+        <p>Wonder first. Explore next.</p>
+      </div>
+    </div>
+
+    <!-- 1 DISCOVER -->
+    <section class="panel active" id="panel-discover" aria-labelledby="h-discover">
+      <h2 id="h-discover">Discover</h2>
+      <p class="lede">Tap a word. Tap a world.</p>
+      <div class="word-orbit" id="wordOrbit">
+        <button class="word-item" data-word="khel.o" data-a="KHEL" data-b=".O" data-ca="var(--teal)" data-cb="var(--gold)"
+          data-meaning="KHEL = play (Hindi). +.O turns it into a name.">
+          <span class="wa"></span><span class="wb"></span>
+        </button>
+        <button class="word-item" data-word="dis-play" data-a="DIS" data-b="PLAY" data-ca="var(--muted)" data-cb="var(--coral)"
+          data-meaning="Say it slow: dis-PLAY. PLAY was hiding inside.">
+          <span class="wa"></span><span class="wb"></span>
+        </button>
+        <button class="word-item" data-word="bac.he" data-a="BAC" data-b=".HE" data-ca="var(--violet)" data-cb="var(--green)"
+          data-meaning="Close to “bachche” — Hindi for children. Rhymes with khel·o." title="Our best guess — tell us if you meant something else">
+          <span class="wa"></span><span class="wb"></span>
+        </button>
+      </div>
+      <div class="controls-row">
+        <div class="tabs" role="tablist" aria-label="Filter worlds">
+          <button class="tab active" role="tab" aria-selected="true" data-filter="all">All</button>
+          <button class="tab" role="tab" aria-selected="false" data-filter="species">🐘 Living</button>
+          <button class="tab" role="tab" aria-selected="false" data-filter="knowledge">✦ Ideas</button>
         </div>
-    </div>
-
-    <!-- The Dynamic Symbol Ribbon (The Evolution) -->
-    <div class="symbol-ribbon-wrapper interactive">
-        <div class="ribbon-title" id="ribbon-title">Contextual Awareness</div>
-        <div class="symbol-ribbon" id="symbol-ribbon">
-            <!-- Dynamic nodes injected here -->
+        <div class="search-wrap">
+          <label for="worldSearch" class="sr-only">Search worlds</label>
+          <span aria-hidden="true">🔎</span>
+          <input type="search" id="worldSearch" placeholder="Search…" autocomplete="off">
+          <button class="mic-btn" id="micBtn" type="button" aria-label="Search by voice">🎙️</button>
         </div>
-    </div>
-</div>
+      </div>
+      <div class="card-grid" id="worldGrid"></div>
+    </section>
 
-<!-- 3. THE JOURNEY BAR (Bottom) -->
-<div class="journey-wrapper interactive">
-    <div class="flow-track" id="journey-track">
-        <!-- Stages injected via JS -->
-    </div>
-</div>
-
-<!-- 4. THE 6D COSMIC DRILL-DOWN PANEL -->
-<div class="cosmic-panel interactive" id="cosmic-panel">
-    <button class="close-btn" onclick="UIController.closeCosmicPanel()">✕</button>
-    <div class="cp-header">
-        <div id="cp-icon" class="cp-icon">✨</div>
-        <div id="cp-title" class="cp-title">Concept</div>
-        <div class="cp-subtitle">6D Ontological Drill-Down</div>
-        <div class="res-badges">
-            <div class="badge phase"><span class="material-symbols-rounded" id="cp-phase-icon">child_care</span> <span id="cp-phase">Phase</span></div>
-            <div class="badge disc"><span class="material-symbols-rounded" id="cp-disc-icon">psychology</span> <span id="cp-disc">Discipline</span></div>
+    <!-- 2 LEARN -->
+    <section class="panel" id="panel-learn" aria-labelledby="h-learn">
+      <h2 id="h-learn">Learn</h2>
+      <p class="lede">Search anything. Real results from MediaWiki.</p>
+      <div class="controls-row">
+        <div class="search-wrap" style="max-width:420px;">
+          <label for="wikiSearch" class="sr-only">Search MediaWiki</label>
+          <span aria-hidden="true">🔎</span>
+          <input type="search" id="wikiSearch" placeholder="Search anything…" autocomplete="off">
+          <button class="mic-btn" id="wikiMicBtn" type="button" aria-label="Search by voice">🎙️</button>
         </div>
-        <p id="cp-summary" class="mt-6 text-slate-300 text-sm leading-relaxed max-w-2xl mx-auto"></p>
-    </div>
-    <div class="discipline-grid" id="cp-grid">
-        <!-- 6D cards injected here -->
-    </div>
+      </div>
+      <div id="wikiResults" class="simple-list" style="margin-bottom:18px;"></div>
+      <p class="lede" style="margin-top:0;">Or start with a curated world:</p>
+      <div class="card-grid" id="learnGrid"></div>
+    </section>
+
+    <!-- 3 EXPERIENCE -->
+    <section class="panel" id="panel-experience" aria-labelledby="h-experience">
+      <h2 id="h-experience">Experience</h2>
+      <p class="lede">Go do it. Check it off.</p>
+      <div class="simple-list" id="experienceList"></div>
+    </section>
+
+    <!-- 4 COLLABORATE -->
+    <section class="panel" id="panel-collaborate" aria-labelledby="h-collaborate">
+      <h2 id="h-collaborate">Collaborate</h2>
+      <p class="lede">The Wonder Graph — how worlds connect.</p>
+      <div class="simple-list" id="graphList"></div>
+    </section>
+
+    <!-- 5 CONTRIBUTE -->
+    <section class="panel" id="panel-contribute" aria-labelledby="h-contribute">
+      <h2 id="h-contribute">Contribute</h2>
+      <p class="lede">Add what you notice to the wiki.</p>
+      <div class="simple-list" id="contributeList"></div>
+    </section>
+
+    <!-- 6 EVOLVE -->
+    <section class="panel" id="panel-evolve" aria-labelledby="h-evolve">
+      <h2 id="h-evolve">Evolve</h2>
+      <div class="progress-ring">
+        <div class="ring-num" id="evolveCount">0</div>
+        <div class="ring-label">things learned</div>
+      </div>
+      <p class="lede" id="evolveMsg">Keep discovering — every page you open moves this forward.</p>
+    </section>
+  </main>
 </div>
 
-<!-- Loader -->
-<div id="ai-loader">
-    <div class="spinner"></div>
-    <div class="loading-text" id="loader-msg">Mapping Universe...</div>
+<div class="viewer-overlay" id="viewerOverlay">
+  <div class="viewer" id="viewer" role="dialog" aria-modal="true" aria-labelledby="viewerTitle">
+    <div class="viewer-top">
+      <div>
+        <div class="glyph-big" id="viewerGlyph"></div>
+        <h2 id="viewerTitle"></h2>
+      </div>
+      <button class="close-viewer" id="closeViewer" aria-label="Close">✕</button>
+    </div>
+    <div id="viewerStatus"></div>
+    <p class="extract" id="viewerExtract"></p>
+    <div class="viewer-actions">
+      <a class="viewer-btn primary" id="viewerWikiLink" href="#" target="_blank" rel="noopener">📖 Open the Wiki page ↗</a>
+      <button class="viewer-btn" id="viewerReadAloud">🔊 Read aloud</button>
+    </div>
+  </div>
 </div>
 
-<!-- Toasts -->
-<div id="toast-container"></div>
+<div class="access-panel" id="accessPanel" role="dialog" aria-label="Access and comfort settings">
+  <div class="access-row"><span>Motion</span>
+    <div class="seg" role="group" aria-label="Motion"><button data-set="motion" data-val="full" aria-pressed="true">Full</button><button data-set="motion" data-val="reduced" aria-pressed="false">Reduced</button></div>
+  </div>
+  <div class="access-row"><span>Contrast</span>
+    <div class="seg" role="group" aria-label="Contrast"><button data-set="contrast" data-val="normal" aria-pressed="true">Normal</button><button data-set="contrast" data-val="high" aria-pressed="false">High</button></div>
+  </div>
+  <div class="access-row"><span>Text size</span>
+    <div class="seg" role="group" aria-label="Text size"><button data-set="textsize" data-val="base" aria-pressed="true">A</button><button data-set="textsize" data-val="lg" aria-pressed="false">A+</button><button data-set="textsize" data-val="xl" aria-pressed="false">A++</button></div>
+  </div>
+  <div class="access-row"><span>Read aloud</span>
+    <div class="seg" role="group" aria-label="Read aloud"><button data-set="speak" data-val="off" aria-pressed="true">Off</button><button data-set="speak" data-val="on" aria-pressed="false">On</button></div>
+  </div>
+</div>
 
 <script>
-/**
- * */
-const SystemCore = {
-    recognition: null,
-    isRecording: false,
+const NODES = [
+  { id:'elephant', kind:'species', glyph:'🐘', title:'Asian Elephant', status:'Endangered', statusColor:'var(--coral)',
+    extract:'Elephants recognize themselves in a mirror and comfort each other by touching trunks.',
+    tryIt:'Ask a grown-up to take you to a zoo or sanctuary and watch how elephants use their trunks.',
+    links:['Empathy in animals','Grasslands','Memory & cognition'] },
+  { id:'coral', kind:'species', glyph:'🪸', title:'Coral Reef', status:'Threatened', statusColor:'var(--coral)',
+    extract:'A reef is thousands of tiny animals sharing one skeleton — home to a quarter of ocean life.',
+    tryIt:'Ask to visit an aquarium and find the tank with the most colors.',
+    links:['Ocean ecosystems','Symbiosis','Climate & warming seas'] },
+  { id:'leopard', kind:'species', glyph:'🐆', title:'Snow Leopard', status:'Vulnerable', statusColor:'var(--gold)',
+    extract:'Can leap 15 meters — about three cars long — to cross mountain gaps while hunting.',
+    tryIt:'Go outside and pace out 15 meters. That whole distance, in one jump.',
+    links:['Mountain habitats','Camouflage','Big cats'] },
+  { id:'octopus', kind:'species', glyph:'🐙', title:'Octopus', status:'Stable', statusColor:'var(--green)',
+    extract:'Three hearts, blue blood, and skin that changes color and texture in under a second.',
+    tryIt:'Ask to visit an aquarium\'s octopus tank — watch how still, then how fast, it moves.',
+    links:['Camouflage','Ocean ecosystems','Problem-solving minds'] },
+  { id:'math', kind:'knowledge', glyph:'∞', title:'The Fibonacci Spiral', status:null,
+    extract:'A number pattern in sunflower seeds, pinecones, and galaxy arms — the same math, everywhere.',
+    tryIt:'Go find a pinecone or a pineapple nearby and count its spiral rows.',
+    links:['Patterns in nature','Spirals','Sunflowers'] },
+  { id:'ocean', kind:'knowledge', glyph:'🌊', title:'The Deep Ocean', status:null,
+    extract:'We have better maps of Mars than of our own ocean floor.',
+    tryIt:'Ask a grown-up to visit a beach, lake, or aquarium with you this month.',
+    links:['Ocean ecosystems','Exploration','Coral Reef'] },
+  { id:'space', kind:'knowledge', glyph:'✦', title:'Starlight', status:null,
+    extract:'Starlight you see tonight may have left its star thousands of years ago.',
+    tryIt:'Go outside tonight, pick a star, and ask a grown-up to help you find its age.',
+    links:['Time & distance','Galaxies','The Fibonacci Spiral'] },
+  { id:'ants', kind:'species', glyph:'🐜', title:'Leafcutter Ants', status:'Stable', statusColor:'var(--green)',
+    extract:'They farm fungus underground — one of the only non-human farmers on Earth.',
+    tryIt:'Go outside and find a real ant trail — follow it and see where it leads.',
+    links:['Farming','Colonies','Teamwork'] },
+];
 
-    init() {
-        // Setup Voice Recognition if available
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (SpeechRecognition) {
-            this.recognition = new SpeechRecognition();
-            this.recognition.continuous = false;
-            this.recognition.interimResults = false;
-            this.recognition.lang = 'en-US';
+let evodProgress = 1, speakEnabled = false, currentFilter = 'all', currentSearch = '';
 
-            this.recognition.onstart = () => {
-                this.isRecording = true;
-                document.getElementById('voice-btn').classList.add('recording');
-                this.showToast("Listening...", "mic");
-                this.vibrate([20, 50, 20]);
-            };
-
-            this.recognition.onresult = (e) => {
-                const transcript = e.results[0][0].transcript;
-                document.getElementById('omni-input').value = transcript;
-                SemanticEngine.processQuery(transcript);
-            };
-
-            this.recognition.onerror = (e) => {
-                this.showToast("Voice error: " + e.error, "error");
-                this.stopVoice();
-            };
-
-            this.recognition.onend = () => this.stopVoice();
-        }
-    },
-
-    toggleVoice() {
-        if (!this.recognition) return this.showToast("Voice not supported", "error");
-        if (this.isRecording) {
-            this.recognition.stop();
-        } else {
-            this.recognition.start();
-        }
-    },
-
-    stopVoice() {
-        this.isRecording = false;
-        document.getElementById('voice-btn').classList.remove('recording');
-    },
-
-    vibrate(pattern = 15) {
-        if (navigator.vibrate) navigator.vibrate(pattern);
-    },
-
-    showToast(msg, icon = "eco") {
-        const container = document.getElementById('toast-container');
-        const toast = document.createElement('div');
-        toast.className = 'toast';
-        toast.innerHTML = `<span class="material-symbols-rounded text-emerald-400">${icon}</span> ${msg}`;
-        container.appendChild(toast);
-        setTimeout(() => {
-            toast.style.animation = 'slideDown 0.3s ease reverse forwards';
-            setTimeout(() => toast.remove(), 300);
-        }, 3000);
-    }
-};
-
-/**
- * */
-const SymbolDB = {
-    // Maps Journey stages to core semantic concepts for the Ribbon
-    journeyMap: {
-        'Discover': [
-            { id: 'd1', label: 'Space', icon: '🔭', color: '#818cf8', query: 'astronomy cosmos' },
-            { id: 'd2', label: 'Nature', icon: '🌍', color: '#10b981', query: 'nature earth environment' },
-            { id: 'd3', label: 'Questions', icon: '❓', color: '#fbbf24', query: 'philosophy inquiry' },
-            { id: 'd4', label: 'Micro', icon: '🔬', color: '#38bdf8', query: 'biology cells' }
-        ],
-        'Meet': [
-            { id: 'm1', label: 'Community', icon: '🤝', color: '#f472b6', query: 'society community' },
-            { id: 'm2', label: 'Cultures', icon: '🌍', color: '#34d399', query: 'culture anthropology' },
-            { id: 'm3', label: 'Languages', icon: '🗣️', color: '#c084fc', query: 'language linguistics' },
-            { id: 'm4', label: 'History', icon: '📜', color: '#f59e0b', query: 'history civilization' }
-        ],
-        'Learn': [
-            { id: 'l1', label: 'Math', icon: '📐', color: '#38bdf8', query: 'mathematics geometry' },
-            { id: 'l2', label: 'Physics', icon: '⚛️', color: '#fbbf24', query: 'physics energy' },
-            { id: 'l3', label: 'Biology', icon: '🧬', color: '#10b981', query: 'biology genetics' },
-            { id: 'l4', label: 'Code', icon: '💻', color: '#a78bfa', query: 'computer science code' }
-        ],
-        'Experience': [
-            { id: 'e1', label: 'Play', icon: '🏃', color: '#f43f5e', query: 'sports play movement' },
-            { id: 'e2', label: 'Music', icon: '🎵', color: '#c084fc', query: 'music sound audio' },
-            { id: 'e3', label: 'Art', icon: '🎨', color: '#fbbf24', query: 'art painting visual' },
-            { id: 'e4', label: 'Food', icon: '🍎', color: '#10b981', query: 'food nutrition cooking' }
-        ],
-        'Contribute': [
-            { id: 'c1', label: 'Volunteer', icon: '🤲', color: '#f472b6', query: 'volunteering help' },
-            { id: 'c2', label: 'Plant', icon: '🌱', color: '#10b981', query: 'planting ecology' },
-            { id: 'c3', label: 'Teach', icon: '👨‍🏫', color: '#38bdf8', query: 'teaching education' },
-            { id: 'c4', label: 'Build', icon: '🛠️', color: '#fbbf24', query: 'engineering building' }
-        ],
-        'Evolve': [
-            { id: 'ev1', label: 'Transform', icon: '🦋', color: '#c084fc', query: 'transformation evolution' },
-            { id: 'ev2', label: 'Singularity', icon: '🌀', color: '#38bdf8', query: 'singularity future' },
-            { id: 'ev3', label: 'Cosmos', icon: '🚀', color: '#f59e0b', query: 'space exploration' },
-            { id: 'ev4', label: 'Infinite', icon: '♾️', color: '#f43f5e', query: 'infinity endless' }
-        ]
-    },
-
-    // A fallback 6D generator for offline/fast mode
-    generateFallback6D(query) {
-        const icons = ['🌟','🚀','🎨','🦁','🍎','🌈','🧩','🦋','🧸','💎','🔮','🌊','🔥','⚡'];
-        const colors = ['#38bdf8', '#10b981', '#fbbf24', '#f43f5e', '#a78bfa', '#34d399'];
-        
-        return {
-            topic: query.toUpperCase(),
-            summary: `Exploring the multi-dimensional facets of ${query}.`,
-            phase: 'Youth',
-            discipline: 'Philosophy',
-            nodes: Array.from({length: 6}).map((_, i) => ({
-                id: `n_${i}`,
-                label: `Aspect ${i+1}`,
-                icon: icons[Math.floor(Math.random()*icons.length)],
-                color: colors[i % colors.length]
-            })),
-            cosmic_matrix: {
-                physics: `The kinetic and energetic state of ${query}.`,
-                biology: `The organic and cellular impact of ${query}.`,
-                psychology: `The cognitive resonance of ${query}.`,
-                sociology: `Cultural evolution surrounding ${query}.`,
-                economics: `Resource allocation and value of ${query}.`,
-                philosophy: `The existential meaning of ${query}.`
-            }
-        };
-    }
-};
-
-/**
- * */
-const VisualEngine = {
-    scene: null, camera: null, renderer: null, hub: null, svgLayer: null,
-    nodes: [], edges: [], stars: null,
-    cam: { x:0, y:0, z:0.6, rx:0, ry:0 },
-    tgt: { x:0, y:0, z:0.6, rx:0, ry:0 },
-    layout: 'galaxy', // default
-
-    init() {
-        this.scene = new THREE.Scene();
-        this.camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
-        this.camera.position.z = 50;
-
-        this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
-        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        document.getElementById('canvas-container').appendChild(this.renderer.domElement);
-
-        this.hub = document.getElementById('dom-matrix');
-        this.svgLayer = document.getElementById('svg-layer');
-
-        // Starfield
-        const geo = new THREE.BufferGeometry();
-        const pts = [];
-        for(let i=0; i<600; i++) pts.push((Math.random()-0.5)*300, (Math.random()-0.5)*300, (Math.random()-0.5)*300);
-        geo.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
-        this.stars = new THREE.Points(geo, new THREE.PointsMaterial({color: 0x38bdf8, size: 0.2, transparent: true, opacity: 0.3}));
-        this.scene.add(this.stars);
-
-        window.addEventListener('resize', () => {
-            this.camera.aspect = window.innerWidth / window.innerHeight;
-            this.camera.updateProjectionMatrix();
-            this.renderer.setSize(window.innerWidth, window.innerHeight);
-        });
-
-        this.setupGestures();
-        this.renderLoop();
-    },
-
-    clearGraph() {
-        this.nodes.forEach(n => n.el.remove());
-        this.nodes = []; this.edges = [];
-        this.svgLayer.innerHTML = '';
-        this.tgt = { x:0, y:0, z:0.6, rx:0, ry:0 }; // Reset cam
-    },
-
-    buildGraph(data, layoutType = 'galaxy') {
-        this.clearGraph();
-        this.layout = layoutType;
-
-        // Root Node
-        const root = { id: 'root', label: data.topic, icon: '☀️', color: '#ffffff' };
-        this.spawnNode(root, 0, data);
-
-        // Child Nodes
-        (data.nodes || []).forEach((n, i) => {
-            this.spawnNode(n, i + 1, data);
-            this.addEdge(0, i + 1, n.color);
-        });
-
-        this.applyLayout();
-    },
-
-    spawnNode(d, index, fullData) {
-        const el = document.createElement('div');
-        el.className = 'os-node';
-        const sz = index === 0 ? 100 : 70;
-        
-        el.style.cssText = `--x:0px; --y:0px; --z:0px; width:${sz}px; height:${sz}px; color:${d.color}; animation-delay: ${index*0.05}s;`;
-        el.innerHTML = `<div class="node-icon">${d.icon}</div><div class="node-label" style="color:${d.color}">${d.label}</div>`;
-        
-        el.onclick = (e) => {
-            e.stopPropagation();
-            SystemCore.vibrate(20);
-            
-            // Focus Camera
-            const n = this.nodes[index];
-            this.tgt.x = -n.tx; this.tgt.y = -n.ty; this.tgt.z = index === 0 ? 0.8 : 1.2;
-
-            // Open 6D Drilldown
-            UIController.openCosmicPanel(d.icon, d.label, fullData);
-        };
-
-        this.hub.appendChild(el);
-        this.nodes.push({ id: d.id, el, x:0, y:0, z:0, tx:0, ty:0, tz:0 });
-    },
-
-    addEdge(sIdx, tIdx, color) {
-        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        path.setAttribute("class", "stellar-path");
-        path.style.stroke = color;
-        path.style.strokeOpacity = 0.4;
-        this.svgLayer.appendChild(path);
-        this.edges.push({ s: sIdx, t: tIdx, el: path });
-    },
-
-    applyLayout() {
-        const total = this.nodes.length - 1;
-        if(total < 1) return;
-
-        this.nodes.forEach((n, i) => {
-            if(i === 0) { n.tx=0; n.ty=0; n.tz=0; return; }
-            let idx = i - 1;
-
-            if (this.layout === 'galaxy') {
-                // Fibonacci Spiral
-                const angle = idx * 137.508 * (Math.PI / 180);
-                const r = 100 + Math.sqrt(idx) * 40;
-                n.tx = Math.cos(angle) * r;
-                n.ty = Math.sin(angle) * r;
-                n.tz = Math.sin(idx * 0.5) * 40;
-            } else if (this.layout === 'tree') {
-                // Pyramid Hierarchical
-                const row = Math.floor(Math.sqrt(idx));
-                const col = idx - (row * row);
-                const items = row * 2 + 1;
-                n.tx = (col - Math.floor(items/2)) * 120;
-                n.ty = (row + 1) * -120 + 150;
-                n.tz = 0;
-                if(i === 1) n.ty = 250; // push first child up
-            } else if (this.layout === 'radial') {
-                // Circle
-                const angle = (idx / total) * Math.PI * 2;
-                const r = 200;
-                n.tx = Math.cos(angle) * r;
-                n.ty = Math.sin(angle) * r;
-                n.tz = (idx % 2 === 0) ? 30 : -30;
-            }
-        });
-    },
-
-    setupGestures() {
-        const mc = new Hammer.Manager(document.getElementById('canvas-container'));
-        mc.add(new Hammer.Pan({ threshold: 0 }));
-        mc.add(new Hammer.Pinch({ enable: true })).recognizeWith(mc.get('pan'));
-        mc.add(new Hammer.Tap({ event: 'doubletap', taps: 2 }));
-
-        let initZ = 1, isPan = false, lx = 0, ly = 0;
-
-        mc.on('doubletap', () => {
-            SystemCore.vibrate(20);
-            this.tgt.x = 0; this.tgt.y = 0; this.tgt.z = 0.6; this.tgt.rx = 0; this.tgt.ry = 0;
-        });
-
-        mc.on('pinchstart', () => initZ = this.tgt.z);
-        mc.on('pinch', e => this.tgt.z = Math.max(0.1, Math.min(4, initZ * e.scale)));
-
-        mc.on('panstart', e => { isPan = true; lx = e.center.x; ly = e.center.y; });
-        mc.on('panmove', e => {
-            if (!isPan) return;
-            let dx = e.center.x - lx, dy = e.center.y - ly;
-            if (e.pointers.length >= 2 || e.srcEvent.shiftKey) { 
-                this.tgt.ry += dx * 0.4; this.tgt.rx -= dy * 0.4;
-            } else { 
-                this.tgt.x += dx / this.cam.z; this.tgt.y += dy / this.cam.z;
-            }
-            lx = e.center.x; ly = e.center.y;
-        });
-        mc.on('panend pancancel', () => isPan = false);
-        window.addEventListener('wheel', e => { this.tgt.z = Math.max(0.1, Math.min(4, this.tgt.z - e.deltaY * 0.0015)); }, {passive:true});
-    },
-
-    lerp(a, b, t) { return a + (b - a) * t; },
-
-    renderLoop() {
-        // Camera Physics
-        this.cam.x = this.lerp(this.cam.x, this.tgt.x, 0.08); 
-        this.cam.y = this.lerp(this.cam.y, this.tgt.y, 0.08);
-        this.cam.z = this.lerp(this.cam.z, this.tgt.z, 0.08);
-        this.cam.rx = this.lerp(this.cam.rx, this.tgt.rx, 0.08); 
-        this.cam.ry = this.lerp(this.cam.ry, this.tgt.ry, 0.08);
-
-        this.hub.style.transform = `translate(-50%, -50%) perspective(1500px) scale(${this.cam.z}) translate3d(${this.cam.x}px, ${this.cam.y}px, 0) rotateX(${this.cam.rx}deg) rotateY(${this.cam.ry}deg)`;
-
-        // Node Physics
-        this.nodes.forEach(n => {
-            n.x = this.lerp(n.x, n.tx, 0.06); n.y = this.lerp(n.y, n.ty, 0.06); n.z = this.lerp(n.z, n.tz, 0.06);
-            n.el.style.setProperty('--x', `${n.x}px`); n.el.style.setProperty('--y', `${n.y}px`); n.el.style.setProperty('--z', `${n.z}px`);
-        });
-
-        // Edge Physics
-        this.edges.forEach(e => {
-            const sn = this.nodes[e.s]; const tn = this.nodes[e.t];
-            if(sn && tn) {
-                const mx = (sn.x + tn.x) / 2 - (tn.y - sn.y) * 0.15 + 5000; 
-                const my = (sn.y + tn.y) / 2 + (tn.x - sn.x) * 0.15 + 5000;
-                e.el.setAttribute("d", `M${sn.x + 5000} ${sn.y + 5000} Q${mx} ${my} ${tn.x + 5000} ${tn.y + 5000}`);
-            }
-        });
-
-        // Idle Rotation
-        if(Math.abs(this.tgt.ry - this.cam.ry) < 0.01 && this.nodes.length > 1) {
-            this.tgt.ry += 0.002;
-        }
-        if(this.stars) { this.stars.rotation.y += 0.0005; }
-
-        this.renderer.render(this.scene, this.camera);
-        requestAnimationFrame(() => this.renderLoop());
-    }
-};
-
-/**
- * */
-const SemanticEngine = {
-    apiKey: 'sk-2963449b94da43dba59be015fa1cd569', // DeepSeek key provided
-    
-    async processQuery(query) {
-        if(!query) query = document.getElementById('omni-input').value.trim();
-        if(!query) return;
-
-        SystemCore.vibrate(20);
-        document.getElementById('omni-input').value = ''; // clear
-        document.getElementById('omni-input').placeholder = `Synthesizing "${query}"...`;
-        
-        UIController.showLoader(`Mapping ${query}...`);
-
-        try {
-            // Using DeepSeek API to generate 6D Ontology
-            const res = await fetch('https://api.deepseek.com/v1/chat/completions', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.apiKey}` },
-                body: JSON.stringify({
-                    model: 'deepseek-chat',
-                    messages: [
-                        { role: 'system', content: `You are an Ontological Engine for Khel.o OS. Map the query into a 6D matrix. Return strict JSON:
-{
-  "topic": "string",
-  "summary": "1 engaging sentence for a kid/elder.",
-  "phase": "Childhood" | "Youth" | "Adulthood" | "Elderhood",
-  "discipline": "Physics" | "Biology" | "Psychology" | "Sociology" | "Economics" | "Philosophy",
-  "nodes": [{"id":"n1", "label":"string", "icon":"single emoji", "color":"hex color"}],
-  "cosmic_matrix": {
-    "physics": "1 short sentence", "biology": "1 short sentence", 
-    "psychology": "1 short sentence", "sociology": "1 short sentence",
-    "economics": "1 short sentence", "philosophy": "1 short sentence"
+// Learned-things tracker — uses Claude's artifact storage when available (persists across visits),
+// falls back to plain in-memory tracking for this session when opened as a normal downloaded file.
+const hasStorage = (typeof window.storage !== 'undefined');
+let learnedSet = new Set();
+async function loadLearned(){
+  if(!hasStorage) return;
+  try{ const r = await window.storage.get('khelo-learned', false); if(r) learnedSet = new Set(JSON.parse(r.value)); }
+  catch(e){ /* first run, nothing stored yet */ }
+  updateEvolve();
+}
+async function markLearned(title){
+  if(learnedSet.has(title)) return;
+  learnedSet.add(title);
+  updateEvolve();
+  if(hasStorage){
+    try{ await window.storage.set('khelo-learned', JSON.stringify([...learnedSet]), false); } catch(e){}
   }
-}` },
-                        { role: 'user', content: query }
-                    ],
-                    response_format: { type: 'json_object' }
-                })
-            });
+}
+function updateEvolve(){
+  document.getElementById('evolveCount').textContent = learnedSet.size;
+  document.getElementById('evolveMsg').textContent = learnedSet.size === 0
+    ? 'Keep discovering — every page you open moves this forward.'
+    : `You've learned about ${learnedSet.size} thing${learnedSet.size===1?'':'s'} so far. Keep going!`;
+}
 
-            if (!res.ok) throw new Error("API Limit or Network Error");
-            
-            const data = await res.json();
-            const parsedData = JSON.parse(data.choices[0].message.content);
-            
-            UIController.hideLoader();
-            VisualEngine.buildGraph(parsedData, 'galaxy');
-            document.getElementById('omni-input').placeholder = "What shall we explore today?";
-            
-            SystemCore.showToast(`Synthesized: ${query}`);
+// ============ REAL MEDIAWIKI SEARCH — searches anything, not a fixed list ============
+const WIKI_API_BASE = 'https://kids.miraheze.org/w/api.php'; // any MediaWiki install works here
+const WIKI_SITE_BASE = 'https://kids.miraheze.org/wiki/';
 
-        } catch (e) {
-            console.warn("API Failed, using Smart Fallback...", e);
-            // Fallback Generator
-            const fallbackData = SymbolDB.generateFallback6D(query);
-            UIController.hideLoader();
-            VisualEngine.buildGraph(fallbackData, 'galaxy');
-            document.getElementById('omni-input').placeholder = "What shall we explore today?";
-            SystemCore.showToast(`Local Mapping: ${query}`);
-        }
+function stripTags(html){ const d = document.createElement('div'); d.innerHTML = html; return d.textContent || ''; }
+
+async function searchWiki(query){
+  const resultsEl = document.getElementById('wikiResults');
+  if(!query){ resultsEl.innerHTML = ''; return; }
+  resultsEl.innerHTML = `<p class="lede" style="margin:0;">Searching…</p>`;
+  try{
+    const url = `${WIKI_API_BASE}?action=query&list=search&srsearch=${encodeURIComponent(query)}&srlimit=8&format=json&origin=*`;
+    const res = await fetch(url);
+    if(!res.ok) throw new Error('bad response');
+    const data = await res.json();
+    const hits = (data.query && data.query.search) || [];
+    if(hits.length === 0){
+      resultsEl.innerHTML = `<p class="lede" style="margin:0;">No results — try a different word.</p>`;
+      return;
     }
-};
+    resultsEl.innerHTML = '';
+    hits.forEach(hit => {
+      const row = document.createElement('a');
+      row.className = 'simple-item';
+      row.style.textDecoration = 'none';
+      row.style.display = 'flex';
+      row.href = WIKI_SITE_BASE + encodeURIComponent(hit.title.replace(/\s+/g,'_'));
+      row.target = '_blank'; row.rel = 'noopener';
+      row.innerHTML = `<span><span class="t">📖 ${hit.title}</span><br><span class="d">${stripTags(hit.snippet)}…</span></span>`;
+      row.addEventListener('click', () => { markLearned(hit.title); if(speakEnabled) speak(hit.title); });
+      resultsEl.appendChild(row);
+    });
+  } catch(e){
+    resultsEl.innerHTML = `<p class="lede" style="margin:0;">Search is unavailable right now — check your connection, or try the curated worlds below.</p>`;
+  }
+}
+let searchDebounce;
+document.getElementById('wikiSearch').addEventListener('input', e => {
+  clearTimeout(searchDebounce);
+  const q = e.target.value.trim();
+  searchDebounce = setTimeout(() => searchWiki(q), 400);
+});
+const wikiMicBtn = document.getElementById('wikiMicBtn');
+if(SpeechRecognitionAPIcheck()){
+  const rec2 = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+  rec2.continuous = false; rec2.interimResults = false;
+  rec2.onstart = () => wikiMicBtn.classList.add('listening');
+  rec2.onend = () => wikiMicBtn.classList.remove('listening');
+  rec2.onresult = e => { const t = e.results[0][0].transcript; document.getElementById('wikiSearch').value = t; searchWiki(t); };
+  wikiMicBtn.addEventListener('click', () => rec2.start());
+} else { wikiMicBtn.style.display = 'none'; }
+function SpeechRecognitionAPIcheck(){ return !!(window.SpeechRecognition || window.webkitSpeechRecognition); }
 
-/**
- * */
-const UIController = {
-    stages: ['Discover', 'Meet', 'Learn', 'Experience', 'Participate', 'Contribute', 'Create', 'Evolve'],
-    
-    init() {
-        this.renderJourneyBar();
-        this.setStage(0); // Default to Discover
-        
-        // Setup Enter key for search
-        document.getElementById('omni-input').addEventListener('keypress', (e) => {
-            if(e.key === 'Enter') SemanticEngine.processQuery();
-        });
-    },
+function slugFor(title){ return encodeURIComponent(title.trim().replace(/\s+/g,'_')); }
 
-    renderJourneyBar() {
-        const track = document.getElementById('journey-track');
-        let html = '';
-        this.stages.forEach((stage, i) => {
-            html += `<button class="flow-step" id="stage-${i}" onclick="UIController.setStage(${i})">${stage}</button>`;
-            if (i < this.stages.length - 1) html += `<span class="flow-arrow">→</span>`;
-        });
-        track.innerHTML = html;
-    },
+function matchesFilter(n){
+  const f = currentFilter === 'all' || n.kind === currentFilter;
+  const s = !currentSearch || n.title.toLowerCase().includes(currentSearch.toLowerCase());
+  return f && s;
+}
 
-    setStage(index) {
-        SystemCore.vibrate(10);
-        document.querySelectorAll('.flow-step').forEach(el => el.classList.remove('active'));
-        document.getElementById(`stage-${index}`).classList.add('active');
-        
-        const stageName = this.stages[index];
-        document.getElementById('ribbon-title').innerText = `${stageName} Sequence`;
+function previewCardHTML(n, compact){
+  return `<span class="row1"><span class="glyph" aria-hidden="true">${n.glyph}</span><h3>${n.title}</h3></span>
+    <p class="extract">${n.extract}</p>
+    <span class="wiki-link">📖 kids.miraheze.org ↗</span>`;
+}
 
-        // Update Dynamic Ribbon
-        const symbols = SymbolDB.journeyMap[stageName] || SymbolDB.journeyMap['Experience'];
-        this.renderRibbon(symbols, stageName);
-        
-        // Alter 3D Layout based on stage to show visual morphing
-        if(index < 3) VisualEngine.layout = 'galaxy';
-        else if (index < 6) VisualEngine.layout = 'tree';
-        else VisualEngine.layout = 'radial';
-        
-        if(VisualEngine.nodes.length > 0) VisualEngine.applyLayout();
-    },
+function renderDiscoverGrid(){
+  const grid = document.getElementById('worldGrid');
+  grid.innerHTML = '';
+  NODES.filter(matchesFilter).forEach(n => {
+    const btn = document.createElement('button');
+    btn.className = 'preview-card';
+    btn.innerHTML = `<span class="row1"><span class="glyph" aria-hidden="true">${n.glyph}</span><h3>${n.title}</h3></span>`;
+    btn.addEventListener('click', () => openViewer(n));
+    grid.appendChild(btn);
+  });
+}
 
-    renderRibbon(symbols, contextName) {
-        const ribbon = document.getElementById('symbol-ribbon');
-        ribbon.innerHTML = '';
-        
-        symbols.forEach((sym, i) => {
-            const el = document.createElement('div');
-            el.className = 'ribbon-node';
-            el.style.color = sym.color;
-            el.style.borderColor = sym.color;
-            el.innerHTML = `<div class="r-icon">${sym.icon}</div><div class="r-label" style="background:${sym.color}; padding:2px 8px; border-radius:10px;">${sym.label}</div>`;
-            
-            el.onclick = () => {
-                SystemCore.vibrate(15);
-                SemanticEngine.processQuery(sym.query || sym.label);
-            };
+function renderLearnGrid(){
+  const grid = document.getElementById('learnGrid');
+  grid.innerHTML = '';
+  NODES.forEach(n => {
+    const btn = document.createElement('button');
+    btn.className = 'preview-card';
+    btn.innerHTML = previewCardHTML(n);
+    btn.addEventListener('click', () => openViewer(n));
+    grid.appendChild(btn);
+  });
+}
 
-            ribbon.appendChild(el);
-            
-            // Staggered pop-in animation
-            setTimeout(() => el.classList.add('visible'), i * 100 + 50);
-        });
-    },
+function renderExperience(){
+  const list = document.getElementById('experienceList');
+  list.innerHTML = '';
+  NODES.forEach(n => {
+    const item = document.createElement('label');
+    item.className = 'simple-item';
+    item.innerHTML = `<input type="checkbox" aria-label="Mark tried: ${n.title}">
+      <span><span class="t">${n.glyph} ${n.title}</span><br><span class="d">${n.tryIt}</span></span>`;
+    item.querySelector('input').addEventListener('change', (e) => {
+      item.classList.toggle('done', e.target.checked);
+      advanceEvod(3);
+    });
+    list.appendChild(item);
+  });
+}
 
-    openCosmicPanel(icon, title, data) {
-        const colors = { physics:'#38bdf8', biology:'#10b981', psychology:'#a78bfa', sociology:'#fbbf24', economics:'#ef4444', philosophy:'#ffffff' };
-        const emojis = { physics:'⚛️', biology:'🧬', psychology:'🧠', sociology:'🤝', economics:'⚖️', philosophy:'👁️' };
-        
-        document.getElementById('cp-icon').innerText = icon;
-        document.getElementById('cp-title').innerText = title;
-        
-        // Add Phase & Discipline badges if provided in data
-        if(data.phase) {
-            document.getElementById('cp-phase').innerText = data.phase;
-            document.getElementById('cp-phase-icon').innerText = data.phase === 'Childhood' ? 'child_care' : data.phase === 'Elderhood' ? 'elderly' : 'psychology';
-            document.querySelector('.badge.phase').style.display = 'flex';
-        } else {
-            document.querySelector('.badge.phase').style.display = 'none';
-        }
+function renderGraph(){
+  const list = document.getElementById('graphList');
+  list.innerHTML = '';
+  NODES.forEach(n => {
+    const row = document.createElement('div');
+    row.className = 'simple-item';
+    row.innerHTML = `<span class="connect-row" style="width:100%">
+      <span class="from">${n.glyph} ${n.title}</span>
+      ${n.links.map(l => `<span class="chip">${l}</span>`).join('')}
+    </span>`;
+    list.appendChild(row);
+  });
+}
 
-        if(data.discipline) {
-            document.getElementById('cp-disc').innerText = data.discipline;
-            document.querySelector('.badge.disc').style.display = 'flex';
-        } else {
-            document.querySelector('.badge.disc').style.display = 'none';
-        }
+function renderContribute(){
+  const list = document.getElementById('contributeList');
+  list.innerHTML = '';
+  NODES.forEach(n => {
+    const row = document.createElement('div');
+    row.className = 'simple-item contribute-item';
+    row.innerHTML = `<span class="t">${n.glyph} ${n.title}</span>
+      <a class="contribute-btn" href="https://kids.miraheze.org/wiki/${slugFor(n.title)}?action=edit" target="_blank" rel="noopener">✏️ Add to wiki</a>`;
+    list.appendChild(row);
+  });
+}
 
-        let gridHtml = '';
-        if (data.cosmic_matrix) {
-            Object.entries(data.cosmic_matrix).forEach(([domain, text]) => {
-                gridHtml += `
-                    <div class="discipline-card" style="--c:${colors[domain]}">
-                        <div class="d-header"><span class="text-lg">${emojis[domain]}</span> ${domain}</div>
-                        <div class="d-concept">${text}</div>
-                    </div>
-                `;
-            });
-        } else {
-            gridHtml = `<div class="text-slate-400 col-span-full text-center py-10">Matrix data unavailable.</div>`;
-        }
-        
-        document.getElementById('cp-grid').innerHTML = gridHtml;
-        document.getElementById('cosmic-panel').classList.add('active');
-    },
+function openViewer(n){
+  document.getElementById('viewerGlyph').textContent = n.glyph;
+  document.getElementById('viewerTitle').textContent = n.title;
+  document.getElementById('viewerExtract').textContent = n.extract;
+  document.getElementById('viewerStatus').innerHTML = n.status
+    ? `<span class="status-pill" style="color:${n.statusColor}">● ${n.status}</span>` : '';
+  document.getElementById('viewerWikiLink').href = `https://kids.miraheze.org/wiki/${slugFor(n.title)}`;
+  document.getElementById('viewerOverlay').classList.add('open');
+  document.getElementById('viewer').classList.add('open');
+  markLearned(n.title);
+  advanceEvod(2);
+  if(speakEnabled) speak(n.title + '. ' + n.extract);
+}
+function closeViewer(){
+  document.getElementById('viewerOverlay').classList.remove('open');
+  document.getElementById('viewer').classList.remove('open');
+}
+document.getElementById('closeViewer').addEventListener('click', closeViewer);
+document.getElementById('viewerOverlay').addEventListener('click', closeViewer);
+document.getElementById('viewerReadAloud').addEventListener('click', () => {
+  speak(document.getElementById('viewerTitle').textContent + '. ' + document.getElementById('viewerExtract').textContent);
+  advanceEvod(3);
+});
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeViewer(); });
 
-    closeCosmicPanel() {
-        document.getElementById('cosmic-panel').classList.remove('active');
-    },
+function speak(text){
+  if(!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text); u.rate = 0.95;
+  window.speechSynthesis.speak(u);
+}
 
-    showLoader(msg) {
-        document.getElementById('loader-msg').innerText = msg;
-        document.getElementById('ai-loader').style.display = 'flex';
-    },
+function advanceEvod(step){
+  if(step <= evodProgress) return;
+  evodProgress = step;
+  document.querySelectorAll('.nav-item').forEach(el => {
+    const n = Array.from(document.querySelectorAll('.nav-item')).indexOf(el) + 1;
+    el.classList.toggle('done', n < evodProgress);
+  });
+}
 
-    hideLoader() {
-        document.getElementById('ai-loader').style.display = 'none';
-    }
-};
+// ============ SIDEBAR NAV / PANELS ============
+document.querySelectorAll('.nav-item').forEach((item, i) => {
+  item.addEventListener('click', () => {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    item.classList.add('active');
+    document.getElementById('panel-' + item.dataset.panel).classList.add('active');
+    document.getElementById('sidebar').classList.remove('open');
+    advanceEvod(i+1);
+  });
+});
+document.getElementById('sidebarToggle').addEventListener('click', () => {
+  const open = document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarToggle').setAttribute('aria-expanded', open);
+});
 
-// ==========================================
-// IGNITION
-// ==========================================
-window.onload = () => {
-    SystemCore.init();
-    VisualEngine.init();
-    UIController.init();
-    
-    // Initialize with a playful default universe
-    setTimeout(() => {
-        SemanticEngine.processQuery("Nature and Play");
-    }, 500);
-};
+// ============ DISCOVER: tabs + search + voice ============
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected','false'); });
+    tab.classList.add('active'); tab.setAttribute('aria-selected','true');
+    currentFilter = tab.dataset.filter; renderDiscoverGrid();
+  });
+});
+document.getElementById('worldSearch').addEventListener('input', e => { currentSearch = e.target.value; renderDiscoverGrid(); });
 
+const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+const micBtn = document.getElementById('micBtn');
+if(SpeechRecognitionAPI){
+  const rec = new SpeechRecognitionAPI();
+  rec.continuous = false; rec.interimResults = false;
+  rec.onstart = () => micBtn.classList.add('listening');
+  rec.onend = () => micBtn.classList.remove('listening');
+  rec.onresult = e => { const t = e.results[0][0].transcript; document.getElementById('worldSearch').value = t; currentSearch = t; renderDiscoverGrid(); };
+  micBtn.addEventListener('click', () => rec.start());
+} else { micBtn.style.display = 'none'; }
+
+// ============ WORD ORBIT ============
+const SCRAMBLE_CHARS = 'abcdefghijklmnopqrstuvwxyz';
+function scrambleSpan(el, finalText, duration){
+  if(document.body.dataset.motion === 'reduced'){ el.textContent = finalText; return Promise.resolve(); }
+  const frames = 8; let frame = 0;
+  return new Promise(resolve => {
+    const iv = setInterval(() => {
+      frame++;
+      const revealCount = Math.floor((frame/frames) * finalText.length);
+      let out = '';
+      for(let i=0;i<finalText.length;i++){
+        if(!/[a-zA-Z]/.test(finalText[i])){ out += finalText[i]; continue; }
+        out += (i < revealCount) ? finalText[i] : SCRAMBLE_CHARS[Math.floor(Math.random()*SCRAMBLE_CHARS.length)];
+      }
+      el.textContent = out;
+      if(frame >= frames){ clearInterval(iv); el.textContent = finalText; resolve(); }
+    }, duration/frames);
+  });
+}
+function jumbleWordItem(item){
+  const wa = item.querySelector('.wa'), wb = item.querySelector('.wb');
+  wa.style.color = item.dataset.ca; wb.style.color = item.dataset.cb;
+  Promise.all([scrambleSpan(wa, item.dataset.a, 450), scrambleSpan(wb, item.dataset.b, 450)]);
+}
+document.querySelectorAll('.word-item').forEach(item => {
+  jumbleWordItem(item);
+  item.addEventListener('click', () => {
+    jumbleWordItem(item);
+    if(speakEnabled) speak(item.dataset.word + '. ' + item.dataset.meaning);
+  });
+});
+
+// ============ ACCESS PANEL ============
+const accessToggle = document.getElementById('accessToggle');
+const accessPanel = document.getElementById('accessPanel');
+accessToggle.addEventListener('click', () => {
+  const open = accessPanel.classList.toggle('open');
+  accessToggle.setAttribute('aria-expanded', open);
+});
+document.querySelectorAll('.access-panel .seg button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const { set, val } = btn.dataset;
+    document.querySelectorAll(`.seg button[data-set="${set}"]`).forEach(b => b.setAttribute('aria-pressed', b===btn));
+    if(set === 'speak'){ speakEnabled = (val === 'on'); return; }
+    document.body.setAttribute('data-' + set, val);
+    if(set === 'motion') cosmosMotion = (val === 'full');
+  });
+});
+
+// ============ SMALL DECORATIVE COSMOS (no longer gates content) ============
+const canvas = document.getElementById('cosmos');
+const ctx = canvas.getContext('2d');
+let cosmosMotion = true, W, H, DPR;
+function resize(){
+  DPR = Math.min(window.devicePixelRatio||1, 2);
+  W = canvas.clientWidth = 96; H = canvas.clientHeight = 96;
+  canvas.width = W*DPR; canvas.height = H*DPR; ctx.setTransform(DPR,0,0,DPR,0,0);
+}
+const orbits = [
+  { radius:0.32, speed:0.6, color:'#FF7A5C', size:3, angle:0.4 },
+  { radius:0.42, speed:0.4, color:'#9C8CF0', size:3.4, angle:2.1 },
+];
+let t = 0;
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  const cx=W/2, cy=H/2;
+  ctx.fillStyle = '#FFD98A';
+  ctx.beginPath(); ctx.arc(cx,cy,W*0.14,0,Math.PI*2); ctx.fill();
+  orbits.forEach(o => {
+    const r = W/2*o.radius + W*0.18;
+    if(cosmosMotion) o.angle += o.speed*0.02;
+    const px = cx+Math.cos(o.angle)*r, py = cy+Math.sin(o.angle)*r*0.9;
+    ctx.fillStyle = o.color; ctx.beginPath(); ctx.arc(px,py,o.size,0,Math.PI*2); ctx.fill();
+  });
+  t++; requestAnimationFrame(draw);
+}
+
+// init
+resize(); draw();
+renderDiscoverGrid(); renderLearnGrid(); renderExperience(); renderGraph(); renderContribute(); loadLearned();
+if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+  document.body.setAttribute('data-motion','reduced'); cosmosMotion = false;
+  document.querySelector('.seg button[data-set="motion"][data-val="reduced"]').click();
+}
 </script>
 </body>
 </html>
