@@ -1,147 +1,178 @@
-```html
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Khel.o · The Ultimate Hyper-OS (500+ Chats Compiled)</title>
+<title>Khel.o · Hyper-OS v2.0 (The Wonder Graph NPU)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700;800&family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0" />
 <style>
+/* === CORE VARIABLES & TRI-STATE CONSCIOUSNESS === */
 :root {
-    --bg-void: #02040a; --panel-bg: rgba(10, 15, 25, 0.85); --panel-edge: rgba(255, 255, 255, 0.08);
+    --bg-void: #02040a; --panel-bg: rgba(10, 15, 25, 0.9); --panel-edge: rgba(255, 255, 255, 0.08);
     --text-main: #f8fafc; --text-muted: #94a3b8;
     --gold: #fbbf24; --accent: #38bdf8; --emerald: #10b981; --rose: #f43f5e; --violet: #a855f7;
-    --sidebar-w: 260px; --radius: 20px;
+    --sidebar-w: 280px; --radius: 24px;
     --font-ui: 'Inter', sans-serif; --font-disp: 'Space Grotesk', sans-serif; --font-mono: 'JetBrains Mono', monospace;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 body { 
     background: var(--bg-void); color: var(--text-main); font-family: var(--font-ui); 
     overflow: hidden; height: 100vh; touch-action: none;
-    transition: filter 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: filter 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.8s ease;
 }
-/* Tri-State Consciousness Filters */
-body.mode-sat { filter: grayscale(80%) contrast(1.15); }
-body.mode-chit { filter: none; }
-body.mode-anand { filter: saturate(1.4) brightness(1.05) contrast(1.05); }
+/* Tri-State Modes */
+body.mode-sat { filter: grayscale(60%) contrast(1.1); background: #050508; } /* Structured, Grounded */
+body.mode-chit { filter: none; background: var(--bg-void); } /* Balanced, Playful */
+body.mode-anand { filter: saturate(1.3) brightness(1.05) contrast(1.05); background: #0a0510; } /* Flowing, Creative */
 
 .f-disp { font-family: var(--font-disp); }
 .f-mono { font-family: var(--font-mono); }
 
 /* === APP SHELL === */
 .app-shell { display: flex; height: 100vh; overflow: hidden; position: relative; z-index: 10; }
-#webgl-bg { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
-
 .sidebar {
     width: var(--sidebar-w); background: rgba(3, 6, 12, 0.95);
     border-right: 1px solid var(--panel-edge); display: flex; flex-direction: column;
     padding: 24px 16px; z-index: 50; flex-shrink: 0; backdrop-filter: blur(20px);
 }
-.brand { font-size: 1.8rem; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 8px; margin-bottom: 10px; padding: 0 10px; font-family: var(--font-disp);}
+.brand { font-size: 1.8rem; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 8px; margin-bottom: 8px; padding: 0 10px; font-family: var(--font-disp);}
 .brand span { color: var(--accent); animation: pulse 2s infinite;}
 .brand-sub { font-size: 0.65rem; color: var(--text-muted); letter-spacing: 2px; text-transform: uppercase; padding: 0 10px; margin-bottom: 30px; font-family: var(--font-mono);}
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
 .nav-item {
-    display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 12px;
+    display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 16px;
     color: var(--text-muted); font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: 0.2s;
-    border: 1px solid transparent; margin-bottom: 4px;
+    border: 1px solid transparent; margin-bottom: 6px;
 }
 .nav-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
 .nav-item.active { background: rgba(56, 189, 248, 0.1); border-color: rgba(56, 189, 248, 0.3); color: #fff; box-shadow: 0 0 15px rgba(56,189,248,0.1);}
 .nav-item .n-badge {
-    width: 24px; height: 24px; border-radius: 50%; background: var(--panel-edge); color: #fff;
+    width: 26px; height: 26px; border-radius: 50%; background: var(--panel-edge); color: #fff;
     display: flex; align-items: center; justify-content: center; font-size: 0.75rem; flex-shrink: 0; font-family: var(--font-mono);
 }
 .nav-item.active .n-badge { background: var(--accent); color: #000; }
 .nav-item.done .n-badge { background: var(--emerald); color: #000; }
 
-.tri-state-toggle { margin-top: auto; display: flex; gap: 6px; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 12px; border: 1px solid var(--panel-edge); }
-.ts-btn { flex: 1; padding: 8px; border-radius: 8px; text-align: center; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; color: var(--text-muted); transition: 0.2s; border: 1px solid transparent;}
+.tri-state-toggle { margin-top: auto; display: flex; gap: 6px; padding: 8px; background: rgba(0,0,0,0.4); border-radius: 16px; border: 1px solid var(--panel-edge); }
+.ts-btn { flex: 1; padding: 10px 4px; border-radius: 10px; text-align: center; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; color: var(--text-muted); transition: 0.2s; border: 1px solid transparent;}
 .ts-btn.active { color: #000; }
 .ts-btn[data-mode="sat"].active { background: #94a3b8; }
 .ts-btn[data-mode="chit"].active { background: var(--accent); }
 .ts-btn[data-mode="anand"].active { background: var(--gold); }
 
 main { flex: 1; position: relative; background: transparent; overflow-y: auto; overflow-x: hidden; scroll-behavior: smooth;}
-.panel { display: none; padding: 40px; max-width: 1200px; margin: 0 auto; animation: fadeUp 0.4s ease forwards; }
+.panel { display: none; padding: 40px; max-width: 1000px; margin: 0 auto; animation: fadeUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
 .panel.active { display: block; }
-@keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 
-.panel-title { font-size: 2.5rem; font-weight: 800; color: #fff; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; font-family: var(--font-disp); }
-.panel-desc { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 30px; line-height: 1.6; }
+.panel-title { font-size: 2.2rem; font-weight: 800; color: #fff; margin-bottom: 12px; display: flex; align-items: center; gap: 12px; font-family: var(--font-disp); }
+.panel-desc { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 30px; line-height: 1.6; max-width: 600px; }
 
-.glass-box { background: var(--panel-bg); border: 1px solid var(--panel-edge); border-radius: var(--radius); padding: 24px; backdrop-filter: blur(16px); box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
-.btn-action { background: var(--accent); color: #000; font-family: var(--font-disp); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; padding: 14px 28px; border-radius: 30px; border: none; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px;}
-.btn-action:hover { transform: translateY(-2px); filter: brightness(1.1); box-shadow: 0 10px 20px rgba(56,189,248,0.3); }
+.glass-box { background: var(--panel-bg); border: 1px solid var(--panel-edge); border-radius: var(--radius); padding: 28px; backdrop-filter: blur(16px); box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
 
-/* === DISCOVER === */
-.jumble-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 30px; }
-.jumble-card { 
-    background: rgba(255,255,255,0.02); border: 1px dashed var(--panel-edge); border-radius: 16px; 
-    padding: 30px 20px; text-align: center; cursor: pointer; transition: 0.3s; position: relative; overflow: hidden;
+/* === DISCOVER: RADICAL PALETTE === */
+.radical-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 12px; margin-bottom: 30px; }
+.radical-card { 
+    background: rgba(255,255,255,0.03); border: 1px solid var(--panel-edge); border-radius: 16px; 
+    padding: 20px 10px; text-align: center; cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; align-items: center; gap: 8px;
 }
-.jumble-card:hover { background: rgba(255,255,255,0.05); border-color: var(--accent); transform: translateY(-4px); box-shadow: 0 10px 30px rgba(56,189,248,0.1);}
-.j-text { font-family: var(--font-mono); font-size: 1.5rem; font-weight: 700; letter-spacing: 4px; color: #fff; transition: 0.3s;}
-.jumble-card.solved { border-color: var(--emerald); background: rgba(16,185,129,0.1); border-style: solid;}
-.jumble-card.solved .j-text { color: var(--emerald); font-family: var(--font-disp); letter-spacing: 2px;}
+.radical-card:hover { background: rgba(255,255,255,0.08); transform: translateY(-4px); border-color: rgba(255,255,255,0.2); }
+.radical-card .r-icon { font-size: 2rem; filter: drop-shadow(0 0 8px currentColor); }
+.radical-card .r-name { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); }
 
-/* === SEARCH & VIEWER === */
-.search-wrap { display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.4); border: 2px solid var(--panel-edge); border-radius: 30px; padding: 8px 16px 8px 24px; max-width: 600px; transition: 0.3s; margin-bottom: 30px;}
+/* === SEARCH & RESULTS === */
+.search-wrap { display: flex; align-items: center; gap: 12px; background: rgba(0,0,0,0.4); border: 2px solid var(--panel-edge); border-radius: 30px; padding: 8px 8px 8px 24px; max-width: 600px; transition: 0.3s; margin-bottom: 30px;}
 .search-wrap:focus-within { border-color: var(--accent); box-shadow: 0 0 20px rgba(56,189,248,0.2); }
 .search-wrap input { flex: 1; background: transparent; border: none; color: #fff; font-size: 1.1rem; outline: none; font-family: var(--font-ui); }
+.search-btn { width: 44px; height: 44px; border-radius: 50%; background: var(--accent); border: none; color: #000; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+.search-btn:hover { transform: scale(1.1); }
 
-.viewer-overlay { position: fixed; inset: 0; background: rgba(5,7,12,0.8); backdrop-filter: blur(8px); z-index: 100; display: none; }
-.viewer-overlay.open { display: block; animation: fadeIn 0.3s; }
-.viewer {
-    position: fixed; top: 0; right: 0; height: 100vh; width: min(450px, 90vw); background: var(--panel-bg);
-    border-left: 1px solid var(--panel-edge); z-index: 110; padding: 30px; overflow-y: auto;
-    transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    box-shadow: -20px 0 50px rgba(0,0,0,0.5); backdrop-filter: blur(20px);
+.result-card { 
+    background: rgba(255,255,255,0.03); border: 1px solid var(--panel-edge); border-radius: 20px; 
+    padding: 24px; cursor: pointer; transition: 0.3s; display: flex; gap: 20px; align-items: flex-start;
 }
-.viewer.open { transform: translateX(0); }
-.v-hero-img { width: 100%; height: 200px; object-fit: cover; border-radius: 12px; margin-bottom: 16px; border: 1px solid var(--panel-edge); display: none; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
-.action-chip { display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; border-radius: 12px; font-weight: 700; font-size: 0.9rem; text-decoration: none; transition: 0.2s; border: 2px solid transparent; width: 100%; justify-content: center; margin-bottom: 10px;}
-.chip-wiki { background: rgba(16, 185, 129, 0.1); color: var(--emerald); border-color: rgba(16, 185, 129, 0.3); }
-.chip-github { background: rgba(168, 85, 247, 0.1); color: var(--violet); border-color: rgba(168, 85, 247, 0.3); }
-.chip-google { background: rgba(251, 191, 36, 0.1); color: var(--gold); border-color: rgba(251, 191, 36, 0.3); }
-.action-chip:hover { transform: translateY(-2px); filter: brightness(1.2); }
+.result-card:hover { background: rgba(255,255,255,0.06); border-color: var(--accent); transform: translateX(8px); }
+.result-icon { font-size: 3rem; flex-shrink: 0; filter: drop-shadow(0 0 15px currentColor); }
+.result-content { flex: 1; }
+.result-title { font-family: var(--font-disp); font-size: 1.5rem; font-weight: 700; color: #fff; margin-bottom: 8px; }
+.result-desc { font-size: 0.95rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 12px; }
+.dot-code { font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent); background: rgba(56,189,248,0.1); padding: 4px 10px; border-radius: 6px; display: inline-block; }
 
-/* === WONDER GRAPH (DOT CODING) === */
+/* === WONDER GRAPH VISUALIZER === */
 .graph-container { 
-    position: relative; background: rgba(0,0,0,0.4); border: 1px solid var(--panel-edge); border-radius: 24px; 
-    box-shadow: inset 0 0 30px rgba(0,0,0,0.5); width: 100%; min-height: 500px; overflow: hidden; 
-    background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px); background-size: 20px 20px;
+    position: relative; background: rgba(0,0,0,0.3); border: 1px solid var(--panel-edge); border-radius: 24px; 
+    width: 100%; height: 500px; overflow: hidden; 
+    background-image: radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px); background-size: 30px 30px;
 }
 .dot-node {
     position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center;
     border-radius: 50%; cursor: pointer; text-align: center;
-    background: rgba(10, 15, 25, 0.9); border: 2px solid; backdrop-filter: blur(8px);
+    background: rgba(5, 7, 12, 0.95); border: 2px solid; backdrop-filter: blur(8px);
     transform: translate(-50%, -50%) scale(0);
-    animation: popNode 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-    transition: transform 0.3s, box-shadow 0.3s, border-radius 0.4s; z-index: 10;
+    animation: popNode 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    transition: transform 0.3s, box-shadow 0.3s; z-index: 10;
 }
-body.mode-sat .dot-node { border-radius: 12px; }
-.dot-node:hover { transform: translate(-50%, -50%) scale(1.2); z-index: 20; box-shadow: 0 0 25px currentColor !important;}
+/* Tri-State Layout Overrides */
+body.mode-sat .dot-node { border-radius: 12px; } /* Matrix */
+body.mode-anand .dot-node { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; animation: morph 8s ease-in-out infinite; } /* Organic */
+@keyframes morph { 0%, 100% { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; } 50% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; } }
+
+.dot-node:hover { transform: translate(-50%, -50%) scale(1.25); z-index: 20; box-shadow: 0 0 30px currentColor !important;}
 @keyframes popNode { to { transform: translate(-50%, -50%) scale(1); } }
 .dot-label {
-    position: absolute; top: 110%; font-family: var(--font-disp); font-size: 0.75rem;
-    font-weight: 800; text-transform: uppercase; letter-spacing: 1px; white-space: nowrap;
-    text-shadow: 0 2px 4px #000; pointer-events: none; color: #fff;
+    position: absolute; top: 115%; font-family: var(--font-disp); font-size: 0.7rem;
+    font-weight: 700; text-transform: uppercase; letter-spacing: 1px; white-space: nowrap;
+    text-shadow: 0 2px 4px #000; pointer-events: none; color: #fff; opacity: 0.8;
 }
 
-#toast { position: fixed; top: 30px; left: 50%; transform: translateX(-50%); background: var(--emerald); color: #000; padding: 12px 24px; border-radius: 30px; font-family: var(--font-disp); font-weight: 800; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 10px 40px rgba(16,185,129,0.5); z-index: 1000; opacity: 0; pointer-events: none; transition: 0.4s; }
-#toast.show { opacity: 1; transform: translateX(-50%) translateY(10px); }
+/* === VIEWER OVERLAY === */
+.viewer-overlay { position: fixed; inset: 0; background: rgba(2, 4, 10, 0.85); backdrop-filter: blur(12px); z-index: 100; display: none; }
+.viewer-overlay.open { display: block; animation: fadeIn 0.3s; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.viewer {
+    position: fixed; top: 0; right: 0; height: 100vh; width: min(480px, 95vw); background: #0a0f19;
+    border-left: 1px solid var(--panel-edge); z-index: 110; padding: 32px; overflow-y: auto;
+    transform: translateX(100%); transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: -20px 0 60px rgba(0,0,0,0.6);
+}
+.viewer.open { transform: translateX(0); }
+
+.ikrw-box {
+    background: rgba(244, 63, 94, 0.1); border: 1px solid rgba(244, 63, 94, 0.3); border-radius: 16px;
+    padding: 20px; margin: 24px 0; position: relative;
+}
+.ikrw-box::before { content: '⚡ IKRw Physical Action'; position: absolute; top: -10px; left: 16px; background: #0a0f19; padding: 0 8px; font-size: 0.7rem; font-weight: 800; color: var(--rose); text-transform: uppercase; letter-spacing: 1px; }
+.ikrw-text { font-size: 1.1rem; color: #fecdd3; line-height: 1.6; font-weight: 500; }
+
+.action-btn {
+    width: 100%; padding: 16px; border-radius: 16px; border: none; font-family: var(--font-disp);
+    font-weight: 700; font-size: 1rem; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 12px;
+}
+.btn-compile { background: linear-gradient(135deg, var(--accent), var(--violet)); color: #fff; }
+.btn-compile:hover { filter: brightness(1.2); transform: translateY(-2px); box-shadow: 0 10px 20px rgba(56,189,248,0.3); }
+.btn-verify { background: rgba(16, 185, 129, 0.1); color: var(--emerald); border: 2px solid rgba(16, 185, 129, 0.3); }
+.btn-verify:hover { background: rgba(16, 185, 129, 0.2); }
+
+#toast { 
+    position: fixed; top: 30px; left: 50%; transform: translateX(-50%) translateY(-20px); 
+    background: var(--emerald); color: #000; padding: 14px 28px; border-radius: 30px; 
+    font-family: var(--font-disp); font-weight: 800; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; 
+    box-shadow: 0 10px 40px rgba(16,185,129,0.4); z-index: 1000; opacity: 0; pointer-events: none; transition: 0.4s; 
+}
+#toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
 @media (max-width: 768px) {
     .app-shell { flex-direction: column; }
-    .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--panel-edge); padding: 16px; flex-direction: row; overflow-x: auto; white-space: nowrap; gap: 10px;}
+    .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--panel-edge); padding: 12px; flex-direction: row; overflow-x: auto; white-space: nowrap; gap: 8px; align-items: center; }
     .brand, .brand-sub, .tri-state-toggle { display: none; }
-    .nav-item { padding: 8px 12px; min-height: 40px; margin-bottom: 0; }
+    .nav-item { padding: 10px 14px; min-height: 44px; margin-bottom: 0; font-size: 0.85rem; }
     main { padding: 20px; }
-    .panel-title { font-size: 1.8rem; }
+    .panel-title { font-size: 1.6rem; }
+    .viewer { width: 100vw; }
 }
 </style>
 </head>
@@ -150,102 +181,98 @@ body.mode-sat .dot-node { border-radius: 12px; }
 <div class="app-shell">
     <aside class="sidebar">
         <div class="brand">Khel<span>.</span>o</div>
-        <div class="brand-sub">Hyper-OS v∞</div>
+        <div class="brand-sub">Wonder Graph NPU v2.0</div>
         <nav id="evod-nav">
             <div class="nav-item active" data-panel="discover" onclick="App.route('discover')"><span class="n-badge">1</span> Discover</div>
             <div class="nav-item" data-panel="learn" onclick="App.route('learn')"><span class="n-badge">2</span> Learn</div>
             <div class="nav-item" data-panel="experience" onclick="App.route('experience')"><span class="n-badge">3</span> Experience</div>
             <div class="nav-item" data-panel="collaborate" onclick="App.route('collaborate')"><span class="n-badge">4</span> Collaborate</div>
-            <div class="nav-item" data-panel="contribute" onclick="App.route('contribute')"><span class="n-badge">5</span> Contribute</div>
-            <div class="nav-item" data-panel="evolve" onclick="App.route('evolve')"><span class="n-badge">6</span> Evolve</div>
+            <div class="nav-item" data-panel="evolve" onclick="App.route('evolve')"><span class="n-badge">5</span> Evolve</div>
         </nav>
         <div class="tri-state-toggle">
-            <div class="ts-btn" data-mode="sat" onclick="App.setMode('sat')">Sat</div>
-            <div class="ts-btn active" data-mode="chit" onclick="App.setMode('chit')">Chit</div>
-            <div class="ts-btn" data-mode="anand" onclick="App.setMode('anand')">Anand</div>
+            <div class="ts-btn" data-mode="sat" onclick="App.setMode('sat')">Sat (Grid)</div>
+            <div class="ts-btn active" data-mode="chit" onclick="App.setMode('chit')">Chit (Orbit)</div>
+            <div class="ts-btn" data-mode="anand" onclick="App.setMode('anand')">Anand (Flow)</div>
         </div>
     </aside>
 
     <main>
         <!-- 1. DISCOVER -->
         <section class="panel active" id="panel-discover">
-            <div class="panel-title"><span class="material-symbols-rounded text-sky-400 text-4xl">travel_explore</span> Discover & Innovate</div>
-            <p class="panel-desc">The universe is encrypted. Tap a signal anomaly to decipher it and begin your journey.</p>
-            <div class="jumble-grid" id="jumble-container"></div>
+            <div class="panel-title"><span class="material-symbols-rounded text-sky-400 text-4xl">hub</span> The 24 Radicals</div>
+            <p class="panel-desc">Tap a foundational element of the universe to begin your compilation journey.</p>
+            <div class="radical-grid" id="radical-container"></div>
         </section>
 
         <!-- 2. LEARN -->
         <section class="panel" id="panel-learn">
-            <div class="panel-title"><span class="material-symbols-rounded text-blue-400 text-4xl">menu_book</span> Learn</div>
-            <p class="panel-desc">Search the global matrix. We extract the semantic DNA and map its connections.</p>
+            <div class="panel-title"><span class="material-symbols-rounded text-blue-400 text-4xl">search</span> Semantic Search</div>
+            <p class="panel-desc">Type a concept. The NPU will extract its essence, assign a Dot Code, and map its connections.</p>
             <div class="search-wrap">
-                <span class="material-symbols-rounded text-slate-400">search</span>
-                <input type="text" id="wikiSearch" placeholder="e.g., Photosynthesis, Gravity, Mycelium..." autocomplete="off" onkeypress="if(event.key==='Enter') App.searchWiki()">
-                <button class="btn-action !p-3 !rounded-full" onclick="App.searchWiki()"><span class="material-symbols-rounded">arrow_forward</span></button>
+                <span class="material-symbols-rounded text-slate-400">psychology</span>
+                <input type="text" id="conceptSearch" placeholder="e.g., Photosynthesis, Gravity, Mycelium..." autocomplete="off" onkeypress="if(event.key==='Enter') App.search()">
+                <button class="search-btn" onclick="App.search()"><span class="material-symbols-rounded">arrow_forward</span></button>
             </div>
-            <div id="learn-results" class="flex flex-col gap-4"></div>
+            <div id="search-results" class="flex flex-col gap-4"></div>
         </section>
 
         <!-- 3. EXPERIENCE -->
         <section class="panel" id="panel-experience">
             <div class="panel-title"><span class="material-symbols-rounded text-rose-400 text-4xl">directions_run</span> Experience (IKRw)</div>
-            <p class="panel-desc">Knowledge requires physical mass. Complete your grounding protocol to anchor this concept in reality.</p>
-            <div id="experience-list" class="glass-box">
-                <div class="text-center text-slate-500 py-10">Awaiting concept discovery...</div>
+            <p class="panel-desc">Knowledge requires physical mass. Complete the grounding protocol to anchor this concept.</p>
+            <div id="experience-container" class="glass-box">
+                <div class="text-center text-slate-500 py-10 f-disp">Awaiting concept discovery...</div>
             </div>
         </section>
 
         <!-- 4. COLLABORATE -->
         <section class="panel" id="panel-collaborate">
-            <div class="panel-title"><span class="material-symbols-rounded text-purple-400 text-4xl">hub</span> Collaborate (Local AST)</div>
-            <p class="panel-desc">How does this concept connect to its immediate ecosystem? (Semantic Resonance Map)</p>
+            <div class="panel-title"><span class="material-symbols-rounded text-purple-400 text-4xl">account_tree</span> Collaborate (Wonder Graph)</div>
+            <p class="panel-desc">How does this concept auto-organize with its ecosystem? (Tri-State Layout Active)</p>
             <div class="graph-container" id="collab-graph-container">
                 <svg id="collab-svg" style="position:absolute; inset:0; width:100%; height:100%; pointer-events:none;"></svg>
                 <div id="collab-nodes" style="position:absolute; inset:0;"></div>
             </div>
         </section>
 
-        <!-- 5. CONTRIBUTE -->
-        <section class="panel" id="panel-contribute">
-            <div class="panel-title"><span class="material-symbols-rounded text-yellow-400 text-4xl">volunteer_activism</span> Contribute</div>
-            <p class="panel-desc">Export your physical observations back into the digital commons. Choose your vector.</p>
-            <div id="contribute-list" class="glass-box">
-                <div class="text-center text-slate-500 py-10">Pending concept selection.</div>
-            </div>
-        </section>
-
-        <!-- 6. EVOLVE -->
+        <!-- 5. EVOLVE -->
         <section class="panel" id="panel-evolve">
-            <div class="panel-title"><span class="material-symbols-rounded text-green-400 text-4xl">all_inclusive</span> Evolve (Master Karma Ledger)</div>
-            <p class="panel-desc">Your infinite journey mapped. All learned nodes permanently connected across the cosmos.</p>
-            <div class="graph-container" id="evolve-graph-container" style="min-height: 600px;">
+            <div class="panel-title"><span class="material-symbols-rounded text-green-400 text-4xl">all_inclusive</span> Evolve (Karma Ledger)</div>
+            <p class="panel-desc">Your infinite journey mapped. All compiled nodes permanently connected.</p>
+            <div class="graph-container" id="evolve-graph-container" style="height: 600px;">
                 <svg id="evolve-svg" style="position:absolute; inset:0; width:100%; height:100%; pointer-events:none;"></svg>
                 <div id="evolve-nodes" style="position:absolute; inset:0;"></div>
             </div>
-        </section>
+        </section
     </main>
 </div>
 
 <!-- VIEWER OVERLAY -->
 <div class="viewer-overlay" id="viewerOverlay" onclick="if(event.target===this) App.closeViewer()">
     <div class="viewer" id="viewer">
-        <div class="flex justify-between items-start mb-4">
+        <div class="flex justify-between items-start mb-6">
             <div>
                 <div id="v-category" class="text-xs font-bold uppercase tracking-widest mb-2 f-mono">Category</div>
                 <h2 id="v-title" class="f-disp text-3xl font-bold text-white mb-1">Concept</h2>
+                <div id="v-dotcode" class="dot-code mt-2">0x00 0x00 0x00</div>
             </div>
             <button class="w-10 h-10 rounded-full border border-slate-700 flex items-center justify-center text-white hover:bg-rose-500 hover:border-rose-500 transition" onclick="App.closeViewer()"><span class="material-symbols-rounded">close</span></button>
         </div>
-        <img id="v-image" class="v-hero-img" alt="Knowledge Image" />
-        <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700 mb-6">
-            <p id="v-extract" class="text-sm text-slate-300 leading-relaxed"></p>
+        
+        <div class="bg-slate-800/30 p-6 rounded-2xl border border-slate-700 mb-6">
+            <p id="v-desc" class="text-base text-slate-200 leading-relaxed"></p>
         </div>
-        <h3 class="f-disp text-lg text-white mb-3 flex items-center gap-2"><span class="material-symbols-rounded text-rose-400">psychology</span> IKRw Physical Action</h3>
-        <p id="v-ikrw" class="text-sm text-rose-200 mb-8 bg-rose-500/10 p-4 rounded-xl border border-rose-500/20"></p>
-        <h3 class="f-disp text-lg text-white mb-3">Contribution Vectors</h3>
-        <div id="v-actions"></div>
-        <button class="w-full py-3 rounded-xl bg-white/5 border border-white/10 text-white font-bold flex items-center justify-center gap-2 hover:bg-white/10 transition mt-4" onclick="App.readAloud()">
-            <span class="material-symbols-rounded">volume_up</span> Read Concept Aloud (Drishti)
+
+        <div class="ikrw-box">
+            <p id="v-ikrw" class="ikrw-text"></p>
+        </div>
+
+        <button class="action-btn btn-verify" id="btn-verify" onclick="App.verifyExperience()">
+            <span class="material-symbols-rounded">check_circle</span> I have completed this physical action
+        </button>
+
+        <button class="action-btn btn-compile" onclick="App.compileToLedger()">
+            <span class="material-symbols-rounded">memory</span> Compile to NPU & Save
         </button>
     </div>
 </div>
@@ -255,93 +282,108 @@ body.mode-sat .dot-node { border-radius: 12px; }
 <script>
 /**
  * =====================================================================
- * KHEL.O HYPER-OS: THE ULTIMATE COMPILATION
- * Architecture: SPU (Semantic Processing Unit) + FMEA Shield + WonderGraph
+ * KHEL.O HYPER-OS v2.0: THE WONDER GRAPH NPU
+ * Architecture: SPU (Semantic Processing Unit) + FMEA Shield + Auto-Organizing Dot Graph
  * =====================================================================
  */
 
-// 1. THE 14-WAY CLASSIFICATION (Real Learning & IKRw Protocols)
-const CATEGORIES = [
-    { name: 'Agriculture & Soil', test: /farm|soil|crop|seed|plant|tree|agriculture|hydroponics|mycelium/i, color: '#10b981', icon: '🌱', hue: 140,
-      ikrw: t => `Go outside and touch the soil. Find a seed or a plant similar to ${t} and observe its structure without a screen.` },
-    { name: 'Nutrition & Health', test: /food|nutrition|eat|diet|vitamin|protein|health|gut/i, color: '#f59e0b', icon: '🍎', hue: 40,
-      ikrw: t => `Look in your kitchen for an ingredient related to ${t}. Discuss its nutritional value or origin with an elder.` },
-    { name: 'Physics & Forces', test: /physics|gravity|force|motion|energy|light|sound|quantum|thermo/i, color: '#38bdf8', icon: '⚛️', hue: 200,
-      ikrw: t => `Create a physical experiment to demonstrate ${t} using household objects (like dropping a ball or bending light with water).` },
-    { name: 'Earth Engineering', test: /build|structure|water|purify|clean|filter|architecture|civil/i, color: '#64748b', icon: '🏗️', hue: 210,
-      ikrw: t => `Draw a blueprint on paper showing how you would engineer a solution using ${t} to help your local community.` },
-    { name: 'Animal Biology', test: /animal|mammal|species|bird|fish|insect|zoology|ecology/i, color: '#f97316', icon: '🦁', hue: 25,
-      ikrw: t => `Observe a local animal or insect outside. Think about how it survives and how its traits compare to ${t}.` },
-    { name: 'Mathematics & Logic', test: /math|number|geometry|equation|spiral|fibonacci|algorithm/i, color: '#a855f7', icon: '🧮', hue: 270,
-      ikrw: t => `Find a pattern in nature (like a leaf or shell) that reflects the rules of ${t}. Count its segments.` },
-    { name: 'Ocean & Marine', test: /ocean|sea|reef|coral|marine|tidal|whale/i, color: '#0ea5e9', hue: 190, icon: '🌊',
-      ikrw: t => `Fill a bowl with water. Think about how ${t} relies on water properties, or visit a local water body.` },
-    { name: 'Space & Astronomy', test: /space|planet|star|galaxy|universe|moon|solar|astro/i, color: '#8b5cf6', icon: '🌌', hue: 260,
-      ikrw: t => `Look at the night sky. Try to imagine the scale and distance of ${t} compared to your own body.` },
-    { name: 'Art & Culture', test: /art|music|paint|draw|dance|culture|instrument|sculpt/i, color: '#ec4899', icon: '🎨', hue: 330,
-      ikrw: t => `Draw a quick sketch or hum a tune representing how ${t} feels. Express it physically.` },
-    { name: 'History & Civilization', test: /history|ancient|king|war|empire|civilization|ritual/i, color: '#d97706', icon: '🏛️', hue: 35,
-      ikrw: t => `Ask an elder in your family if they know a story or physical artifact related to ${t}.` },
-    { name: 'Geography & Places', test: /geography|country|mountain|river|city|continent|map/i, color: '#14b8a6', icon: '🗺️', hue: 160,
-      ikrw: t => `Look at a physical map or globe and try to locate ${t}. Trace its boundaries with your finger.` },
-    { name: 'Technology & Code', test: /technology|computer|machine|robot|software|engine|ai|code/i, color: '#6366f1', icon: '💻', hue: 240,
-      ikrw: t => `Look at a device in your home. Think about the physical materials inside that make ${t} work.` },
-    { name: 'Language & Literature', test: /language|word|book|literature|poem|write|story/i, color: '#f43f5e', icon: '📚', hue: 350,
-      ikrw: t => `Write a physical note to someone using concepts from ${t}, or read a page aloud.` },
-    { name: 'General Knowledge', test: /.*/, color: '#94a3b8', icon: '✨', hue: 0,
-      ikrw: t => `Explain the concept of ${t} to someone younger than you in simple words, without using a screen.` }
+// 1. THE 24 BASE RADICALS (The Alphabet of Existence)
+const RADICALS = [
+    { id: 'truti', name: 'Seed', icon: '◉', color: '#10b981', hue: 140 },
+    { id: 'jiva', name: 'Life', icon: '🧬', color: '#34d399', hue: 150 },
+    { id: 'prakriti', name: 'Earth', icon: '🌍', color: '#10b981', hue: 140 },
+    { id: 'agni', name: 'Energy', icon: '⚡', color: '#f59e0b', hue: 40 },
+    { id: 'jal', name: 'Flow', icon: '💧', color: '#38bdf8', hue: 200 },
+    { id: 'vayu', name: 'Air', icon: '🌬️', color: '#94a3b8', hue: 210 },
+    { id: 'akasha', name: 'Space', icon: '🌌', color: '#8b5cf6', hue: 260 },
+    { id: 'manas', name: 'Mind', icon: '🧠', color: '#ec4899', hue: 330 },
+    { id: 'buddhi', name: 'Logic', icon: '🔺', color: '#6366f1', hue: 240 },
+    { id: 'atma', name: 'Soul', icon: '◎', color: '#fbbf24', hue: 50 },
+    { id: 'karma', name: 'Action', icon: '⚙️', color: '#64748b', hue: 210 },
+    { id: 'dharma', name: 'Duty', icon: '⚖️', color: '#f43f5e', hue: 350 },
+    { id: 'artha', name: 'Resource', icon: '💎', color: '#14b8a6', hue: 160 },
+    { id: 'kama', name: 'Desire', icon: '🧲', color: '#f472b6', hue: 320 },
+    { id: 'moksha', name: 'Evolve', icon: '🚀', color: '#a855f7', hue: 270 },
+    { id: 'kala', name: 'Time', icon: '⏳', color: '#d97706', hue: 35 },
+    { id: 'rupa', name: 'Form', icon: '📐', color: '#0ea5e9', hue: 190 },
+    { id: 'shabda', name: 'Sound', icon: '🔊', color: '#818cf8', hue: 250 },
+    { id: 'sangha', name: 'Community', icon: '🤝', color: '#f97316', hue: 25 },
+    { id: 'shiksha', name: 'Learn', icon: '🪷', color: '#e879f9', hue: 290 },
+    { id: 'yantra', name: 'Tech', icon: '💻', color: '#22d3ee', hue: 180 },
+    { id: 'kshetra', name: 'Agri', icon: '🌾', color: '#84cc16', hue: 80 },
+    { id: 'yuddha', name: 'Risk', icon: '🛡️', color: '#ef4444', hue: 0 },
+    { id: 'ananda', name: 'Bliss', icon: '☀️', color: '#fde047', hue: 55 }
 ];
 
-// 2. SPU (SEMANTIC PROCESSING UNIT) & FMEA SHIELD
+// 2. LOCAL SEMANTIC KNOWLEDGE BASE (Kid-Friendly, No External Links)
+const KNOWLEDGE_BASE = [
+    { title: 'Photosynthesis', radical: 'prakriti', desc: 'Plants are like tiny chefs! They use sunlight, water, and air to cook their own food and give us fresh oxygen to breathe.', ikrw: 'Find a green leaf. Hold it up to the sun and say "thank you" for making the air fresh.', connections: ['Sunlight', 'Water', 'Oxygen', 'Trees'] },
+    { title: 'Gravity', radical: 'akasha', desc: 'Gravity is the invisible hug of the Earth. It keeps our feet on the ground, the oceans in their beds, and the Moon dancing around us.', ikrw: 'Drop a soft toy and a feather at the same time. Watch how Earth pulls them both down.', connections: ['Earth', 'Moon', 'Mass', 'Orbit'] },
+    { title: 'Mycelium', radical: 'jiva', desc: 'Under the forest floor is a giant, natural internet made of tiny threads. Trees use it to share food and send warning messages to each other!', ikrw: 'Look under a damp log or leaf pile. Can you find the white, stringy threads of the forest web?', connections: ['Trees', 'Soil', 'Network', 'Fungi'] },
+    { title: 'Water Cycle', radical: 'jal', desc: 'Water never disappears; it just changes costumes! It evaporates into clouds, rains down, and flows back to the sea, ready to start again.', ikrw: 'Breathe on a cold window or mirror. You just made a tiny cloud from your own water cycle!', connections: ['Rain', 'Clouds', 'Ocean', 'Sun'] },
+    { title: 'Fraction', radical: 'buddhi', desc: 'A fraction is just a fair share. If you have one apple and cut it into two equal pieces, each piece is a fraction of the whole apple.', ikrw: 'Take a piece of paper and fold it exactly in half, then in half again. You just made quarters!', connections: ['Sharing', 'Math', 'Whole', 'Parts'] },
+    { title: 'Pollination', radical: 'kshetra', desc: 'Bees and butterflies are nature\'s mail carriers. They carry golden dust (pollen) from one flower to another so fruits and seeds can grow.', ikrw: 'Look closely at a flower. Can you spot the tiny golden dust? Imagine you are a bee visiting it.', connections: ['Bees', 'Flowers', 'Fruit', 'Nature'] },
+    { title: 'Magnetism', radical: 'agni', desc: 'Magnets have an invisible force field. They can pull certain metals towards them or push other magnets away without even touching them!', ikrw: 'Find two fridge magnets. Try to push them together. Feel the invisible push?', connections: ['Metal', 'Force', 'Earth', 'Compass'] },
+    { title: 'Empathy', radical: 'manas', desc: 'Empathy is like wearing someone else\'s emotional shoes. It means you can feel happy when they are happy, and you want to help when they are sad.', ikrw: 'Think of a friend who was sad. Draw a picture for them to make them smile today.', connections: ['Kindness', 'Mind', 'Community', 'Love'] },
+    { title: 'Recycling', radical: 'karma', desc: 'Recycling is giving old things a new life. Instead of throwing plastic or paper away, we transform it into something brand new and useful.', ikrw: 'Find an empty cardboard box. Imagine what awesome new toy or fort you could build from it.', connections: ['Earth', 'Action', 'Future', 'Waste'] },
+    { title: 'Constellation', radical: 'akasha', desc: 'A constellation is a connect-the-dots picture in the night sky, made by stars that are very, very far away from each other.', ikrw: 'Tonight, look up at the sky. Can you connect the bright stars to make your own animal picture?', connections: ['Stars', 'Space', 'Night', 'Stories'] }
+];
+
+// 3. SEMANTIC PROCESSING UNIT (SPU) & DOT CODING ENGINE
 const SPU = {
-    hash(str) {
-        let h = 0x811c9dc5;
-        for (let i = 0; i < str.length; i++) h = Math.imul(h ^ str.charCodeAt(i), 0x01000193);
-        return Math.abs(h >>> 0);
+    // Generates a deterministic 3-Byte Hex Code based on concept
+    generateDotCode(title, radicalId) {
+        const r = RADICALS.find(x => x.id === radicalId) || RADICALS[0];
+        const rByte = r.hue.toString(16).padStart(2, '0'); // Byte 1: Domain
+        const aByte = '01'; // Byte 2: Action (Create/Explore)
+        const sByte = '01'; // Byte 3: Scale (Micro/Personal)
+        return `0x${rByte} 0x${aByte} 0x${sByte}`;
     },
-    analyze(text) {
-        const hVal = this.hash(text);
-        const hue = hVal % 360;
-        const cat = CATEGORIES.find(c => c.test.test(text)) || CATEGORIES[CATEGORIES.length - 1];
-        return {
-            title: text,
-            hash: hVal,
-            color: cat.color,
-            icon: cat.icon,
-            hue: cat.hue || hue,
-            category: cat,
-            ikrw: cat.ikrw(text)
-        };
+    
+    search(query) {
+        const q = query.toLowerCase();
+        const results = KNOWLEDGE_BASE.filter(k => 
+            k.title.toLowerCase().includes(q) || 
+            k.desc.toLowerCase().includes(q) ||
+            k.connections.some(c => c.toLowerCase().includes(q))
+        );
+        
+        // FMEA Fallback: If no exact match, synthesize a safe, generic response
+        if (results.length === 0 && q.length > 2) {
+            return [{
+                title: query.charAt(0).toUpperCase() + query.slice(1),
+                radical: 'buddhi',
+                desc: `A wonderful concept to explore! "${query}" connects to the broader web of knowledge. Let's discover how it fits into our universe.`,
+                ikrw: `Write down three questions you have about "${query}" and ask an elder or look in a book.`,
+                connections: ['Curiosity', 'Learning', 'Discovery', 'Questions']
+            }];
+        }
+        return results;
     }
 };
 
-// 3. AUDIO DSP (DRISHTI PROTOCOL)
+// 4. AUDIO DSP (432Hz Resonance Engine)
 const AudioDSP = {
     ctx: null,
     init() { if(!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); },
-    playSargam(hue) {
+    playResonance(hue) {
         this.init();
+        if(this.ctx.state === 'suspended') this.ctx.resume();
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
         osc.type = 'sine';
-        // Map Hue (0-360) to Frequency (200Hz - 600Hz) for 432Hz Sargam resonance
+        // Map Hue (0-360) to 432Hz-based scale (200Hz - 600Hz)
         const freq = 200 + (hue * 1.11); 
         osc.frequency.setTargetAtTime(freq, this.ctx.currentTime, 0.05);
-        gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.6);
+        gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.8);
         osc.connect(gain); gain.connect(this.ctx.destination);
-        osc.start(); osc.stop(this.ctx.currentTime + 0.6);
-    },
-    speak(txt) {
-        if('speechSynthesis' in window) {
-            window.speechSynthesis.cancel();
-            const u = new SpeechSynthesisUtterance(txt);
-            u.rate = 0.95; window.speechSynthesis.speak(u);
-        }
+        osc.start(); osc.stop(this.ctx.currentTime + 0.8);
+        if(navigator.vibrate) navigator.vibrate(15);
     }
 };
 
-// 4. WONDER GRAPH ENGINE (DOT CODING & TRI-STATE LAYOUTS)
+// 5. WONDER GRAPH VISUALIZER (Auto-Organizing Dot Engine)
 const WonderGraph = {
     drawNode(container, data, x, y, size = 60) {
         const el = document.createElement('div');
@@ -349,9 +391,14 @@ const WonderGraph = {
         el.style.width = `${size}px`; el.style.height = `${size}px`;
         el.style.left = `${x}px`; el.style.top = `${y}px`;
         el.style.borderColor = data.color; el.style.color = data.color;
-        el.style.boxShadow = `0 0 15px ${data.color}40, inset 0 0 10px ${data.color}20`;
-        el.innerHTML = `<span style="font-size:${size * 0.4}px;">${data.icon}</span><div class="dot-label" style="color:${data.color}">${data.title}</div>`;
-        el.onclick = () => { AudioDSP.playSargam(data.hue || 0); if(navigator.vibrate) navigator.vibrate(10); };
+        el.style.boxShadow = `0 0 20px ${data.color}40, inset 0 0 10px ${data.color}20`;
+        el.innerHTML = `<span style="font-size:${size * 0.45}px; filter: drop-shadow(0 0 5px currentColor);">${data.icon}</span><div class="dot-label" style="color:${data.color}">${data.title}</div>`;
+        el.onclick = () => { 
+            AudioDSP.playResonance(data.hue || 0); 
+            // Find full concept data and open viewer if it exists in KB
+            const concept = KNOWLEDGE_BASE.find(k => k.title === data.title);
+            if(concept) { App.currentConcept = { ...concept, dotCode: SPU.generateDotCode(concept.title, concept.radical) }; App.openViewer(); }
+        };
         container.appendChild(el);
         return el;
     },
@@ -360,14 +407,15 @@ const WonderGraph = {
         line.setAttribute("x1", x1); line.setAttribute("y1", y1);
         line.setAttribute("x2", x2); line.setAttribute("y2", y2);
         line.setAttribute("stroke", color); line.setAttribute("stroke-width", "2");
-        line.setAttribute("stroke-dasharray", "4 4"); line.style.opacity = "0.5";
+        line.setAttribute("stroke-dasharray", "4 4"); line.style.opacity = "0.4";
+        line.style.animation = "dash 20s linear infinite";
         svg.appendChild(line);
     },
     render(containerId, centerNode, satellites, mode = 'chit') {
         const container = document.getElementById(`${containerId}-container`);
         const svg = document.getElementById(`${containerId}-svg`);
         const nodesLayer = document.getElementById(`${containerId}-nodes`);
-        if(!container || container.clientWidth === 0) return; // FMEA: Prevent rendering in hidden tabs
+        if(!container || container.clientWidth === 0) return; // FMEA: Prevent hidden render errors
         
         nodesLayer.innerHTML = ''; svg.innerHTML = '';
         const cx = container.clientWidth / 2;
@@ -375,40 +423,40 @@ const WonderGraph = {
         
         this.drawNode(nodesLayer, centerNode, cx, cy, 80);
         
-        const radius = Math.min(cx, cy) - 80;
         satellites.forEach((sat, i) => {
             let x, y;
-            if (mode === 'sat') { // Matrix / Grid
+            if (mode === 'sat') { // Matrix / Grid (Structured)
                 const cols = Math.ceil(Math.sqrt(satellites.length));
-                const spacing = Math.min(100, (container.clientWidth - 100) / cols);
+                const spacing = Math.min(120, (container.clientWidth - 150) / cols);
                 x = 100 + (i % cols) * spacing;
                 y = 100 + Math.floor(i / cols) * spacing;
-            } else if (mode === 'anand') { // Fibonacci Flower
+            } else if (mode === 'anand') { // Fibonacci Flower (Creative Flow)
                 const angle = i * 137.508 * (Math.PI / 180);
-                const r = 60 + Math.sqrt(i) * 40;
+                const r = 70 + Math.sqrt(i + 1) * 45;
                 x = cx + Math.cos(angle) * r;
                 y = cy + Math.sin(angle) * r;
-            } else { // Chit / Radial Orbit
+            } else { // Chit / Radial Orbit (Balanced)
                 const angle = (i / satellites.length) * Math.PI * 2;
+                const radius = Math.min(cx, cy) - 100;
                 x = cx + Math.cos(angle) * radius;
                 y = cy + Math.sin(angle) * radius;
             }
             
             this.drawLine(svg, cx, cy, x, y, sat.color);
-            this.drawNode(nodesLayer, sat, x, y, 50);
+            this.drawNode(nodesLayer, sat, x, y, 55);
         });
     }
 };
 
-// 5. MASTER APP CONTROLLER (EVOD FLOW)
+// 6. MASTER APP CONTROLLER (EVOD FLOW)
 const App = {
     currentConcept: null,
-    learnedConcepts: [],
+    ledger: [],
     activeMode: 'chit',
     
     init() {
-        this.loadMemory();
-        this.buildJumbleGame();
+        this.loadLedger();
+        this.renderRadicals();
         this.route('discover');
         window.addEventListener('resize', () => {
             if(this.currentConcept) this.renderCollaborateGraph();
@@ -416,14 +464,11 @@ const App = {
         });
     },
 
-    loadMemory() {
-        try { 
-            const mem = localStorage.getItem('khelo_karma_ledger');
-            if (mem) this.learnedConcepts = JSON.parse(mem);
-        } catch(e) { this.learnedConcepts = []; }
+    loadLedger() {
+        try { const mem = localStorage.getItem('khelo_npu_ledger'); if (mem) this.ledger = JSON.parse(mem); } catch(e) { this.ledger = []; }
     },
-    saveMemory() {
-        localStorage.setItem('khelo_karma_ledger', JSON.stringify(this.learnedConcepts));
+    saveLedger() {
+        localStorage.setItem('khelo_npu_ledger', JSON.stringify(this.ledger));
     },
 
     setMode(mode) {
@@ -446,7 +491,6 @@ const App = {
             if(i < idx) n.classList.add('done');
         });
 
-        // JIT Graph Compilation (FMEA: Only render when visible)
         if(panelId === 'collaborate' && this.currentConcept) this.renderCollaborateGraph();
         if(panelId === 'evolve') this.renderMasterGraph();
     },
@@ -457,185 +501,104 @@ const App = {
         setTimeout(() => t.classList.remove('show'), 3000);
     },
 
-    readAloud() {
-        if(!this.currentConcept) return;
-        AudioDSP.speak(`${this.currentConcept.title}. ${this.currentConcept.snippet}`);
-    },
-
-    // --- DISCOVER: Jumble Engine ---
-    buildJumbleGame() {
-        const c = document.getElementById('jumble-container');
-        const seeds = [
-            { target: 'Ecology', cat: 'Science', color: '#10b981' },
-            { target: 'Gravity', cat: 'Physics', color: '#38bdf8' },
-            { target: 'Mycelium', cat: 'Biology', color: '#a855f7' },
-            { target: 'Nutrition', cat: 'Health', color: '#fbbf24' }
-        ];
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ@#$*!';
-        seeds.forEach(seed => {
+    renderRadicals() {
+        const c = document.getElementById('radical-container');
+        RADICALS.forEach(r => {
             const el = document.createElement('div');
-            el.className = 'jumble-card';
-            let scrambled = '';
-            for(let i=0; i<seed.target.length; i++) scrambled += chars[Math.floor(Math.random()*chars.length)];
-            el.innerHTML = `<div class="text-[10px] text-slate-500 uppercase tracking-widest mb-2 font-bold f-mono">${seed.cat} Anomaly</div><div class="j-text">${scrambled}</div>`;
-            el.onclick = () => this.solveJumble(el, seed);
+            el.className = 'radical-card';
+            el.style.color = r.color;
+            el.innerHTML = `<div class="r-icon">${r.icon}</div><div class="r-name">${r.name}</div>`;
+            el.onclick = () => {
+                AudioDSP.playResonance(r.hue);
+                document.getElementById('conceptSearch').value = r.name;
+                this.route('learn');
+                this.search();
+            };
             c.appendChild(el);
         });
     },
-    solveJumble(cardEl, seed) {
-        if(cardEl.classList.contains('solved')) return;
-        const textEl = cardEl.querySelector('.j-text');
-        const target = seed.target.toUpperCase();
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ@#$*!';
-        let frame = 0;
-        const interval = setInterval(() => {
-            let out = '';
-            for(let i=0; i<target.length; i++) {
-                out += (i < Math.floor((frame/15)*target.length)) ? target[i] : chars[Math.floor(Math.random()*chars.length)];
-            }
-            textEl.innerText = out;
-            if(frame++ >= 15) {
-                clearInterval(interval);
-                textEl.innerText = target;
-                cardEl.classList.add('solved');
-                setTimeout(() => {
-                    document.getElementById('wikiSearch').value = seed.target;
-                    this.route('learn');
-                    this.searchWiki();
-                }, 600);
-            }
-        }, 30);
-    },
 
-    // --- LEARN: Wiki Extraction Pipeline with FMEA ---
-    async searchWiki() {
-        const query = document.getElementById('wikiSearch').value.trim();
+    search() {
+        const query = document.getElementById('conceptSearch').value.trim();
         if(!query) return;
-        const resEl = document.getElementById('learn-results');
-        resEl.innerHTML = `<div class="text-sky-400 f-mono text-sm tracking-widest uppercase flex items-center gap-3"><span class="material-symbols-rounded animate-spin">sync</span> Synthesizing Knowledge...</div>`;
+        const resEl = document.getElementById('search-results');
+        resEl.innerHTML = `<div class="text-sky-400 f-mono text-sm tracking-widest uppercase flex items-center gap-3"><span class="material-symbols-rounded animate-spin">sync</span> NPU Compiling Semantics...</div>`;
         
-        try {
-            // FMEA PRIMARY: Rich Extract, High-Res Image & Links via Generator Search
-            const url = `https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(query)}&gsrlimit=1&prop=extracts|pageimages|links&exintro=1&explaintext=1&piprop=thumbnail&pithumbsize=600&pllimit=8&format=json&origin=*`;
-            const res = await fetch(url);
-            const data = await res.json();
-            if(!data.query || !data.query.pages) throw new Error("No results");
-            
-            const page = Object.values(data.query.pages)[0];
-            const title = page.title;
-            const fullExtract = page.extract || "Concept logged in universal matrix.";
-            const snippet = fullExtract.substring(0, 140);
-            const imageUrl = page.thumbnail ? page.thumbnail.source : null;
-            const links = (page.links || []).filter(l => l.ns === 0).map(l => l.title).slice(0, 8);
-            
-            // SPU Classification
-            const spuData = SPU.analyze(title + " " + fullExtract);
-            this.currentConcept = { title, snippet, fullExtract, imageUrl, links, ...spuData };
-
-        } catch(e) {
-            // FMEA FALLBACK: SPU Mathematical Synthesis (Zero Dead Ends)
-            const spuData = SPU.analyze(query);
-            this.currentConcept = { 
-                title: query, 
-                snippet: `Secure connection failed. Synthesized baseline semantics for ${query}. The universe still resonates.`, 
-                fullExtract: `Offline synthesis complete. Concept: ${query}.`,
-                imageUrl: null, 
-                links: ['Nature', 'Science', 'Society', 'Logic', 'Art'], 
-                ...spuData 
-            };
-            this.toast("Offline Mode: SPU Fallback Engaged");
-        }
-
-        // Save to Karma Ledger
-        if(!this.learnedConcepts.find(n => n.title === this.currentConcept.title)) {
-            this.learnedConcepts.push(this.currentConcept);
-            this.saveMemory();
-        }
-
-        const c = this.currentConcept;
-        resEl.innerHTML = `
-            <div class="glass-box flex gap-6 items-start cursor-pointer hover:border-sky-400 transition" onclick="App.openViewer()">
-                <span class="text-5xl" style="filter: drop-shadow(0 0 15px ${c.color}80);">${c.icon}</span>
-                <div style="flex:1;">
-                    <div class="text-xs font-bold uppercase tracking-widest mb-2 f-mono" style="color: ${c.color};">${c.category.name}</div>
-                    <div class="f-disp text-2xl font-bold text-white mb-2">${c.title}</div>
-                    <div class="text-slate-400 text-sm leading-relaxed mb-4">${c.snippet}...</div>
-                    <div class="inline-flex items-center gap-2 text-xs font-bold text-sky-400 uppercase tracking-widest bg-sky-500/10 px-3 py-1 rounded-full border border-sky-500/30">Expand Node →</div>
-                </div>
-            </div>
-        `;
-        this.buildPipelines();
+        setTimeout(() => { // Simulate NPU processing time for effect
+            const results = SPU.search(query);
+            resEl.innerHTML = '';
+            results.forEach(k => {
+                const r = RADICALS.find(x => x.id === k.radical) || RADICALS[0];
+                const dotCode = SPU.generateDotCode(k.title, k.radical);
+                const el = document.createElement('div');
+                el.className = 'result-card';
+                el.innerHTML = `
+                    <div class="result-icon" style="color: ${r.color}">${r.icon}</div>
+                    <div class="result-content">
+                        <div class="result-title">${k.title}</div>
+                        <div class="result-desc">${k.desc}</div>
+                        <div class="dot-code">NPU Code: ${dotCode}</div>
+                    </div>
+                `;
+                el.onclick = () => {
+                    this.currentConcept = { ...k, dotCode, color: r.color, icon: r.icon, hue: r.hue };
+                    this.openViewer();
+                };
+                resEl.appendChild(el);
+            });
+        }, 600);
     },
 
     openViewer() {
         const c = this.currentConcept;
         if(!c) return;
+        const r = RADICALS.find(x => x.id === c.radical) || RADICALS[0];
+        
         document.getElementById('v-title').innerText = c.title;
-        document.getElementById('v-category').innerText = `${c.icon} ${c.category.name}`;
-        document.getElementById('v-category').style.color = c.color;
-        
-        const imgEl = document.getElementById('v-image');
-        if(c.imageUrl) { imgEl.src = c.imageUrl; imgEl.style.display = 'block'; } 
-        else { imgEl.style.display = 'none'; }
-        
-        document.getElementById('v-extract').innerText = c.fullExtract;
+        document.getElementById('v-category').innerText = `${r.icon} ${r.name} Radical`;
+        document.getElementById('v-category').style.color = r.color;
+        document.getElementById('v-dotcode').innerText = `Compiled: ${c.dotCode}`;
+        document.getElementById('v-desc').innerText = c.desc;
         document.getElementById('v-ikrw').innerText = c.ikrw;
-
-        // Contribution Vectors (GitHub, Miraheze, Google)
-        const safeTitle = encodeURIComponent(c.title.replace(/\s+/g,'_'));
-        const fileContent = `# ${c.title}\n**My Physical Observation:**\n[Write what you noticed here...]\n**Category:** ${c.category.name}\n**Task:** ${c.ikrw}`;
-        const githubUrl = `https://github.com/bhearth/khela/new/main/pages?filename=${safeTitle}.md&value=${encodeURIComponent(fileContent)}`;
-        const mediaWikiUrl = `https://kids.miraheze.org/wiki/${safeTitle}?action=edit`;
-        const googleUrl = `https://www.google.com/search?q=${encodeURIComponent(c.title + ' facts for kids')}`;
-
-        document.getElementById('v-actions').innerHTML = `
-            <a href="${mediaWikiUrl}" target="_blank" class="action-chip chip-wiki"><span class="material-symbols-rounded">edit_document</span> Edit on Kids Wiki</a>
-            <a href="${githubUrl}" target="_blank" class="action-chip chip-github"><span class="material-symbols-rounded">code</span> Map to GitHub Repo</a>
-            <a href="${googleUrl}" target="_blank" class="action-chip chip-google"><span class="material-symbols-rounded">travel_explore</span> Search Google Knowledge</a>
-        `;
+        
         document.getElementById('viewerOverlay').classList.add('open');
-        this.route('experience');
     },
-    closeViewer() { document.getElementById('viewerOverlay').classList.remove('open'); },
+    
+    closeViewer() { 
+        document.getElementById('viewerOverlay').classList.remove('open'); 
+    },
 
-    buildPipelines() {
-        const c = this.currentConcept;
-        if(!c) return;
+    verifyExperience() {
+        AudioDSP.playResonance(140); // Emerald resonance
+        this.toast('Physical Anchor Verified!');
+        document.getElementById('btn-verify').innerHTML = '<span class="material-symbols-rounded">check_circle</span> Verified';
+        document.getElementById('btn-verify').style.background = 'rgba(16, 185, 129, 0.3)';
+        setTimeout(() => this.route('collaborate'), 800);
+    },
 
-        // 3. Experience Tab
-        document.getElementById('experience-list').innerHTML = `
-            <div class="flex gap-6 items-start">
-                <span class="text-5xl">${c.icon}</span>
-                <div>
-                    <div class="f-disp text-xl font-bold text-white mb-2">Physical Grounding Protocol (IKRw)</div>
-                    <div class="text-rose-200 text-lg my-4 leading-relaxed bg-rose-500/10 p-4 rounded-xl border border-rose-500/20">${c.ikrw}</div>
-                    <label class="mt-4 flex items-center gap-3 cursor-pointer text-sm text-emerald-400 font-bold border border-emerald-500/30 w-max px-4 py-2 rounded-full hover:bg-emerald-500/10 transition">
-                        <input type="checkbox" onchange="if(this.checked) { App.toast('Physical Anchor Verified. Matrix Updated.'); setTimeout(()=>App.route('collaborate'), 800); }"> I have completed this physical action
-                    </label>
-                </div>
-            </div>
-        `;
-
-        // 5. Contribute Tab
-        const safeTitle = encodeURIComponent(c.title.replace(/\s+/g,'_'));
-        const fileContent = `# ${c.title}\n**My Physical Observation:**\n[Write what you noticed here...]`;
-        const githubUrl = `https://github.com/bhearth/khela/new/main/pages?filename=${safeTitle}.md&value=${encodeURIComponent(fileContent)}`;
-        document.getElementById('contribute-list').innerHTML = `
-            <a href="https://kids.miraheze.org/wiki/${safeTitle}?action=edit" target="_blank" class="action-chip chip-wiki"><span class="material-symbols-rounded">edit_document</span> Edit on Kids Wiki</a>
-            <a href="${githubUrl}" target="_blank" class="action-chip chip-github"><span class="material-symbols-rounded">code</span> Map to GitHub Repo</a>
-            <a href="https://www.google.com/search?q=${encodeURIComponent(c.title + ' facts for kids')}" target="_blank" class="action-chip chip-google"><span class="material-symbols-rounded">travel_explore</span> Search Google Knowledge</a>
-        `;
-
-        this.renderCollaborateGraph();
+    compileToLedger() {
+        if(!this.currentConcept) return;
+        if(!this.ledger.find(n => n.title === this.currentConcept.title)) {
+            this.ledger.push(this.currentConcept);
+            this.saveLedger();
+            AudioDSP.playResonance(270); // Moksha/Evolve resonance
+            this.toast('Concept Compiled to Karma Ledger!');
+            this.closeViewer();
+            setTimeout(() => this.route('evolve'), 500);
+        } else {
+            this.toast('Already Compiled in Ledger.');
+            this.closeViewer();
+        }
     },
 
     renderCollaborateGraph() {
         if(!this.currentConcept || document.getElementById('panel-collaborate').classList.contains('active') === false) return;
         const c = this.currentConcept;
-        const centerNode = { title: c.title, icon: c.icon, color: c.color, hue: c.hue };
-        const satellites = c.links.map(link => {
-            const cat = SPU.analyze(link);
-            return { title: link, icon: cat.icon, color: cat.color, hue: cat.hue };
+        const r = RADICALS.find(x => x.id === c.radical) || RADICALS[0];
+        const centerNode = { title: c.title, icon: r.icon, color: r.color, hue: r.hue };
+        const satellites = c.connections.map(link => {
+            // Synthesize satellite data
+            return { title: link, icon: '✨', color: '#94a3b8', hue: 210 };
         });
         WonderGraph.render('collab-graph', centerNode, satellites, this.activeMode);
     },
@@ -643,12 +606,13 @@ const App = {
     renderMasterGraph() {
         if(document.getElementById('panel-evolve').classList.contains('active') === false) return;
         const centerNode = { title: 'Explorer', icon: '👶', color: '#fbbf24', hue: 50 };
-        const satellites = this.learnedConcepts.map(c => ({
-            title: c.title, icon: c.icon, color: c.color, hue: c.hue
-        }));
+        const satellites = this.ledger.map(c => {
+            const r = RADICALS.find(x => x.id === c.radical) || RADICALS[0];
+            return { title: c.title, icon: r.icon, color: r.color, hue: r.hue };
+        });
         
         if (satellites.length === 0) {
-            document.getElementById('evolve-nodes').innerHTML = '<div style="color:var(--text-muted); text-align:center; padding-top:200px; width:100%;">Search concepts to map your universe.</div>';
+            document.getElementById('evolve-nodes').innerHTML = '<div style="color:var(--text-muted); text-align:center; padding-top:200px; width:100%; font-family:var(--font-disp);">Compile concepts in "Learn" to map your universe.</div>';
             document.getElementById('evolve-svg').innerHTML = '';
         } else {
             WonderGraph.render('evolve-graph', centerNode, satellites, this.activeMode);
@@ -656,8 +620,12 @@ const App = {
     }
 };
 
+// Add dash animation for SVG lines
+const styleSheet = document.createElement("style");
+styleSheet.innerText = `@keyframes dash { to { stroke-dashoffset: -100; } }`;
+document.head.appendChild(styleSheet);
+
 window.onload = () => App.init();
 </script>
 </body>
 </html>
-```
