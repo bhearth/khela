@@ -574,6 +574,113 @@ const App = {
     }
 };
 
+          /* ============ WONDER GRAPH (Dot Coding) ============ */
+        .graph-container { position: relative; background: rgba(0,0,0,0.4); border: 1px solid var(--panel-edge); border-radius: 24px; box-shadow: inset 0 0 30px rgba(0,0,0,0.5); width: 100%; min-height: 450px; overflow: hidden; display: flex; justify-content: center; align-items: center; background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px); background-size: 20px 20px;}
+        
+        .dot-node {
+<!-- ... existing code ... -->
+        .viewer .status-pill{ display:inline-block; font-size:0.72rem; font-weight:700; padding:3px 9px; border-radius:999px; border:1.5px solid currentColor; margin-bottom:8px; }
+        .viewer p#v-extract { font-size: 1.1rem; line-height: 1.7; color: var(--text); font-weight: 500; letter-spacing: 0.2px; }
+        .viewer-actions{ display:flex; flex-direction:column; gap:8px; margin-top:14px; }
+<!-- ... existing code ... -->
+        <!-- 4. COLLABORATE (Dot Code Node Map) -->
+        <section class="panel" id="panel-collaborate">
+            <h2><span class="material-symbols-rounded text-purple-400 text-3xl">hub</span> Collaborate</h2>
+            <p class="lede">How does this concept connect to the universe?</p>
+            <div class="graph-container" id="collaborate-graph-container">
+                <svg id="collaborate-graph-svg" style="position:absolute; inset:0; width:100%; height:100%; pointer-events:none;"></svg>
+                <div id="collaborate-graph-nodes" style="position:absolute; inset:0;"></div>
+            </div>
+            <button class="mt-6 w-full text-center text-sm text-purple-400 font-bold uppercase tracking-widest" onclick="App.route('contribute')">Next: Share Your Findings →</button>
+        </section>
+
+        <!-- 5. CONTRIBUTE (Universal Connectors) -->
+        <section class="panel" id="panel-contribute">
+<!-- ... existing code ... -->
+        <!-- 6. EVOLVE (The Master Dot Map) -->
+        <section class="panel" id="panel-evolve">
+            <h2><span class="material-symbols-rounded text-amber-400 text-3xl">all_inclusive</span> Evolve</h2>
+            <p class="lede">Your infinite journey mapped across the matrix.</p>
+            <div class="graph-container" id="evolve-graph-container">
+                <svg id="evolve-graph-svg" style="position:absolute; inset:0; width:100%; height:100%; pointer-events:none;"></svg>
+                <div id="evolve-graph-nodes" style="position:absolute; inset:0;"></div>
+            </div>
+        </section>
+    </main>
+<!-- ... existing code ... -->
+    init() { 
+        this.loadMemory();
+        this.route('discover'); 
+        this.renderMasterGraph(); 
+        
+        // Handle window resize for graphs
+        window.addEventListener('resize', () => {
+            if(this.currentConcept) this.renderCollaborateGraph();
+            this.renderMasterGraph();
+        });
+    },
+<!-- ... existing code ... -->
+    route(panelId) {
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.getElementById(`panel-${panelId}`).classList.add('active');
+        document.querySelector(`[data-panel="${panelId}"]`).classList.add('active');
+        
+        const navs = Array.from(document.querySelectorAll('.nav-item'));
+        const idx = navs.findIndex(n => n.dataset.panel === panelId);
+        navs.forEach((n, i) => { n.classList.toggle('done', i < idx); });
+        
+        // JIT Compilation: Only render the graph math when the container is visible
+        if(panelId === 'evolve') this.renderMasterGraph();
+        if(panelId === 'collaborate') this.renderCollaborateGraph();
+    },
+
+    scrambleAndSearch(btn, wordA, wordB, targetSearch) {
+<!-- ... existing code ... -->
+    buildPipelines() {
+        const c = this.currentConcept;
+        if(!c) return;
+
+        // 3. Experience Tab
+        document.getElementById('experience-list').innerHTML = `
+            <div class="simple-item" style="border-color: ${c.category.color}">
+                <span class="text-4xl">${c.category.icon}</span>
+                <div>
+                    <div class="t">Physical Grounding Protocol (IKRw)</div>
+                    <div class="d text-white font-bold my-2 text-lg">${c.category.ikrw(c.title)}</div>
+                    <label class="mt-4 flex items-center gap-3 cursor-pointer text-sm text-teal-400 font-bold border border-teal-500/30 w-max px-4 py-2 rounded-full hover:bg-teal-500/10 transition">
+                        <input type="checkbox" onchange="if(this.checked) App.route('collaborate')"> I have completed this physical action
+                    </label>
+                </div>
+            </div>
+        `;
+
+        // 4. Collaborate Tab (Concept Wonder Graph) - Prepared but deferred to route()
+        this.renderCollaborateGraph();
+
+        // 5. Contribute Tab
+        document.getElementById('contribute-list').innerHTML = document.getElementById('v-actions').innerHTML;
+
+        // 6. Evolve Tab (Master Graph)
+        this.renderMasterGraph();
+    },
+
+    renderCollaborateGraph() {
+        if(!this.currentConcept || document.getElementById('panel-collaborate').classList.contains('active') === false) return;
+        const c = this.currentConcept;
+        const centerNode = { title: c.title, icon: c.category.icon, color: c.category.color };
+        const satellites = c.links.map(link => {
+            const cat = this.getCategory(link);
+            return { title: link, icon: cat.icon, color: cat.color };
+        });
+        WonderGraph.renderRadial('collaborate-graph', centerNode, satellites);
+    },
+
+    renderMasterGraph() {
+        if(document.getElementById('panel-evolve').classList.contains('active') === false) return;
+
+        const centerNode = { title: 'Explorer', icon: '👶', color: '#E8A33D' }
+
 window.onload = () => App.init();
 </script>
 </body>
