@@ -1,14 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Khel.o · Infinite EVOD Mapping</title>
-    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Khel.o · Dis-play Universe</title>
+
     <!-- Typography & Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700;800&family=Atkinson+Hyperlegible:wght@400;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700;800&family=Atkinson+Hyperlegible:wght@400;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0" />
-    
+
     <!-- Core Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
@@ -18,7 +19,7 @@
             --bg: #0B0F1A; --panel: #121A29; --panel-edge: #232E45;
             --text: #F2EFE9; --muted: #A9B0C0;
             --gold: #E8A33D; --coral: #FF7A5C; --violet: #9C8CF0; --teal: #4FD1C5; --green: #6FCF97;
-            --focus: #FFD166; --radius: 14px; --sidebar-w: 240px;
+            --focus: #FFD166; --radius: 16px; --sidebar-w: 240px;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -27,10 +28,8 @@
         .f-mono { font-family: 'IBM Plex Mono', monospace; }
         button { cursor: pointer; background: none; border: none; color: inherit; font-family: inherit; }
 
-        /* ============ SHELL ============ */
+        /* ============ SHELL & SIDEBAR ============ */
         .app-shell { display: flex; height: 100vh; overflow: hidden; }
-
-        /* ============ SIDEBAR ============ */
         .sidebar {
             width: var(--sidebar-w); flex-shrink: 0; background: var(--panel);
             border-right: 1px solid var(--panel-edge); display: flex; flex-direction: column;
@@ -60,7 +59,6 @@
         .panel { display: none; animation: fadeIn 0.4s ease forwards; }
         .panel.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
         .panel h2 { font-size: 2rem; margin-bottom: 8px; color: #fff; display: flex; align-items: center; gap: 10px;}
         .panel .lede { color: var(--muted); font-size: 1rem; margin-bottom: 24px; }
 
@@ -72,7 +70,7 @@
         /* ============ SEARCH ============ */
         .search-wrap { display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.4); border: 2px solid var(--panel-edge); border-radius: 30px; padding: 8px 16px 8px 24px; max-width: 600px; transition: 0.3s; margin-bottom: 30px;}
         .search-wrap:focus-within { border-color: var(--teal); box-shadow: 0 0 20px rgba(79, 209, 197, 0.2); background: rgba(0,0,0,0.8); }
-        .search-wrap input { flex: 1; background: transparent; border: none; color: #fff; font-size: 1rem; outline: none; font-family: 'Inter'; }
+        .search-wrap input { flex: 1; background: transparent; border: none; color: #fff; font-size: 1.1rem; outline: none; font-family: 'Inter'; }
         .btn-search { background: var(--teal); color: #000; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; transition: 0.2s; }
         .btn-search:hover { transform: scale(1.1); box-shadow: 0 0 15px var(--teal); }
 
@@ -82,17 +80,34 @@
         .simple-item:hover { border-color: rgba(255,255,255,0.2); transform: translateX(4px); }
         .simple-item .t { font-weight: 700; font-size: 1.1rem; color: #fff; margin-bottom: 4px; font-family: 'Space Grotesk'; }
         .simple-item .d { font-size: 0.9rem; color: var(--muted); line-height: 1.5; }
-        .action-chip { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-top: 10px; background: rgba(255,255,255,0.05); color: var(--teal); border: 1px solid rgba(79, 209, 197, 0.3); }
+
+        /* ============ VIEWER OVERLAY ============ */
+        .viewer-overlay { position: fixed; inset: 0; background: rgba(5,7,12,0.8); backdrop-filter: blur(8px); z-index: 100; display: none; }
+        .viewer-overlay.open { display: block; animation: fadeIn 0.3s; }
+        .viewer {
+            position: fixed; top: 0; right: 0; height: 100vh; width: min(450px, 90vw); background: var(--panel);
+            border-left: 1px solid var(--panel-edge); z-index: 110; padding: 30px; overflow-y: auto;
+            transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: -20px 0 50px rgba(0,0,0,0.5);
+        }
+        .viewer.open { transform: translateX(0); }
+        .viewer-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;}
+        .close-viewer { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--panel-edge); color: #fff; display: flex; align-items: center; justify-content: center; transition: 0.2s;}
+        .close-viewer:hover { background: #ef4444; border-color: #ef4444; transform: rotate(90deg);}
+
+        .action-chip { display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; border-radius: 12px; font-weight: 700; font-size: 0.9rem; text-decoration: none; transition: 0.2s; border: 2px solid transparent; width: 100%; justify-content: center;}
+        .chip-wiki { background: rgba(79, 209, 197, 0.1); color: var(--teal); border-color: rgba(79, 209, 197, 0.3); }
+        .chip-github { background: rgba(156, 140, 240, 0.1); color: var(--violet); border-color: rgba(156, 140, 240, 0.3); }
+        .chip-google { background: rgba(232, 163, 61, 0.1); color: var(--gold); border-color: rgba(232, 163, 61, 0.3); }
+        .action-chip:hover { transform: translateY(-2px); filter: brightness(1.2); }
 
         /* ============ MERMAID GRAPH WRAPPERS ============ */
-        .graph-container { background: rgba(0,0,0,0.5); border: 1px solid var(--panel-edge); border-radius: 24px; padding: 30px; overflow-x: auto; box-shadow: inset 0 0 30px rgba(0,0,0,0.5); width: 100%; min-height: 400px; display: flex; justify-content: center; }
+        .graph-container { background: rgba(0,0,0,0.5); border: 1px solid var(--panel-edge); border-radius: 24px; padding: 20px; overflow-x: auto; box-shadow: inset 0 0 30px rgba(0,0,0,0.5); width: 100%; min-height: 300px; display: flex; justify-content: center; align-items: center;}
         .mermaid { font-family: 'Space Grotesk', sans-serif !important; width: 100%; display: flex; justify-content: center;}
-        .mermaid svg { max-width: 100%; height: auto; }
 
         /* Loader */
         #loader { display: none; align-items: center; gap: 12px; color: var(--teal); font-family: 'IBM Plex Mono'; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; }
         .spinner { width: 20px; height: 20px; border: 2px solid rgba(79, 209, 197, 0.2); border-top-color: var(--teal); border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
 
         @media (max-width: 768px) {
             .app-shell { flex-direction: column; }
@@ -108,7 +123,7 @@
 <div class="app-shell">
     <!-- EVOD SIDEBAR -->
     <aside class="sidebar">
-        <div class="wordmark">Khel<span class="dot">.</span>o <span style="font-size:0.6rem; color:var(--muted); font-family:'IBM Plex Mono'; display:block; letter-spacing:2px; font-weight:normal; text-transform:uppercase;">Infinite Mapping</span></div>
+        <div class="wordmark">Khel<span class="dot">.</span>o <span class="block text-[0.6rem] text-slate-500 f-mono tracking-widest uppercase mt-1 font-normal">Playful Search Engine</span></div>
         <nav class="evod-nav" id="main-nav">
             <button class="nav-item active" data-panel="discover" onclick="App.route('discover')"><span class="n">1</span> Discover</button>
             <button class="nav-item" data-panel="learn" onclick="App.route('learn')"><span class="n">2</span> Learn</button>
@@ -123,35 +138,34 @@
         <!-- 1. DISCOVER -->
         <section class="panel active" id="panel-discover">
             <h2><span class="material-symbols-rounded text-teal-400 text-3xl">travel_explore</span> Discover</h2>
-            <p class="lede">Tap a word to break it down. Words hide deeper meanings.</p>
+            <p class="lede">Tap a word to break it down. Look for the hidden meaning.</p>
             <div class="word-orbit">
-                <button class="word-item" onclick="App.scramble(this, 'KHEL', '.O')"><span class="wa" style="color:var(--teal)">KHEL</span><span class="wb" style="color:var(--gold)">.O</span></button>
-                <button class="word-item" onclick="App.scramble(this, 'DIS', '-PLAY')"><span class="wa" style="color:var(--muted)">DIS</span><span class="wb" style="color:var(--coral)">-PLAY</span></button>
-                <button class="word-item" onclick="App.scramble(this, 'EDU', 'CATION')"><span class="wa" style="color:var(--violet)">EDU</span><span class="wb" style="color:var(--green)">CATION</span></button>
+                <button class="word-item" onclick="App.scramble(this, 'KHEL', '.O')"><span class="wa text-teal-400">KHEL</span><span class="wb text-amber-400">.O</span></button>
+                <button class="word-item" onclick="App.scramble(this, 'DIS', '-PLAY')"><span class="wa text-slate-400">DIS</span><span class="wb text-rose-400">-PLAY</span></button>
+                <button class="word-item" onclick="App.scramble(this, 'EDU', 'CATION')"><span class="wa text-purple-400">EDU</span><span class="wb text-green-400">CATION</span></button>
             </div>
-            <button class="mt-4 bg-teal-500/10 text-teal-400 border border-teal-500/30 px-6 py-3 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-teal-500/20 transition" onclick="App.route('learn')">Next: Learn a Concept →</button>
+            <button class="mt-4 bg-teal-500/10 text-teal-400 border border-teal-500/30 px-6 py-3 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-teal-500/20 transition" onclick="App.route('learn')">Start Learning →</button>
         </section>
 
         <!-- 2. LEARN (Wiki Search) -->
         <section class="panel" id="panel-learn">
-            <h2><span class="material-symbols-rounded text-blue-400 text-3xl">menu_book</span> Learn</h2>
-            <p class="lede">Search the global knowledge base. We will map its DNA.</p>
+            <h2><span class="material-symbols-rounded text-blue-400 text-3xl">search</span> Learn</h2>
+            <p class="lede">Search for a concept. We will map its DNA for you.</p>
             
             <div class="search-wrap">
                 <span class="material-symbols-rounded text-muted">search</span>
-                <input type="text" id="wikiSearch" placeholder="Search a concept (e.g., Photosynthesis, Mathematics)..." autocomplete="off" onkeypress="if(event.key==='Enter') App.searchWiki()">
+                <input type="text" id="wikiSearch" placeholder="e.g., Photosynthesis, Hydroponics, Gravity..." autocomplete="off" onkeypress="if(event.key==='Enter') App.searchWiki()">
                 <button class="btn-search" onclick="App.searchWiki()"><span class="material-symbols-rounded">arrow_forward</span></button>
             </div>
             
-            <div id="loader"><div class="spinner"></div> Extracting Semantic Nodes...</div>
-            
+            <div id="loader"><div class="spinner"></div> Synthesizing Knowledge...</div>
             <div id="learn-results" class="simple-list"></div>
         </section>
 
         <!-- 3. EXPERIENCE -->
         <section class="panel" id="panel-experience">
             <h2><span class="material-symbols-rounded text-rose-400 text-3xl">directions_run</span> Experience</h2>
-            <p class="lede">Knowledge without action is dead. Here is your physical grounding protocol (IKRw).</p>
+            <p class="lede">Knowledge without physical action is dead. Here is your IKRw Protocol.</p>
             <div id="experience-list" class="simple-list">
                 <div class="p-10 text-center border border-dashed border-slate-700 rounded-2xl text-slate-500">Search and select a concept in the 'Learn' tab first.</div>
             </div>
@@ -160,19 +174,18 @@
         <!-- 4. COLLABORATE (Mermaid Node Map) -->
         <section class="panel" id="panel-collaborate">
             <h2><span class="material-symbols-rounded text-purple-400 text-3xl">hub</span> Collaborate</h2>
-            <p class="lede">How does this concept connect to the universe? (Dynamically compiled AST)</p>
+            <p class="lede">How does this concept connect to the universe?</p>
             <div class="graph-container">
-                <div id="collaborate-graph" class="mermaid">
-                    %% Awaiting Data
-                </div>
+                <div id="collaborate-graph" class="mermaid">%% Awaiting Data</div>
             </div>
+            <button class="mt-6 w-full text-center text-sm text-purple-400 font-bold uppercase tracking-widest" onclick="App.route('contribute')">Next: Share Your Findings →</button>
         </section>
 
-        <!-- 5. CONTRIBUTE -->
+        <!-- 5. CONTRIBUTE (Universal Connectors) -->
         <section class="panel" id="panel-contribute">
-            <h2><span class="material-symbols-rounded text-green-400 text-3xl">eco</span> Contribute</h2>
-            <p class="lede">Add your findings to the open ledger.</p>
-            <div id="contribute-list" class="simple-list">
+            <h2><span class="material-symbols-rounded text-green-400 text-3xl">volunteer_activism</span> Contribute</h2>
+            <p class="lede">Select your preferred method to evolve this knowledge.</p>
+            <div id="contribute-list" class="flex flex-col gap-4 max-w-md">
                 <div class="p-10 text-center border border-dashed border-slate-700 rounded-2xl text-slate-500">Search and select a concept in the 'Learn' tab first.</div>
             </div>
         </section>
@@ -180,14 +193,37 @@
         <!-- 6. EVOLVE (The Master EVOD Mermaid Map) -->
         <section class="panel" id="panel-evolve">
             <h2><span class="material-symbols-rounded text-amber-400 text-3xl">all_inclusive</span> Evolve</h2>
-            <p class="lede">Your infinite journey mapped across the 6 stages of human development.</p>
+            <p class="lede">Your infinite journey mapped across the stages of human development.</p>
             <div class="graph-container">
-                <div id="evolve-graph" class="mermaid">
-                    %% Awaiting Data
-                </div>
+                <div id="evolve-graph" class="mermaid">%% Awaiting Data</div>
             </div>
         </section>
     </main>
+</div>
+
+<!-- VIEWER OVERLAY (Right Slide-over) -->
+<div class="viewer-overlay" id="viewerOverlay">
+    <div class="viewer" id="viewer">
+        <div class="viewer-top">
+            <div>
+                <h2 id="v-title" class="f-disp text-3xl font-bold text-white mb-1">Concept</h2>
+                <div id="v-category" class="text-xs font-bold uppercase tracking-widest mb-4">Category</div>
+            </div>
+            <button class="close-viewer" onclick="App.closeViewer()"><span class="material-symbols-rounded">close</span></button>
+        </div>
+        
+        <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700 mb-6">
+            <p id="v-extract" class="text-sm text-slate-300 leading-relaxed"></p>
+        </div>
+
+        <h3 class="f-disp text-lg text-white mb-3 flex items-center gap-2"><span class="material-symbols-rounded text-rose-400">psychology</span> IKRw Action Protocol</h3>
+        <p id="v-ikrw" class="text-sm text-rose-200 mb-8 bg-rose-500/10 p-4 rounded-xl border border-rose-500/20"></p>
+
+        <h3 class="f-disp text-lg text-white mb-3">Contribution Vectors</h3>
+        <div class="flex flex-col gap-3" id="v-actions">
+            <!-- Buttons injected via JS -->
+        </div>
+    </div>
 </div>
 
 <script>
@@ -195,63 +231,65 @@
  * STREAMING_CHUNK: System Initialization & Configuration
  */
 mermaid.initialize({
-    startOnLoad: false,
-    theme: 'base',
+    startOnLoad: false, theme: 'base',
     themeVariables: {
-        background: 'transparent',
-        primaryColor: '#121A29',
-        primaryTextColor: '#F2EFE9',
-        primaryBorderColor: '#232E45',
-        lineColor: '#4FD1C5',
-        secondaryColor: '#1A2436',
-        tertiaryColor: '#1A2436',
-        fontFamily: 'Space Grotesk'
+        background: 'transparent', primaryColor: '#121A29', primaryTextColor: '#F2EFE9',
+        primaryBorderColor: '#232E45', lineColor: '#4FD1C5', secondaryColor: '#1A2436',
+        tertiaryColor: '#1A2436', fontFamily: 'Space Grotesk'
     },
-    flowchart: { curve: 'basis', nodeSpacing: 60, rankSpacing: 60 }
+    flowchart: { curve: 'basis' }
 });
 
 const App = {
     currentConcept: null,
     learnedConcepts: new Set(),
     
-    init() {
-        this.route('discover');
-        this.renderMasterGraph(); // Render empty state
-    },
+    // 14-Way Classification tailored for Real Learning (Agri, Nutrition, Earth Engineering)
+    CATEGORIES: [
+        { name: 'Agriculture & Soil', test: /farm|soil|crop|seed|plant|tree|agriculture|hydroponics/i, color: '#6FCF97', icon: '🌱',
+          ikrw: t => `Go outside and touch the soil. Find a seed or a plant similar to ${t} and observe its structure without a screen.` },
+        { name: 'Nutrition & Health', test: /food|nutrition|eat|diet|vitamin|protein|health/i, color: '#E8A33D', icon: '🍎',
+          ikrw: t => `Look in your kitchen for an ingredient related to ${t}. Discuss its nutritional value with an elder.` },
+        { name: 'Physics & Forces', test: /physics|gravity|force|motion|energy|light|sound/i, color: '#4FD1C5', icon: '⚛️',
+          ikrw: t => `Create a physical experiment to demonstrate ${t} using household objects (like dropping a ball or bending light with a glass of water).` },
+        { name: 'Earth Engineering', test: /build|structure|water|purify|clean|filter|architecture/i, color: '#38bdf8', icon: '🏗️',
+          ikrw: t => `Draw a blueprint on paper showing how you would engineer a solution using ${t} to help your local community.` },
+        { name: 'Animal Biology', test: /animal|mammal|species|bird|fish|insect/i, color: '#FF7A5C', icon: '🦁',
+          ikrw: t => `Observe a local animal or insect outside. Think about how it survives and how its traits compare to ${t}.` },
+        { name: 'Mathematics', test: /math|number|geometry|equation|spiral|fibonacci/i, color: '#9C8CF0', icon: '🧮',
+          ikrw: t => `Find a pattern in nature (like a leaf or shell) that reflects the rules of ${t}. Count its segments.` },
+        { name: 'General Knowledge', test: /.*/, color: '#A9B0C0', icon: '✨',
+          ikrw: t => `Explain the concept of ${t} to someone younger than you in simple words.` }
+    ],
+
+    init() { this.route('discover'); this.renderMasterGraph(); },
 
     route(panelId) {
         document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        
         document.getElementById(`panel-${panelId}`).classList.add('active');
         document.querySelector(`[data-panel="${panelId}"]`).classList.add('active');
         
-        // Mark previous as done
         const navs = Array.from(document.querySelectorAll('.nav-item'));
         const idx = navs.findIndex(n => n.dataset.panel === panelId);
-        navs.forEach((n, i) => { if (i < idx) n.classList.add('done'); else n.classList.remove('done'); });
+        navs.forEach((n, i) => { n.classList.toggle('done', i < idx); });
     },
 
-    // Scramble Animation for Discover
     scramble(btn, wordA, wordB) {
-        const wa = btn.querySelector('.wa'); const wb = btn.querySelector('.wb');
+        const wa = btn.querySelector('.wa'), wb = btn.querySelector('.wb');
         const chars = '!<>-_\\/[]{}—=+*^?#~';
-        const scrambleText = (el, final) => {
-            let f = 0;
-            const iv = setInterval(() => {
+        const scr = (el, final) => {
+            let f = 0; const iv = setInterval(() => {
                 let out = '';
-                for(let i=0; i<final.length; i++) {
-                    out += (i < Math.floor((f/10)*final.length)) ? final[i] : chars[Math.floor(Math.random()*chars.length)];
-                }
-                el.innerText = out;
-                if(f++ >= 10) { clearInterval(iv); el.innerText = final; }
+                for(let i=0; i<final.length; i++) out += (i < Math.floor((f/10)*final.length)) ? final[i] : chars[Math.floor(Math.random()*chars.length)];
+                el.innerText = out; if(f++ >= 10) { clearInterval(iv); el.innerText = final; }
             }, 40);
         };
-        scrambleText(wa, wordA); scrambleText(wb, wordB);
+        scr(wa, wordA); scr(wb, wordB);
     },
 
     /**
-     * STREAMING_CHUNK: Data Extraction (Wiki API)
+     * STREAMING_CHUNK: Search & MediaWiki Extraction
      */
     async searchWiki() {
         const query = document.getElementById('wikiSearch').value.trim();
@@ -262,7 +300,7 @@ const App = {
         resEl.innerHTML = ''; loader.style.display = 'flex';
 
         try {
-            // 1. Search Query
+            // Priority 1: Search Wikipedia for rich data
             const url = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&utf8=&format=json&origin=*`;
             const res = await fetch(url);
             const data = await res.json();
@@ -272,25 +310,27 @@ const App = {
             const title = data.query.search[0].title;
             const snippet = data.query.search[0].snippet.replace(/<[^>]*>?/gm, '');
 
-            // 2. Deep Parse (Links & Categories)
-            const parseUrl = `https://en.wikipedia.org/w/api.php?action=parse&page=${encodeURIComponent(title)}&prop=links|categories&format=json&origin=*`;
-            const pRes = await fetch(parseUrl);
+            // Priority 2: Extract links/categories to build the graph
+            const pRes = await fetch(`https://en.wikipedia.org/w/api.php?action=parse&page=${encodeURIComponent(title)}&prop=links|categories&format=json&origin=*`);
             const pData = await pRes.json();
             
-            const links = (pData.parse.links || []).filter(l => l.ns === 0).map(l => l['*']).slice(0, 6);
-            const cats = (pData.parse.categories || []).filter(c => !c['*'].includes('articles')).map(c => c['*'].replace(/_/g, ' ')).slice(0, 4);
+            const links = (pData.parse.links || []).filter(l => l.ns === 0).map(l => l['*']).slice(0, 5);
+            const cats = (pData.parse.categories || []).filter(c => !c['*'].includes('articles')).map(c => c['*'].replace(/_/g, ' ')).slice(0, 3);
 
-            this.currentConcept = { title, snippet, links, cats };
+            // Priority 3: Classify the topic for IKRw
+            const category = this.CATEGORIES.find(c => c.test.test(title + " " + snippet)) || this.CATEGORIES[this.CATEGORIES.length - 1];
+
+            this.currentConcept = { title, snippet, links, cats, category };
             this.learnedConcepts.add(title);
             
-            // Render UI
+            // Render Result
             resEl.innerHTML = `
-                <div class="simple-item" style="border-color: var(--teal); cursor:pointer;" onclick="App.route('experience')">
-                    <span class="material-symbols-rounded text-teal-400 text-4xl">lightbulb</span>
+                <div class="simple-item" style="border-color: ${category.color}; cursor:pointer;" onclick="App.openViewer()">
+                    <span class="text-3xl">${category.icon}</span>
                     <div>
-                        <div class="t" style="color: var(--teal);">${title}</div>
+                        <div class="t" style="color: ${category.color};">${title}</div>
                         <div class="d">${snippet}...</div>
-                        <div class="action-chip">Parsed successfully. Proceed to Experience →</div>
+                        <div class="mt-2 text-xs font-bold text-teal-400 uppercase tracking-widest">Click to Expand & Evolve →</div>
                     </div>
                 </div>
             `;
@@ -298,34 +338,66 @@ const App = {
             this.buildPipelines();
 
         } catch(e) {
-            resEl.innerHTML = `<div class="text-rose-400 f-mono">Syntax Error: Concept not found in universal registry.</div>`;
+            resEl.innerHTML = `<div class="text-rose-400 f-mono">System Error: Concept not found in universal registry.</div>`;
         }
         loader.style.display = 'none';
     },
 
     /**
-     * STREAMING_CHUNK: Dynamic Pipeline Generation (IKRw & Mermaid Compilers)
+     * STREAMING_CHUNK: Viewer & Contribution Links
+     */
+    openViewer() {
+        const c = this.currentConcept;
+        if(!c) return;
+
+        document.getElementById('v-title').innerText = c.title;
+        document.getElementById('v-category').innerText = `${c.category.icon} ${c.category.name}`;
+        document.getElementById('v-category').style.color = c.category.color;
+        document.getElementById('v-extract').innerText = c.snippet + "...";
+        document.getElementById('v-ikrw').innerText = c.category.ikrw(c.title);
+
+        // Build Universal Contribution Vectors
+        const githubRepoBase = 'https://github.com/bhearth/khela/new/main/pages';
+        const fileContent = `# ${c.title}\n\n**My Physical Observation:**\n[Write what you noticed here...]\n\n**Category:** ${c.category.name}`;
+        const githubUrl = `${githubRepoBase}?filename=${encodeURIComponent(c.title.replace(/\s+/g,'_'))}.md&value=${encodeURIComponent(fileContent)}`;
+        
+        const mediaWikiUrl = `https://kids.miraheze.org/wiki/${encodeURIComponent(c.title.replace(/\s+/g,'_'))}?action=edit`;
+        const googleUrl = `https://www.google.com/search?q=${encodeURIComponent(c.title + ' facts for kids')}`;
+
+        document.getElementById('v-actions').innerHTML = `
+            <a href="${mediaWikiUrl}" target="_blank" class="action-chip chip-wiki">
+                <span class="material-symbols-rounded">edit_document</span> Edit on Kids Wiki
+            </a>
+            <a href="${githubUrl}" target="_blank" class="action-chip chip-github">
+                <span class="material-symbols-rounded">code</span> Map to GitHub Repo
+            </a>
+            <a href="${googleUrl}" target="_blank" class="action-chip chip-google">
+                <span class="material-symbols-rounded">travel_explore</span> Search Google Knowledge
+            </a>
+        `;
+
+        document.getElementById('viewerOverlay').classList.add('open');
+        this.route('experience'); // Auto-advance flow
+    },
+
+    closeViewer() {
+        document.getElementById('viewerOverlay').classList.remove('open');
+    },
+
+    /**
+     * STREAMING_CHUNK: Dynamic Mermaid Compilation (AST & Evolve)
      */
     buildPipelines() {
         const c = this.currentConcept;
         if(!c) return;
 
-        // --- 3. Experience (IKRw) ---
-        const actions = [
-            `Go outside and find a physical manifestation of ${c.title}.`,
-            `Explain ${c.title} to a child without using a screen.`,
-            `Draw the architecture of ${c.title} on physical paper.`,
-            `Meditate on how ${c.title} connects to your daily life.`
-        ];
-        const randomAction = actions[Math.floor(Math.random() * actions.length)];
-        
+        // 3. Experience Tab
         document.getElementById('experience-list').innerHTML = `
-            <div class="simple-item">
-                <span class="material-symbols-rounded text-rose-400 text-3xl">psychology</span>
+            <div class="simple-item" style="border-color: ${c.category.color}">
+                <span class="text-3xl">${c.category.icon}</span>
                 <div>
                     <div class="t">Physical Grounding Protocol (IKRw)</div>
-                    <div class="d text-white font-bold my-2 text-lg">${randomAction}</div>
-                    <div class="d text-xs mt-2">Theory without action is illusion. Check this off when complete.</div>
+                    <div class="d text-white font-bold my-2 text-lg">${c.category.ikrw(c.title)}</div>
                     <label class="mt-4 flex items-center gap-3 cursor-pointer text-sm text-teal-400 font-bold border border-teal-500/30 w-max px-4 py-2 rounded-full hover:bg-teal-500/10 transition">
                         <input type="checkbox" onchange="if(this.checked) App.route('collaborate')"> I have completed this physical action
                     </label>
@@ -333,60 +405,41 @@ const App = {
             </div>
         `;
 
-        // --- 4. Collaborate (Concept Mermaid Graph) ---
-        const safeTitle = c.title.replace(/[^a-zA-Z0-9]/g, '_');
+        // 4. Collaborate Tab (Concept Graph)
         let mmdNode = `graph TD\n`;
-        mmdNode += `classDef core fill:#121A29,stroke:#4FD1C5,stroke-width:2px,color:#fff\n`;
+        mmdNode += `classDef core fill:#121A29,stroke:${c.category.color},stroke-width:2px,color:#fff\n`;
         mmdNode += `classDef link fill:#1A2436,stroke:#9C8CF0,stroke-width:1px,color:#A9B0C0\n`;
         mmdNode += `classDef cat fill:#1A2436,stroke:#E8A33D,stroke-width:1px,color:#A9B0C0\n`;
         
         mmdNode += `ROOT(("${c.title}")):::core\n`;
         
         c.links.forEach((link, i) => {
-            const safeLink = link.replace(/[^a-zA-Z0-9]/g, '');
             mmdNode += `L${i}["${link}"]:::link\n`;
-            mmdNode += `ROOT -->|Connects| L${i}\n`;
+            mmdNode += `ROOT --> L${i}\n`;
         });
         
         c.cats.forEach((cat, i) => {
-            const safeCat = cat.replace(/[^a-zA-Z0-9]/g, '');
             mmdNode += `C${i}["${cat}"]:::cat\n`;
-            mmdNode += `ROOT -.->|Category| C${i}\n`;
+            mmdNode += `ROOT -.-> C${i}\n`;
         });
 
         this.renderMermaid('collaborate-graph', mmdNode);
 
-        // --- 5. Contribute ---
-        document.getElementById('contribute-list').innerHTML = `
-            <div class="simple-item">
-                <span class="material-symbols-rounded text-green-400 text-3xl">edit_document</span>
-                <div>
-                    <div class="t">Improve the Global Knowledge Base</div>
-                    <div class="d mb-4">Did you discover something new about <b>${c.title}</b> during your physical experience? Add it to the open ledger.</div>
-                    <a href="https://kids.miraheze.org/wiki/${encodeURIComponent(c.title)}?action=edit" target="_blank" class="bg-green-500/20 text-green-400 border border-green-500/50 px-5 py-2 rounded-full text-sm font-bold uppercase tracking-widest hover:bg-green-500 hover:text-black transition inline-flex items-center gap-2">
-                        Edit Wiki Page <span class="material-symbols-rounded text-lg">launch</span>
-                    </a>
-                    <button class="mt-4 block text-xs text-muted underline" onclick="App.route('evolve')">Skip to Master Evolution Map</button>
-                </div>
-            </div>
-        `;
+        // 5. Contribute Tab (Mirroring Viewer Links for flow)
+        document.getElementById('contribute-list').innerHTML = document.getElementById('v-actions').innerHTML;
 
-        // --- 6. Evolve (Master EVOD Graph) ---
+        // 6. Evolve Tab (Master Graph)
         this.renderMasterGraph();
     },
 
-    /**
-     * STREAMING_CHUNK: The Infinite Master Graph Compiler
-     */
     renderMasterGraph() {
         let mmdMaster = `graph LR\n`;
         mmdMaster += `classDef user fill:#0B0F1A,stroke:#E8A33D,stroke-width:3px,color:#fff\n`;
         mmdMaster += `classDef stage fill:#121A29,stroke:#4FD1C5,stroke-width:2px,color:#fff\n`;
         mmdMaster += `classDef concept fill:#1A2436,stroke:#9C8CF0,stroke-width:1px,color:#fff\n`;
         
-        mmdMaster += `U(("👶 Innocent<br/>User")):::user\n`;
+        mmdMaster += `U(("👶 Child / Explorer")):::user\n`;
         
-        // Define the 6 static stages
         const stages = ['Discover', 'Learn', 'Experience', 'Collaborate', 'Contribute', 'Evolve'];
         stages.forEach((s, i) => {
             mmdMaster += `S${i}{{"${i+1}. ${s}"}}:::stage\n`;
@@ -394,22 +447,17 @@ const App = {
             else mmdMaster += `S${i-1} ==> S${i}\n`;
         });
 
-        // Map learned concepts to the stages dynamically
         if (this.learnedConcepts.size === 0) {
-            mmdMaster += `Empty["(Search a concept to begin mapping)"]:::concept\n`;
+            mmdMaster += `Empty["(Awaiting Knowledge)"]:::concept\n`;
             mmdMaster += `S1 -.-> Empty\n`;
         } else {
             let i = 0;
             this.learnedConcepts.forEach(concept => {
-                const safeC = concept.replace(/[^a-zA-Z0-9]/g, '');
                 mmdMaster += `C${i}["${concept}"]:::concept\n`;
-                // Map the concept to the learning flow
-                mmdMaster += `S1 -->|Searched| C${i}\n`;
-                mmdMaster += `C${i} -.->|Generated Action| S2\n`;
-                mmdMaster += `C${i} -.->|Built Network| S3\n`;
+                mmdMaster += `S1 --> C${i}\n`;
+                mmdMaster += `C${i} -.->|Action Taken| S2\n`;
                 i++;
             });
-            // Show evolution looping back
             mmdMaster += `S5 -.->|Generates New Curiosity| U\n`;
         }
 
@@ -418,13 +466,13 @@ const App = {
 
     async renderMermaid(containerId, graphStr) {
         const container = document.getElementById(containerId);
-        container.innerHTML = ''; // Clear previous
+        container.innerHTML = ''; 
         try {
             const { svg } = await mermaid.render(`mmd-${Date.now()}`, graphStr);
             container.innerHTML = svg;
         } catch (e) {
             console.error("Mermaid Render Error:", e);
-            container.innerHTML = `<div class="text-rose-400 f-mono text-sm p-4">Graph compilation error. Adjust syntax.</div>`;
+            container.innerHTML = `<div class="text-rose-400 f-mono text-sm p-4">Compilation Error.</div>`;
         }
     }
 };
