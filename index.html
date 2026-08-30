@@ -1,361 +1,454 @@
+```html
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=no">
-    <title>Khel.o · Supreme Evolution</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Khel.o · The Ultimate Hyper-OS (500+ Chats Compiled)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700;800&family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0" />
+<style>
+:root {
+    --bg-void: #02040a; --panel-bg: rgba(10, 15, 25, 0.85); --panel-edge: rgba(255, 255, 255, 0.08);
+    --text-main: #f8fafc; --text-muted: #94a3b8;
+    --gold: #fbbf24; --accent: #38bdf8; --emerald: #10b981; --rose: #f43f5e; --violet: #a855f7;
+    --sidebar-w: 260px; --radius: 20px;
+    --font-ui: 'Inter', sans-serif; --font-disp: 'Space Grotesk', sans-serif; --font-mono: 'JetBrains Mono', monospace;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body { 
+    background: var(--bg-void); color: var(--text-main); font-family: var(--font-ui); 
+    overflow: hidden; height: 100vh; touch-action: none;
+    transition: filter 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+/* Tri-State Consciousness Filters */
+body.mode-sat { filter: grayscale(80%) contrast(1.15); }
+body.mode-chit { filter: none; }
+body.mode-anand { filter: saturate(1.4) brightness(1.05) contrast(1.05); }
 
-    <!-- Premium Typography & Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700;800&family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0" />
+.f-disp { font-family: var(--font-disp); }
+.f-mono { font-family: var(--font-mono); }
 
-    <!-- Core Libraries -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+/* === APP SHELL === */
+.app-shell { display: flex; height: 100vh; overflow: hidden; position: relative; z-index: 10; }
+#webgl-bg { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
 
-    <style>
-        :root {
-            --bg-void: #02040a;
-            --panel-bg: rgba(10, 15, 25, 0.85);
-            --panel-border: rgba(255, 255, 255, 0.1);
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --gold: #fbbf24;
-            --accent: #38bdf8;
-            --sidebar-w: 240px;
-        }
+.sidebar {
+    width: var(--sidebar-w); background: rgba(3, 6, 12, 0.95);
+    border-right: 1px solid var(--panel-edge); display: flex; flex-direction: column;
+    padding: 24px 16px; z-index: 50; flex-shrink: 0; backdrop-filter: blur(20px);
+}
+.brand { font-size: 1.8rem; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 8px; margin-bottom: 10px; padding: 0 10px; font-family: var(--font-disp);}
+.brand span { color: var(--accent); animation: pulse 2s infinite;}
+.brand-sub { font-size: 0.65rem; color: var(--text-muted); letter-spacing: 2px; text-transform: uppercase; padding: 0 10px; margin-bottom: 30px; font-family: var(--font-mono);}
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg-void); color: var(--text-main); font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; }
+.nav-item {
+    display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 12px;
+    color: var(--text-muted); font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: 0.2s;
+    border: 1px solid transparent; margin-bottom: 4px;
+}
+.nav-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+.nav-item.active { background: rgba(56, 189, 248, 0.1); border-color: rgba(56, 189, 248, 0.3); color: #fff; box-shadow: 0 0 15px rgba(56,189,248,0.1);}
+.nav-item .n-badge {
+    width: 24px; height: 24px; border-radius: 50%; background: var(--panel-edge); color: #fff;
+    display: flex; align-items: center; justify-content: center; font-size: 0.75rem; flex-shrink: 0; font-family: var(--font-mono);
+}
+.nav-item.active .n-badge { background: var(--accent); color: #000; }
+.nav-item.done .n-badge { background: var(--emerald); color: #000; }
 
-        .f-disp { font-family: 'Space Grotesk', sans-serif; }
-        .f-mono { font-family: 'JetBrains Mono', monospace; }
+.tri-state-toggle { margin-top: auto; display: flex; gap: 6px; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 12px; border: 1px solid var(--panel-edge); }
+.ts-btn { flex: 1; padding: 8px; border-radius: 8px; text-align: center; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; color: var(--text-muted); transition: 0.2s; border: 1px solid transparent;}
+.ts-btn.active { color: #000; }
+.ts-btn[data-mode="sat"].active { background: #94a3b8; }
+.ts-btn[data-mode="chit"].active { background: var(--accent); }
+.ts-btn[data-mode="anand"].active { background: var(--gold); }
 
-        .app-shell { display: flex; height: 100vh; overflow: hidden; position: relative; z-index: 10; }
-        #webgl-bg { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
-        
-        .sidebar {
-            width: var(--sidebar-w); background: rgba(3, 6, 12, 0.95);
-            border-right: 1px solid var(--panel-border); display: flex; flex-direction: column;
-            padding: 24px 16px; z-index: 50; flex-shrink: 0; backdrop-filter: blur(20px);
-        }
-        
-        .brand { font-size: 1.8rem; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 8px; margin-bottom: 30px; padding: 0 10px; font-family: 'Space Grotesk';}
-        .brand span { color: var(--accent); animation: pulse 2s infinite;}
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+main { flex: 1; position: relative; background: transparent; overflow-y: auto; overflow-x: hidden; scroll-behavior: smooth;}
+.panel { display: none; padding: 40px; max-width: 1200px; margin: 0 auto; animation: fadeUp 0.4s ease forwards; }
+.panel.active { display: block; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        .nav-item {
-            display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 12px;
-            color: var(--text-muted); font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: 0.2s;
-            border: 1px solid transparent; margin-bottom: 4px;
-        }
-        .nav-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
-        .nav-item.active { background: rgba(56, 189, 248, 0.1); border-color: rgba(56, 189, 248, 0.3); color: #fff; box-shadow: 0 0 15px rgba(56,189,248,0.1);}
-        .nav-item .n-badge {
-            width: 24px; height: 24px; border-radius: 50%; background: var(--panel-border); color: #fff;
-            display: flex; align-items: center; justify-content: center; font-size: 0.75rem; flex-shrink: 0; font-family: 'JetBrains Mono';
-        }
-        .nav-item.active .n-badge { background: var(--accent); color: #000; }
-        .nav-item.completed .n-badge { background: #10b981; color: #000; }
+.panel-title { font-size: 2.5rem; font-weight: 800; color: #fff; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; font-family: var(--font-disp); }
+.panel-desc { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 30px; line-height: 1.6; }
 
-        main { flex: 1; position: relative; background: transparent; overflow-y: auto; overflow-x: hidden; scroll-behavior: smooth;}
-        
-        .panel { display: none; padding: 40px; max-width: 1000px; margin: 0 auto; animation: fadeUp 0.4s ease forwards; }
-        .panel.active { display: block; }
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.glass-box { background: var(--panel-bg); border: 1px solid var(--panel-edge); border-radius: var(--radius); padding: 24px; backdrop-filter: blur(16px); box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+.btn-action { background: var(--accent); color: #000; font-family: var(--font-disp); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; padding: 14px 28px; border-radius: 30px; border: none; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px;}
+.btn-action:hover { transform: translateY(-2px); filter: brightness(1.1); box-shadow: 0 10px 20px rgba(56,189,248,0.3); }
 
-        .panel-title { font-size: 2.5rem; font-weight: 800; color: #fff; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; font-family: 'Space Grotesk'; }
-        .panel-desc { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 30px; line-height: 1.6; }
+/* === DISCOVER === */
+.jumble-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 30px; }
+.jumble-card { 
+    background: rgba(255,255,255,0.02); border: 1px dashed var(--panel-edge); border-radius: 16px; 
+    padding: 30px 20px; text-align: center; cursor: pointer; transition: 0.3s; position: relative; overflow: hidden;
+}
+.jumble-card:hover { background: rgba(255,255,255,0.05); border-color: var(--accent); transform: translateY(-4px); box-shadow: 0 10px 30px rgba(56,189,248,0.1);}
+.j-text { font-family: var(--font-mono); font-size: 1.5rem; font-weight: 700; letter-spacing: 4px; color: #fff; transition: 0.3s;}
+.jumble-card.solved { border-color: var(--emerald); background: rgba(16,185,129,0.1); border-style: solid;}
+.jumble-card.solved .j-text { color: var(--emerald); font-family: var(--font-disp); letter-spacing: 2px;}
 
-        .glass-box { background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 20px; padding: 24px; backdrop-filter: blur(16px); box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
-        .btn-action { background: var(--accent); color: #000; font-family: 'Space Grotesk'; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; padding: 14px 28px; border-radius: 30px; border: none; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px;}
-        .btn-action:hover { transform: translateY(-2px); filter: brightness(1.1); box-shadow: 0 10px 20px rgba(56,189,248,0.3); }
+/* === SEARCH & VIEWER === */
+.search-wrap { display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.4); border: 2px solid var(--panel-edge); border-radius: 30px; padding: 8px 16px 8px 24px; max-width: 600px; transition: 0.3s; margin-bottom: 30px;}
+.search-wrap:focus-within { border-color: var(--accent); box-shadow: 0 0 20px rgba(56,189,248,0.2); }
+.search-wrap input { flex: 1; background: transparent; border: none; color: #fff; font-size: 1.1rem; outline: none; font-family: var(--font-ui); }
 
-        .jumble-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 30px; }
-        .jumble-card { 
-            background: rgba(255,255,255,0.02); border: 1px dashed var(--panel-border); border-radius: 16px; 
-            padding: 30px 20px; text-align: center; cursor: pointer; transition: 0.3s; position: relative; overflow: hidden;
-        }
-        .jumble-card:hover { background: rgba(255,255,255,0.05); border-color: var(--accent); transform: translateY(-4px); box-shadow: 0 10px 30px rgba(56,189,248,0.1);}
-        .j-text { font-family: 'JetBrains Mono'; font-size: 1.5rem; font-weight: 700; letter-spacing: 4px; color: #fff; transition: 0.3s;}
-        .jumble-card.solved { border-color: #10b981; background: rgba(16,185,129,0.1); border-style: solid;}
-        .jumble-card.solved .j-text { color: #10b981; font-family: 'Space Grotesk'; letter-spacing: 2px;}
+.viewer-overlay { position: fixed; inset: 0; background: rgba(5,7,12,0.8); backdrop-filter: blur(8px); z-index: 100; display: none; }
+.viewer-overlay.open { display: block; animation: fadeIn 0.3s; }
+.viewer {
+    position: fixed; top: 0; right: 0; height: 100vh; width: min(450px, 90vw); background: var(--panel-bg);
+    border-left: 1px solid var(--panel-edge); z-index: 110; padding: 30px; overflow-y: auto;
+    transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: -20px 0 50px rgba(0,0,0,0.5); backdrop-filter: blur(20px);
+}
+.viewer.open { transform: translateX(0); }
+.v-hero-img { width: 100%; height: 200px; object-fit: cover; border-radius: 12px; margin-bottom: 16px; border: 1px solid var(--panel-edge); display: none; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+.action-chip { display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; border-radius: 12px; font-weight: 700; font-size: 0.9rem; text-decoration: none; transition: 0.2s; border: 2px solid transparent; width: 100%; justify-content: center; margin-bottom: 10px;}
+.chip-wiki { background: rgba(16, 185, 129, 0.1); color: var(--emerald); border-color: rgba(16, 185, 129, 0.3); }
+.chip-github { background: rgba(168, 85, 247, 0.1); color: var(--violet); border-color: rgba(168, 85, 247, 0.3); }
+.chip-google { background: rgba(251, 191, 36, 0.1); color: var(--gold); border-color: rgba(251, 191, 36, 0.3); }
+.action-chip:hover { transform: translateY(-2px); filter: brightness(1.2); }
 
-        .mermaid-stage { background: rgba(0,0,0,0.5); border: 1px solid var(--panel-border); border-radius: 20px; padding: 20px; width: 100%; min-height: 400px; display: flex; justify-content: center; overflow-x: auto; box-shadow: inset 0 0 30px rgba(0,0,0,0.5);}
-        .mermaid { font-family: 'Space Grotesk', sans-serif !important; }
+/* === WONDER GRAPH (DOT CODING) === */
+.graph-container { 
+    position: relative; background: rgba(0,0,0,0.4); border: 1px solid var(--panel-edge); border-radius: 24px; 
+    box-shadow: inset 0 0 30px rgba(0,0,0,0.5); width: 100%; min-height: 500px; overflow: hidden; 
+    background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px); background-size: 20px 20px;
+}
+.dot-node {
+    position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    border-radius: 50%; cursor: pointer; text-align: center;
+    background: rgba(10, 15, 25, 0.9); border: 2px solid; backdrop-filter: blur(8px);
+    transform: translate(-50%, -50%) scale(0);
+    animation: popNode 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    transition: transform 0.3s, box-shadow 0.3s, border-radius 0.4s; z-index: 10;
+}
+body.mode-sat .dot-node { border-radius: 12px; }
+.dot-node:hover { transform: translate(-50%, -50%) scale(1.2); z-index: 20; box-shadow: 0 0 25px currentColor !important;}
+@keyframes popNode { to { transform: translate(-50%, -50%) scale(1); } }
+.dot-label {
+    position: absolute; top: 110%; font-family: var(--font-disp); font-size: 0.75rem;
+    font-weight: 800; text-transform: uppercase; letter-spacing: 1px; white-space: nowrap;
+    text-shadow: 0 2px 4px #000; pointer-events: none; color: #fff;
+}
 
-        .karma-form { display: flex; flex-direction: column; gap: 16px; }
-        .karma-input { background: rgba(0,0,0,0.4); border: 1px solid var(--panel-border); color: #fff; padding: 14px 20px; border-radius: 12px; font-family: 'Inter'; font-size: 1rem; outline: none; transition: 0.3s; }
-        .karma-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(56,189,248,0.2); }
+#toast { position: fixed; top: 30px; left: 50%; transform: translateX(-50%); background: var(--emerald); color: #000; padding: 12px 24px; border-radius: 30px; font-family: var(--font-disp); font-weight: 800; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 10px 40px rgba(16,185,129,0.5); z-index: 1000; opacity: 0; pointer-events: none; transition: 0.4s; }
+#toast.show { opacity: 1; transform: translateX(-50%) translateY(10px); }
 
-        #toast { position: fixed; top: 30px; left: 50%; transform: translateX(-50%); background: #10b981; color: #000; padding: 12px 24px; border-radius: 30px; font-family: 'Space Grotesk'; font-weight: 800; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 10px 40px rgba(16,185,129,0.5); z-index: 1000; opacity: 0; pointer-events: none; transition: 0.4s; }
-        #toast.show { opacity: 1; transform: translateX(-50%) translateY(10px); }
-
-        @media (max-width: 768px) {
-            .app-shell { flex-direction: column; }
-            .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--panel-border); padding: 16px; flex-direction: row; overflow-x: auto; white-space: nowrap; gap: 10px; }
-            .brand { display: none; }
-            .nav-item { padding: 8px 12px; min-height: 40px; margin-bottom: 0; }
-            main { padding: 20px; }
-        }
-    </style>
+@media (max-width: 768px) {
+    .app-shell { flex-direction: column; }
+    .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--panel-edge); padding: 16px; flex-direction: row; overflow-x: auto; white-space: nowrap; gap: 10px;}
+    .brand, .brand-sub, .tri-state-toggle { display: none; }
+    .nav-item { padding: 8px 12px; min-height: 40px; margin-bottom: 0; }
+    main { padding: 20px; }
+    .panel-title { font-size: 1.8rem; }
+}
+</style>
 </head>
-<body>
-
-<!-- 3D Stellar Background -->
-<div id="webgl-bg"></div>
+<body class="mode-chit">
 
 <div class="app-shell">
-    <!-- EVOD SIDEBAR -->
     <aside class="sidebar">
-        <div class="brand">Khel<span class="text-sky-400">.</span>o</div>
-        <nav id="evod-nav" style="display: flex; flex-direction: column; gap: 4px;"></nav>
+        <div class="brand">Khel<span>.</span>o</div>
+        <div class="brand-sub">Hyper-OS v∞</div>
+        <nav id="evod-nav">
+            <div class="nav-item active" data-panel="discover" onclick="App.route('discover')"><span class="n-badge">1</span> Discover</div>
+            <div class="nav-item" data-panel="learn" onclick="App.route('learn')"><span class="n-badge">2</span> Learn</div>
+            <div class="nav-item" data-panel="experience" onclick="App.route('experience')"><span class="n-badge">3</span> Experience</div>
+            <div class="nav-item" data-panel="collaborate" onclick="App.route('collaborate')"><span class="n-badge">4</span> Collaborate</div>
+            <div class="nav-item" data-panel="contribute" onclick="App.route('contribute')"><span class="n-badge">5</span> Contribute</div>
+            <div class="nav-item" data-panel="evolve" onclick="App.route('evolve')"><span class="n-badge">6</span> Evolve</div>
+        </nav>
+        <div class="tri-state-toggle">
+            <div class="ts-btn" data-mode="sat" onclick="App.setMode('sat')">Sat</div>
+            <div class="ts-btn active" data-mode="chit" onclick="App.setMode('chit')">Chit</div>
+            <div class="ts-btn" data-mode="anand" onclick="App.setMode('anand')">Anand</div>
+        </div>
     </aside>
 
     <main>
-        <!-- 1. DISCOVER: The Jumble Game -->
+        <!-- 1. DISCOVER -->
         <section class="panel active" id="panel-discover">
-            <div class="panel-title"><span class="material-symbols-rounded text-sky-400 text-4xl">travel_explore</span> Discover</div>
+            <div class="panel-title"><span class="material-symbols-rounded text-sky-400 text-4xl">travel_explore</span> Discover & Innovate</div>
             <p class="panel-desc">The universe is encrypted. Tap a signal anomaly to decipher it and begin your journey.</p>
-            
-            <div class="jumble-grid" id="jumble-container">
-                <!-- Injected via JS -->
-            </div>
+            <div class="jumble-grid" id="jumble-container"></div>
         </section>
 
-        <!-- 2. LEARN: The Wikipedia SPU Compiler -->
+        <!-- 2. LEARN -->
         <section class="panel" id="panel-learn">
             <div class="panel-title"><span class="material-symbols-rounded text-blue-400 text-4xl">menu_book</span> Learn</div>
-            <p class="panel-desc">We have decrypted the anomaly. Here is the semantic essence extracted from the global matrix.</p>
-            
-            <div id="learn-loader" style="display:none;" class="text-sky-400 f-mono text-sm tracking-widest uppercase mb-6 flex items-center gap-3">
-                <span class="material-symbols-rounded animate-spin">sync</span> Compiling Ast...
+            <p class="panel-desc">Search the global matrix. We extract the semantic DNA and map its connections.</p>
+            <div class="search-wrap">
+                <span class="material-symbols-rounded text-slate-400">search</span>
+                <input type="text" id="wikiSearch" placeholder="e.g., Photosynthesis, Gravity, Mycelium..." autocomplete="off" onkeypress="if(event.key==='Enter') App.searchWiki()">
+                <button class="btn-action !p-3 !rounded-full" onclick="App.searchWiki()"><span class="material-symbols-rounded">arrow_forward</span></button>
             </div>
-
-            <div id="learn-result" class="glass-box">
-                <div class="text-center text-slate-500 py-10">Awaiting decryption...</div>
-            </div>
-            
-            <div class="mt-6 flex justify-end">
-                <button class="btn-action" style="display:none;" id="btn-to-exp" onclick="App.route('experience')">Proceed to Experience <span class="material-symbols-rounded">arrow_forward</span></button>
-            </div>
+            <div id="learn-results" class="flex flex-col gap-4"></div>
         </section>
 
-        <!-- 3. EXPERIENCE: IKRw & Karma Ledger -->
+        <!-- 3. EXPERIENCE -->
         <section class="panel" id="panel-experience">
-            <div class="panel-title"><span class="material-symbols-rounded text-rose-400 text-4xl">directions_run</span> Experience</div>
-            <p class="panel-desc">Knowledge requires physical mass. Complete your IKRw Protocol to anchor this concept in reality.</p>
-            
-            <div class="glass-box">
-                <div id="ikrw-task" class="text-lg text-white font-bold mb-6 p-4 bg-rose-500/10 border border-rose-500/30 rounded-xl">
-                    Pending concept discovery...
-                </div>
-                
-                <form class="karma-form" id="karma-form" onsubmit="App.submitKarma(event)">
-                    <h3 class="f-disp text-xl text-emerald-400 mb-2">Log Physical Verification</h3>
-                    <input type="text" id="k-name" class="karma-input" placeholder="Your Explorer Name" required>
-                    <textarea id="k-obs" class="karma-input" rows="3" placeholder="Describe your physical observation of this concept..." required></textarea>
-                    <button type="submit" class="btn-action w-max !bg-emerald-400">Anchor Knowledge</button>
-                </form>
+            <div class="panel-title"><span class="material-symbols-rounded text-rose-400 text-4xl">directions_run</span> Experience (IKRw)</div>
+            <p class="panel-desc">Knowledge requires physical mass. Complete your grounding protocol to anchor this concept in reality.</p>
+            <div id="experience-list" class="glass-box">
+                <div class="text-center text-slate-500 py-10">Awaiting concept discovery...</div>
             </div>
         </section>
 
-        <!-- 4. COLLABORATE: Local AST Mermaid Map -->
+        <!-- 4. COLLABORATE -->
         <section class="panel" id="panel-collaborate">
-            <div class="panel-title"><span class="material-symbols-rounded text-purple-400 text-4xl">hub</span> Collaborate</div>
-            <p class="panel-desc">How does this concept connect to its immediate ecosystem? (Local AST)</p>
-            
-            <div class="mermaid-stage">
-                <div class="mermaid" id="local-mermaid">
-                    %% Awaiting Data
-                </div>
-            </div>
-            
-            <div class="mt-6 text-center">
-                <button class="btn-action" onclick="App.route('contribute')">Next: Share Findings <span class="material-symbols-rounded">arrow_forward</span></button>
+            <div class="panel-title"><span class="material-symbols-rounded text-purple-400 text-4xl">hub</span> Collaborate (Local AST)</div>
+            <p class="panel-desc">How does this concept connect to its immediate ecosystem? (Semantic Resonance Map)</p>
+            <div class="graph-container" id="collab-graph-container">
+                <svg id="collab-svg" style="position:absolute; inset:0; width:100%; height:100%; pointer-events:none;"></svg>
+                <div id="collab-nodes" style="position:absolute; inset:0;"></div>
             </div>
         </section>
 
-        <!-- 5. CONTRIBUTE: Extensibility Links -->
+        <!-- 5. CONTRIBUTE -->
         <section class="panel" id="panel-contribute">
-            <div class="panel-title"><span class="material-symbols-rounded text-gold text-4xl">volunteer_activism</span> Contribute</div>
-            <p class="panel-desc">Export your physical observations back into the digital commons.</p>
-            
-            <div class="glass-box" id="contribute-links">
-                <div class="text-center text-slate-500">Pending concept selection.</div>
+            <div class="panel-title"><span class="material-symbols-rounded text-yellow-400 text-4xl">volunteer_activism</span> Contribute</div>
+            <p class="panel-desc">Export your physical observations back into the digital commons. Choose your vector.</p>
+            <div id="contribute-list" class="glass-box">
+                <div class="text-center text-slate-500 py-10">Pending concept selection.</div>
             </div>
         </section>
 
-        <!-- 6. EVOLVE: The Infinite Master Graph -->
+        <!-- 6. EVOLVE -->
         <section class="panel" id="panel-evolve">
-            <div class="panel-title"><span class="material-symbols-rounded text-green-400 text-4xl">all_inclusive</span> Evolve</div>
-            <p class="panel-desc">Your infinite journey mapped. All learned nodes permanently connected.</p>
-            
-            <div class="mermaid-stage" style="min-height: 600px;">
-                <div class="mermaid" id="master-mermaid">
-                    %% Awaiting Data
-                </div>
+            <div class="panel-title"><span class="material-symbols-rounded text-green-400 text-4xl">all_inclusive</span> Evolve (Master Karma Ledger)</div>
+            <p class="panel-desc">Your infinite journey mapped. All learned nodes permanently connected across the cosmos.</p>
+            <div class="graph-container" id="evolve-graph-container" style="min-height: 600px;">
+                <svg id="evolve-svg" style="position:absolute; inset:0; width:100%; height:100%; pointer-events:none;"></svg>
+                <div id="evolve-nodes" style="position:absolute; inset:0;"></div>
             </div>
         </section>
     </main>
+</div>
+
+<!-- VIEWER OVERLAY -->
+<div class="viewer-overlay" id="viewerOverlay" onclick="if(event.target===this) App.closeViewer()">
+    <div class="viewer" id="viewer">
+        <div class="flex justify-between items-start mb-4">
+            <div>
+                <div id="v-category" class="text-xs font-bold uppercase tracking-widest mb-2 f-mono">Category</div>
+                <h2 id="v-title" class="f-disp text-3xl font-bold text-white mb-1">Concept</h2>
+            </div>
+            <button class="w-10 h-10 rounded-full border border-slate-700 flex items-center justify-center text-white hover:bg-rose-500 hover:border-rose-500 transition" onclick="App.closeViewer()"><span class="material-symbols-rounded">close</span></button>
+        </div>
+        <img id="v-image" class="v-hero-img" alt="Knowledge Image" />
+        <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700 mb-6">
+            <p id="v-extract" class="text-sm text-slate-300 leading-relaxed"></p>
+        </div>
+        <h3 class="f-disp text-lg text-white mb-3 flex items-center gap-2"><span class="material-symbols-rounded text-rose-400">psychology</span> IKRw Physical Action</h3>
+        <p id="v-ikrw" class="text-sm text-rose-200 mb-8 bg-rose-500/10 p-4 rounded-xl border border-rose-500/20"></p>
+        <h3 class="f-disp text-lg text-white mb-3">Contribution Vectors</h3>
+        <div id="v-actions"></div>
+        <button class="w-full py-3 rounded-xl bg-white/5 border border-white/10 text-white font-bold flex items-center justify-center gap-2 hover:bg-white/10 transition mt-4" onclick="App.readAloud()">
+            <span class="material-symbols-rounded">volume_up</span> Read Concept Aloud (Drishti)
+        </button>
+    </div>
 </div>
 
 <div id="toast"></div>
 
 <script>
 /**
- * STREAMING_CHUNK: System Initialization & Configuration
+ * =====================================================================
+ * KHEL.O HYPER-OS: THE ULTIMATE COMPILATION
+ * Architecture: SPU (Semantic Processing Unit) + FMEA Shield + WonderGraph
+ * =====================================================================
  */
-// Initialize Mermaid with a custom Dark Theme tailored to Khel.o
-mermaid.initialize({
-    startOnLoad: false,
-    theme: 'base',
-    themeVariables: {
-        background: 'transparent',
-        primaryColor: '#121A29',
-        primaryTextColor: '#F2EFE9',
-        primaryBorderColor: '#38bdf8',
-        lineColor: '#94a3b8',
-        secondaryColor: '#1A2436',
-        tertiaryColor: '#1A2436',
-        fontFamily: 'Space Grotesk'
-    },
-    flowchart: { curve: 'basis', nodeSpacing: 50, rankSpacing: 50 }
-});
 
-const CONFIG = {
-    EVOD_STEPS: [
-        { id: 'discover', label: 'Discover' },
-        { id: 'learn', label: 'Learn' },
-        { id: 'experience', label: 'Experience' },
-        { id: 'collaborate', label: 'Collaborate' },
-        { id: 'contribute', label: 'Contribute' },
-        { id: 'evolve', label: 'Evolve' }
-    ],
-    // The seeds for the Jumble Game
-    SEEDS: [
-        { target: 'Ecology', cat: 'Science', color: '#10b981' },
-        { target: 'Gravity', cat: 'Physics', color: '#a855f7' },
-        { target: 'Architecture', cat: 'Construct', color: '#38bdf8' },
-        { target: 'Nutrition', cat: 'Biology', color: '#fbbf24' }
-    ]
-};
+// 1. THE 14-WAY CLASSIFICATION (Real Learning & IKRw Protocols)
+const CATEGORIES = [
+    { name: 'Agriculture & Soil', test: /farm|soil|crop|seed|plant|tree|agriculture|hydroponics|mycelium/i, color: '#10b981', icon: '🌱', hue: 140,
+      ikrw: t => `Go outside and touch the soil. Find a seed or a plant similar to ${t} and observe its structure without a screen.` },
+    { name: 'Nutrition & Health', test: /food|nutrition|eat|diet|vitamin|protein|health|gut/i, color: '#f59e0b', icon: '🍎', hue: 40,
+      ikrw: t => `Look in your kitchen for an ingredient related to ${t}. Discuss its nutritional value or origin with an elder.` },
+    { name: 'Physics & Forces', test: /physics|gravity|force|motion|energy|light|sound|quantum|thermo/i, color: '#38bdf8', icon: '⚛️', hue: 200,
+      ikrw: t => `Create a physical experiment to demonstrate ${t} using household objects (like dropping a ball or bending light with water).` },
+    { name: 'Earth Engineering', test: /build|structure|water|purify|clean|filter|architecture|civil/i, color: '#64748b', icon: '🏗️', hue: 210,
+      ikrw: t => `Draw a blueprint on paper showing how you would engineer a solution using ${t} to help your local community.` },
+    { name: 'Animal Biology', test: /animal|mammal|species|bird|fish|insect|zoology|ecology/i, color: '#f97316', icon: '🦁', hue: 25,
+      ikrw: t => `Observe a local animal or insect outside. Think about how it survives and how its traits compare to ${t}.` },
+    { name: 'Mathematics & Logic', test: /math|number|geometry|equation|spiral|fibonacci|algorithm/i, color: '#a855f7', icon: '🧮', hue: 270,
+      ikrw: t => `Find a pattern in nature (like a leaf or shell) that reflects the rules of ${t}. Count its segments.` },
+    { name: 'Ocean & Marine', test: /ocean|sea|reef|coral|marine|tidal|whale/i, color: '#0ea5e9', hue: 190, icon: '🌊',
+      ikrw: t => `Fill a bowl with water. Think about how ${t} relies on water properties, or visit a local water body.` },
+    { name: 'Space & Astronomy', test: /space|planet|star|galaxy|universe|moon|solar|astro/i, color: '#8b5cf6', icon: '🌌', hue: 260,
+      ikrw: t => `Look at the night sky. Try to imagine the scale and distance of ${t} compared to your own body.` },
+    { name: 'Art & Culture', test: /art|music|paint|draw|dance|culture|instrument|sculpt/i, color: '#ec4899', icon: '🎨', hue: 330,
+      ikrw: t => `Draw a quick sketch or hum a tune representing how ${t} feels. Express it physically.` },
+    { name: 'History & Civilization', test: /history|ancient|king|war|empire|civilization|ritual/i, color: '#d97706', icon: '🏛️', hue: 35,
+      ikrw: t => `Ask an elder in your family if they know a story or physical artifact related to ${t}.` },
+    { name: 'Geography & Places', test: /geography|country|mountain|river|city|continent|map/i, color: '#14b8a6', icon: '🗺️', hue: 160,
+      ikrw: t => `Look at a physical map or globe and try to locate ${t}. Trace its boundaries with your finger.` },
+    { name: 'Technology & Code', test: /technology|computer|machine|robot|software|engine|ai|code/i, color: '#6366f1', icon: '💻', hue: 240,
+      ikrw: t => `Look at a device in your home. Think about the physical materials inside that make ${t} work.` },
+    { name: 'Language & Literature', test: /language|word|book|literature|poem|write|story/i, color: '#f43f5e', icon: '📚', hue: 350,
+      ikrw: t => `Write a physical note to someone using concepts from ${t}, or read a page aloud.` },
+    { name: 'General Knowledge', test: /.*/, color: '#94a3b8', icon: '✨', hue: 0,
+      ikrw: t => `Explain the concept of ${t} to someone younger than you in simple words, without using a screen.` }
+];
 
-/**
- * STREAMING_CHUNK: SPU (Semantic Processing Unit)
- * Mathematical fallback and categorization.
- */
+// 2. SPU (SEMANTIC PROCESSING UNIT) & FMEA SHIELD
 const SPU = {
     hash(str) {
         let h = 0x811c9dc5;
         for (let i = 0; i < str.length; i++) h = Math.imul(h ^ str.charCodeAt(i), 0x01000193);
         return Math.abs(h >>> 0);
     },
-    
     analyze(text) {
         const hVal = this.hash(text);
         const hue = hVal % 360;
-        
-        // IKRw Generation Fallback
-        const actions = [
-            `Go outside and find a physical manifestation of ${text}.`,
-            `Explain ${text} to a child without using a screen.`,
-            `Draw the architecture of ${text} on physical paper.`,
-            `Meditate on how ${text} connects to your daily life.`
-        ];
-        
+        const cat = CATEGORIES.find(c => c.test.test(text)) || CATEGORIES[CATEGORIES.length - 1];
         return {
             title: text,
             hash: hVal,
-            color: `hsl(${hue}, 80%, 65%)`,
-            ikrw: actions[hVal % actions.length],
-            links: ['Nature', 'Science', 'Society'] // Fallback links
+            color: cat.color,
+            icon: cat.icon,
+            hue: cat.hue || hue,
+            category: cat,
+            ikrw: cat.ikrw(text)
         };
     }
 };
 
-/**
- * STREAMING_CHUNK: WebGL Background (Stardust)
- */
-function initWebGL() {
-    const container = document.getElementById('webgl-bg');
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.z = 50;
+// 3. AUDIO DSP (DRISHTI PROTOCOL)
+const AudioDSP = {
+    ctx: null,
+    init() { if(!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); },
+    playSargam(hue) {
+        this.init();
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        // Map Hue (0-360) to Frequency (200Hz - 600Hz) for 432Hz Sargam resonance
+        const freq = 200 + (hue * 1.11); 
+        osc.frequency.setTargetAtTime(freq, this.ctx.currentTime, 0.05);
+        gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.6);
+        osc.connect(gain); gain.connect(this.ctx.destination);
+        osc.start(); osc.stop(this.ctx.currentTime + 0.6);
+    },
+    speak(txt) {
+        if('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const u = new SpeechSynthesisUtterance(txt);
+            u.rate = 0.95; window.speechSynthesis.speak(u);
+        }
+    }
+};
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    container.appendChild(renderer.domElement);
+// 4. WONDER GRAPH ENGINE (DOT CODING & TRI-STATE LAYOUTS)
+const WonderGraph = {
+    drawNode(container, data, x, y, size = 60) {
+        const el = document.createElement('div');
+        el.className = 'dot-node';
+        el.style.width = `${size}px`; el.style.height = `${size}px`;
+        el.style.left = `${x}px`; el.style.top = `${y}px`;
+        el.style.borderColor = data.color; el.style.color = data.color;
+        el.style.boxShadow = `0 0 15px ${data.color}40, inset 0 0 10px ${data.color}20`;
+        el.innerHTML = `<span style="font-size:${size * 0.4}px;">${data.icon}</span><div class="dot-label" style="color:${data.color}">${data.title}</div>`;
+        el.onclick = () => { AudioDSP.playSargam(data.hue || 0); if(navigator.vibrate) navigator.vibrate(10); };
+        container.appendChild(el);
+        return el;
+    },
+    drawLine(svg, x1, y1, x2, y2, color) {
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", x1); line.setAttribute("y1", y1);
+        line.setAttribute("x2", x2); line.setAttribute("y2", y2);
+        line.setAttribute("stroke", color); line.setAttribute("stroke-width", "2");
+        line.setAttribute("stroke-dasharray", "4 4"); line.style.opacity = "0.5";
+        svg.appendChild(line);
+    },
+    render(containerId, centerNode, satellites, mode = 'chit') {
+        const container = document.getElementById(`${containerId}-container`);
+        const svg = document.getElementById(`${containerId}-svg`);
+        const nodesLayer = document.getElementById(`${containerId}-nodes`);
+        if(!container || container.clientWidth === 0) return; // FMEA: Prevent rendering in hidden tabs
+        
+        nodesLayer.innerHTML = ''; svg.innerHTML = '';
+        const cx = container.clientWidth / 2;
+        const cy = container.clientHeight / 2;
+        
+        this.drawNode(nodesLayer, centerNode, cx, cy, 80);
+        
+        const radius = Math.min(cx, cy) - 80;
+        satellites.forEach((sat, i) => {
+            let x, y;
+            if (mode === 'sat') { // Matrix / Grid
+                const cols = Math.ceil(Math.sqrt(satellites.length));
+                const spacing = Math.min(100, (container.clientWidth - 100) / cols);
+                x = 100 + (i % cols) * spacing;
+                y = 100 + Math.floor(i / cols) * spacing;
+            } else if (mode === 'anand') { // Fibonacci Flower
+                const angle = i * 137.508 * (Math.PI / 180);
+                const r = 60 + Math.sqrt(i) * 40;
+                x = cx + Math.cos(angle) * r;
+                y = cy + Math.sin(angle) * r;
+            } else { // Chit / Radial Orbit
+                const angle = (i / satellites.length) * Math.PI * 2;
+                x = cx + Math.cos(angle) * radius;
+                y = cy + Math.sin(angle) * radius;
+            }
+            
+            this.drawLine(svg, cx, cy, x, y, sat.color);
+            this.drawNode(nodesLayer, sat, x, y, 50);
+        });
+    }
+};
 
-    const geo = new THREE.BufferGeometry(); const pts = [];
-    for(let i=0; i<600; i++) pts.push((Math.random()-0.5)*200, (Math.random()-0.5)*200, (Math.random()-0.5)*200);
-    geo.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
-    const mat = new THREE.PointsMaterial({ color: 0x38bdf8, size: 0.2, transparent: true, opacity: 0.3 });
-    const stars = new THREE.Points(geo, mat);
-    scene.add(stars);
-
-    window.addEventListener('resize', () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-    });
-
-    const animate = () => {
-        requestAnimationFrame(animate);
-        stars.rotation.y += 0.0005;
-        stars.rotation.x += 0.0002;
-        renderer.render(scene, camera);
-    };
-    animate();
-}
-
-/**
- * STREAMING_CHUNK: Master App Controller
- */
+// 5. MASTER APP CONTROLLER (EVOD FLOW)
 const App = {
-    activeConcept: null,
-    learnedConcepts: [], // Persistent Memory
+    currentConcept: null,
+    learnedConcepts: [],
+    activeMode: 'chit',
     
     init() {
-        initWebGL();
-        
-        // Load persistent graph memory
-        try { this.learnedConcepts = JSON.parse(localStorage.getItem('khelo_master_graph')) || []; } 
-        catch(e) { this.learnedConcepts = []; }
-        
-        this.buildNav();
+        this.loadMemory();
         this.buildJumbleGame();
         this.route('discover');
+        window.addEventListener('resize', () => {
+            if(this.currentConcept) this.renderCollaborateGraph();
+            if(document.getElementById('panel-evolve').classList.contains('active')) this.renderMasterGraph();
+        });
     },
 
-    buildNav() {
-        const nav = document.getElementById('evod-nav');
-        CONFIG.EVOD_STEPS.forEach((step, i) => {
-            const el = document.createElement('div');
-            el.className = `nav-item`; el.id = `nav-${step.id}`;
-            el.onclick = () => this.route(step.id);
-            el.innerHTML = `<div class="n-badge">${i+1}</div> <span>${step.label}</span>`;
-            nav.appendChild(el);
-        });
+    loadMemory() {
+        try { 
+            const mem = localStorage.getItem('khelo_karma_ledger');
+            if (mem) this.learnedConcepts = JSON.parse(mem);
+        } catch(e) { this.learnedConcepts = []; }
+    },
+    saveMemory() {
+        localStorage.setItem('khelo_karma_ledger', JSON.stringify(this.learnedConcepts));
+    },
+
+    setMode(mode) {
+        this.activeMode = mode;
+        document.body.className = `mode-${mode}`;
+        document.querySelectorAll('.ts-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+        if(this.currentConcept) this.renderCollaborateGraph();
+        if(document.getElementById('panel-evolve').classList.contains('active')) this.renderMasterGraph();
     },
 
     route(panelId) {
         document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active', 'completed'));
-        
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active', 'done'));
         document.getElementById(`panel-${panelId}`).classList.add('active');
         
         const navs = Array.from(document.querySelectorAll('.nav-item'));
-        const idx = navs.findIndex(n => n.id === `nav-${panelId}`);
-        navs.forEach((n, i) => {
+        const idx = navs.findIndex(n => n.dataset.panel === panelId);
+        navs.forEach((n, i) => { 
             if(i === idx) n.classList.add('active');
-            if(i < idx) n.classList.add('completed');
+            if(i < idx) n.classList.add('done');
         });
 
-        // JIT Graph Compilation
-        if(panelId === 'collaborate' && this.activeConcept) this.compileLocalGraph();
-        if(panelId === 'evolve') this.compileMasterGraph();
+        // JIT Graph Compilation (FMEA: Only render when visible)
+        if(panelId === 'collaborate' && this.currentConcept) this.renderCollaborateGraph();
+        if(panelId === 'evolve') this.renderMasterGraph();
     },
 
     toast(msg) {
@@ -364,197 +457,201 @@ const App = {
         setTimeout(() => t.classList.remove('show'), 3000);
     },
 
-    /**
-     * STREAMING_CHUNK: The Jumble Engine
-     */
+    readAloud() {
+        if(!this.currentConcept) return;
+        AudioDSP.speak(`${this.currentConcept.title}. ${this.currentConcept.snippet}`);
+    },
+
+    // --- DISCOVER: Jumble Engine ---
     buildJumbleGame() {
         const c = document.getElementById('jumble-container');
+        const seeds = [
+            { target: 'Ecology', cat: 'Science', color: '#10b981' },
+            { target: 'Gravity', cat: 'Physics', color: '#38bdf8' },
+            { target: 'Mycelium', cat: 'Biology', color: '#a855f7' },
+            { target: 'Nutrition', cat: 'Health', color: '#fbbf24' }
+        ];
         const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ@#$*!';
-        
-        CONFIG.SEEDS.forEach(seed => {
+        seeds.forEach(seed => {
             const el = document.createElement('div');
             el.className = 'jumble-card';
-            el.style.setProperty('--accent', seed.color);
-            
-            // Initial scramble
             let scrambled = '';
             for(let i=0; i<seed.target.length; i++) scrambled += chars[Math.floor(Math.random()*chars.length)];
-            
-            el.innerHTML = `<div class="text-[10px] text-slate-500 uppercase tracking-widest mb-2 font-bold">${seed.cat} Anomaly</div><div class="j-text">${scrambled}</div>`;
-            
+            el.innerHTML = `<div class="text-[10px] text-slate-500 uppercase tracking-widest mb-2 font-bold f-mono">${seed.cat} Anomaly</div><div class="j-text">${scrambled}</div>`;
             el.onclick = () => this.solveJumble(el, seed);
             c.appendChild(el);
         });
     },
-
     solveJumble(cardEl, seed) {
         if(cardEl.classList.contains('solved')) return;
-        if(navigator.vibrate) navigator.vibrate(10);
-        
         const textEl = cardEl.querySelector('.j-text');
         const target = seed.target.toUpperCase();
         const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ@#$*!';
         let frame = 0;
-        
         const interval = setInterval(() => {
             let out = '';
             for(let i=0; i<target.length; i++) {
                 out += (i < Math.floor((frame/15)*target.length)) ? target[i] : chars[Math.floor(Math.random()*chars.length)];
             }
             textEl.innerText = out;
-            
             if(frame++ >= 15) {
                 clearInterval(interval);
                 textEl.innerText = target;
                 cardEl.classList.add('solved');
-                setTimeout(() => this.executeSearch(seed.target), 600);
+                setTimeout(() => {
+                    document.getElementById('wikiSearch').value = seed.target;
+                    this.route('learn');
+                    this.searchWiki();
+                }, 600);
             }
         }, 30);
     },
 
-    /**
-     * STREAMING_CHUNK: Wiki Extraction Pipeline
-     */
-    async executeSearch(query) {
-        this.route('learn');
-        document.getElementById('learn-loader').style.display = 'flex';
-        document.getElementById('learn-result').innerHTML = '';
-        document.getElementById('btn-to-exp').style.display = 'none';
-
+    // --- LEARN: Wiki Extraction Pipeline with FMEA ---
+    async searchWiki() {
+        const query = document.getElementById('wikiSearch').value.trim();
+        if(!query) return;
+        const resEl = document.getElementById('learn-results');
+        resEl.innerHTML = `<div class="text-sky-400 f-mono text-sm tracking-widest uppercase flex items-center gap-3"><span class="material-symbols-rounded animate-spin">sync</span> Synthesizing Knowledge...</div>`;
+        
         try {
-            // FMEA: Primary API Fetch
-            const url = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&utf8=&format=json&origin=*`;
+            // FMEA PRIMARY: Rich Extract, High-Res Image & Links via Generator Search
+            const url = `https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(query)}&gsrlimit=1&prop=extracts|pageimages|links&exintro=1&explaintext=1&piprop=thumbnail&pithumbsize=600&pllimit=8&format=json&origin=*`;
             const res = await fetch(url);
             const data = await res.json();
+            if(!data.query || !data.query.pages) throw new Error("No results");
             
-            if(!data.query.search.length) throw new Error();
+            const page = Object.values(data.query.pages)[0];
+            const title = page.title;
+            const fullExtract = page.extract || "Concept logged in universal matrix.";
+            const snippet = fullExtract.substring(0, 140);
+            const imageUrl = page.thumbnail ? page.thumbnail.source : null;
+            const links = (page.links || []).filter(l => l.ns === 0).map(l => l.title).slice(0, 8);
             
-            const title = data.query.search[0].title;
-            const snippet = data.query.search[0].snippet.replace(/<[^>]*>?/gm, '');
-
-            // Deep Parse for Links
-            const pRes = await fetch(`https://en.wikipedia.org/w/api.php?action=parse&page=${encodeURIComponent(title)}&prop=links&format=json&origin=*`);
-            const pData = await pRes.json();
-            const links = (pData.parse.links || []).filter(l => l.ns === 0).map(l => l['*']).slice(0, 6);
-
-            const spuData = SPU.analyze(title);
-            
-            this.activeConcept = { title, snippet, links, ...spuData };
+            // SPU Classification
+            const spuData = SPU.analyze(title + " " + fullExtract);
+            this.currentConcept = { title, snippet, fullExtract, imageUrl, links, ...spuData };
 
         } catch(e) {
-            // FMEA: Fallback to SPU Math
-            this.activeConcept = SPU.analyze(query);
-            this.activeConcept.snippet = `Secure connection failed. Synthesized baseline semantics for ${query}.`;
+            // FMEA FALLBACK: SPU Mathematical Synthesis (Zero Dead Ends)
+            const spuData = SPU.analyze(query);
+            this.currentConcept = { 
+                title: query, 
+                snippet: `Secure connection failed. Synthesized baseline semantics for ${query}. The universe still resonates.`, 
+                fullExtract: `Offline synthesis complete. Concept: ${query}.`,
+                imageUrl: null, 
+                links: ['Nature', 'Science', 'Society', 'Logic', 'Art'], 
+                ...spuData 
+            };
+            this.toast("Offline Mode: SPU Fallback Engaged");
         }
 
-        const c = this.activeConcept;
-        
-        // Save to Persistent Memory
-        if(!this.learnedConcepts.find(n => n.title === c.title)) {
-            this.learnedConcepts.push(c);
-            localStorage.setItem('khelo_master_graph', JSON.stringify(this.learnedConcepts));
+        // Save to Karma Ledger
+        if(!this.learnedConcepts.find(n => n.title === this.currentConcept.title)) {
+            this.learnedConcepts.push(this.currentConcept);
+            this.saveMemory();
         }
 
-        document.getElementById('learn-loader').style.display = 'none';
-        document.getElementById('learn-result').innerHTML = `
-            <h3 class="f-disp text-3xl font-bold text-white mb-2" style="color:${c.color}">${c.title}</h3>
-            <p class="text-slate-300 leading-relaxed">${c.snippet}</p>
-            <div class="mt-4 flex gap-2 flex-wrap">
-                ${c.links.map(l => `<span class="bg-white/5 border border-white/10 px-3 py-1 rounded-full text-xs text-slate-400">${l}</span>`).join('')}
+        const c = this.currentConcept;
+        resEl.innerHTML = `
+            <div class="glass-box flex gap-6 items-start cursor-pointer hover:border-sky-400 transition" onclick="App.openViewer()">
+                <span class="text-5xl" style="filter: drop-shadow(0 0 15px ${c.color}80);">${c.icon}</span>
+                <div style="flex:1;">
+                    <div class="text-xs font-bold uppercase tracking-widest mb-2 f-mono" style="color: ${c.color};">${c.category.name}</div>
+                    <div class="f-disp text-2xl font-bold text-white mb-2">${c.title}</div>
+                    <div class="text-slate-400 text-sm leading-relaxed mb-4">${c.snippet}...</div>
+                    <div class="inline-flex items-center gap-2 text-xs font-bold text-sky-400 uppercase tracking-widest bg-sky-500/10 px-3 py-1 rounded-full border border-sky-500/30">Expand Node →</div>
+                </div>
             </div>
         `;
-        document.getElementById('btn-to-exp').style.display = 'inline-flex';
-        
         this.buildPipelines();
     },
 
-    /**
-     * STREAMING_CHUNK: Pipeline & Mermaid Graph Generation
-     */
-    buildPipelines() {
-        const c = this.activeConcept;
+    openViewer() {
+        const c = this.currentConcept;
+        if(!c) return;
+        document.getElementById('v-title').innerText = c.title;
+        document.getElementById('v-category').innerText = `${c.icon} ${c.category.name}`;
+        document.getElementById('v-category').style.color = c.color;
         
-        // 3. Experience
-        document.getElementById('ikrw-task').innerText = c.ikrw;
+        const imgEl = document.getElementById('v-image');
+        if(c.imageUrl) { imgEl.src = c.imageUrl; imgEl.style.display = 'block'; } 
+        else { imgEl.style.display = 'none'; }
+        
+        document.getElementById('v-extract').innerText = c.fullExtract;
+        document.getElementById('v-ikrw').innerText = c.ikrw;
 
-        // 5. Contribute
+        // Contribution Vectors (GitHub, Miraheze, Google)
         const safeTitle = encodeURIComponent(c.title.replace(/\s+/g,'_'));
-        document.getElementById('contribute-links').innerHTML = `
-            <a href="https://kids.miraheze.org/wiki/${safeTitle}?action=edit" target="_blank" class="btn-action w-full !justify-start !bg-teal-500/20 !text-teal-400 border border-teal-500/50 mb-3">
-                <span class="material-symbols-rounded">edit_document</span> Edit on Kids Wiki
-            </a>
-            <a href="https://github.com/bhearth/khela/new/main/pages?filename=${safeTitle}.md" target="_blank" class="btn-action w-full !justify-start !bg-violet-500/20 !text-violet-400 border border-violet-500/50">
-                <span class="material-symbols-rounded">code</span> Map to GitHub Repo
-            </a>
+        const fileContent = `# ${c.title}\n**My Physical Observation:**\n[Write what you noticed here...]\n**Category:** ${c.category.name}\n**Task:** ${c.ikrw}`;
+        const githubUrl = `https://github.com/bhearth/khela/new/main/pages?filename=${safeTitle}.md&value=${encodeURIComponent(fileContent)}`;
+        const mediaWikiUrl = `https://kids.miraheze.org/wiki/${safeTitle}?action=edit`;
+        const googleUrl = `https://www.google.com/search?q=${encodeURIComponent(c.title + ' facts for kids')}`;
+
+        document.getElementById('v-actions').innerHTML = `
+            <a href="${mediaWikiUrl}" target="_blank" class="action-chip chip-wiki"><span class="material-symbols-rounded">edit_document</span> Edit on Kids Wiki</a>
+            <a href="${githubUrl}" target="_blank" class="action-chip chip-github"><span class="material-symbols-rounded">code</span> Map to GitHub Repo</a>
+            <a href="${googleUrl}" target="_blank" class="action-chip chip-google"><span class="material-symbols-rounded">travel_explore</span> Search Google Knowledge</a>
         `;
+        document.getElementById('viewerOverlay').classList.add('open');
+        this.route('experience');
+    },
+    closeViewer() { document.getElementById('viewerOverlay').classList.remove('open'); },
+
+    buildPipelines() {
+        const c = this.currentConcept;
+        if(!c) return;
+
+        // 3. Experience Tab
+        document.getElementById('experience-list').innerHTML = `
+            <div class="flex gap-6 items-start">
+                <span class="text-5xl">${c.icon}</span>
+                <div>
+                    <div class="f-disp text-xl font-bold text-white mb-2">Physical Grounding Protocol (IKRw)</div>
+                    <div class="text-rose-200 text-lg my-4 leading-relaxed bg-rose-500/10 p-4 rounded-xl border border-rose-500/20">${c.ikrw}</div>
+                    <label class="mt-4 flex items-center gap-3 cursor-pointer text-sm text-emerald-400 font-bold border border-emerald-500/30 w-max px-4 py-2 rounded-full hover:bg-emerald-500/10 transition">
+                        <input type="checkbox" onchange="if(this.checked) { App.toast('Physical Anchor Verified. Matrix Updated.'); setTimeout(()=>App.route('collaborate'), 800); }"> I have completed this physical action
+                    </label>
+                </div>
+            </div>
+        `;
+
+        // 5. Contribute Tab
+        const safeTitle = encodeURIComponent(c.title.replace(/\s+/g,'_'));
+        const fileContent = `# ${c.title}\n**My Physical Observation:**\n[Write what you noticed here...]`;
+        const githubUrl = `https://github.com/bhearth/khela/new/main/pages?filename=${safeTitle}.md&value=${encodeURIComponent(fileContent)}`;
+        document.getElementById('contribute-list').innerHTML = `
+            <a href="https://kids.miraheze.org/wiki/${safeTitle}?action=edit" target="_blank" class="action-chip chip-wiki"><span class="material-symbols-rounded">edit_document</span> Edit on Kids Wiki</a>
+            <a href="${githubUrl}" target="_blank" class="action-chip chip-github"><span class="material-symbols-rounded">code</span> Map to GitHub Repo</a>
+            <a href="https://www.google.com/search?q=${encodeURIComponent(c.title + ' facts for kids')}" target="_blank" class="action-chip chip-google"><span class="material-symbols-rounded">travel_explore</span> Search Google Knowledge</a>
+        `;
+
+        this.renderCollaborateGraph();
     },
 
-    submitKarma(e) {
-        e.preventDefault();
-        this.toast("Physical anchor verified. Matrix updated.");
-        setTimeout(() => this.route('collaborate'), 800);
-    },
-
-    async compileLocalGraph() {
-        const c = this.activeConcept;
-        let mmd = `graph TD\n`;
-        mmd += `classDef core fill:#121A29,stroke:${c.color},stroke-width:2px,color:#fff\n`;
-        mmd += `classDef link fill:#1A2436,stroke:#94a3b8,stroke-width:1px,color:#A9B0C0\n`;
-        
-        mmd += `ROOT(("${c.title}")):::core\n`;
-        
-        c.links.forEach((link, i) => {
-            const safeLink = link.replace(/[^a-zA-Z0-9]/g, '');
-            mmd += `L${i}["${link}"]:::link\n`;
-            mmd += `ROOT --> L${i}\n`;
+    renderCollaborateGraph() {
+        if(!this.currentConcept || document.getElementById('panel-collaborate').classList.contains('active') === false) return;
+        const c = this.currentConcept;
+        const centerNode = { title: c.title, icon: c.icon, color: c.color, hue: c.hue };
+        const satellites = c.links.map(link => {
+            const cat = SPU.analyze(link);
+            return { title: link, icon: cat.icon, color: cat.color, hue: cat.hue };
         });
-
-        await this.renderMermaid('local-mermaid', mmd);
+        WonderGraph.render('collab-graph', centerNode, satellites, this.activeMode);
     },
 
-    async compileMasterGraph() {
-        if(this.learnedConcepts.length === 0) {
-            document.getElementById('master-mermaid').innerHTML = '<div class="text-slate-500 text-center mt-20">Discover concepts to build your universe.</div>';
-            return;
-        }
-
-        let mmd = `graph LR\n`;
-        mmd += `classDef user fill:#0B0F1A,stroke:#fbbf24,stroke-width:3px,color:#fff\n`;
-        mmd += `classDef stage fill:#121A29,stroke:#38bdf8,stroke-width:2px,color:#fff\n`;
-        mmd += `classDef concept fill:#1A2436,stroke:#10b981,stroke-width:1px,color:#fff\n`;
+    renderMasterGraph() {
+        if(document.getElementById('panel-evolve').classList.contains('active') === false) return;
+        const centerNode = { title: 'Explorer', icon: '👶', color: '#fbbf24', hue: 50 };
+        const satellites = this.learnedConcepts.map(c => ({
+            title: c.title, icon: c.icon, color: c.color, hue: c.hue
+        }));
         
-        mmd += `U(("👶 Explorer")):::user\n`;
-        
-        // Render the 6 EVOD Stages
-        const stages = ['Discover', 'Learn', 'Experience', 'Collaborate', 'Contribute', 'Evolve'];
-        stages.forEach((s, i) => {
-            mmd += `S${i}{{"${i+1}. ${s}"}}:::stage\n`;
-            if (i === 0) mmd += `U ==> S0\n`;
-            else mmd += `S${i-1} ==> S${i}\n`;
-        });
-
-        // Attach all learned concepts
-        this.learnedConcepts.forEach((c, i) => {
-            const id = `C${i}`;
-            mmd += `${id}["${c.title}"]:::concept\n`;
-            mmd += `S1 -->|Discovered| ${id}\n`;
-            mmd += `${id} -.->|Generated IKRw| S2\n`;
-            mmd += `${id} -.->|Built Network| S3\n`;
-        });
-
-        mmd += `S5 -.->|Generates New Curiosity| U\n`; // The Infinite Loop
-
-        await this.renderMermaid('master-mermaid', mmd);
-    },
-
-    async renderMermaid(containerId, graphStr) {
-        const container = document.getElementById(containerId);
-        container.innerHTML = ''; 
-        try {
-            const { svg } = await mermaid.render(`mmd-${Date.now()}`, graphStr);
-            container.innerHTML = svg;
-        } catch (e) {
-            container.innerHTML = `<div class="text-rose-400 f-mono text-sm">AST Compilation Error.</div>`;
+        if (satellites.length === 0) {
+            document.getElementById('evolve-nodes').innerHTML = '<div style="color:var(--text-muted); text-align:center; padding-top:200px; width:100%;">Search concepts to map your universe.</div>';
+            document.getElementById('evolve-svg').innerHTML = '';
+        } else {
+            WonderGraph.render('evolve-graph', centerNode, satellites, this.activeMode);
         }
     }
 };
@@ -563,3 +660,4 @@ window.onload = () => App.init();
 </script>
 </body>
 </html>
+```
