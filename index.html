@@ -1,673 +1,565 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Khel.o WonderGraph</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=no">
+    <title>Khel.o · Supreme Evolution</title>
+
+    <!-- Premium Typography & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700;800&family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0" />
+
+    <!-- Core Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+
     <style>
         :root {
-            --bg: #0B0F1A; --panel: #121A29; --panel-border: #232E45;
-            --text: #F2EFE9; --text-muted: #A9B0C0;
-            --accent: #4FD1C5; --accent-hover: #38bdf8;
-            --sidebar-w: 220px;
+            --bg-void: #02040a;
+            --panel-bg: rgba(10, 15, 25, 0.85);
+            --panel-border: rgba(255, 255, 255, 0.1);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --gold: #fbbf24;
+            --accent: #38bdf8;
+            --sidebar-w: 240px;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
-        body { background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
-        button { cursor: pointer; border: none; background: none; color: inherit; font: inherit; }
-        input { font: inherit; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg-void); color: var(--text-main); font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; }
 
-        /* Sidebar Navigation */
-        aside { width: var(--sidebar-w); background: var(--panel); border-right: 1px solid var(--panel-border); display: flex; flex-direction: column; z-index: 10; transition: transform 0.3s ease; }
-        .brand { font-size: 1.5rem; font-weight: bold; padding: 20px; color: #fff; letter-spacing: 1px; }
-        .brand span { color: var(--accent); }
-        nav { display: flex; flex-direction: column; padding: 0 10px; gap: 5px; }
-        .nav-btn { padding: 12px 15px; text-align: left; border-radius: 8px; font-weight: 600; color: var(--text-muted); transition: all 0.2s; display: flex; align-items: center; gap: 10px; }
-        .nav-btn:hover { background: rgba(255,255,255,0.05); color: #fff; }
-        .nav-btn.active { background: rgba(79, 209, 197, 0.15); color: var(--accent); }
-        .nav-num { width: 22px; height: 22px; background: var(--panel-border); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; color: #fff; }
-        .nav-btn.active .nav-num { background: var(--accent); color: #000; }
+        .f-disp { font-family: 'Space Grotesk', sans-serif; }
+        .f-mono { font-family: 'JetBrains Mono', monospace; }
 
-        /* Main Content */
-        main { flex: 1; overflow-y: auto; padding: 30px; position: relative; }
-        .tab-panel { display: none; animation: fadeIn 0.3s; }
-        .tab-panel.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .app-shell { display: flex; height: 100vh; overflow: hidden; position: relative; z-index: 10; }
+        #webgl-bg { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
         
-        h2 { font-size: 2rem; margin-bottom: 10px; }
-        .subtitle { color: var(--text-muted); margin-bottom: 25px; }
+        .sidebar {
+            width: var(--sidebar-w); background: rgba(3, 6, 12, 0.95);
+            border-right: 1px solid var(--panel-border); display: flex; flex-direction: column;
+            padding: 24px 16px; z-index: 50; flex-shrink: 0; backdrop-filter: blur(20px);
+        }
+        
+        .brand { font-size: 1.8rem; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 8px; margin-bottom: 30px; padding: 0 10px; font-family: 'Space Grotesk';}
+        .brand span { color: var(--accent); animation: pulse 2s infinite;}
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
-        /* Search & Input */
-        .search-bar { display: flex; gap: 10px; margin-bottom: 20px; max-width: 600px; }
-        .search-bar input { flex: 1; padding: 12px 20px; border-radius: 25px; border: 2px solid var(--panel-border); background: rgba(0,0,0,0.3); color: #fff; outline: none; transition: 0.2s; }
-        .search-bar input:focus { border-color: var(--accent); }
-        .btn-primary { background: var(--accent); color: #000; padding: 12px 25px; border-radius: 25px; font-weight: bold; transition: 0.2s; }
-        .btn-primary:hover { background: var(--accent-hover); transform: scale(1.05); }
-        .btn-icon { width: 44px; height: 44px; border-radius: 50%; background: var(--panel-border); display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-        .btn-icon:hover { background: var(--accent); color: #000; }
-        .btn-icon.recording { background: #ef4444; color: #fff; animation: pulse 1s infinite; }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        .nav-item {
+            display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 12px;
+            color: var(--text-muted); font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: 0.2s;
+            border: 1px solid transparent; margin-bottom: 4px;
+        }
+        .nav-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+        .nav-item.active { background: rgba(56, 189, 248, 0.1); border-color: rgba(56, 189, 248, 0.3); color: #fff; box-shadow: 0 0 15px rgba(56,189,248,0.1);}
+        .nav-item .n-badge {
+            width: 24px; height: 24px; border-radius: 50%; background: var(--panel-border); color: #fff;
+            display: flex; align-items: center; justify-content: center; font-size: 0.75rem; flex-shrink: 0; font-family: 'JetBrains Mono';
+        }
+        .nav-item.active .n-badge { background: var(--accent); color: #000; }
+        .nav-item.completed .n-badge { background: #10b981; color: #000; }
 
-        /* Discover Jumble */
-        .jumble-grid { display: flex; gap: 10px; flex-wrap: wrap; }
-        .jumble-btn { padding: 15px 25px; background: var(--panel); border: 1px solid var(--panel-border); border-radius: 12px; font-weight: bold; font-size: 1.1rem; transition: 0.2s; }
-        .jumble-btn:hover { border-color: var(--accent); transform: translateY(-3px); }
+        main { flex: 1; position: relative; background: transparent; overflow-y: auto; overflow-x: hidden; scroll-behavior: smooth;}
+        
+        .panel { display: none; padding: 40px; max-width: 1000px; margin: 0 auto; animation: fadeUp 0.4s ease forwards; }
+        .panel.active { display: block; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Lists & Cards */
-        .list-grid { display: grid; gap: 15px; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
-        .card { background: var(--panel); border: 1px solid var(--panel-border); padding: 20px; border-radius: 15px; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; gap: 10px; }
-        .card:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-        .card-icon { font-size: 2rem; }
-        .card-title { font-weight: bold; font-size: 1.2rem; }
-        .card-desc { font-size: 0.9rem; color: var(--text-muted); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        .panel-title { font-size: 2.5rem; font-weight: 800; color: #fff; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; font-family: 'Space Grotesk'; }
+        .panel-desc { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 30px; line-height: 1.6; }
 
-        /* Slide-over Viewer */
-        .viewer { position: fixed; top: 0; right: -100%; width: min(450px, 100vw); height: 100vh; background: var(--panel); border-left: 1px solid var(--panel-border); z-index: 100; transition: right 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); display: flex; flex-direction: column; box-shadow: -10px 0 30px rgba(0,0,0,0.6); }
-        .viewer.open { right: 0; }
-        .viewer-close { position: absolute; top: 15px; right: 15px; width: 35px; height: 35px; border-radius: 50%; background: rgba(0,0,0,0.5); color: #fff; font-weight: bold; font-size: 1.2rem; z-index: 101; display: flex; align-items: center; justify-content: center; }
-        .viewer-close:hover { background: #ef4444; }
-        
-        .viewer-content { flex: 1; overflow-y: auto; padding: 25px; padding-top: 50px; display: flex; flex-direction: column; gap: 20px; }
-        .viewer-img { width: 100%; height: 200px; object-fit: cover; border-radius: 12px; background: rgba(0,0,0,0.3); }
-        .viewer-tag { display: inline-block; padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; width: max-content; }
-        .viewer-title { font-size: 2rem; font-weight: bold; line-height: 1.1; }
-        .viewer-extract { font-size: 1rem; line-height: 1.6; color: #ddd; }
-        
-        .action-box { background: rgba(0,0,0,0.3); border: 1px solid var(--panel-border); padding: 15px; border-radius: 12px; }
-        .action-box h4 { margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
-        .action-box p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; }
-        
-        .btn-link { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border-radius: 12px; font-weight: bold; text-decoration: none; text-align: center; border: 1px solid transparent; transition: 0.2s; }
-        .btn-miraheze { background: rgba(16, 185, 129, 0.1); color: #10b981; border-color: rgba(16, 185, 129, 0.3); }
-        .btn-github { background: rgba(168, 85, 247, 0.1); color: #a855f7; border-color: rgba(168, 85, 247, 0.3); }
-        .btn-google { background: rgba(234, 179, 8, 0.1); color: #eab308; border-color: rgba(234, 179, 8, 0.3); }
-        .btn-link:hover { filter: brightness(1.2); transform: translateY(-2px); }
+        .glass-box { background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 20px; padding: 24px; backdrop-filter: blur(16px); box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+        .btn-action { background: var(--accent); color: #000; font-family: 'Space Grotesk'; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; padding: 14px 28px; border-radius: 30px; border: none; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px;}
+        .btn-action:hover { transform: translateY(-2px); filter: brightness(1.1); box-shadow: 0 10px 20px rgba(56,189,248,0.3); }
 
-        /* Graphs */
-        .graph-wrap { position: relative; width: 100%; height: 60vh; min-height: 400px; background: rgba(0,0,0,0.3); border: 1px solid var(--panel-border); border-radius: 20px; overflow: hidden; margin-top: 15px; }
-        .graph-controls { display: flex; gap: 10px; margin-bottom: 10px; }
-        .graph-controls button { padding: 8px 15px; border-radius: 20px; background: var(--panel); border: 1px solid var(--panel-border); font-size: 0.85rem; font-weight: bold; color: var(--text-muted); }
-        .graph-controls button.active { background: var(--accent); color: #000; border-color: var(--accent); }
-        
-        svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
-        .node { position: absolute; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; transition: transform 0.2s; }
-        .node:hover { transform: translate(-50%, -50%) scale(1.2); z-index: 10; }
-        .node-dot { display: flex; align-items: center; justify-content: center; border-radius: 50%; border: 2px solid; background: var(--bg); box-shadow: 0 0 15px currentColor; }
-        .node-label { font-size: 0.75rem; font-weight: bold; text-shadow: 0 2px 4px #000; white-space: nowrap; pointer-events: none; }
-        
-        /* Mobile Hamburger */
-        .mobile-toggle { display: none; position: fixed; bottom: 20px; left: 20px; width: 50px; height: 50px; border-radius: 50%; background: var(--accent); color: #000; z-index: 50; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
-        
+        .jumble-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 30px; }
+        .jumble-card { 
+            background: rgba(255,255,255,0.02); border: 1px dashed var(--panel-border); border-radius: 16px; 
+            padding: 30px 20px; text-align: center; cursor: pointer; transition: 0.3s; position: relative; overflow: hidden;
+        }
+        .jumble-card:hover { background: rgba(255,255,255,0.05); border-color: var(--accent); transform: translateY(-4px); box-shadow: 0 10px 30px rgba(56,189,248,0.1);}
+        .j-text { font-family: 'JetBrains Mono'; font-size: 1.5rem; font-weight: 700; letter-spacing: 4px; color: #fff; transition: 0.3s;}
+        .jumble-card.solved { border-color: #10b981; background: rgba(16,185,129,0.1); border-style: solid;}
+        .jumble-card.solved .j-text { color: #10b981; font-family: 'Space Grotesk'; letter-spacing: 2px;}
+
+        .mermaid-stage { background: rgba(0,0,0,0.5); border: 1px solid var(--panel-border); border-radius: 20px; padding: 20px; width: 100%; min-height: 400px; display: flex; justify-content: center; overflow-x: auto; box-shadow: inset 0 0 30px rgba(0,0,0,0.5);}
+        .mermaid { font-family: 'Space Grotesk', sans-serif !important; }
+
+        .karma-form { display: flex; flex-direction: column; gap: 16px; }
+        .karma-input { background: rgba(0,0,0,0.4); border: 1px solid var(--panel-border); color: #fff; padding: 14px 20px; border-radius: 12px; font-family: 'Inter'; font-size: 1rem; outline: none; transition: 0.3s; }
+        .karma-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(56,189,248,0.2); }
+
+        #toast { position: fixed; top: 30px; left: 50%; transform: translateX(-50%); background: #10b981; color: #000; padding: 12px 24px; border-radius: 30px; font-family: 'Space Grotesk'; font-weight: 800; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 10px 40px rgba(16,185,129,0.5); z-index: 1000; opacity: 0; pointer-events: none; transition: 0.4s; }
+        #toast.show { opacity: 1; transform: translateX(-50%) translateY(10px); }
+
         @media (max-width: 768px) {
-            aside { position: fixed; left: -100%; height: 100%; box-shadow: 10px 0 30px rgba(0,0,0,0.5); }
-            aside.open { left: 0; }
-            .mobile-toggle { display: block; }
+            .app-shell { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--panel-border); padding: 16px; flex-direction: row; overflow-x: auto; white-space: nowrap; gap: 10px; }
+            .brand { display: none; }
+            .nav-item { padding: 8px 12px; min-height: 40px; margin-bottom: 0; }
+            main { padding: 20px; }
         }
-        
-        #loader { display: none; align-items: center; gap: 10px; margin-bottom: 15px; color: var(--accent); font-weight: bold; }
-        .spinner { width: 20px; height: 20px; border: 3px solid rgba(79,209,197,0.3); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-    <!-- Sidebar Navigation -->
-    <aside id="sidebar" aria-label="Main Navigation">
-        <div class="brand">Khel.o<span>Graph</span></div>
-        <nav id="navMenu">
-            <button class="nav-btn active" data-tab="discover"><span class="nav-num">1</span> Discover</button>
-            <button class="nav-btn" data-tab="learn"><span class="nav-num">2</span> Learn</button>
-            <button class="nav-btn" data-tab="experience"><span class="nav-num">3</span> Experience</button>
-            <button class="nav-btn" data-tab="collaborate"><span class="nav-num">4</span> Collaborate</button>
-            <button class="nav-btn" data-tab="contribute"><span class="nav-num">5</span> Contribute</button>
-            <button class="nav-btn" data-tab="evolve"><span class="nav-num">6</span> Evolve</button>
-        </nav>
+<!-- 3D Stellar Background -->
+<div id="webgl-bg"></div>
+
+<div class="app-shell">
+    <!-- EVOD SIDEBAR -->
+    <aside class="sidebar">
+        <div class="brand">Khel<span class="text-sky-400">.</span>o</div>
+        <nav id="evod-nav" style="display: flex; flex-direction: column; gap: 4px;"></nav>
     </aside>
-    <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle Menu">☰</button>
 
-    <!-- Main Content Area -->
-    <main id="mainContent">
-        
-        <!-- 1. Discover -->
-        <section class="tab-panel active" id="tab-discover">
-            <h2>Discover</h2>
-            <p class="subtitle">Tap a scrambled word to reveal its secret and start your journey.</p>
-            <div class="jumble-grid" id="jumbleGrid"></div>
-        </section>
-
-        <!-- 2. Learn -->
-        <section class="tab-panel" id="tab-learn">
-            <h2>Learn</h2>
-            <p class="subtitle">Search for any concept. We'll map its DNA.</p>
-            <div class="search-bar">
-                <input type="text" id="searchInput" placeholder="e.g. Gravity, Forest, Telescope..." aria-label="Search Concept">
-                <button class="btn-icon" id="micBtn" aria-label="Voice Search">🎤</button>
-                <button class="btn-primary" id="searchBtn">Search</button>
-            </div>
-            <div id="loader"><div class="spinner"></div> Extracting Knowledge...</div>
-            <div id="searchResults" class="list-grid"></div>
-        </section>
-
-        <!-- 3. Experience -->
-        <section class="tab-panel" id="tab-experience">
-            <h2>Experience</h2>
-            <p class="subtitle">Knowledge must be grounded. Complete these physical actions.</p>
-            <div id="experienceList" class="list-grid"></div>
-        </section>
-
-        <!-- 4. Collaborate -->
-        <section class="tab-panel" id="tab-collaborate">
-            <h2>Collaborate</h2>
-            <p class="subtitle">How your current concept connects to the universe.</p>
-            <div class="graph-wrap" id="collabGraph">
-                <svg id="collabSvg"></svg>
-                <div id="collabNodes"></div>
+    <main>
+        <!-- 1. DISCOVER: The Jumble Game -->
+        <section class="panel active" id="panel-discover">
+            <div class="panel-title"><span class="material-symbols-rounded text-sky-400 text-4xl">travel_explore</span> Discover</div>
+            <p class="panel-desc">The universe is encrypted. Tap a signal anomaly to decipher it and begin your journey.</p>
+            
+            <div class="jumble-grid" id="jumble-container">
+                <!-- Injected via JS -->
             </div>
         </section>
 
-        <!-- 5. Contribute -->
-        <section class="tab-panel" id="tab-contribute">
-            <h2>Contribute</h2>
-            <p class="subtitle">Expand the matrix. Where do you want to add your findings?</p>
-            <div id="contributeList" class="list-grid"></div>
-        </section>
-
-        <!-- 6. Evolve -->
-        <section class="tab-panel" id="tab-evolve">
-            <h2>Evolve</h2>
-            <p class="subtitle">Your complete, expanding learning journey.</p>
-            <div class="graph-controls">
-                <button class="layout-btn active" data-layout="spiral">Fibonacci Spiral</button>
-                <button class="layout-btn" data-layout="grid">Matrix Grid</button>
-                <button class="layout-btn" data-layout="radial">Radial Orbit</button>
+        <!-- 2. LEARN: The Wikipedia SPU Compiler -->
+        <section class="panel" id="panel-learn">
+            <div class="panel-title"><span class="material-symbols-rounded text-blue-400 text-4xl">menu_book</span> Learn</div>
+            <p class="panel-desc">We have decrypted the anomaly. Here is the semantic essence extracted from the global matrix.</p>
+            
+            <div id="learn-loader" style="display:none;" class="text-sky-400 f-mono text-sm tracking-widest uppercase mb-6 flex items-center gap-3">
+                <span class="material-symbols-rounded animate-spin">sync</span> Compiling Ast...
             </div>
-            <div class="graph-wrap" id="evolveGraph">
-                <svg id="evolveSvg"></svg>
-                <div id="evolveNodes"></div>
+
+            <div id="learn-result" class="glass-box">
+                <div class="text-center text-slate-500 py-10">Awaiting decryption...</div>
+            </div>
+            
+            <div class="mt-6 flex justify-end">
+                <button class="btn-action" style="display:none;" id="btn-to-exp" onclick="App.route('experience')">Proceed to Experience <span class="material-symbols-rounded">arrow_forward</span></button>
             </div>
         </section>
 
+        <!-- 3. EXPERIENCE: IKRw & Karma Ledger -->
+        <section class="panel" id="panel-experience">
+            <div class="panel-title"><span class="material-symbols-rounded text-rose-400 text-4xl">directions_run</span> Experience</div>
+            <p class="panel-desc">Knowledge requires physical mass. Complete your IKRw Protocol to anchor this concept in reality.</p>
+            
+            <div class="glass-box">
+                <div id="ikrw-task" class="text-lg text-white font-bold mb-6 p-4 bg-rose-500/10 border border-rose-500/30 rounded-xl">
+                    Pending concept discovery...
+                </div>
+                
+                <form class="karma-form" id="karma-form" onsubmit="App.submitKarma(event)">
+                    <h3 class="f-disp text-xl text-emerald-400 mb-2">Log Physical Verification</h3>
+                    <input type="text" id="k-name" class="karma-input" placeholder="Your Explorer Name" required>
+                    <textarea id="k-obs" class="karma-input" rows="3" placeholder="Describe your physical observation of this concept..." required></textarea>
+                    <button type="submit" class="btn-action w-max !bg-emerald-400">Anchor Knowledge</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- 4. COLLABORATE: Local AST Mermaid Map -->
+        <section class="panel" id="panel-collaborate">
+            <div class="panel-title"><span class="material-symbols-rounded text-purple-400 text-4xl">hub</span> Collaborate</div>
+            <p class="panel-desc">How does this concept connect to its immediate ecosystem? (Local AST)</p>
+            
+            <div class="mermaid-stage">
+                <div class="mermaid" id="local-mermaid">
+                    %% Awaiting Data
+                </div>
+            </div>
+            
+            <div class="mt-6 text-center">
+                <button class="btn-action" onclick="App.route('contribute')">Next: Share Findings <span class="material-symbols-rounded">arrow_forward</span></button>
+            </div>
+        </section>
+
+        <!-- 5. CONTRIBUTE: Extensibility Links -->
+        <section class="panel" id="panel-contribute">
+            <div class="panel-title"><span class="material-symbols-rounded text-gold text-4xl">volunteer_activism</span> Contribute</div>
+            <p class="panel-desc">Export your physical observations back into the digital commons.</p>
+            
+            <div class="glass-box" id="contribute-links">
+                <div class="text-center text-slate-500">Pending concept selection.</div>
+            </div>
+        </section>
+
+        <!-- 6. EVOLVE: The Infinite Master Graph -->
+        <section class="panel" id="panel-evolve">
+            <div class="panel-title"><span class="material-symbols-rounded text-green-400 text-4xl">all_inclusive</span> Evolve</div>
+            <p class="panel-desc">Your infinite journey mapped. All learned nodes permanently connected.</p>
+            
+            <div class="mermaid-stage" style="min-height: 600px;">
+                <div class="mermaid" id="master-mermaid">
+                    %% Awaiting Data
+                </div>
+            </div>
+        </section>
     </main>
+</div>
 
-    <!-- Viewer Slide-over -->
-    <div class="viewer" id="viewer" aria-hidden="true" role="dialog">
-        <button class="viewer-close" id="closeViewer" aria-label="Close viewer">×</button>
-        <div class="viewer-content" id="viewerContent">
-            <!-- Dynamic Content Injected Here -->
-        </div>
-    </div>
+<div id="toast"></div>
 
 <script>
-    /* =========================================================================
-       1. DATA & CONFIGURATION
-       ========================================================================= */
+/**
+ * STREAMING_CHUNK: System Initialization & Configuration
+ */
+// Initialize Mermaid with a custom Dark Theme tailored to Khel.o
+mermaid.initialize({
+    startOnLoad: false,
+    theme: 'base',
+    themeVariables: {
+        background: 'transparent',
+        primaryColor: '#121A29',
+        primaryTextColor: '#F2EFE9',
+        primaryBorderColor: '#38bdf8',
+        lineColor: '#94a3b8',
+        secondaryColor: '#1A2436',
+        tertiaryColor: '#1A2436',
+        fontFamily: 'Space Grotesk'
+    },
+    flowchart: { curve: 'basis', nodeSpacing: 50, rankSpacing: 50 }
+});
 
-    // The 14-Way Semantic Categories with dynamic Physical Experience Prompts & Contribute prompts
-    const CATEGORIES = [
-        { id: 'Animals', test: /animal|mammal|species|bird|fish|insect|reptile/i, color: '#f97316', icon: '🦁', 
-          exp: t => `Go outside and observe an animal or insect safely. Compare its movement to ${t}.`, cont: t => `Add a fact about ${t}'s habitat.` },
-        { id: 'Ocean', test: /ocean|sea|water|marine|coral|fish/i, color: '#0ea5e9', icon: '🌊', 
-          exp: t => `Fill a bowl with water. Think about how ${t} relies on water properties.`, cont: t => `Write why protecting ${t} matters.` },
-        { id: 'Space', test: /space|planet|star|galaxy|universe|moon/i, color: '#8b5cf6', icon: '🌌', 
-          exp: t => `Look at the night sky. Try to imagine the scale and distance of ${t}.`, cont: t => `Add a numerical fact (distance/size) about ${t}.` },
-        { id: 'Plants', test: /plant|tree|flower|forest|botany|grass|agriculture/i, color: '#10b981', icon: '🌱', 
-          exp: t => `Find a plant or leaf. Examine its veins and think how it connects to ${t}.`, cont: t => `Describe how ${t} helps the ecosystem.` },
-        { id: 'Math', test: /math|number|geometry|equation|spiral|fibonacci/i, color: '#ec4899', icon: '🧮', 
-          exp: t => `Find an object in your room that uses the geometry or rules of ${t}.`, cont: t => `Provide a real-world example of ${t}.` },
-        { id: 'Physics', test: /physics|gravity|force|motion|energy|light|sound|chemistry/i, color: '#06b6d4', icon: '⚛️', 
-          exp: t => `Drop an object or use a flashlight to physically demonstrate ${t}.`, cont: t => `Explain ${t} in one simple sentence.` },
-        { id: 'Art', test: /art|music|paint|draw|dance|culture/i, color: '#f43f5e', icon: '🎨', 
-          exp: t => `Draw a quick sketch or hum a tune representing how ${t} feels.`, cont: t => `Add an example of a famous ${t} creation.` },
-        { id: 'History', test: /history|ancient|king|war|empire|civilization/i, color: '#d97706', icon: '🏛️', 
-          exp: t => `Ask an elder in your family if they know a story related to ${t}.`, cont: t => `Add why ${t} is important to remember.` },
-        { id: 'Food', test: /food|cook|recipe|fruit|vegetable|nutrition/i, color: '#eab308', icon: '🍎', 
-          exp: t => `Go to the kitchen. Find an ingredient that shares properties with ${t}.`, cont: t => `Add where ${t} originally came from.` },
-        { id: 'Geography', test: /geography|country|mountain|river|city|continent/i, color: '#14b8a6', icon: '🗺️', 
-          exp: t => `Look at a physical map or globe and try to locate ${t}.`, cont: t => `Add a unique geographical feature of ${t}.` },
-        { id: 'Tech', test: /technology|computer|machine|robot|software|engine/i, color: '#64748b', icon: '💻', 
-          exp: t => `Look at a device in your home. Think about how ${t} makes it work.`, cont: t => `Explain how ${t} helps people.` },
-        { id: 'Language', test: /language|word|book|literature|poem|write/i, color: '#a855f7', icon: '📚', 
-          exp: t => `Write a physical note to someone using concepts from ${t}.`, cont: t => `Add the root/origin of the word ${t}.` },
-        { id: 'Sports', test: /sport|game|play|athlete|ball|run/i, color: '#ef4444', icon: '⚽', 
-          exp: t => `Stand up and mimic the physical movement required in ${t}.`, cont: t => `Add a rule or record about ${t}.` },
-        { id: 'General', test: /.*/, color: '#94a3b8', icon: '✨', 
-          exp: t => `Explain the concept of ${t} aloud to an imaginary person.`, cont: t => `Add a fun fact about ${t}.` }
-    ];
+const CONFIG = {
+    EVOD_STEPS: [
+        { id: 'discover', label: 'Discover' },
+        { id: 'learn', label: 'Learn' },
+        { id: 'experience', label: 'Experience' },
+        { id: 'collaborate', label: 'Collaborate' },
+        { id: 'contribute', label: 'Contribute' },
+        { id: 'evolve', label: 'Evolve' }
+    ],
+    // The seeds for the Jumble Game
+    SEEDS: [
+        { target: 'Ecology', cat: 'Science', color: '#10b981' },
+        { target: 'Gravity', cat: 'Physics', color: '#a855f7' },
+        { target: 'Architecture', cat: 'Construct', color: '#38bdf8' },
+        { target: 'Nutrition', cat: 'Biology', color: '#fbbf24' }
+    ]
+};
 
-    const JUMBLES = [
-        { scrambled: "VIYATRG", clear: "Gravity" },
-        { scrambled: "YSHTIESNOHTSPO", clear: "Photosynthesis" },
-        { scrambled: "RTAHCTICERUE", clear: "Architecture" },
-        { scrambled: "LEYESVTCO", clear: "Velocity" }
-    ];
-
-    // State Management
-    let state = {
-        learned: JSON.parse(localStorage.getItem('khelo_learned') || '[]'),
-        currentConcept: null,
-        activeLayout: 'spiral'
-    };
-
-    /* =========================================================================
-       2. LOGIC & API
-       ========================================================================= */
-
-    // Unscramble animation
-    function unscramble(btn, target) {
-        let iterations = 0;
-        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        const interval = setInterval(() => {
-            btn.innerText = target.split("").map((l, i) => {
-                if(i < iterations) return target[i];
-                return chars[Math.floor(Math.random() * chars.length)];
-            }).join("");
-            if(iterations >= target.length) {
-                clearInterval(interval);
-                document.getElementById('searchInput').value = target;
-                fetchAndProcess(target);
-            }
-            iterations += 1/3;
-        }, 30);
-    }
-
-    // Classify concept based on text
-    function classify(title, text) {
-        const str = (title + " " + text).toLowerCase();
-        return CATEGORIES.find(c => c.test.test(str));
-    }
-
-    // Fetch from Wiki API (REST first, Action API fallback)
-    async function fetchWiki(query) {
-        const restUrl = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query)}`;
-        try {
-            let res = await fetch(restUrl);
-            if (!res.ok) throw new Error("REST failed");
-            let data = await res.json();
-            return {
-                title: data.title,
-                extract: data.extract || data.description || "A concept in the universe.",
-                image: data.thumbnail ? data.thumbnail.source : null,
-                url: data.content_urls ? data.content_urls.desktop.page : `https://en.wikipedia.org/wiki/${query}`
-            };
-        } catch (e) {
-            // Fallback
-            const actionUrl = `https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=true&explaintext=true&titles=${encodeURIComponent(query)}&format=json&origin=*`;
-            try {
-                let res2 = await fetch(actionUrl);
-                let data2 = await res2.json();
-                let pages = data2.query.pages;
-                let pageId = Object.keys(pages)[0];
-                if (pageId == "-1") throw new Error("Not found");
-                return {
-                    title: pages[pageId].title,
-                    extract: pages[pageId].extract.split('\n')[0] || "Found in the depths of the matrix.",
-                    image: null,
-                    url: `https://en.wikipedia.org/wiki/${pages[pageId].title}`
-                };
-            } catch (err) {
-                return null;
-            }
-        }
-    }
-
-    // Main fetch and process loop
-    async function fetchAndProcess(query) {
-        switchTab('learn');
-        const loader = document.getElementById('loader');
-        const results = document.getElementById('searchResults');
+/**
+ * STREAMING_CHUNK: SPU (Semantic Processing Unit)
+ * Mathematical fallback and categorization.
+ */
+const SPU = {
+    hash(str) {
+        let h = 0x811c9dc5;
+        for (let i = 0; i < str.length; i++) h = Math.imul(h ^ str.charCodeAt(i), 0x01000193);
+        return Math.abs(h >>> 0);
+    },
+    
+    analyze(text) {
+        const hVal = this.hash(text);
+        const hue = hVal % 360;
         
-        loader.style.display = 'flex';
-        results.innerHTML = '';
-
-        let wikiData = await fetchWiki(query);
-        loader.style.display = 'none';
-
-        if (!wikiData) {
-            results.innerHTML = `<p style="color:#ef4444;">Concept "${query}" not found. Try another word.</p>`;
-            return;
-        }
-
-        const cat = classify(wikiData.title, wikiData.extract);
+        // IKRw Generation Fallback
+        const actions = [
+            `Go outside and find a physical manifestation of ${text}.`,
+            `Explain ${text} to a child without using a screen.`,
+            `Draw the architecture of ${text} on physical paper.`,
+            `Meditate on how ${text} connects to your daily life.`
+        ];
         
-        const concept = {
-            id: Date.now().toString(),
-            title: wikiData.title,
-            extract: wikiData.extract,
-            image: wikiData.image,
-            category: cat.id,
-            color: cat.color,
-            icon: cat.icon,
-            expPrompt: cat.exp(wikiData.title),
-            contPrompt: cat.cont(wikiData.title)
+        return {
+            title: text,
+            hash: hVal,
+            color: `hsl(${hue}, 80%, 65%)`,
+            ikrw: actions[hVal % actions.length],
+            links: ['Nature', 'Science', 'Society'] // Fallback links
         };
-
-        state.currentConcept = concept;
-        
-        // Save if not already learned
-        if (!state.learned.find(c => c.title.toLowerCase() === concept.title.toLowerCase())) {
-            state.learned.push(concept);
-            localStorage.setItem('khelo_learned', JSON.stringify(state.learned));
-        }
-
-        // Render card
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.innerHTML = `
-            <div style="display:flex; align-items:center; gap:10px;">
-                <span class="card-icon">${concept.icon}</span>
-                <span style="color:${concept.color}; font-size:0.8rem; font-weight:bold; text-transform:uppercase;">${concept.category}</span>
-            </div>
-            <div class="card-title">${concept.title}</div>
-            <div class="card-desc">${concept.extract}</div>
-        `;
-        card.onclick = () => openViewer(concept);
-        results.appendChild(card);
-        
-        updateSubsequentTabs();
     }
+};
 
-    /* =========================================================================
-       3. UI & RENDERERS
-       ========================================================================= */
+/**
+ * STREAMING_CHUNK: WebGL Background (Stardust)
+ */
+function initWebGL() {
+    const container = document.getElementById('webgl-bg');
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.z = 50;
 
-    // Tab Switching
-    document.querySelectorAll('.nav-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const tab = e.currentTarget.getAttribute('data-tab');
-            switchTab(tab);
-        });
-    });
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    container.appendChild(renderer.domElement);
 
-    function switchTab(tabId) {
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-        
-        document.querySelector(`.nav-btn[data-tab="${tabId}"]`).classList.add('active');
-        document.getElementById(`tab-${tabId}`).classList.add('active');
-
-        // Close sidebar on mobile
-        document.getElementById('sidebar').classList.remove('open');
-
-        // Graph rendering protection (Black Screen Fix)
-        if (tabId === 'collaborate') renderCollaborateGraph();
-        if (tabId === 'evolve') renderEvolveGraph();
-    }
-
-    // Mobile Toggle
-    document.getElementById('mobileToggle').addEventListener('click', () => {
-        document.getElementById('sidebar').classList.toggle('open');
-    });
-
-    // Populate Discover
-    const jgrid = document.getElementById('jumbleGrid');
-    JUMBLES.forEach(j => {
-        let btn = document.createElement('button');
-        btn.className = 'jumble-btn';
-        btn.innerText = j.scrambled;
-        btn.onclick = () => unscramble(btn, j.clear);
-        jgrid.appendChild(btn);
-    });
-
-    // Viewer Logic
-    const viewer = document.getElementById('viewer');
-    const vContent = document.getElementById('viewerContent');
-    
-    function openViewer(concept) {
-        const encTitle = encodeURIComponent(concept.title);
-        
-        let html = `
-            <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
-                <span style="font-size:2rem;">${concept.icon}</span>
-                <span class="viewer-tag" style="background:${concept.color}20; color:${concept.color}; border:1px solid ${concept.color}50;">${concept.category}</span>
-            </div>
-            <div class="viewer-title">${concept.title}</div>
-            ${concept.image ? `<img src="${concept.image}" class="viewer-img" alt="${concept.title}">` : ''}
-            
-            <button class="btn-primary" style="display:flex; align-items:center; justify-content:center; gap:10px; padding:10px;" onclick="readAloud('${concept.title}. ${concept.extract.replace(/'/g, "\\'")}')">
-                🔊 Read Aloud
-            </button>
-
-            <div class="viewer-extract">${concept.extract}</div>
-            
-            <div class="action-box">
-                <h4 style="color:var(--accent);">🏃 IKRw Experience Protocol</h4>
-                <p>${concept.expPrompt}</p>
-            </div>
-
-            <div class="action-box">
-                <h4 style="color:#a855f7;">✍️ Contribution Task</h4>
-                <p>${concept.contPrompt}</p>
-            </div>
-
-            <div style="display:flex; flex-direction:column; gap:10px;">
-                <a href="https://kids.miraheze.org/wiki/${encTitle}?action=edit" target="_blank" class="btn-link btn-miraheze">📝 Edit on Kids Miraheze</a>
-                <a href="https://github.com/bhearth/khela/new/main/pages?filename=${encTitle}.md&value=${encodeURIComponent('# '+concept.title+'\n\n'+concept.contPrompt)}" target="_blank" class="btn-link btn-github">🐙 Create GitHub Subpage</a>
-                <a href="https://www.google.com/search?q=${encTitle}+facts+for+kids" target="_blank" class="btn-link btn-google">🔍 Google Knowledge Fallback</a>
-            </div>
-        `;
-        
-        vContent.innerHTML = html;
-        viewer.classList.add('open');
-        viewer.setAttribute('aria-hidden', 'false');
-    }
-
-    document.getElementById('closeViewer').addEventListener('click', () => {
-        viewer.classList.remove('open');
-        viewer.setAttribute('aria-hidden', 'true');
-        window.speechSynthesis.cancel();
-    });
-
-    // Update other tabs
-    function updateSubsequentTabs() {
-        // Experience Tab
-        const expList = document.getElementById('experienceList');
-        expList.innerHTML = state.learned.map(c => `
-            <div class="card" style="border-left: 4px solid ${c.color}">
-                <div class="card-title">${c.icon} ${c.title}</div>
-                <div class="card-desc" style="color:#fff;">${c.expPrompt}</div>
-            </div>
-        `).join('');
-
-        // Contribute Tab
-        const contList = document.getElementById('contributeList');
-        contList.innerHTML = state.learned.map(c => `
-            <div class="card" style="border-left: 4px solid ${c.color}" onclick="openViewer(state.learned.find(x=>x.id==='${c.id}'))">
-                <div class="card-title">${c.icon} ${c.title}</div>
-                <div class="card-desc">${c.contPrompt}</div>
-                <div style="font-size:0.8rem; color:var(--accent); margin-top:5px;">Tap to open contribution links →</div>
-            </div>
-        `).join('');
-    }
-
-    /* =========================================================================
-       4. GRAPHING ENGINE (Fixing Black Screen via ClientWidth check)
-       ========================================================================= */
-    
-    function drawNode(container, c, x, y, size=50) {
-        let el = document.createElement('div');
-        el.className = 'node';
-        el.style.left = `${x}px`;
-        el.style.top = `${y}px`;
-        el.style.color = c.color;
-        el.innerHTML = `
-            <div class="node-dot" style="width:${size}px; height:${size}px; font-size:${size*0.4}px;">${c.icon}</div>
-            <div class="node-label">${c.title}</div>
-        `;
-        el.onclick = () => openViewer(c);
-        container.appendChild(el);
-    }
-
-    function drawLine(svg, x1, y1, x2, y2, color) {
-        let line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-        line.setAttribute("x1", x1); line.setAttribute("y1", y1);
-        line.setAttribute("x2", x2); line.setAttribute("y2", y2);
-        line.setAttribute("stroke", color);
-        line.setAttribute("stroke-width", "2");
-        line.setAttribute("stroke-dasharray", "5,5");
-        line.style.opacity = "0.4";
-        svg.appendChild(line);
-    }
-
-    // Collaborate Graph: Current concept and pseudo-related concepts radially
-    function renderCollaborateGraph() {
-        const wrap = document.getElementById('collabGraph');
-        if(wrap.clientWidth === 0) return; // Black screen fix
-        
-        const svg = document.getElementById('collabSvg');
-        const nodesDiv = document.getElementById('collabNodes');
-        svg.innerHTML = ''; nodesDiv.innerHTML = '';
-
-        const c = state.currentConcept;
-        if(!c) {
-            nodesDiv.innerHTML = `<div style="text-align:center; padding-top:100px; color:var(--text-muted);">Search a concept first to see connections.</div>`;
-            return;
-        }
-
-        const cx = wrap.clientWidth / 2;
-        const cy = wrap.clientHeight / 2;
-        const r = Math.min(cx, cy) - 50;
-
-        // Draw Center
-        drawNode(nodesDiv, c, cx, cy, 70);
-
-        // Mock related nodes based on words in extract
-        let words = c.extract.split(' ').filter(w => w.length > 5).slice(0, 5);
-        words.forEach((w, i) => {
-            let cat = CATEGORIES[i % CATEGORIES.length];
-            let angle = (i / words.length) * Math.PI * 2;
-            let nx = cx + Math.cos(angle) * r;
-            let ny = cy + Math.sin(angle) * r;
-            
-            drawLine(svg, cx, cy, nx, ny, c.color);
-            drawNode(nodesDiv, {title: w.replace(/[^a-zA-Z]/g,''), icon: cat.icon, color: cat.color}, nx, ny, 40);
-        });
-    }
-
-    // Evolve Graph: All learned concepts in chosen layout
-    function renderEvolveGraph() {
-        const wrap = document.getElementById('evolveGraph');
-        if(wrap.clientWidth === 0) return; // Black screen fix
-
-        const svg = document.getElementById('evolveSvg');
-        const nodesDiv = document.getElementById('evolveNodes');
-        svg.innerHTML = ''; nodesDiv.innerHTML = '';
-
-        if(state.learned.length === 0) {
-            nodesDiv.innerHTML = `<div style="text-align:center; padding-top:100px; color:var(--text-muted);">Your journey is empty. Discover concepts to grow the tree.</div>`;
-            return;
-        }
-
-        const cx = wrap.clientWidth / 2;
-        const cy = wrap.clientHeight / 2;
-        const layout = state.activeLayout;
-
-        state.learned.forEach((c, i) => {
-            let nx, ny;
-            if (layout === 'spiral') {
-                // Fibonacci Spiral
-                const angle = i * 137.508 * (Math.PI / 180);
-                const r = 35 * Math.sqrt(i);
-                nx = cx + Math.cos(angle) * r;
-                ny = cy + Math.sin(angle) * r;
-                // Connect to previous
-                if(i > 0) {
-                    let pa = (i-1) * 137.508 * (Math.PI / 180);
-                    let pr = 35 * Math.sqrt(i-1);
-                    drawLine(svg, cx + Math.cos(pa)*pr, cy + Math.sin(pa)*pr, nx, ny, c.color);
-                }
-            } else if (layout === 'grid') {
-                // Grid
-                const cols = Math.ceil(Math.sqrt(state.learned.length));
-                const spacing = 100;
-                const startX = cx - ((cols-1) * spacing)/2;
-                const startY = cy - ((Math.ceil(state.learned.length/cols)-1) * spacing)/2;
-                nx = startX + (i % cols) * spacing;
-                ny = startY + Math.floor(i / cols) * spacing;
-                // Connect to previous in row
-                if(i % cols !== 0) {
-                    drawLine(svg, nx - spacing, ny, nx, ny, c.color);
-                }
-                // Connect to top
-                if(i >= cols) {
-                    drawLine(svg, nx, ny - spacing, nx, ny, c.color);
-                }
-            } else if (layout === 'radial') {
-                // Radial
-                if(i === 0) { nx = cx; ny = cy; }
-                else {
-                    const r = 120 + Math.floor(i/8)*60;
-                    const angle = (i % 8) * (Math.PI / 4) + (Math.floor(i/8)*0.2);
-                    nx = cx + Math.cos(angle) * r;
-                    ny = cy + Math.sin(angle) * r;
-                    drawLine(svg, cx, cy, nx, ny, state.learned[0].color);
-                }
-            }
-            drawNode(nodesDiv, c, nx, ny, 50);
-        });
-    }
-
-    // Graph Layout Controls
-    document.querySelectorAll('.layout-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            document.querySelectorAll('.layout-btn').forEach(b => b.classList.remove('active'));
-            e.target.classList.add('active');
-            state.activeLayout = e.target.getAttribute('data-layout');
-            renderEvolveGraph();
-        });
-    });
+    const geo = new THREE.BufferGeometry(); const pts = [];
+    for(let i=0; i<600; i++) pts.push((Math.random()-0.5)*200, (Math.random()-0.5)*200, (Math.random()-0.5)*200);
+    geo.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
+    const mat = new THREE.PointsMaterial({ color: 0x38bdf8, size: 0.2, transparent: true, opacity: 0.3 });
+    const stars = new THREE.Points(geo, mat);
+    scene.add(stars);
 
     window.addEventListener('resize', () => {
-        if(document.getElementById('tab-collaborate').classList.contains('active')) renderCollaborateGraph();
-        if(document.getElementById('tab-evolve').classList.contains('active')) renderEvolveGraph();
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
     });
 
-    /* =========================================================================
-       5. ACCESSIBILITY & EVENTS
-       ========================================================================= */
+    const animate = () => {
+        requestAnimationFrame(animate);
+        stars.rotation.y += 0.0005;
+        stars.rotation.x += 0.0002;
+        renderer.render(scene, camera);
+    };
+    animate();
+}
 
-    // Text to Speech
-    function readAloud(text) {
-        if(!('speechSynthesis' in window)) return alert("Speech Synthesis not supported in this browser.");
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.rate = 0.9;
-        window.speechSynthesis.speak(utterance);
-    }
+/**
+ * STREAMING_CHUNK: Master App Controller
+ */
+const App = {
+    activeConcept: null,
+    learnedConcepts: [], // Persistent Memory
+    
+    init() {
+        initWebGL();
+        
+        // Load persistent graph memory
+        try { this.learnedConcepts = JSON.parse(localStorage.getItem('khelo_master_graph')) || []; } 
+        catch(e) { this.learnedConcepts = []; }
+        
+        this.buildNav();
+        this.buildJumbleGame();
+        this.route('discover');
+    },
 
-    // Search Logic
-    document.getElementById('searchBtn').addEventListener('click', () => {
-        const q = document.getElementById('searchInput').value;
-        if(q) fetchAndProcess(q);
-    });
-    document.getElementById('searchInput').addEventListener('keypress', (e) => {
-        if(e.key === 'Enter') document.getElementById('searchBtn').click();
-    });
-
-    // Web Speech API Voice Search
-    const micBtn = document.getElementById('micBtn');
-    if('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        const recognition = new SpeechRecognition();
-        recognition.continuous = false;
-        recognition.interimResults = false;
-
-        recognition.onstart = () => micBtn.classList.add('recording');
-        recognition.onend = () => micBtn.classList.remove('recording');
-        recognition.onresult = (event) => {
-            const transcript = event.results[0][0].transcript;
-            document.getElementById('searchInput').value = transcript;
-            fetchAndProcess(transcript);
-        };
-
-        micBtn.addEventListener('click', () => {
-            try { recognition.start(); } catch(e) { recognition.stop(); }
+    buildNav() {
+        const nav = document.getElementById('evod-nav');
+        CONFIG.EVOD_STEPS.forEach((step, i) => {
+            const el = document.createElement('div');
+            el.className = `nav-item`; el.id = `nav-${step.id}`;
+            el.onclick = () => this.route(step.id);
+            el.innerHTML = `<div class="n-badge">${i+1}</div> <span>${step.label}</span>`;
+            nav.appendChild(el);
         });
-    } else {
-        micBtn.style.display = 'none';
-    }
+    },
 
-    // Initial load
-    updateSubsequentTabs();
+    route(panelId) {
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active', 'completed'));
+        
+        document.getElementById(`panel-${panelId}`).classList.add('active');
+        
+        const navs = Array.from(document.querySelectorAll('.nav-item'));
+        const idx = navs.findIndex(n => n.id === `nav-${panelId}`);
+        navs.forEach((n, i) => {
+            if(i === idx) n.classList.add('active');
+            if(i < idx) n.classList.add('completed');
+        });
+
+        // JIT Graph Compilation
+        if(panelId === 'collaborate' && this.activeConcept) this.compileLocalGraph();
+        if(panelId === 'evolve') this.compileMasterGraph();
+    },
+
+    toast(msg) {
+        const t = document.getElementById('toast');
+        t.innerText = msg; t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 3000);
+    },
+
+    /**
+     * STREAMING_CHUNK: The Jumble Engine
+     */
+    buildJumbleGame() {
+        const c = document.getElementById('jumble-container');
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ@#$*!';
+        
+        CONFIG.SEEDS.forEach(seed => {
+            const el = document.createElement('div');
+            el.className = 'jumble-card';
+            el.style.setProperty('--accent', seed.color);
+            
+            // Initial scramble
+            let scrambled = '';
+            for(let i=0; i<seed.target.length; i++) scrambled += chars[Math.floor(Math.random()*chars.length)];
+            
+            el.innerHTML = `<div class="text-[10px] text-slate-500 uppercase tracking-widest mb-2 font-bold">${seed.cat} Anomaly</div><div class="j-text">${scrambled}</div>`;
+            
+            el.onclick = () => this.solveJumble(el, seed);
+            c.appendChild(el);
+        });
+    },
+
+    solveJumble(cardEl, seed) {
+        if(cardEl.classList.contains('solved')) return;
+        if(navigator.vibrate) navigator.vibrate(10);
+        
+        const textEl = cardEl.querySelector('.j-text');
+        const target = seed.target.toUpperCase();
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ@#$*!';
+        let frame = 0;
+        
+        const interval = setInterval(() => {
+            let out = '';
+            for(let i=0; i<target.length; i++) {
+                out += (i < Math.floor((frame/15)*target.length)) ? target[i] : chars[Math.floor(Math.random()*chars.length)];
+            }
+            textEl.innerText = out;
+            
+            if(frame++ >= 15) {
+                clearInterval(interval);
+                textEl.innerText = target;
+                cardEl.classList.add('solved');
+                setTimeout(() => this.executeSearch(seed.target), 600);
+            }
+        }, 30);
+    },
+
+    /**
+     * STREAMING_CHUNK: Wiki Extraction Pipeline
+     */
+    async executeSearch(query) {
+        this.route('learn');
+        document.getElementById('learn-loader').style.display = 'flex';
+        document.getElementById('learn-result').innerHTML = '';
+        document.getElementById('btn-to-exp').style.display = 'none';
+
+        try {
+            // FMEA: Primary API Fetch
+            const url = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&utf8=&format=json&origin=*`;
+            const res = await fetch(url);
+            const data = await res.json();
+            
+            if(!data.query.search.length) throw new Error();
+            
+            const title = data.query.search[0].title;
+            const snippet = data.query.search[0].snippet.replace(/<[^>]*>?/gm, '');
+
+            // Deep Parse for Links
+            const pRes = await fetch(`https://en.wikipedia.org/w/api.php?action=parse&page=${encodeURIComponent(title)}&prop=links&format=json&origin=*`);
+            const pData = await pRes.json();
+            const links = (pData.parse.links || []).filter(l => l.ns === 0).map(l => l['*']).slice(0, 6);
+
+            const spuData = SPU.analyze(title);
+            
+            this.activeConcept = { title, snippet, links, ...spuData };
+
+        } catch(e) {
+            // FMEA: Fallback to SPU Math
+            this.activeConcept = SPU.analyze(query);
+            this.activeConcept.snippet = `Secure connection failed. Synthesized baseline semantics for ${query}.`;
+        }
+
+        const c = this.activeConcept;
+        
+        // Save to Persistent Memory
+        if(!this.learnedConcepts.find(n => n.title === c.title)) {
+            this.learnedConcepts.push(c);
+            localStorage.setItem('khelo_master_graph', JSON.stringify(this.learnedConcepts));
+        }
+
+        document.getElementById('learn-loader').style.display = 'none';
+        document.getElementById('learn-result').innerHTML = `
+            <h3 class="f-disp text-3xl font-bold text-white mb-2" style="color:${c.color}">${c.title}</h3>
+            <p class="text-slate-300 leading-relaxed">${c.snippet}</p>
+            <div class="mt-4 flex gap-2 flex-wrap">
+                ${c.links.map(l => `<span class="bg-white/5 border border-white/10 px-3 py-1 rounded-full text-xs text-slate-400">${l}</span>`).join('')}
+            </div>
+        `;
+        document.getElementById('btn-to-exp').style.display = 'inline-flex';
+        
+        this.buildPipelines();
+    },
+
+    /**
+     * STREAMING_CHUNK: Pipeline & Mermaid Graph Generation
+     */
+    buildPipelines() {
+        const c = this.activeConcept;
+        
+        // 3. Experience
+        document.getElementById('ikrw-task').innerText = c.ikrw;
+
+        // 5. Contribute
+        const safeTitle = encodeURIComponent(c.title.replace(/\s+/g,'_'));
+        document.getElementById('contribute-links').innerHTML = `
+            <a href="https://kids.miraheze.org/wiki/${safeTitle}?action=edit" target="_blank" class="btn-action w-full !justify-start !bg-teal-500/20 !text-teal-400 border border-teal-500/50 mb-3">
+                <span class="material-symbols-rounded">edit_document</span> Edit on Kids Wiki
+            </a>
+            <a href="https://github.com/bhearth/khela/new/main/pages?filename=${safeTitle}.md" target="_blank" class="btn-action w-full !justify-start !bg-violet-500/20 !text-violet-400 border border-violet-500/50">
+                <span class="material-symbols-rounded">code</span> Map to GitHub Repo
+            </a>
+        `;
+    },
+
+    submitKarma(e) {
+        e.preventDefault();
+        this.toast("Physical anchor verified. Matrix updated.");
+        setTimeout(() => this.route('collaborate'), 800);
+    },
+
+    async compileLocalGraph() {
+        const c = this.activeConcept;
+        let mmd = `graph TD\n`;
+        mmd += `classDef core fill:#121A29,stroke:${c.color},stroke-width:2px,color:#fff\n`;
+        mmd += `classDef link fill:#1A2436,stroke:#94a3b8,stroke-width:1px,color:#A9B0C0\n`;
+        
+        mmd += `ROOT(("${c.title}")):::core\n`;
+        
+        c.links.forEach((link, i) => {
+            const safeLink = link.replace(/[^a-zA-Z0-9]/g, '');
+            mmd += `L${i}["${link}"]:::link\n`;
+            mmd += `ROOT --> L${i}\n`;
+        });
+
+        await this.renderMermaid('local-mermaid', mmd);
+    },
+
+    async compileMasterGraph() {
+        if(this.learnedConcepts.length === 0) {
+            document.getElementById('master-mermaid').innerHTML = '<div class="text-slate-500 text-center mt-20">Discover concepts to build your universe.</div>';
+            return;
+        }
+
+        let mmd = `graph LR\n`;
+        mmd += `classDef user fill:#0B0F1A,stroke:#fbbf24,stroke-width:3px,color:#fff\n`;
+        mmd += `classDef stage fill:#121A29,stroke:#38bdf8,stroke-width:2px,color:#fff\n`;
+        mmd += `classDef concept fill:#1A2436,stroke:#10b981,stroke-width:1px,color:#fff\n`;
+        
+        mmd += `U(("👶 Explorer")):::user\n`;
+        
+        // Render the 6 EVOD Stages
+        const stages = ['Discover', 'Learn', 'Experience', 'Collaborate', 'Contribute', 'Evolve'];
+        stages.forEach((s, i) => {
+            mmd += `S${i}{{"${i+1}. ${s}"}}:::stage\n`;
+            if (i === 0) mmd += `U ==> S0\n`;
+            else mmd += `S${i-1} ==> S${i}\n`;
+        });
+
+        // Attach all learned concepts
+        this.learnedConcepts.forEach((c, i) => {
+            const id = `C${i}`;
+            mmd += `${id}["${c.title}"]:::concept\n`;
+            mmd += `S1 -->|Discovered| ${id}\n`;
+            mmd += `${id} -.->|Generated IKRw| S2\n`;
+            mmd += `${id} -.->|Built Network| S3\n`;
+        });
+
+        mmd += `S5 -.->|Generates New Curiosity| U\n`; // The Infinite Loop
+
+        await this.renderMermaid('master-mermaid', mmd);
+    },
+
+    async renderMermaid(containerId, graphStr) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = ''; 
+        try {
+            const { svg } = await mermaid.render(`mmd-${Date.now()}`, graphStr);
+            container.innerHTML = svg;
+        } catch (e) {
+            container.innerHTML = `<div class="text-rose-400 f-mono text-sm">AST Compilation Error.</div>`;
+        }
+    }
+};
+
+window.onload = () => App.init();
 </script>
 </body>
 </html>
