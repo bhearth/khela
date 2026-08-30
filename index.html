@@ -1,668 +1,435 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Khel·o</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Atkinson+Hyperlegible:wght@400;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Khel.o · Infinite EVOD Mapping</title>
+    
+    <!-- Typography & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700;800&family=Atkinson+Hyperlegible:wght@400;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0" />
+    
+    <!-- Core Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
 
-  :root{
-    --bg:#0B0F1A; --panel:#121A29; --panel-edge:#232E45;
-    --text:#F2EFE9; --muted:#A9B0C0;
-    --gold:#E8A33D; --coral:#FF7A5C; --violet:#9C8CF0; --teal:#4FD1C5; --green:#6FCF97;
-    --focus:#FFD166; --radius:14px; --sidebar-w:224px;
-  }
-  [data-motion="reduced"] *{ animation-duration:0.001s !important; transition-duration:0.001s !important; }
-  [data-contrast="high"]{
-    --bg:#000; --panel:#0A0A0A; --panel-edge:#FFF; --text:#FFF; --muted:#DDD;
-    --gold:#FFC94A; --coral:#FF9478; --violet:#C2B4FF; --teal:#7BEFE2; --green:#8BEFAE;
-  }
-  [data-textsize="lg"]{ font-size:112%; } [data-textsize="xl"]{ font-size:126%; }
+    <style>
+        :root {
+            --bg: #0B0F1A; --panel: #121A29; --panel-edge: #232E45;
+            --text: #F2EFE9; --muted: #A9B0C0;
+            --gold: #E8A33D; --coral: #FF7A5C; --violet: #9C8CF0; --teal: #4FD1C5; --green: #6FCF97;
+            --focus: #FFD166; --radius: 14px; --sidebar-w: 240px;
+        }
 
-  *{ box-sizing:border-box; }
-  html,body{ margin:0; padding:0; }
-  body{ background:var(--bg); color:var(--text); font-family:'Atkinson Hyperlegible',system-ui,sans-serif; min-height:100vh; }
-  h1,h2,h3,.display{ font-family:'Space Grotesk',sans-serif; }
-  .mono{ font-family:'IBM Plex Mono',monospace; }
-  button{ cursor:pointer; background:none; border:none; color:inherit; font-family:inherit; }
-  :focus-visible{ outline:3px solid var(--focus); outline-offset:2px; border-radius:4px; }
-  .sr-only{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); }
-  .skip-link{ position:absolute; left:-999px; top:0; background:var(--gold); color:#0B0F1A; padding:10px 16px; z-index:999; font-weight:700; }
-  .skip-link:focus{ left:0; }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); color: var(--text); font-family: 'Atkinson Hyperlegible', sans-serif; min-height: 100vh; overflow-x: hidden; }
+        h1, h2, h3, .f-disp { font-family: 'Space Grotesk', sans-serif; }
+        .f-mono { font-family: 'IBM Plex Mono', monospace; }
+        button { cursor: pointer; background: none; border: none; color: inherit; font-family: inherit; }
 
-  /* ============ SHELL ============ */
-  .app-shell{ display:flex; min-height:100vh; }
+        /* ============ SHELL ============ */
+        .app-shell { display: flex; height: 100vh; overflow: hidden; }
 
-  .sidebar{
-    width: var(--sidebar-w); flex-shrink:0; background:var(--panel);
-    border-right:1px solid var(--panel-edge); display:flex; flex-direction:column;
-    padding: 18px 14px; gap: 18px; position:sticky; top:0; height:100vh;
-  }
-  .wordmark{ font-size:1.25rem; font-weight:700; padding:0 6px; }
-  .wordmark .dot{ color:var(--gold); }
-  .evod-nav{ display:flex; flex-direction:column; gap:4px; }
-  .nav-item{
-    display:flex; align-items:center; gap:10px; text-align:left;
-    padding:11px 12px; border-radius:10px; font-weight:700; font-size:0.92rem;
-    color:var(--muted); min-height:44px;
-  }
-  .nav-item .n{
-    width:22px; height:22px; border-radius:50%; background:var(--panel-edge); color:var(--text);
-    display:flex; align-items:center; justify-content:center; font-family:'IBM Plex Mono',monospace; font-size:0.7rem; flex-shrink:0;
-  }
-  .nav-item:hover{ background: rgba(255,255,255,0.04); }
-  .nav-item.active{ color:var(--text); background: rgba(232,163,61,0.12); }
-  .nav-item.active .n{ background:var(--gold); color:#0B0F1A; }
-  .nav-item.done .n{ background:var(--green); color:#0B0F1A; }
-  .sidebar-bottom{ margin-top:auto; display:flex; flex-direction:column; gap:8px; }
-  .access-btn{
-    display:flex; align-items:center; gap:8px; padding:10px 12px; border-radius:10px;
-    border:1.5px solid var(--teal); font-size:0.85rem; font-weight:700; min-height:44px;
-  }
+        /* ============ SIDEBAR ============ */
+        .sidebar {
+            width: var(--sidebar-w); flex-shrink: 0; background: var(--panel);
+            border-right: 1px solid var(--panel-edge); display: flex; flex-direction: column;
+            padding: 24px 16px; gap: 12px; z-index: 50;
+        }
+        .wordmark { font-size: 1.5rem; font-weight: 800; font-family: 'Space Grotesk'; letter-spacing: 1px; margin-bottom: 16px; padding: 0 8px; color: #fff;}
+        .wordmark .dot { color: var(--teal); text-shadow: 0 0 10px var(--teal); animation: pulse 2s infinite;}
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
-  .sidebar-toggle{ display:none; }
-  @media (max-width: 760px){
-    .sidebar{ position:fixed; z-index:90; left:0; transform: translateX(-100%); transition: transform 0.25s; box-shadow: 20px 0 40px rgba(0,0,0,0.4); }
-    .sidebar.open{ transform: translateX(0); }
-    .sidebar-toggle{ display:flex; align-items:center; gap:8px; min-height:44px; padding:8px 14px; border:1.5px solid var(--panel-edge); border-radius:10px; font-weight:700; }
-  }
+        .nav-item {
+            display: flex; align-items: center; gap: 12px; text-align: left;
+            padding: 12px 14px; border-radius: 12px; font-weight: 700; font-size: 0.95rem;
+            color: var(--muted); transition: 0.2s; border: 1px solid transparent;
+        }
+        .nav-item .n {
+            width: 24px; height: 24px; border-radius: 50%; background: var(--panel-edge); color: var(--text);
+            display: flex; align-items: center; justify-content: center; font-family: 'Space Grotesk'; font-size: 0.75rem; flex-shrink: 0;
+        }
+        .nav-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+        .nav-item.active { background: rgba(79, 209, 197, 0.1); border-color: rgba(79, 209, 197, 0.3); color: #fff; }
+        .nav-item.active .n { background: var(--teal); color: #0B0F1A; }
+        .nav-item.done .n { background: var(--green); color: #0B0F1A; }
 
-  main{ flex:1; min-width:0; padding: 20px 26px 60px; max-width: 980px; }
+        /* ============ MAIN CONTENT ============ */
+        main { flex: 1; overflow-y: auto; padding: 30px 40px; position: relative; background: radial-gradient(circle at top right, #121A29, #0B0F1A); scroll-behavior: smooth;}
+        
+        .panel { display: none; animation: fadeIn 0.4s ease forwards; }
+        .panel.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-  /* ============ TOPBAR: small cosmos accent, decoupled from content ============ */
-  .topbar{ display:flex; align-items:center; gap:16px; margin-bottom: 18px; }
-  #cosmos{ width:96px; height:96px; flex-shrink:0; border-radius:50%; }
-  .topbar-copy h1{ font-size:1.3rem; margin:0 0 2px; }
-  .topbar-copy p{ margin:0; color:var(--muted); font-size:0.85rem; }
+        .panel h2 { font-size: 2rem; margin-bottom: 8px; color: #fff; display: flex; align-items: center; gap: 10px;}
+        .panel .lede { color: var(--muted); font-size: 1rem; margin-bottom: 24px; }
 
-  .panel{ display:none; }
-  .panel.active{ display:block; }
-  .panel h2{ font-size:1.15rem; margin:0 0 4px; }
-  .panel .lede{ color:var(--muted); font-size:0.88rem; margin: 0 0 16px; }
+        /* ============ DISCOVER (Word Orbit) ============ */
+        .word-orbit { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 30px; }
+        .word-item { font-family: 'Space Grotesk'; font-weight: 700; font-size: 1.1rem; padding: 12px 20px; border-radius: 12px; border: 2px solid var(--panel-edge); background: rgba(255,255,255,0.02); transition: 0.3s; }
+        .word-item:hover { transform: translateY(-3px); border-color: var(--teal); box-shadow: 0 10px 20px rgba(79, 209, 197, 0.15); }
 
-  /* ============ WORD ORBIT (kept, compact) ============ */
-  .word-orbit{ display:flex; flex-wrap:wrap; gap:10px; margin: 0 0 18px; }
-  .word-item{
-    font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:1rem;
-    padding:8px 14px; border-radius:10px; border:2px solid var(--panel-edge); background:var(--panel); min-height:40px;
-  }
-  .word-item .wb{ opacity:0.85; }
+        /* ============ SEARCH ============ */
+        .search-wrap { display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.4); border: 2px solid var(--panel-edge); border-radius: 30px; padding: 8px 16px 8px 24px; max-width: 600px; transition: 0.3s; margin-bottom: 30px;}
+        .search-wrap:focus-within { border-color: var(--teal); box-shadow: 0 0 20px rgba(79, 209, 197, 0.2); background: rgba(0,0,0,0.8); }
+        .search-wrap input { flex: 1; background: transparent; border: none; color: #fff; font-size: 1rem; outline: none; font-family: 'Inter'; }
+        .btn-search { background: var(--teal); color: #000; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; transition: 0.2s; }
+        .btn-search:hover { transform: scale(1.1); box-shadow: 0 0 15px var(--teal); }
 
-  /* ============ TABS + SEARCH ============ */
-  .controls-row{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:14px; }
-  .tabs{ display:flex; gap:6px; flex-wrap:wrap; }
-  .tab{ padding:7px 14px; border-radius:999px; border:2px solid var(--panel-edge); background:var(--panel); font-weight:700; font-size:0.82rem; min-height:36px; }
-  .tab.active{ border-color:var(--gold); background:rgba(232,163,61,0.12); }
-  .search-wrap{ display:flex; align-items:center; gap:6px; background:var(--panel); border:2px solid var(--panel-edge); border-radius:999px; padding:5px 8px 5px 14px; flex:1; min-width:180px; max-width:280px; }
-  .search-wrap input{ flex:1; background:transparent; border:none; color:var(--text); font-size:0.85rem; min-height:30px; outline:none; }
-  .mic-btn{ min-width:32px; min-height:32px; border-radius:50%; border:1.5px solid var(--panel-edge); }
-  .mic-btn.listening{ border-color:var(--coral); }
+        /* ============ CARDS & LISTS ============ */
+        .simple-list { display: flex; flex-direction: column; gap: 12px; }
+        .simple-item { background: var(--panel); border: 1px solid var(--panel-edge); border-radius: 16px; padding: 20px; display: flex; gap: 16px; align-items: flex-start; transition: 0.2s; }
+        .simple-item:hover { border-color: rgba(255,255,255,0.2); transform: translateX(4px); }
+        .simple-item .t { font-weight: 700; font-size: 1.1rem; color: #fff; margin-bottom: 4px; font-family: 'Space Grotesk'; }
+        .simple-item .d { font-size: 0.9rem; color: var(--muted); line-height: 1.5; }
+        .action-chip { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-top: 10px; background: rgba(255,255,255,0.05); color: var(--teal); border: 1px solid rgba(79, 209, 197, 0.3); }
 
-  /* ============ WIKI PREVIEW CARDS ============ */
-  .card-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:12px; }
-  .preview-card{ background:var(--panel); border:2px solid var(--panel-edge); border-radius:var(--radius); padding:14px; display:flex; flex-direction:column; gap:6px; text-align:left; width:100%; }
-  .preview-card:hover{ border-color:var(--gold); }
-  .preview-card .row1{ display:flex; align-items:center; gap:8px; }
-  .preview-card .glyph{ font-size:1.3rem; }
-  .preview-card h3{ margin:0; font-size:0.98rem; }
-  .preview-card .extract{ margin:0; font-size:0.82rem; color:var(--muted); line-height:1.4; }
-  .preview-card .wiki-link{ font-size:0.76rem; color:var(--teal); font-weight:700; margin-top:2px; }
+        /* ============ MERMAID GRAPH WRAPPERS ============ */
+        .graph-container { background: rgba(0,0,0,0.5); border: 1px solid var(--panel-edge); border-radius: 24px; padding: 30px; overflow-x: auto; box-shadow: inset 0 0 30px rgba(0,0,0,0.5); width: 100%; min-height: 400px; display: flex; justify-content: center; }
+        .mermaid { font-family: 'Space Grotesk', sans-serif !important; width: 100%; display: flex; justify-content: center;}
+        .mermaid svg { max-width: 100%; height: auto; }
 
-  /* ============ VIEWER (slide-over) ============ */
-  .viewer-overlay{ position:fixed; inset:0; background:rgba(5,7,12,0.6); z-index:80; display:none; }
-  .viewer-overlay.open{ display:block; }
-  .viewer{
-    position:fixed; top:0; right:0; height:100vh; width:min(380px,92vw); background:var(--panel);
-    border-left:1px solid var(--panel-edge); z-index:90; padding:22px; overflow-y:auto;
-    transform: translateX(100%); transition: transform 0.25s;
-  }
-  .viewer.open{ transform:translateX(0); }
-  .viewer-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
-  .viewer .glyph-big{ font-size:2rem; }
-  .viewer h2{ font-size:1.2rem; margin:8px 0 4px; }
-  .viewer .status-pill{ display:inline-block; font-size:0.72rem; font-weight:700; padding:3px 9px; border-radius:999px; border:1.5px solid currentColor; margin-bottom:8px; }
-  .viewer p.extract{ font-size:0.9rem; line-height:1.5; color:var(--text); }
-  .viewer-actions{ display:flex; flex-direction:column; gap:8px; margin-top:14px; }
-  .viewer-btn{ display:flex; align-items:center; gap:8px; padding:11px 14px; border-radius:10px; border:2px solid var(--teal); font-weight:700; font-size:0.86rem; text-decoration:none; min-height:44px; justify-content:center; }
-  .viewer-btn.primary{ border-color:var(--gold); background:rgba(232,163,61,0.1); }
-  .close-viewer{ min-width:40px; min-height:40px; border-radius:50%; border:2px solid var(--panel-edge); }
+        /* Loader */
+        #loader { display: none; align-items: center; gap: 12px; color: var(--teal); font-family: 'IBM Plex Mono'; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; }
+        .spinner { width: 20px; height: 20px; border: 2px solid rgba(79, 209, 197, 0.2); border-top-color: var(--teal); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-  /* ============ EXPERIENCE / COLLABORATE / CONTRIBUTE lists ============ */
-  .simple-list{ display:flex; flex-direction:column; gap:10px; }
-  .simple-item{ background:var(--panel); border:2px solid var(--panel-edge); border-radius:12px; padding:14px; display:flex; gap:12px; align-items:flex-start; }
-  .simple-item input[type="checkbox"]{ width:20px; height:20px; margin-top:2px; flex-shrink:0; }
-  .simple-item .t{ font-weight:700; font-size:0.92rem; margin-bottom:2px; }
-  .simple-item .d{ font-size:0.84rem; color:var(--muted); }
-  .simple-item.done .t{ text-decoration: line-through; color:var(--muted); }
-
-  .connect-row{ display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
-  .connect-row .from{ font-weight:700; font-size:0.9rem; min-width:110px; }
-  .chip{ font-size:0.78rem; padding:5px 11px; border-radius:999px; border:1.5px solid var(--violet); color:var(--violet); }
-
-  .contribute-item{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
-  .contribute-btn{ display:flex; align-items:center; gap:6px; padding:9px 14px; border-radius:999px; border:2px solid var(--green); font-weight:700; font-size:0.82rem; text-decoration:none; min-height:40px; }
-
-  /* ============ EVOLVE ============ */
-  .progress-ring{ display:flex; align-items:center; gap:16px; margin-bottom: 14px; }
-  .ring-num{ font-family:'Space Grotesk'; font-size:2.4rem; font-weight:700; color:var(--gold); }
-  .ring-label{ color:var(--muted); font-size:0.85rem; }
-
-  /* ============ ACCESS PANEL ============ */
-  .access-panel{ position:fixed; bottom:70px; left:14px; z-index:95; background:var(--panel); border:2px solid var(--panel-edge); border-radius:var(--radius); padding:16px; width:260px; display:none; flex-direction:column; gap:12px; }
-  .access-panel.open{ display:flex; }
-  .access-row{ display:flex; align-items:center; justify-content:space-between; gap:8px; font-size:0.85rem; }
-  .access-row span{ font-weight:700; }
-  .seg{ display:flex; border:2px solid var(--panel-edge); border-radius:999px; overflow:hidden; }
-  .seg button{ padding:6px 10px; font-size:0.78rem; min-height:32px; }
-  .seg button[aria-pressed="true"]{ background:var(--gold); color:#0B0F1A; font-weight:700; }
-</style>
+        @media (max-width: 768px) {
+            .app-shell { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--panel-edge); padding: 16px; flex-direction: row; overflow-x: auto; white-space: nowrap; gap: 8px;}
+            .nav-item { padding: 8px 12px; min-height: 36px; }
+            .wordmark { display: none; }
+            main { padding: 20px; }
+        }
+    </style>
 </head>
-<body data-motion="full" data-contrast="normal" data-textsize="base">
-<a href="#main" class="skip-link">Skip to main content</a>
+<body>
 
 <div class="app-shell">
-  <aside class="sidebar" id="sidebar">
-    <div class="wordmark">Khel<span class="dot">·</span>o</div>
-    <nav class="evod-nav" aria-label="Your path through Khel·o">
-      <button class="nav-item active" data-panel="discover"><span class="n">1</span> Discover</button>
-      <button class="nav-item" data-panel="learn"><span class="n">2</span> Learn</button>
-      <button class="nav-item" data-panel="experience"><span class="n">3</span> Experience</button>
-      <button class="nav-item" data-panel="collaborate"><span class="n">4</span> Collaborate</button>
-      <button class="nav-item" data-panel="contribute"><span class="n">5</span> Contribute</button>
-      <button class="nav-item" data-panel="evolve"><span class="n">6</span> Evolve</button>
-    </nav>
-    <div class="sidebar-bottom">
-      <button class="access-btn" id="accessToggle" aria-expanded="false" aria-controls="accessPanel">◐ Access</button>
-    </div>
-  </aside>
+    <!-- EVOD SIDEBAR -->
+    <aside class="sidebar">
+        <div class="wordmark">Khel<span class="dot">.</span>o <span style="font-size:0.6rem; color:var(--muted); font-family:'IBM Plex Mono'; display:block; letter-spacing:2px; font-weight:normal; text-transform:uppercase;">Infinite Mapping</span></div>
+        <nav class="evod-nav" id="main-nav">
+            <button class="nav-item active" data-panel="discover" onclick="App.route('discover')"><span class="n">1</span> Discover</button>
+            <button class="nav-item" data-panel="learn" onclick="App.route('learn')"><span class="n">2</span> Learn</button>
+            <button class="nav-item" data-panel="experience" onclick="App.route('experience')"><span class="n">3</span> Experience</button>
+            <button class="nav-item" data-panel="collaborate" onclick="App.route('collaborate')"><span class="n">4</span> Collaborate</button>
+            <button class="nav-item" data-panel="contribute" onclick="App.route('contribute')"><span class="n">5</span> Contribute</button>
+            <button class="nav-item" data-panel="evolve" onclick="App.route('evolve')"><span class="n">6</span> Evolve</button>
+        </nav>
+    </aside>
 
-  <main id="main">
-    <button class="sidebar-toggle" id="sidebarToggle" aria-expanded="false" aria-controls="sidebar">☰ Menu</button>
+    <main>
+        <!-- 1. DISCOVER -->
+        <section class="panel active" id="panel-discover">
+            <h2><span class="material-symbols-rounded text-teal-400 text-3xl">travel_explore</span> Discover</h2>
+            <p class="lede">Tap a word to break it down. Words hide deeper meanings.</p>
+            <div class="word-orbit">
+                <button class="word-item" onclick="App.scramble(this, 'KHEL', '.O')"><span class="wa" style="color:var(--teal)">KHEL</span><span class="wb" style="color:var(--gold)">.O</span></button>
+                <button class="word-item" onclick="App.scramble(this, 'DIS', '-PLAY')"><span class="wa" style="color:var(--muted)">DIS</span><span class="wb" style="color:var(--coral)">-PLAY</span></button>
+                <button class="word-item" onclick="App.scramble(this, 'EDU', 'CATION')"><span class="wa" style="color:var(--violet)">EDU</span><span class="wb" style="color:var(--green)">CATION</span></button>
+            </div>
+            <button class="mt-4 bg-teal-500/10 text-teal-400 border border-teal-500/30 px-6 py-3 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-teal-500/20 transition" onclick="App.route('learn')">Next: Learn a Concept →</button>
+        </section>
 
-    <div class="topbar">
-      <canvas id="cosmos" aria-hidden="true"></canvas>
-      <div class="topbar-copy">
-        <h1>Khel·o</h1>
-        <p>Wonder first. Explore next.</p>
-      </div>
-    </div>
+        <!-- 2. LEARN (Wiki Search) -->
+        <section class="panel" id="panel-learn">
+            <h2><span class="material-symbols-rounded text-blue-400 text-3xl">menu_book</span> Learn</h2>
+            <p class="lede">Search the global knowledge base. We will map its DNA.</p>
+            
+            <div class="search-wrap">
+                <span class="material-symbols-rounded text-muted">search</span>
+                <input type="text" id="wikiSearch" placeholder="Search a concept (e.g., Photosynthesis, Mathematics)..." autocomplete="off" onkeypress="if(event.key==='Enter') App.searchWiki()">
+                <button class="btn-search" onclick="App.searchWiki()"><span class="material-symbols-rounded">arrow_forward</span></button>
+            </div>
+            
+            <div id="loader"><div class="spinner"></div> Extracting Semantic Nodes...</div>
+            
+            <div id="learn-results" class="simple-list"></div>
+        </section>
 
-    <!-- 1 DISCOVER -->
-    <section class="panel active" id="panel-discover" aria-labelledby="h-discover">
-      <h2 id="h-discover">Discover</h2>
-      <p class="lede">Tap a word. Tap a world.</p>
-      <div class="word-orbit" id="wordOrbit">
-        <button class="word-item" data-word="khel.o" data-a="KHEL" data-b=".O" data-ca="var(--teal)" data-cb="var(--gold)"
-          data-meaning="KHEL = play (Hindi). +.O turns it into a name.">
-          <span class="wa"></span><span class="wb"></span>
-        </button>
-        <button class="word-item" data-word="dis-play" data-a="DIS" data-b="PLAY" data-ca="var(--muted)" data-cb="var(--coral)"
-          data-meaning="Say it slow: dis-PLAY. PLAY was hiding inside.">
-          <span class="wa"></span><span class="wb"></span>
-        </button>
-        <button class="word-item" data-word="bac.he" data-a="BAC" data-b=".HE" data-ca="var(--violet)" data-cb="var(--green)"
-          data-meaning="Close to “bachche” — Hindi for children. Rhymes with khel·o." title="Our best guess — tell us if you meant something else">
-          <span class="wa"></span><span class="wb"></span>
-        </button>
-      </div>
-      <div class="controls-row">
-        <div class="tabs" role="tablist" aria-label="Filter worlds">
-          <button class="tab active" role="tab" aria-selected="true" data-filter="all">All</button>
-          <button class="tab" role="tab" aria-selected="false" data-filter="species">🐘 Living</button>
-          <button class="tab" role="tab" aria-selected="false" data-filter="knowledge">✦ Ideas</button>
-        </div>
-        <div class="search-wrap">
-          <label for="worldSearch" class="sr-only">Search worlds</label>
-          <span aria-hidden="true">🔎</span>
-          <input type="search" id="worldSearch" placeholder="Search…" autocomplete="off">
-          <button class="mic-btn" id="micBtn" type="button" aria-label="Search by voice">🎙️</button>
-        </div>
-      </div>
-      <div class="card-grid" id="worldGrid"></div>
-    </section>
+        <!-- 3. EXPERIENCE -->
+        <section class="panel" id="panel-experience">
+            <h2><span class="material-symbols-rounded text-rose-400 text-3xl">directions_run</span> Experience</h2>
+            <p class="lede">Knowledge without action is dead. Here is your physical grounding protocol (IKRw).</p>
+            <div id="experience-list" class="simple-list">
+                <div class="p-10 text-center border border-dashed border-slate-700 rounded-2xl text-slate-500">Search and select a concept in the 'Learn' tab first.</div>
+            </div>
+        </section>
 
-    <!-- 2 LEARN -->
-    <section class="panel" id="panel-learn" aria-labelledby="h-learn">
-      <h2 id="h-learn">Learn</h2>
-      <p class="lede">Search anything. Real results from MediaWiki.</p>
-      <div class="controls-row">
-        <div class="search-wrap" style="max-width:420px;">
-          <label for="wikiSearch" class="sr-only">Search MediaWiki</label>
-          <span aria-hidden="true">🔎</span>
-          <input type="search" id="wikiSearch" placeholder="Search anything…" autocomplete="off">
-          <button class="mic-btn" id="wikiMicBtn" type="button" aria-label="Search by voice">🎙️</button>
-        </div>
-      </div>
-      <div id="wikiResults" class="simple-list" style="margin-bottom:18px;"></div>
-      <p class="lede" style="margin-top:0;">Or start with a curated world:</p>
-      <div class="card-grid" id="learnGrid"></div>
-    </section>
+        <!-- 4. COLLABORATE (Mermaid Node Map) -->
+        <section class="panel" id="panel-collaborate">
+            <h2><span class="material-symbols-rounded text-purple-400 text-3xl">hub</span> Collaborate</h2>
+            <p class="lede">How does this concept connect to the universe? (Dynamically compiled AST)</p>
+            <div class="graph-container">
+                <div id="collaborate-graph" class="mermaid">
+                    %% Awaiting Data
+                </div>
+            </div>
+        </section>
 
-    <!-- 3 EXPERIENCE -->
-    <section class="panel" id="panel-experience" aria-labelledby="h-experience">
-      <h2 id="h-experience">Experience</h2>
-      <p class="lede">Go do it. Check it off.</p>
-      <div class="simple-list" id="experienceList"></div>
-    </section>
+        <!-- 5. CONTRIBUTE -->
+        <section class="panel" id="panel-contribute">
+            <h2><span class="material-symbols-rounded text-green-400 text-3xl">eco</span> Contribute</h2>
+            <p class="lede">Add your findings to the open ledger.</p>
+            <div id="contribute-list" class="simple-list">
+                <div class="p-10 text-center border border-dashed border-slate-700 rounded-2xl text-slate-500">Search and select a concept in the 'Learn' tab first.</div>
+            </div>
+        </section>
 
-    <!-- 4 COLLABORATE -->
-    <section class="panel" id="panel-collaborate" aria-labelledby="h-collaborate">
-      <h2 id="h-collaborate">Collaborate</h2>
-      <p class="lede">The Wonder Graph — how worlds connect.</p>
-      <div class="simple-list" id="graphList"></div>
-    </section>
-
-    <!-- 5 CONTRIBUTE -->
-    <section class="panel" id="panel-contribute" aria-labelledby="h-contribute">
-      <h2 id="h-contribute">Contribute</h2>
-      <p class="lede">Add what you notice to the wiki.</p>
-      <div class="simple-list" id="contributeList"></div>
-    </section>
-
-    <!-- 6 EVOLVE -->
-    <section class="panel" id="panel-evolve" aria-labelledby="h-evolve">
-      <h2 id="h-evolve">Evolve</h2>
-      <div class="progress-ring">
-        <div class="ring-num" id="evolveCount">0</div>
-        <div class="ring-label">things learned</div>
-      </div>
-      <p class="lede" id="evolveMsg">Keep discovering — every page you open moves this forward.</p>
-    </section>
-  </main>
-</div>
-
-<div class="viewer-overlay" id="viewerOverlay">
-  <div class="viewer" id="viewer" role="dialog" aria-modal="true" aria-labelledby="viewerTitle">
-    <div class="viewer-top">
-      <div>
-        <div class="glyph-big" id="viewerGlyph"></div>
-        <h2 id="viewerTitle"></h2>
-      </div>
-      <button class="close-viewer" id="closeViewer" aria-label="Close">✕</button>
-    </div>
-    <div id="viewerStatus"></div>
-    <p class="extract" id="viewerExtract"></p>
-    <div class="viewer-actions">
-      <a class="viewer-btn primary" id="viewerWikiLink" href="#" target="_blank" rel="noopener">📖 Open the Wiki page ↗</a>
-      <button class="viewer-btn" id="viewerReadAloud">🔊 Read aloud</button>
-    </div>
-  </div>
-</div>
-
-<div class="access-panel" id="accessPanel" role="dialog" aria-label="Access and comfort settings">
-  <div class="access-row"><span>Motion</span>
-    <div class="seg" role="group" aria-label="Motion"><button data-set="motion" data-val="full" aria-pressed="true">Full</button><button data-set="motion" data-val="reduced" aria-pressed="false">Reduced</button></div>
-  </div>
-  <div class="access-row"><span>Contrast</span>
-    <div class="seg" role="group" aria-label="Contrast"><button data-set="contrast" data-val="normal" aria-pressed="true">Normal</button><button data-set="contrast" data-val="high" aria-pressed="false">High</button></div>
-  </div>
-  <div class="access-row"><span>Text size</span>
-    <div class="seg" role="group" aria-label="Text size"><button data-set="textsize" data-val="base" aria-pressed="true">A</button><button data-set="textsize" data-val="lg" aria-pressed="false">A+</button><button data-set="textsize" data-val="xl" aria-pressed="false">A++</button></div>
-  </div>
-  <div class="access-row"><span>Read aloud</span>
-    <div class="seg" role="group" aria-label="Read aloud"><button data-set="speak" data-val="off" aria-pressed="true">Off</button><button data-set="speak" data-val="on" aria-pressed="false">On</button></div>
-  </div>
+        <!-- 6. EVOLVE (The Master EVOD Mermaid Map) -->
+        <section class="panel" id="panel-evolve">
+            <h2><span class="material-symbols-rounded text-amber-400 text-3xl">all_inclusive</span> Evolve</h2>
+            <p class="lede">Your infinite journey mapped across the 6 stages of human development.</p>
+            <div class="graph-container">
+                <div id="evolve-graph" class="mermaid">
+                    %% Awaiting Data
+                </div>
+            </div>
+        </section>
+    </main>
 </div>
 
 <script>
-const NODES = [
-  { id:'elephant', kind:'species', glyph:'🐘', title:'Asian Elephant', status:'Endangered', statusColor:'var(--coral)',
-    extract:'Elephants recognize themselves in a mirror and comfort each other by touching trunks.',
-    tryIt:'Ask a grown-up to take you to a zoo or sanctuary and watch how elephants use their trunks.',
-    links:['Empathy in animals','Grasslands','Memory & cognition'] },
-  { id:'coral', kind:'species', glyph:'🪸', title:'Coral Reef', status:'Threatened', statusColor:'var(--coral)',
-    extract:'A reef is thousands of tiny animals sharing one skeleton — home to a quarter of ocean life.',
-    tryIt:'Ask to visit an aquarium and find the tank with the most colors.',
-    links:['Ocean ecosystems','Symbiosis','Climate & warming seas'] },
-  { id:'leopard', kind:'species', glyph:'🐆', title:'Snow Leopard', status:'Vulnerable', statusColor:'var(--gold)',
-    extract:'Can leap 15 meters — about three cars long — to cross mountain gaps while hunting.',
-    tryIt:'Go outside and pace out 15 meters. That whole distance, in one jump.',
-    links:['Mountain habitats','Camouflage','Big cats'] },
-  { id:'octopus', kind:'species', glyph:'🐙', title:'Octopus', status:'Stable', statusColor:'var(--green)',
-    extract:'Three hearts, blue blood, and skin that changes color and texture in under a second.',
-    tryIt:'Ask to visit an aquarium\'s octopus tank — watch how still, then how fast, it moves.',
-    links:['Camouflage','Ocean ecosystems','Problem-solving minds'] },
-  { id:'math', kind:'knowledge', glyph:'∞', title:'The Fibonacci Spiral', status:null,
-    extract:'A number pattern in sunflower seeds, pinecones, and galaxy arms — the same math, everywhere.',
-    tryIt:'Go find a pinecone or a pineapple nearby and count its spiral rows.',
-    links:['Patterns in nature','Spirals','Sunflowers'] },
-  { id:'ocean', kind:'knowledge', glyph:'🌊', title:'The Deep Ocean', status:null,
-    extract:'We have better maps of Mars than of our own ocean floor.',
-    tryIt:'Ask a grown-up to visit a beach, lake, or aquarium with you this month.',
-    links:['Ocean ecosystems','Exploration','Coral Reef'] },
-  { id:'space', kind:'knowledge', glyph:'✦', title:'Starlight', status:null,
-    extract:'Starlight you see tonight may have left its star thousands of years ago.',
-    tryIt:'Go outside tonight, pick a star, and ask a grown-up to help you find its age.',
-    links:['Time & distance','Galaxies','The Fibonacci Spiral'] },
-  { id:'ants', kind:'species', glyph:'🐜', title:'Leafcutter Ants', status:'Stable', statusColor:'var(--green)',
-    extract:'They farm fungus underground — one of the only non-human farmers on Earth.',
-    tryIt:'Go outside and find a real ant trail — follow it and see where it leads.',
-    links:['Farming','Colonies','Teamwork'] },
-];
+/**
+ * STREAMING_CHUNK: System Initialization & Configuration
+ */
+mermaid.initialize({
+    startOnLoad: false,
+    theme: 'base',
+    themeVariables: {
+        background: 'transparent',
+        primaryColor: '#121A29',
+        primaryTextColor: '#F2EFE9',
+        primaryBorderColor: '#232E45',
+        lineColor: '#4FD1C5',
+        secondaryColor: '#1A2436',
+        tertiaryColor: '#1A2436',
+        fontFamily: 'Space Grotesk'
+    },
+    flowchart: { curve: 'basis', nodeSpacing: 60, rankSpacing: 60 }
+});
 
-let evodProgress = 1, speakEnabled = false, currentFilter = 'all', currentSearch = '';
+const App = {
+    currentConcept: null,
+    learnedConcepts: new Set(),
+    
+    init() {
+        this.route('discover');
+        this.renderMasterGraph(); // Render empty state
+    },
 
-// Learned-things tracker — uses Claude's artifact storage when available (persists across visits),
-// falls back to plain in-memory tracking for this session when opened as a normal downloaded file.
-const hasStorage = (typeof window.storage !== 'undefined');
-let learnedSet = new Set();
-async function loadLearned(){
-  if(!hasStorage) return;
-  try{ const r = await window.storage.get('khelo-learned', false); if(r) learnedSet = new Set(JSON.parse(r.value)); }
-  catch(e){ /* first run, nothing stored yet */ }
-  updateEvolve();
-}
-async function markLearned(title){
-  if(learnedSet.has(title)) return;
-  learnedSet.add(title);
-  updateEvolve();
-  if(hasStorage){
-    try{ await window.storage.set('khelo-learned', JSON.stringify([...learnedSet]), false); } catch(e){}
-  }
-}
-function updateEvolve(){
-  document.getElementById('evolveCount').textContent = learnedSet.size;
-  document.getElementById('evolveMsg').textContent = learnedSet.size === 0
-    ? 'Keep discovering — every page you open moves this forward.'
-    : `You've learned about ${learnedSet.size} thing${learnedSet.size===1?'':'s'} so far. Keep going!`;
-}
+    route(panelId) {
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        
+        document.getElementById(`panel-${panelId}`).classList.add('active');
+        document.querySelector(`[data-panel="${panelId}"]`).classList.add('active');
+        
+        // Mark previous as done
+        const navs = Array.from(document.querySelectorAll('.nav-item'));
+        const idx = navs.findIndex(n => n.dataset.panel === panelId);
+        navs.forEach((n, i) => { if (i < idx) n.classList.add('done'); else n.classList.remove('done'); });
+    },
 
-// ============ REAL MEDIAWIKI SEARCH — searches anything, not a fixed list ============
-const WIKI_API_BASE = 'https://kids.miraheze.org/w/api.php'; // any MediaWiki install works here
-const WIKI_SITE_BASE = 'https://kids.miraheze.org/wiki/';
+    // Scramble Animation for Discover
+    scramble(btn, wordA, wordB) {
+        const wa = btn.querySelector('.wa'); const wb = btn.querySelector('.wb');
+        const chars = '!<>-_\\/[]{}—=+*^?#~';
+        const scrambleText = (el, final) => {
+            let f = 0;
+            const iv = setInterval(() => {
+                let out = '';
+                for(let i=0; i<final.length; i++) {
+                    out += (i < Math.floor((f/10)*final.length)) ? final[i] : chars[Math.floor(Math.random()*chars.length)];
+                }
+                el.innerText = out;
+                if(f++ >= 10) { clearInterval(iv); el.innerText = final; }
+            }, 40);
+        };
+        scrambleText(wa, wordA); scrambleText(wb, wordB);
+    },
 
-function stripTags(html){ const d = document.createElement('div'); d.innerHTML = html; return d.textContent || ''; }
+    /**
+     * STREAMING_CHUNK: Data Extraction (Wiki API)
+     */
+    async searchWiki() {
+        const query = document.getElementById('wikiSearch').value.trim();
+        if(!query) return;
+        
+        const resEl = document.getElementById('learn-results');
+        const loader = document.getElementById('loader');
+        resEl.innerHTML = ''; loader.style.display = 'flex';
 
-async function searchWiki(query){
-  const resultsEl = document.getElementById('wikiResults');
-  if(!query){ resultsEl.innerHTML = ''; return; }
-  resultsEl.innerHTML = `<p class="lede" style="margin:0;">Searching…</p>`;
-  try{
-    const url = `${WIKI_API_BASE}?action=query&list=search&srsearch=${encodeURIComponent(query)}&srlimit=8&format=json&origin=*`;
-    const res = await fetch(url);
-    if(!res.ok) throw new Error('bad response');
-    const data = await res.json();
-    const hits = (data.query && data.query.search) || [];
-    if(hits.length === 0){
-      resultsEl.innerHTML = `<p class="lede" style="margin:0;">No results — try a different word.</p>`;
-      return;
+        try {
+            // 1. Search Query
+            const url = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&utf8=&format=json&origin=*`;
+            const res = await fetch(url);
+            const data = await res.json();
+            
+            if(!data.query.search.length) throw new Error("No results");
+            
+            const title = data.query.search[0].title;
+            const snippet = data.query.search[0].snippet.replace(/<[^>]*>?/gm, '');
+
+            // 2. Deep Parse (Links & Categories)
+            const parseUrl = `https://en.wikipedia.org/w/api.php?action=parse&page=${encodeURIComponent(title)}&prop=links|categories&format=json&origin=*`;
+            const pRes = await fetch(parseUrl);
+            const pData = await pRes.json();
+            
+            const links = (pData.parse.links || []).filter(l => l.ns === 0).map(l => l['*']).slice(0, 6);
+            const cats = (pData.parse.categories || []).filter(c => !c['*'].includes('articles')).map(c => c['*'].replace(/_/g, ' ')).slice(0, 4);
+
+            this.currentConcept = { title, snippet, links, cats };
+            this.learnedConcepts.add(title);
+            
+            // Render UI
+            resEl.innerHTML = `
+                <div class="simple-item" style="border-color: var(--teal); cursor:pointer;" onclick="App.route('experience')">
+                    <span class="material-symbols-rounded text-teal-400 text-4xl">lightbulb</span>
+                    <div>
+                        <div class="t" style="color: var(--teal);">${title}</div>
+                        <div class="d">${snippet}...</div>
+                        <div class="action-chip">Parsed successfully. Proceed to Experience →</div>
+                    </div>
+                </div>
+            `;
+            
+            this.buildPipelines();
+
+        } catch(e) {
+            resEl.innerHTML = `<div class="text-rose-400 f-mono">Syntax Error: Concept not found in universal registry.</div>`;
+        }
+        loader.style.display = 'none';
+    },
+
+    /**
+     * STREAMING_CHUNK: Dynamic Pipeline Generation (IKRw & Mermaid Compilers)
+     */
+    buildPipelines() {
+        const c = this.currentConcept;
+        if(!c) return;
+
+        // --- 3. Experience (IKRw) ---
+        const actions = [
+            `Go outside and find a physical manifestation of ${c.title}.`,
+            `Explain ${c.title} to a child without using a screen.`,
+            `Draw the architecture of ${c.title} on physical paper.`,
+            `Meditate on how ${c.title} connects to your daily life.`
+        ];
+        const randomAction = actions[Math.floor(Math.random() * actions.length)];
+        
+        document.getElementById('experience-list').innerHTML = `
+            <div class="simple-item">
+                <span class="material-symbols-rounded text-rose-400 text-3xl">psychology</span>
+                <div>
+                    <div class="t">Physical Grounding Protocol (IKRw)</div>
+                    <div class="d text-white font-bold my-2 text-lg">${randomAction}</div>
+                    <div class="d text-xs mt-2">Theory without action is illusion. Check this off when complete.</div>
+                    <label class="mt-4 flex items-center gap-3 cursor-pointer text-sm text-teal-400 font-bold border border-teal-500/30 w-max px-4 py-2 rounded-full hover:bg-teal-500/10 transition">
+                        <input type="checkbox" onchange="if(this.checked) App.route('collaborate')"> I have completed this physical action
+                    </label>
+                </div>
+            </div>
+        `;
+
+        // --- 4. Collaborate (Concept Mermaid Graph) ---
+        const safeTitle = c.title.replace(/[^a-zA-Z0-9]/g, '_');
+        let mmdNode = `graph TD\n`;
+        mmdNode += `classDef core fill:#121A29,stroke:#4FD1C5,stroke-width:2px,color:#fff\n`;
+        mmdNode += `classDef link fill:#1A2436,stroke:#9C8CF0,stroke-width:1px,color:#A9B0C0\n`;
+        mmdNode += `classDef cat fill:#1A2436,stroke:#E8A33D,stroke-width:1px,color:#A9B0C0\n`;
+        
+        mmdNode += `ROOT(("${c.title}")):::core\n`;
+        
+        c.links.forEach((link, i) => {
+            const safeLink = link.replace(/[^a-zA-Z0-9]/g, '');
+            mmdNode += `L${i}["${link}"]:::link\n`;
+            mmdNode += `ROOT -->|Connects| L${i}\n`;
+        });
+        
+        c.cats.forEach((cat, i) => {
+            const safeCat = cat.replace(/[^a-zA-Z0-9]/g, '');
+            mmdNode += `C${i}["${cat}"]:::cat\n`;
+            mmdNode += `ROOT -.->|Category| C${i}\n`;
+        });
+
+        this.renderMermaid('collaborate-graph', mmdNode);
+
+        // --- 5. Contribute ---
+        document.getElementById('contribute-list').innerHTML = `
+            <div class="simple-item">
+                <span class="material-symbols-rounded text-green-400 text-3xl">edit_document</span>
+                <div>
+                    <div class="t">Improve the Global Knowledge Base</div>
+                    <div class="d mb-4">Did you discover something new about <b>${c.title}</b> during your physical experience? Add it to the open ledger.</div>
+                    <a href="https://kids.miraheze.org/wiki/${encodeURIComponent(c.title)}?action=edit" target="_blank" class="bg-green-500/20 text-green-400 border border-green-500/50 px-5 py-2 rounded-full text-sm font-bold uppercase tracking-widest hover:bg-green-500 hover:text-black transition inline-flex items-center gap-2">
+                        Edit Wiki Page <span class="material-symbols-rounded text-lg">launch</span>
+                    </a>
+                    <button class="mt-4 block text-xs text-muted underline" onclick="App.route('evolve')">Skip to Master Evolution Map</button>
+                </div>
+            </div>
+        `;
+
+        // --- 6. Evolve (Master EVOD Graph) ---
+        this.renderMasterGraph();
+    },
+
+    /**
+     * STREAMING_CHUNK: The Infinite Master Graph Compiler
+     */
+    renderMasterGraph() {
+        let mmdMaster = `graph LR\n`;
+        mmdMaster += `classDef user fill:#0B0F1A,stroke:#E8A33D,stroke-width:3px,color:#fff\n`;
+        mmdMaster += `classDef stage fill:#121A29,stroke:#4FD1C5,stroke-width:2px,color:#fff\n`;
+        mmdMaster += `classDef concept fill:#1A2436,stroke:#9C8CF0,stroke-width:1px,color:#fff\n`;
+        
+        mmdMaster += `U(("👶 Innocent<br/>User")):::user\n`;
+        
+        // Define the 6 static stages
+        const stages = ['Discover', 'Learn', 'Experience', 'Collaborate', 'Contribute', 'Evolve'];
+        stages.forEach((s, i) => {
+            mmdMaster += `S${i}{{"${i+1}. ${s}"}}:::stage\n`;
+            if (i === 0) mmdMaster += `U ==> S0\n`;
+            else mmdMaster += `S${i-1} ==> S${i}\n`;
+        });
+
+        // Map learned concepts to the stages dynamically
+        if (this.learnedConcepts.size === 0) {
+            mmdMaster += `Empty["(Search a concept to begin mapping)"]:::concept\n`;
+            mmdMaster += `S1 -.-> Empty\n`;
+        } else {
+            let i = 0;
+            this.learnedConcepts.forEach(concept => {
+                const safeC = concept.replace(/[^a-zA-Z0-9]/g, '');
+                mmdMaster += `C${i}["${concept}"]:::concept\n`;
+                // Map the concept to the learning flow
+                mmdMaster += `S1 -->|Searched| C${i}\n`;
+                mmdMaster += `C${i} -.->|Generated Action| S2\n`;
+                mmdMaster += `C${i} -.->|Built Network| S3\n`;
+                i++;
+            });
+            // Show evolution looping back
+            mmdMaster += `S5 -.->|Generates New Curiosity| U\n`;
+        }
+
+        this.renderMermaid('evolve-graph', mmdMaster);
+    },
+
+    async renderMermaid(containerId, graphStr) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = ''; // Clear previous
+        try {
+            const { svg } = await mermaid.render(`mmd-${Date.now()}`, graphStr);
+            container.innerHTML = svg;
+        } catch (e) {
+            console.error("Mermaid Render Error:", e);
+            container.innerHTML = `<div class="text-rose-400 f-mono text-sm p-4">Graph compilation error. Adjust syntax.</div>`;
+        }
     }
-    resultsEl.innerHTML = '';
-    hits.forEach(hit => {
-      const row = document.createElement('a');
-      row.className = 'simple-item';
-      row.style.textDecoration = 'none';
-      row.style.display = 'flex';
-      row.href = WIKI_SITE_BASE + encodeURIComponent(hit.title.replace(/\s+/g,'_'));
-      row.target = '_blank'; row.rel = 'noopener';
-      row.innerHTML = `<span><span class="t">📖 ${hit.title}</span><br><span class="d">${stripTags(hit.snippet)}…</span></span>`;
-      row.addEventListener('click', () => { markLearned(hit.title); if(speakEnabled) speak(hit.title); });
-      resultsEl.appendChild(row);
-    });
-  } catch(e){
-    resultsEl.innerHTML = `<p class="lede" style="margin:0;">Search is unavailable right now — check your connection, or try the curated worlds below.</p>`;
-  }
-}
-let searchDebounce;
-document.getElementById('wikiSearch').addEventListener('input', e => {
-  clearTimeout(searchDebounce);
-  const q = e.target.value.trim();
-  searchDebounce = setTimeout(() => searchWiki(q), 400);
-});
-const wikiMicBtn = document.getElementById('wikiMicBtn');
-if(SpeechRecognitionAPIcheck()){
-  const rec2 = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-  rec2.continuous = false; rec2.interimResults = false;
-  rec2.onstart = () => wikiMicBtn.classList.add('listening');
-  rec2.onend = () => wikiMicBtn.classList.remove('listening');
-  rec2.onresult = e => { const t = e.results[0][0].transcript; document.getElementById('wikiSearch').value = t; searchWiki(t); };
-  wikiMicBtn.addEventListener('click', () => rec2.start());
-} else { wikiMicBtn.style.display = 'none'; }
-function SpeechRecognitionAPIcheck(){ return !!(window.SpeechRecognition || window.webkitSpeechRecognition); }
+};
 
-function slugFor(title){ return encodeURIComponent(title.trim().replace(/\s+/g,'_')); }
-
-function matchesFilter(n){
-  const f = currentFilter === 'all' || n.kind === currentFilter;
-  const s = !currentSearch || n.title.toLowerCase().includes(currentSearch.toLowerCase());
-  return f && s;
-}
-
-function previewCardHTML(n, compact){
-  return `<span class="row1"><span class="glyph" aria-hidden="true">${n.glyph}</span><h3>${n.title}</h3></span>
-    <p class="extract">${n.extract}</p>
-    <span class="wiki-link">📖 kids.miraheze.org ↗</span>`;
-}
-
-function renderDiscoverGrid(){
-  const grid = document.getElementById('worldGrid');
-  grid.innerHTML = '';
-  NODES.filter(matchesFilter).forEach(n => {
-    const btn = document.createElement('button');
-    btn.className = 'preview-card';
-    btn.innerHTML = `<span class="row1"><span class="glyph" aria-hidden="true">${n.glyph}</span><h3>${n.title}</h3></span>`;
-    btn.addEventListener('click', () => openViewer(n));
-    grid.appendChild(btn);
-  });
-}
-
-function renderLearnGrid(){
-  const grid = document.getElementById('learnGrid');
-  grid.innerHTML = '';
-  NODES.forEach(n => {
-    const btn = document.createElement('button');
-    btn.className = 'preview-card';
-    btn.innerHTML = previewCardHTML(n);
-    btn.addEventListener('click', () => openViewer(n));
-    grid.appendChild(btn);
-  });
-}
-
-function renderExperience(){
-  const list = document.getElementById('experienceList');
-  list.innerHTML = '';
-  NODES.forEach(n => {
-    const item = document.createElement('label');
-    item.className = 'simple-item';
-    item.innerHTML = `<input type="checkbox" aria-label="Mark tried: ${n.title}">
-      <span><span class="t">${n.glyph} ${n.title}</span><br><span class="d">${n.tryIt}</span></span>`;
-    item.querySelector('input').addEventListener('change', (e) => {
-      item.classList.toggle('done', e.target.checked);
-      advanceEvod(3);
-    });
-    list.appendChild(item);
-  });
-}
-
-function renderGraph(){
-  const list = document.getElementById('graphList');
-  list.innerHTML = '';
-  NODES.forEach(n => {
-    const row = document.createElement('div');
-    row.className = 'simple-item';
-    row.innerHTML = `<span class="connect-row" style="width:100%">
-      <span class="from">${n.glyph} ${n.title}</span>
-      ${n.links.map(l => `<span class="chip">${l}</span>`).join('')}
-    </span>`;
-    list.appendChild(row);
-  });
-}
-
-function renderContribute(){
-  const list = document.getElementById('contributeList');
-  list.innerHTML = '';
-  NODES.forEach(n => {
-    const row = document.createElement('div');
-    row.className = 'simple-item contribute-item';
-    row.innerHTML = `<span class="t">${n.glyph} ${n.title}</span>
-      <a class="contribute-btn" href="https://kids.miraheze.org/wiki/${slugFor(n.title)}?action=edit" target="_blank" rel="noopener">✏️ Add to wiki</a>`;
-    list.appendChild(row);
-  });
-}
-
-function openViewer(n){
-  document.getElementById('viewerGlyph').textContent = n.glyph;
-  document.getElementById('viewerTitle').textContent = n.title;
-  document.getElementById('viewerExtract').textContent = n.extract;
-  document.getElementById('viewerStatus').innerHTML = n.status
-    ? `<span class="status-pill" style="color:${n.statusColor}">● ${n.status}</span>` : '';
-  document.getElementById('viewerWikiLink').href = `https://kids.miraheze.org/wiki/${slugFor(n.title)}`;
-  document.getElementById('viewerOverlay').classList.add('open');
-  document.getElementById('viewer').classList.add('open');
-  markLearned(n.title);
-  advanceEvod(2);
-  if(speakEnabled) speak(n.title + '. ' + n.extract);
-}
-function closeViewer(){
-  document.getElementById('viewerOverlay').classList.remove('open');
-  document.getElementById('viewer').classList.remove('open');
-}
-document.getElementById('closeViewer').addEventListener('click', closeViewer);
-document.getElementById('viewerOverlay').addEventListener('click', closeViewer);
-document.getElementById('viewerReadAloud').addEventListener('click', () => {
-  speak(document.getElementById('viewerTitle').textContent + '. ' + document.getElementById('viewerExtract').textContent);
-  advanceEvod(3);
-});
-document.addEventListener('keydown', e => { if(e.key==='Escape') closeViewer(); });
-
-function speak(text){
-  if(!('speechSynthesis' in window)) return;
-  window.speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(text); u.rate = 0.95;
-  window.speechSynthesis.speak(u);
-}
-
-function advanceEvod(step){
-  if(step <= evodProgress) return;
-  evodProgress = step;
-  document.querySelectorAll('.nav-item').forEach(el => {
-    const n = Array.from(document.querySelectorAll('.nav-item')).indexOf(el) + 1;
-    el.classList.toggle('done', n < evodProgress);
-  });
-}
-
-// ============ SIDEBAR NAV / PANELS ============
-document.querySelectorAll('.nav-item').forEach((item, i) => {
-  item.addEventListener('click', () => {
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-    item.classList.add('active');
-    document.getElementById('panel-' + item.dataset.panel).classList.add('active');
-    document.getElementById('sidebar').classList.remove('open');
-    advanceEvod(i+1);
-  });
-});
-document.getElementById('sidebarToggle').addEventListener('click', () => {
-  const open = document.getElementById('sidebar').classList.toggle('open');
-  document.getElementById('sidebarToggle').setAttribute('aria-expanded', open);
-});
-
-// ============ DISCOVER: tabs + search + voice ============
-document.querySelectorAll('.tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('.tab').forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected','false'); });
-    tab.classList.add('active'); tab.setAttribute('aria-selected','true');
-    currentFilter = tab.dataset.filter; renderDiscoverGrid();
-  });
-});
-document.getElementById('worldSearch').addEventListener('input', e => { currentSearch = e.target.value; renderDiscoverGrid(); });
-
-const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
-const micBtn = document.getElementById('micBtn');
-if(SpeechRecognitionAPI){
-  const rec = new SpeechRecognitionAPI();
-  rec.continuous = false; rec.interimResults = false;
-  rec.onstart = () => micBtn.classList.add('listening');
-  rec.onend = () => micBtn.classList.remove('listening');
-  rec.onresult = e => { const t = e.results[0][0].transcript; document.getElementById('worldSearch').value = t; currentSearch = t; renderDiscoverGrid(); };
-  micBtn.addEventListener('click', () => rec.start());
-} else { micBtn.style.display = 'none'; }
-
-// ============ WORD ORBIT ============
-const SCRAMBLE_CHARS = 'abcdefghijklmnopqrstuvwxyz';
-function scrambleSpan(el, finalText, duration){
-  if(document.body.dataset.motion === 'reduced'){ el.textContent = finalText; return Promise.resolve(); }
-  const frames = 8; let frame = 0;
-  return new Promise(resolve => {
-    const iv = setInterval(() => {
-      frame++;
-      const revealCount = Math.floor((frame/frames) * finalText.length);
-      let out = '';
-      for(let i=0;i<finalText.length;i++){
-        if(!/[a-zA-Z]/.test(finalText[i])){ out += finalText[i]; continue; }
-        out += (i < revealCount) ? finalText[i] : SCRAMBLE_CHARS[Math.floor(Math.random()*SCRAMBLE_CHARS.length)];
-      }
-      el.textContent = out;
-      if(frame >= frames){ clearInterval(iv); el.textContent = finalText; resolve(); }
-    }, duration/frames);
-  });
-}
-function jumbleWordItem(item){
-  const wa = item.querySelector('.wa'), wb = item.querySelector('.wb');
-  wa.style.color = item.dataset.ca; wb.style.color = item.dataset.cb;
-  Promise.all([scrambleSpan(wa, item.dataset.a, 450), scrambleSpan(wb, item.dataset.b, 450)]);
-}
-document.querySelectorAll('.word-item').forEach(item => {
-  jumbleWordItem(item);
-  item.addEventListener('click', () => {
-    jumbleWordItem(item);
-    if(speakEnabled) speak(item.dataset.word + '. ' + item.dataset.meaning);
-  });
-});
-
-// ============ ACCESS PANEL ============
-const accessToggle = document.getElementById('accessToggle');
-const accessPanel = document.getElementById('accessPanel');
-accessToggle.addEventListener('click', () => {
-  const open = accessPanel.classList.toggle('open');
-  accessToggle.setAttribute('aria-expanded', open);
-});
-document.querySelectorAll('.access-panel .seg button').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const { set, val } = btn.dataset;
-    document.querySelectorAll(`.seg button[data-set="${set}"]`).forEach(b => b.setAttribute('aria-pressed', b===btn));
-    if(set === 'speak'){ speakEnabled = (val === 'on'); return; }
-    document.body.setAttribute('data-' + set, val);
-    if(set === 'motion') cosmosMotion = (val === 'full');
-  });
-});
-
-// ============ SMALL DECORATIVE COSMOS (no longer gates content) ============
-const canvas = document.getElementById('cosmos');
-const ctx = canvas.getContext('2d');
-let cosmosMotion = true, W, H, DPR;
-function resize(){
-  DPR = Math.min(window.devicePixelRatio||1, 2);
-  W = canvas.clientWidth = 96; H = canvas.clientHeight = 96;
-  canvas.width = W*DPR; canvas.height = H*DPR; ctx.setTransform(DPR,0,0,DPR,0,0);
-}
-const orbits = [
-  { radius:0.32, speed:0.6, color:'#FF7A5C', size:3, angle:0.4 },
-  { radius:0.42, speed:0.4, color:'#9C8CF0', size:3.4, angle:2.1 },
-];
-let t = 0;
-function draw(){
-  ctx.clearRect(0,0,W,H);
-  const cx=W/2, cy=H/2;
-  ctx.fillStyle = '#FFD98A';
-  ctx.beginPath(); ctx.arc(cx,cy,W*0.14,0,Math.PI*2); ctx.fill();
-  orbits.forEach(o => {
-    const r = W/2*o.radius + W*0.18;
-    if(cosmosMotion) o.angle += o.speed*0.02;
-    const px = cx+Math.cos(o.angle)*r, py = cy+Math.sin(o.angle)*r*0.9;
-    ctx.fillStyle = o.color; ctx.beginPath(); ctx.arc(px,py,o.size,0,Math.PI*2); ctx.fill();
-  });
-  t++; requestAnimationFrame(draw);
-}
-
-// init
-resize(); draw();
-renderDiscoverGrid(); renderLearnGrid(); renderExperience(); renderGraph(); renderContribute(); loadLearned();
-if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){
-  document.body.setAttribute('data-motion','reduced'); cosmosMotion = false;
-  document.querySelector('.seg button[data-set="motion"][data-val="reduced"]').click();
-}
+window.onload = () => App.init();
 </script>
 </body>
 </html>
