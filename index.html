@@ -2,12 +2,11 @@
 <html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Khel.o · Dis-play Universe</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=no">
+    <title>Khel.o · Universal Extensible OS</title>
 
-    <!-- Typography & Icons -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700;800&family=Atkinson+Hyperlegible:wght@400;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <!-- Premium Typography & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700;800&family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0" />
 
     <!-- Core Libraries -->
@@ -15,126 +14,129 @@
 
     <style>
         :root {
-            --bg: #0B0F1A; --panel: #121A29; --panel-edge: #232E45;
-            --text: #F2EFE9; --muted: #A9B0C0;
-            --gold: #E8A33D; --coral: #FF7A5C; --violet: #9C8CF0; --teal: #4FD1C5; --green: #6FCF97;
-            --focus: #FFD166; --radius: 16px; --sidebar-w: 240px;
+            --bg-void: #030508;
+            --panel-bg: rgba(13, 19, 34, 0.7);
+            --panel-border: rgba(255, 255, 255, 0.08);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --gold: #fbbf24;
+            --accent: #38bdf8;
+            --sidebar-w: 260px;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: var(--text); font-family: 'Atkinson Hyperlegible', sans-serif; min-height: 100vh; overflow-x: hidden; }
-        h1, h2, h3, .f-disp { font-family: 'Space Grotesk', sans-serif; }
-        .f-mono { font-family: 'IBM Plex Mono', monospace; }
-        button { cursor: pointer; background: none; border: none; color: inherit; font-family: inherit; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg-void); color: var(--text-main); font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; }
 
-        /* ============ SHELL & SIDEBAR ============ */
+        .f-disp { font-family: 'Space Grotesk', sans-serif; }
+        .f-mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* ==========================================
+           SHELL & SIDEBAR 
+           ========================================== */
         .app-shell { display: flex; height: 100vh; overflow: hidden; }
+        
         .sidebar {
-            width: var(--sidebar-w); flex-shrink: 0; background: var(--panel);
-            border-right: 1px solid var(--panel-edge); display: flex; flex-direction: column;
-            padding: 24px 16px; gap: 12px; z-index: 50;
+            width: var(--sidebar-w); background: rgba(5, 8, 14, 0.95);
+            border-right: 1px solid var(--panel-border); display: flex; flex-direction: column;
+            padding: 24px 16px; z-index: 50; flex-shrink: 0; backdrop-filter: blur(20px);
         }
-        .wordmark { font-size: 1.5rem; font-weight: 800; font-family: 'Space Grotesk'; letter-spacing: 1px; margin-bottom: 16px; padding: 0 8px; color: #fff;}
-        .wordmark .dot { color: var(--teal); text-shadow: 0 0 10px var(--teal); animation: pulse 2s infinite;}
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        
+        .brand { font-size: 1.8rem; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 8px; margin-bottom: 30px; padding: 0 10px;}
+        .brand span { color: var(--accent); }
 
         .nav-item {
-            display: flex; align-items: center; gap: 12px; text-align: left;
-            padding: 12px 14px; border-radius: 12px; font-weight: 700; font-size: 0.95rem;
-            color: var(--muted); transition: 0.2s; border: 1px solid transparent;
-        }
-        .nav-item .n {
-            width: 24px; height: 24px; border-radius: 50%; background: var(--panel-edge); color: var(--text);
-            display: flex; align-items: center; justify-content: center; font-family: 'Space Grotesk'; font-size: 0.75rem; flex-shrink: 0;
+            display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 12px;
+            color: var(--text-muted); font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: 0.2s;
+            border: 1px solid transparent; margin-bottom: 4px;
         }
         .nav-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
-        .nav-item.active { background: rgba(79, 209, 197, 0.1); border-color: rgba(79, 209, 197, 0.3); color: #fff; }
-        .nav-item.active .n { background: var(--teal); color: #0B0F1A; }
-        .nav-item.done .n { background: var(--green); color: #0B0F1A; }
+        .nav-item.active { background: rgba(56, 189, 248, 0.1); border-color: rgba(56, 189, 248, 0.2); color: #fff; }
+        .nav-item .n-badge {
+            width: 24px; height: 24px; border-radius: 50%; background: var(--panel-border); color: #fff;
+            display: flex; align-items: center; justify-content: center; font-size: 0.75rem; flex-shrink: 0;
+        }
+        .nav-item.active .n-badge { background: var(--accent); color: #000; }
+        .nav-item.completed .n-badge { background: #10b981; color: #000; }
 
-        /* ============ MAIN CONTENT ============ */
-        main { flex: 1; overflow-y: auto; padding: 30px 40px; position: relative; background: radial-gradient(circle at top right, #121A29, #0B0F1A); scroll-behavior: smooth;}
+        /* ==========================================
+           MAIN STAGE & PANELS
+           ========================================== */
+        main { flex: 1; position: relative; background: radial-gradient(circle at top right, #0a1128, #010204); overflow-y: auto; overflow-x: hidden; scroll-behavior: smooth;}
         
-        .panel { display: none; animation: fadeIn 0.4s ease forwards; }
+        .panel { display: none; padding: 40px; max-width: 1000px; margin: 0 auto; animation: fadeUp 0.4s ease forwards; }
         .panel.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .panel h2 { font-size: 2rem; margin-bottom: 8px; color: #fff; display: flex; align-items: center; gap: 10px;}
-        .panel .lede { color: var(--muted); font-size: 1rem; margin-bottom: 24px; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* ============ DISCOVER (Word Orbit) ============ */
-        .word-orbit { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 30px; }
-        .word-item { font-family: 'Space Grotesk'; font-weight: 700; font-size: 1.1rem; padding: 12px 20px; border-radius: 12px; border: 2px solid var(--panel-edge); background: rgba(255,255,255,0.02); transition: 0.3s; }
-        .word-item:hover { transform: translateY(-3px); border-color: var(--teal); box-shadow: 0 10px 20px rgba(79, 209, 197, 0.15); }
+        .panel-title { font-size: 2.5rem; font-weight: 800; color: #fff; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; }
+        .panel-desc { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 30px; line-height: 1.6; }
 
-        /* ============ SEARCH ============ */
-        .search-wrap { display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.4); border: 2px solid var(--panel-edge); border-radius: 30px; padding: 8px 16px 8px 24px; max-width: 600px; transition: 0.3s; margin-bottom: 30px;}
-        .search-wrap:focus-within { border-color: var(--teal); box-shadow: 0 0 20px rgba(79, 209, 197, 0.2); background: rgba(0,0,0,0.8); }
-        .search-wrap input { flex: 1; background: transparent; border: none; color: #fff; font-size: 1.1rem; outline: none; font-family: 'Inter'; }
-        .btn-search { background: var(--teal); color: #000; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; transition: 0.2s; }
-        .btn-search:hover { transform: scale(1.1); box-shadow: 0 0 15px var(--teal); }
-
-        /* ============ CARDS & LISTS ============ */
-        .simple-list { display: flex; flex-direction: column; gap: 12px; }
-        .simple-item { background: var(--panel); border: 1px solid var(--panel-edge); border-radius: 16px; padding: 20px; display: flex; gap: 16px; align-items: flex-start; transition: 0.2s; position: relative; overflow: hidden;}
-        .simple-item:hover { border-color: rgba(255,255,255,0.2); transform: translateX(4px); }
-        .simple-item .t { font-weight: 700; font-size: 1.1rem; color: #fff; margin-bottom: 4px; font-family: 'Space Grotesk'; }
-        .simple-item .d { font-size: 0.9rem; color: var(--muted); line-height: 1.5; }
-
-        /* ============ WONDER GRAPH (Dot Coding) ============ */
-        .graph-container { position: relative; background: rgba(0,0,0,0.4); border: 1px solid var(--panel-edge); border-radius: 24px; box-shadow: inset 0 0 30px rgba(0,0,0,0.5); width: 100%; min-height: 450px; overflow: hidden; display: flex; justify-content: center; align-items: center;}
+        .glass-box { background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 20px; padding: 24px; backdrop-filter: blur(12px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
         
-        .dot-node {
+        .search-wrap { display: flex; align-items: center; background: rgba(0,0,0,0.5); border: 1px solid var(--accent); border-radius: 40px; padding: 10px 24px; width: 100%; max-width: 600px; transition: 0.3s; }
+        .search-wrap:focus-within { border-color: #fff; box-shadow: 0 0 30px rgba(56,189,248,0.3); background: rgba(15,23,42,0.9); }
+        .search-wrap input { flex: 1; background: transparent; border: none; color: #fff; font-size: 1.1rem; outline: none; font-family: 'Inter'; margin-left: 12px;}
+
+        .btn-action { background: var(--accent); color: #000; font-family: 'Space Grotesk'; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding: 14px 28px; border-radius: 30px; border: none; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px;}
+        .btn-action:hover { transform: translateY(-2px); filter: brightness(1.1); box-shadow: 0 10px 20px rgba(56,189,248,0.3); }
+
+        /* ==========================================
+           WONDER GRAPH ENGINE (Extensible CSS3D)
+           ========================================== */
+        .graph-stage { position: relative; width: 100%; height: 500px; background: rgba(0,0,0,0.3); border: 1px solid var(--panel-border); border-radius: 24px; overflow: hidden; }
+        .graph-svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+        .res-line { fill: none; stroke-width: 2; stroke-linecap: round; opacity: 0.5; stroke-dasharray: 4 4; animation: flowDash 20s linear infinite; }
+        @keyframes flowDash { to { stroke-dashoffset: -1000; } }
+
+        .wg-node {
             position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center;
             border-radius: 50%; cursor: pointer; text-align: center;
-            background: rgba(10, 15, 25, 0.9); border: 2px solid; backdrop-filter: blur(8px);
-            transform: translate(-50%, -50%) scale(0);
+            background: rgba(10, 15, 25, 0.95); border: 2px solid var(--col);
+            transform: translate3d(calc(-50% + var(--x)), calc(-50% + var(--y)), 0) scale(var(--s, 0));
+            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s;
             animation: popNode 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-            transition: transform 0.3s, box-shadow 0.3s; z-index: 10;
+            z-index: 10; pointer-events: auto;
         }
-        .dot-node:hover { transform: translate(-50%, -50%) scale(1.2); z-index: 20; box-shadow: 0 0 20px currentColor !important;}
-        @keyframes popNode { to { transform: translate(-50%, -50%) scale(1); } }
+        @keyframes popNode { to { transform: translate3d(calc(-50% + var(--x)), calc(-50% + var(--y)), 0) scale(var(--s, 1)); } }
         
-        .dot-label {
-            position: absolute; top: 110%; font-family: 'Space Grotesk'; font-size: 0.75rem; 
-            font-weight: 800; text-transform: uppercase; letter-spacing: 1px; white-space: nowrap;
-            text-shadow: 0 2px 4px #000; pointer-events: none;
-        }
+        .wg-node:hover { transform: translate3d(calc(-50% + var(--x)), calc(-50% + var(--y)), 0) scale(1.15) !important; z-index: 20; box-shadow: 0 0 30px var(--col), inset 0 0 15px rgba(255,255,255,0.2); }
+        .wg-icon { font-size: var(--icon-sz); filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6)); line-height: 1; }
+        .wg-label { position: absolute; top: calc(100% + 8px); font-family: 'Space Grotesk'; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #fff; text-shadow: 0 2px 4px #000; white-space: nowrap; pointer-events: none;}
 
-        /* ============ VIEWER OVERLAY ============ */
-        .viewer-overlay { position: fixed; inset: 0; background: rgba(5,7,12,0.8); backdrop-filter: blur(8px); z-index: 100; display: none; }
-        .viewer-overlay.open { display: block; animation: fadeIn 0.3s; }
-        .viewer {
-            position: fixed; top: 0; right: 0; height: 100vh; width: min(450px, 90vw); background: var(--panel);
-            border-left: 1px solid var(--panel-edge); z-index: 110; padding: 30px; overflow-y: auto;
+        /* ==========================================
+           JANM KUNDALI (DECODER SHEET)
+           ========================================== */
+        .viewer-overlay { position: fixed; inset: 0; background: rgba(2,3,5,0.85); backdrop-filter: blur(10px); z-index: 200; display: none; justify-content: flex-end; }
+        .viewer-overlay.active { display: flex; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .viewer-panel {
+            width: 100%; max-width: 480px; height: 100vh; background: var(--panel-bg);
+            border-left: 1px solid var(--col); padding: 40px; overflow-y: auto;
             transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: -20px 0 50px rgba(0,0,0,0.5);
+            display: flex; flex-direction: column; box-shadow: -20px 0 60px rgba(0,0,0,0.8);
         }
-        .viewer.open { transform: translateX(0); }
-        .viewer-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;}
-        .close-viewer { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--panel-edge); color: #fff; display: flex; align-items: center; justify-content: center; transition: 0.2s;}
-        .close-viewer:hover { background: #ef4444; border-color: #ef4444; transform: rotate(90deg);}
+        .viewer-overlay.active .viewer-panel { transform: translateX(0); }
 
-        .v-hero-img { width: 100%; height: 200px; object-fit: cover; border-radius: 12px; margin-bottom: 16px; border: 1px solid var(--panel-edge); display: none; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        .v-close { position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); width: 40px; height: 40px; border-radius: 50%; color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s;}
+        .v-close:hover { background: #ef4444; border-color: #ef4444; transform: rotate(90deg); }
 
-        .action-chip { display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; border-radius: 12px; font-weight: 700; font-size: 0.9rem; text-decoration: none; transition: 0.2s; border: 2px solid transparent; width: 100%; justify-content: center;}
-        .chip-wiki { background: rgba(79, 209, 197, 0.1); color: var(--teal); border-color: rgba(79, 209, 197, 0.3); }
-        .chip-github { background: rgba(156, 140, 240, 0.1); color: var(--violet); border-color: rgba(156, 140, 240, 0.3); }
-        .chip-google { background: rgba(232, 163, 61, 0.1); color: var(--gold); border-color: rgba(232, 163, 61, 0.3); }
-        .action-chip:hover { transform: translateY(-2px); filter: brightness(1.2); }
+        .v-hero-img { width: 100%; height: 220px; object-fit: cover; border-radius: 16px; margin-bottom: 20px; border: 1px solid var(--panel-border); box-shadow: 0 10px 20px rgba(0,0,0,0.4); display: none;}
+        .v-meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+        .v-meta-box { background: rgba(0,0,0,0.4); border: 1px solid var(--panel-border); padding: 12px; border-radius: 12px; text-align: center;}
+        
+        .ikrw-box { background: linear-gradient(135deg, rgba(16,185,129,0.1), rgba(16,185,129,0.05)); border: 1px solid rgba(16,185,129,0.3); border-radius: 16px; padding: 20px; margin-bottom: 24px; }
 
-        .btn-tts { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px; border-radius: 12px; background: rgba(255,255,255,0.05); color: #fff; font-family: 'Space Grotesk'; font-weight: 700; border: 1px solid rgba(255,255,255,0.1); margin-top: 12px; transition: 0.2s;}
-        .btn-tts:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.3); color: var(--teal); }
-
-        /* Loader */
-        #loader { display: none; align-items: center; gap: 12px; color: var(--teal); font-family: 'IBM Plex Mono'; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; }
-        .spinner { width: 20px; height: 20px; border: 2px solid rgba(79, 209, 197, 0.2); border-top-color: var(--teal); border-radius: 50%; animation: spin 1s linear infinite; }
+        #toast { position: fixed; top: 30px; left: 50%; transform: translateX(-50%); background: #10b981; color: #000; padding: 12px 24px; border-radius: 30px; font-family: 'Space Grotesk'; font-weight: 800; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 10px 40px rgba(16,185,129,0.5); z-index: 1000; opacity: 0; pointer-events: none; transition: 0.4s; }
+        #toast.show { opacity: 1; transform: translateX(-50%) translateY(10px); }
 
         @media (max-width: 768px) {
             .app-shell { flex-direction: column; }
-            .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--panel-edge); padding: 16px; flex-direction: row; overflow-x: auto; white-space: nowrap; gap: 8px;}
-            .nav-item { padding: 8px 12px; min-height: 36px; }
-            .wordmark { display: none; }
+            .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--panel-border); padding: 16px; flex-direction: row; overflow-x: auto; white-space: nowrap; gap: 10px; }
+            .brand { display: none; }
+            .nav-item { padding: 8px 12px; min-height: 40px; margin-bottom: 0; }
             main { padding: 20px; }
+            .panel { padding: 20px; }
+            .viewer-panel { max-width: 100%; }
         }
     </style>
 </head>
@@ -143,544 +145,620 @@
 <div class="app-shell">
     <!-- EVOD SIDEBAR -->
     <aside class="sidebar">
-        <div class="wordmark">Khel<span class="dot">.</span>o <span class="block text-[0.6rem] text-slate-500 f-mono tracking-widest uppercase mt-1 font-normal">Playful Search Engine</span></div>
-        <nav class="evod-nav" id="main-nav">
-            <button class="nav-item active" data-panel="discover" onclick="App.route('discover')"><span class="n">1</span> Discover & Innovate</button>
-            <button class="nav-item" data-panel="learn" onclick="App.route('learn')"><span class="n">2</span> Learn</button>
-            <button class="nav-item" data-panel="experience" onclick="App.route('experience')"><span class="n">3</span> Experience</button>
-            <button class="nav-item" data-panel="collaborate" onclick="App.route('collaborate')"><span class="n">4</span> Collaborate</button>
-            <button class="nav-item" data-panel="contribute" onclick="App.route('contribute')"><span class="n">5</span> Contribute</button>
-            <button class="nav-item" data-panel="evolve" onclick="App.route('evolve')"><span class="n">6</span> Evolve</button>
-        </nav>
+        <div class="brand">Khel<span style="color:var(--accent);">.</span>o</div>
+        <nav id="evod-nav" style="display: flex; flex-direction: column; gap: 4px;"></nav>
     </aside>
 
     <main>
-        <!-- 1. DISCOVER -->
         <section class="panel active" id="panel-discover">
-            <h2><span class="material-symbols-rounded text-teal-400 text-3xl">travel_explore</span> Discover & Innovate</h2>
-            <p class="lede">Tap a word to unscramble it. This sparks the flow of learning.</p>
-            <div class="word-orbit">
-                <button class="word-item" onclick="App.scrambleAndSearch(this, 'KHEL', '.O', 'Khel.o')"><span class="wa text-teal-400">KHEL</span><span class="wb text-amber-400">.O</span></button>
-                <button class="word-item" onclick="App.scrambleAndSearch(this, 'DIS', '-PLAY', 'Play')"><span class="wa text-slate-400">DIS</span><span class="wb text-rose-400">-PLAY</span></button>
-                <button class="word-item" onclick="App.scrambleAndSearch(this, 'EDU', 'CATION', 'Education')"><span class="wa text-purple-400">EDU</span><span class="wb text-green-400">CATION</span></button>
-                <button class="word-item" onclick="App.scrambleAndSearch(this, 'GRAV', 'ITY', 'Gravity')"><span class="wa text-sky-400">GRAV</span><span class="wb text-emerald-400">ITY</span></button>
+            <div class="panel-title"><span class="material-symbols-rounded text-sky-400 text-4xl">travel_explore</span> Discover & Innovate</div>
+            <p class="panel-desc">Tap a scrambled seed to ignite the flow of learning.</p>
+            
+            <div class="flex flex-wrap gap-4 mb-10" id="discover-seeds">
+                <!-- Injected via CONFIG -->
             </div>
-            <button class="mt-4 bg-teal-500/10 text-teal-400 border border-teal-500/30 px-6 py-3 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-teal-500/20 transition" onclick="App.route('learn')">Start Free Learning →</button>
+            
+            <button class="btn-action" onclick="App.route('learn')">Launch Universal Search <span class="material-symbols-rounded">arrow_forward</span></button>
         </section>
 
-        <!-- 2. LEARN (Wiki Search) -->
         <section class="panel" id="panel-learn">
-            <h2><span class="material-symbols-rounded text-blue-400 text-3xl">search</span> Learn</h2>
-            <p class="lede">Search for a concept. We will map its DNA for you.</p>
+            <div class="panel-title"><span class="material-symbols-rounded text-emerald-400 text-4xl">menu_book</span> Learn</div>
+            <p class="panel-desc">Query the universal matrix. We extract the essence automatically.</p>
             
-            <div class="search-wrap">
-                <span class="material-symbols-rounded text-muted">search</span>
-                <input type="text" id="wikiSearch" placeholder="e.g., Photosynthesis, Hydroponics, Gravity..." autocomplete="off" onkeypress="if(event.key==='Enter') App.searchWiki()">
-                <button class="btn-search" onclick="App.searchWiki()"><span class="material-symbols-rounded">arrow_forward</span></button>
+            <div class="search-wrap mb-8">
+                <span class="material-symbols-rounded text-slate-400">search</span>
+                <input type="text" id="omni-search" placeholder="e.g. Quantum Physics, Permaculture..." autocomplete="off" onkeypress="if(event.key==='Enter') App.executeSearch()">
+                <button class="bg-transparent border-none text-sky-400 cursor-pointer flex items-center justify-center p-2" onclick="App.executeSearch()">
+                    <span class="material-symbols-rounded">arrow_forward</span>
+                </button>
             </div>
-            
-            <div id="loader"><div class="spinner"></div> Synthesizing Knowledge...</div>
-            <div id="learn-results" class="simple-list"></div>
+
+            <div id="search-loader" style="display:none;" class="text-sky-400 f-mono text-sm tracking-widest uppercase mb-6 flex items-center gap-3">
+                <span class="material-symbols-rounded animate-spin">sync</span> Synthesizing Data...
+            </div>
+
+            <div id="search-results" class="flex flex-col gap-4"></div>
         </section>
 
-        <!-- 3. EXPERIENCE -->
         <section class="panel" id="panel-experience">
-            <h2><span class="material-symbols-rounded text-rose-400 text-3xl">directions_run</span> Experience</h2>
-            <p class="lede">Knowledge without physical action is dead. Here is your IKRw Protocol.</p>
-            <div id="experience-list" class="simple-list">
-                <div class="p-10 text-center border border-dashed border-slate-700 rounded-2xl text-slate-500">Search and select a concept in the 'Learn' tab first.</div>
+            <div class="panel-title"><span class="material-symbols-rounded text-rose-400 text-4xl">directions_run</span> Experience</div>
+            <p class="panel-desc">Knowledge requires physical anchoring. Complete your IKRw Protocol.</p>
+            
+            <div id="experience-container" class="glass-box text-center text-slate-500">
+                Search and select a concept in the 'Learn' tab first.
             </div>
         </section>
 
-        <!-- 4. COLLABORATE (Dot Code Node Map) -->
         <section class="panel" id="panel-collaborate">
-            <h2><span class="material-symbols-rounded text-purple-400 text-3xl">hub</span> Collaborate</h2>
-            <p class="lede">How does this concept connect to the universe?</p>
-            <div class="graph-container" id="collaborate-graph-container">
-                <svg id="collaborate-svg" style="position:absolute; inset:0; width:100%; height:100%; pointer-events:none;"></svg>
-                <div id="collaborate-nodes" style="position:absolute; inset:0;"></div>
+            <div class="panel-title"><span class="material-symbols-rounded text-purple-400 text-4xl">hub</span> Collaborate</div>
+            <p class="panel-desc">Visualizing local resonance. How does this concept connect to its immediate ecosystem?</p>
+            
+            <div class="graph-stage" id="local-graph">
+                <svg class="graph-svg" id="local-svg"></svg>
+                <div id="local-nodes" class="absolute inset-0"></div>
             </div>
-            <button class="mt-6 w-full text-center text-sm text-purple-400 font-bold uppercase tracking-widest" onclick="App.route('contribute')">Next: Share Your Findings →</button>
+            
+            <div class="mt-6 text-center">
+                <button class="btn-action" onclick="App.route('contribute')">Next: Synthesize Findings <span class="material-symbols-rounded">arrow_forward</span></button>
+            </div>
         </section>
 
-        <!-- 5. CONTRIBUTE (Universal Connectors) -->
         <section class="panel" id="panel-contribute">
-            <h2><span class="material-symbols-rounded text-green-400 text-3xl">volunteer_activism</span> Contribute</h2>
-            <p class="lede">Select your preferred method to evolve this knowledge.</p>
-            <div id="contribute-list" class="flex flex-col gap-4 max-w-md">
-                <div class="p-10 text-center border border-dashed border-slate-700 rounded-2xl text-slate-500">Search and select a concept in the 'Learn' tab first.</div>
+            <div class="panel-title"><span class="material-symbols-rounded text-gold text-4xl">volunteer_activism</span> Contribute</div>
+            <p class="panel-desc">Export your physical observations back into the digital commons.</p>
+            
+            <div id="contribute-container" class="flex flex-col gap-4 max-w-lg">
+                <div class="glass-box text-center text-slate-500">Pending concept selection.</div>
             </div>
         </section>
 
-        <!-- 6. EVOLVE (The Master Dot Map) -->
         <section class="panel" id="panel-evolve">
-            <h2><span class="material-symbols-rounded text-amber-400 text-3xl">all_inclusive</span> Evolve</h2>
-            <p class="lede">Your infinite journey mapped across the matrix.</p>
-            <div class="graph-container" id="evolve-graph-container">
-                <svg id="evolve-svg" style="position:absolute; inset:0; width:100%; height:100%; pointer-events:none;"></svg>
-                <div id="evolve-nodes" style="position:absolute; inset:0;"></div>
+            <div class="panel-title"><span class="material-symbols-rounded text-green-400 text-4xl">all_inclusive</span> Evolve</div>
+            <p class="panel-desc">Your expanding cognitive universe. All learned nodes permanently mapped.</p>
+            
+            <div class="flex gap-2 mb-4">
+                <button class="bg-white/10 px-4 py-2 rounded-full text-xs font-bold text-white hover:bg-white/20 transition" onclick="WonderGraph.setLayout('master', 'flower')">🌸 Flower</button>
+                <button class="bg-white/10 px-4 py-2 rounded-full text-xs font-bold text-white hover:bg-white/20 transition" onclick="WonderGraph.setLayout('master', 'orbit')">🎯 Orbit</button>
+                <button class="bg-white/10 px-4 py-2 rounded-full text-xs font-bold text-white hover:bg-white/20 transition" onclick="WonderGraph.setLayout('master', 'matrix')">🧮 Matrix</button>
+            </div>
+
+            <div class="graph-stage" id="master-graph" style="height: 600px;">
+                <svg class="graph-svg" id="master-svg"></svg>
+                <div id="master-nodes" class="absolute inset-0"></div>
             </div>
         </section>
     </main>
 </div>
 
-<!-- VIEWER OVERLAY (Right Slide-over) -->
-<div class="viewer-overlay" id="viewerOverlay">
-    <div class="viewer" id="viewer">
-        <div class="viewer-top">
+<div class="viewer-overlay" id="viewer-overlay">
+    <div class="viewer-panel" id="viewer-panel">
+        <button class="v-close" onclick="Viewer.close()"><span class="material-symbols-rounded">close</span></button>
+        
+        <div class="flex items-center gap-4 mb-6">
+            <div id="v-icon" class="text-5xl filter drop-shadow-[0_0_15px_currentColor]">✨</div>
             <div>
-                <h2 id="v-title" class="f-disp text-3xl font-bold text-white mb-1">Concept</h2>
-                <div id="v-category" class="text-xs font-bold uppercase tracking-widest mb-4">Category</div>
+                <div id="v-domain" class="text-[10px] uppercase tracking-widest font-bold mb-1 opacity-80">Domain</div>
+                <h2 id="v-title" class="f-disp text-3xl font-bold text-white leading-tight">Concept</h2>
             </div>
-            <button class="close-viewer" onclick="App.closeViewer()"><span class="material-symbols-rounded">close</span></button>
         </div>
+
+        <img id="v-image" class="v-hero-img" alt="Knowledge Hero" />
+
+        <div class="v-meta-grid">
+            <div class="v-meta-box">
+                <div class="text-[9px] text-slate-400 uppercase tracking-widest mb-1">Color DNA</div>
+                <div id="v-hue" class="font-mono text-lg font-bold">0° HZ</div>
+            </div>
+            <div class="v-meta-box">
+                <div class="text-[9px] text-slate-400 uppercase tracking-widest mb-1">Wiki Words</div>
+                <div id="v-words" class="f-disp text-xl font-bold text-white">0</div>
+            </div>
+        </div>
+
+        <div class="bg-black/30 p-5 rounded-2xl border border-white/10 mb-6">
+            <p id="v-extract" class="text-sm text-slate-300 leading-relaxed">Extracting semantic truth...</p>
+        </div>
+
+        <div class="ikrw-box">
+            <span class="material-symbols-rounded text-3xl text-emerald-400">directions_run</span>
+            <div>
+                <div class="text-[9px] text-emerald-400 font-bold uppercase tracking-widest mb-1">IKRw Grounding Protocol</div>
+                <div id="v-ikrw" class="text-sm text-emerald-50 leading-relaxed font-medium">Physical action required.</div>
+            </div>
+        </div>
+
+        <button class="btn-action w-full" id="v-btn-read" onclick="AudioDSP.speakExtract()">
+            <span class="material-symbols-rounded">volume_up</span> Read Aloud (Drishti)
+        </button>
         
-        <img id="v-image" class="v-hero-img" alt="Knowledge Image" />
-
-        <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700 mb-6">
-            <p id="v-extract" class="text-sm text-slate-300 leading-relaxed"></p>
-        </div>
-
-        <h3 class="f-disp text-lg text-white mb-3 flex items-center gap-2"><span class="material-symbols-rounded text-rose-400">psychology</span> IKRw Action Protocol</h3>
-        <p id="v-ikrw" class="text-sm text-rose-200 mb-8 bg-rose-500/10 p-4 rounded-xl border border-rose-500/20"></p>
-
-        <h3 class="f-disp text-lg text-white mb-3">Contribution Vectors</h3>
-        <div class="flex flex-col gap-3" id="v-actions">
-            <!-- Buttons injected via JS -->
-        </div>
-        
-        <button class="btn-tts" onclick="App.readAloud()">
-            <span class="material-symbols-rounded">volume_up</span> Read Concept Aloud
+        <button class="btn-action w-full mt-3 !bg-transparent border border-sky-500 !text-sky-400" onclick="Viewer.pushToFlow()">
+            Add to Evolution Matrix <span class="material-symbols-rounded">add_circle</span>
         </button>
     </div>
 </div>
 
+<div id="toast"></div>
+
 <script>
 /**
- * STREAMING_CHUNK: System Initialization & Configuration
+ * STREAMING_CHUNK: CORE CONFIGURATION
+ * The ultimate "Edit Anywhere, Extend Easily" dictionary.
+ * Adding a new category requires ZERO changes to the rendering logic.
  */
+const CONFIG = {
+    // 1. The EVOD Flow Steps
+    EVOD_STEPS: [
+        { id: 'discover', label: 'Discover & Innovate' },
+        { id: 'learn', label: 'Learn' },
+        { id: 'experience', label: 'Experience' },
+        { id: 'collaborate', label: 'Collaborate' },
+        { id: 'contribute', label: 'Contribute' },
+        { id: 'evolve', label: 'Evolve' }
+    ],
 
-// 14-Way Classification tailored for Real Learning (Agri, Nutrition, Earth Engineering)
-const CATEGORIES = [
-    { name: 'Agriculture & Soil', test: /farm|soil|crop|seed|plant|tree|agriculture|hydroponics/i, color: '#6FCF97', icon: '🌱',
-      ikrw: t => `Go outside and touch the soil. Find a seed or a plant similar to ${t} and observe its structure without a screen.` },
-    { name: 'Nutrition & Health', test: /food|nutrition|eat|diet|vitamin|protein|health/i, color: '#E8A33D', icon: '🍎',
-      ikrw: t => `Look in your kitchen for an ingredient related to ${t}. Discuss its nutritional value with an elder.` },
-    { name: 'Physics & Forces', test: /physics|gravity|force|motion|energy|light|sound/i, color: '#4FD1C5', icon: '⚛️',
-      ikrw: t => `Create a physical experiment to demonstrate ${t} using household objects (like dropping a ball or bending light with a glass of water).` },
-    { name: 'Earth Engineering', test: /build|structure|water|purify|clean|filter|architecture/i, color: '#38bdf8', icon: '🏗️',
-      ikrw: t => `Draw a blueprint on paper showing how you would engineer a solution using ${t} to help your local community.` },
-    { name: 'Animal Biology', test: /animal|mammal|species|bird|fish|insect/i, color: '#FF7A5C', icon: '🦁',
-      ikrw: t => `Observe a local animal or insect outside. Think about how it survives and how its traits compare to ${t}.` },
-    { name: 'Mathematics', test: /math|number|geometry|equation|spiral|fibonacci/i, color: '#9C8CF0', icon: '🧮',
-      ikrw: t => `Find a pattern in nature (like a leaf or shell) that reflects the rules of ${t}. Count its segments.` },
-    { name: 'General Knowledge', test: /.*/, color: '#A9B0C0', icon: '✨',
-      ikrw: t => `Explain the concept of ${t} to someone younger than you in simple words.` }
-];
+    // 2. Discover Scramble Seeds
+    SEEDS: [
+        { wordA: 'KHEL', wordB: '.O', target: 'Khel.o', colorA: '#38bdf8', colorB: '#fbbf24' },
+        { wordA: 'ECO', wordB: 'LOGY', target: 'Ecology', colorA: '#10b981', colorB: '#a7f3d0' },
+        { wordA: 'GRAV', wordB: 'ITY', target: 'Gravity', colorA: '#a855f7', colorB: '#c084fc' }
+    ],
 
-const WonderGraph = {
-    drawNode(container, data, x, y, size = 60) {
-        const el = document.createElement('div');
-        el.className = 'dot-node';
-        el.style.width = `${size}px`;
-        el.style.height = `${size}px`;
-        el.style.left = `${x}px`;
-        el.style.top = `${y}px`;
-        el.style.borderColor = data.color;
-        el.style.color = data.color;
-        el.style.boxShadow = `0 0 15px ${data.color}40, inset 0 0 10px ${data.color}20`;
-        el.innerHTML = `
-            <span style="font-size:${size * 0.4}px;">${data.icon}</span>
-            <div class="dot-label" style="color:${data.color}">${data.title}</div>
-        `;
-        container.appendChild(el);
-        return el;
+    // 3. Extensible Taxonomy (Add anything here)
+    CATEGORIES: [
+        { test: /farm|soil|crop|seed|plant|tree|agriculture/i, name: 'Ecology', color: '#10b981', icon: '🌱', 
+          ikrw: t => `Go outside and touch the soil. Find a plant similar to ${t}.` },
+        { test: /food|nutrition|eat|diet|vitamin/i, name: 'Nutrition', color: '#fbbf24', icon: '🍎', 
+          ikrw: t => `Look in your kitchen for an ingredient related to ${t}.` },
+        { test: /physics|gravity|force|energy|space|quantum/i, name: 'Physics', color: '#a855f7', icon: '⚛️', 
+          ikrw: t => `Create a physical experiment demonstrating ${t} using safe household objects.` },
+        { test: /build|structure|water|purify|architecture/i, name: 'Engineering', color: '#38bdf8', icon: '🏗️', 
+          ikrw: t => `Draw a blueprint on paper showing how you would engineer ${t}.` },
+        { test: /animal|mammal|species|bird|fish/i, name: 'Biology', color: '#f43f5e', icon: '🦁', 
+          ikrw: t => `Observe a local animal or insect outside. Compare it to ${t}.` },
+        { test: /math|number|geometry|equation|fibonacci/i, name: 'Mathematics', color: '#8b5cf6', icon: '🧮', 
+          ikrw: t => `Find a pattern in nature that reflects the rules of ${t}.` }
+    ],
+    
+    // Fallback Category
+    DEFAULT_CATEGORY: { name: 'Universal Truth', color: '#94a3b8', icon: '✨', 
+          ikrw: t => `Explain the concept of ${t} to someone younger than you in simple words.` }
+};
+
+/**
+ * STREAMING_CHUNK: MODULE - SPU (Semantic Processing Unit)
+ * Pure mathematical logic. Independent of DOM.
+ */
+const SPU = {
+    hash(str) {
+        let h = 0x811c9dc5;
+        for (let i = 0; i < str.length; i++) h = Math.imul(h ^ str.charCodeAt(i), 0x01000193);
+        return Math.abs(h >>> 0);
     },
-    drawLine(svg, x1, y1, x2, y2, color) {
-        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-        line.setAttribute("x1", x1); line.setAttribute("y1", y1);
-        line.setAttribute("x2", x2); line.setAttribute("y2", y2);
-        line.setAttribute("stroke", color);
-        line.setAttribute("stroke-width", "2");
-        line.setAttribute("stroke-dasharray", "4 4");
-        line.style.opacity = "0.5";
-        svg.appendChild(line);
-    },
-    renderRadial(containerId, centerNode, satellites) {
-        const container = document.getElementById(`${containerId}-container`);
-        const svg = document.getElementById(`${containerId}-svg`);
-        const nodesLayer = document.getElementById(`${containerId}-nodes`);
+    
+    analyze(text) {
+        const hVal = this.hash(text);
+        const cat = CONFIG.CATEGORIES.find(c => c.test.test(text)) || CONFIG.DEFAULT_CATEGORY;
         
-        if(!container || !svg || !nodesLayer) return;
-        
-        nodesLayer.innerHTML = ''; svg.innerHTML = '';
-        const cx = container.clientWidth / 2;
-        const cy = container.clientHeight / 2;
-
-        // Draw Center
-        this.drawNode(nodesLayer, centerNode, cx, cy, 80);
-
-        // Draw Satellites
-        const radius = Math.min(cx, cy) - 60;
-        satellites.forEach((sat, i) => {
-            const angle = (i / satellites.length) * Math.PI * 2;
-            const x = cx + Math.cos(angle) * radius;
-            const y = cy + Math.sin(angle) * radius;
-            
-            this.drawLine(svg, cx, cy, x, y, sat.color);
-            this.drawNode(nodesLayer, sat, x, y, 50);
-        });
+        return {
+            raw: text,
+            hash: hVal,
+            hue: hVal % 360,
+            category: cat.name,
+            color: cat.color,
+            icon: cat.icon,
+            ikrw: cat.ikrw(text)
+        };
     }
 };
 
-const App = {
-    currentConcept: null,
-    learnedConcepts: [], // Array of concept objects
-    
-    init() { 
-        this.loadMemory();
-        this.route('discover'); 
-        this.renderMasterGraph(); 
-        
-        // Handle window resize for graphs
-        window.addEventListener('resize', () => {
-            if(this.currentConcept) this.buildPipelines();
-            this.renderMasterGraph();
-        });
+/**
+ * STREAMING_CHUNK: MODULE - AudioDSP
+ * Blind-first accessibility. Independent of DOM.
+ */
+const AudioDSP = {
+    ctx: null, ready: false,
+    init() {
+        if(this.ready) return;
+        this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        this.ready = true;
     },
-
-    loadMemory() {
-        try {
-            const mem = localStorage.getItem('khelo_matrix_memory');
-            if (mem) {
-                this.learnedConcepts = JSON.parse(mem);
-                // Reattach category methods lost during JSON serialization
-                this.learnedConcepts.forEach(c => {
-                    const baseCat = CATEGORIES.find(cat => cat.name === c.category.name);
-                    if (baseCat) c.category.ikrw = baseCat.ikrw;
-                });
-            }
-        } catch(e) { console.warn("Memory sequence fresh."); }
+    playTone(hue) {
+        if(!this.ready) this.init();
+        if(navigator.vibrate) navigator.vibrate(15);
+        const freq = 432 * (1 + (hue / 360));
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+        gain.gain.setValueAtTime(0, this.ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.2, this.ctx.currentTime + 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 1.0);
+        osc.connect(gain); gain.connect(this.ctx.destination);
+        osc.start(); osc.stop(this.ctx.currentTime + 1.2);
     },
-
-    saveMemory() {
-        localStorage.setItem('khelo_matrix_memory', JSON.stringify(this.learnedConcepts));
-    },
-
-    readAloud() {
-        if(!this.currentConcept || !('speechSynthesis' in window)) return;
+    speakExtract() {
+        if(!App.activeConcept || !('speechSynthesis' in window)) return;
         window.speechSynthesis.cancel();
-        const textToRead = `${this.currentConcept.title}. ${this.currentConcept.snippet}`;
-        const utterance = new SpeechSynthesisUtterance(textToRead);
-        utterance.rate = 0.95;
-        window.speechSynthesis.speak(utterance);
+        const text = `${App.activeConcept.title}. ${App.activeConcept.extract}`;
+        const u = new SpeechSynthesisUtterance(text);
+        u.rate = 0.95;
+        window.speechSynthesis.speak(u);
+    }
+};
+
+/**
+ * STREAMING_CHUNK: MODULE - Storage (FMEA Persistence)
+ */
+const Storage = {
+    KEY: 'khelo_universal_memory',
+    save(dataArray) {
+        localStorage.setItem(this.KEY, JSON.stringify(dataArray));
     },
+    load() {
+        try { return JSON.parse(localStorage.getItem(this.KEY)) || []; } 
+        catch(e) { return []; }
+    }
+};
 
-    route(panelId) {
-        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        document.getElementById(`panel-${panelId}`).classList.add('active');
-        document.querySelector(`[data-panel="${panelId}"]`).classList.add('active');
-        
-        const navs = Array.from(document.querySelectorAll('.nav-item'));
-        const idx = navs.findIndex(n => n.dataset.panel === panelId);
-        navs.forEach((n, i) => { n.classList.toggle('done', i < idx); });
-        
-        if(panelId === 'evolve') this.renderMasterGraph();
-    },
-
-    scrambleAndSearch(btn, wordA, wordB, targetSearch) {
-        const wa = btn.querySelector('.wa'), wb = btn.querySelector('.wb');
-        const chars = '!<>-_\\/[]{}—=+*^?#~';
-        const scr = (el, final) => {
-            let f = 0; const iv = setInterval(() => {
-                let out = '';
-                for(let i=0; i<final.length; i++) out += (i < Math.floor((f/10)*final.length)) ? final[i] : chars[Math.floor(Math.random()*chars.length)];
-                el.innerText = out; if(f++ >= 10) { clearInterval(iv); el.innerText = final; }
-            }, 30);
-        };
-        scr(wa, wordA); scr(wb, wordB);
-        
-        setTimeout(() => {
-            document.getElementById('wikiSearch').value = targetSearch;
-            this.route('learn');
-            this.searchWiki();
-        }, 600);
-    },
-
-    getCategory(text) {
-        return CATEGORIES.find(c => c.test.test(text)) || CATEGORIES[CATEGORIES.length - 1];
-    },
-
-    async searchWiki() {
-        const query = document.getElementById('wikiSearch').value.trim();
-        if(!query) return;
-        
-        const resEl = document.getElementById('learn-results');
-        const loader = document.getElementById('loader');
-        resEl.innerHTML = ''; loader.style.display = 'flex';
-
+/**
+ * STREAMING_CHUNK: MODULE - WikiAPI (External Gateway)
+ * Features FMEA Fallback. If API fails, SPU takes over completely.
+ */
+const WikiAPI = {
+    async fetchDetails(query) {
         try {
-            // Priority 1: Rich Extract, High-Res Image & Links via Generator Search
             const url = `https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(query)}&gsrlimit=1&prop=extracts|pageimages|links&exintro=1&explaintext=1&piprop=thumbnail&pithumbsize=600&pllimit=8&format=json&origin=*`;
             const res = await fetch(url);
             const data = await res.json();
             
-            if(!data.query || !data.query.pages) throw new Error("No results");
+            if(!data.query || !data.query.pages) throw new Error("No Page");
             
-            const pages = data.query.pages;
-            const pageId = Object.keys(pages)[0];
-            const page = pages[pageId];
+            const page = data.query.pages[Object.keys(data.query.pages)[0]];
+            const links = (page.links || []).filter(l => l.ns === 0).map(l => l.title);
             
-            const title = page.title;
-            const fullExtract = page.extract || "Concept logged in universal matrix.";
-            const snippet = fullExtract.substring(0, 120);
-            const imageUrl = page.thumbnail ? page.thumbnail.source : null;
-            const links = (page.links || []).filter(l => l.ns === 0).map(l => l.title).slice(0, 6);
-
-            // Priority 2: Classify the topic
-            const category = this.getCategory(title + " " + fullExtract);
-
-            this.currentConcept = { title, snippet, fullExtract, imageUrl, links, category };
-            
-            // Add to learned if not exists
-            if(!this.learnedConcepts.find(c => c.title === title)) {
-                this.learnedConcepts.push(this.currentConcept);
-                this.saveMemory(); // Persist the AST to the local device
-            }
-            
-            // Render Result
-            resEl.innerHTML = `
-                <div class="simple-item" style="border-color: ${category.color}; cursor:pointer;" onclick="App.openViewer()">
-                    <span class="text-4xl" style="filter: drop-shadow(0 0 10px ${category.color}80);">${category.icon}</span>
-                    <div style="flex:1;">
-                        <div class="t" style="color: ${category.color};">${title}</div>
-                        <div class="d">${snippet}...</div>
-                        <div class="mt-3 text-xs font-bold text-teal-400 uppercase tracking-widest bg-teal-500/10 inline-block px-3 py-1 rounded-full border border-teal-500/30 hover:bg-teal-500/20">Expand Node →</div>
-                    </div>
-                </div>
-            `;
-            
-            this.buildPipelines();
-
-        } catch(e) {
-            resEl.innerHTML = `<div class="text-rose-400 f-mono">System Error: Concept not found in universal registry.</div>`;
-        }
-        loader.style.display = 'none';
-    },
-
-    openViewer() {
-        const c = this.currentConcept;
-        if(!c) return;
-
-        document.getElementById('v-title').innerText = c.title;
-        document.getElementById('v-category').innerText = `${c.category.icon} ${c.category.name}`;
-        document.getElementById('v-category').style.color = c.category.color;
-        
-        const imgEl = document.getElementById('v-image');
-        if(c.imageUrl) {
-            imgEl.src = c.imageUrl;
-            imgEl.style.display = 'block';
-        } else {
-            imgEl.style.display = 'none';
-        }
-
-        document.getElementById('v-extract').innerText = c.fullExtract;
-        document.getElementById('v-ikrw').innerText = c.category.ikrw(c.title);
-
-        const githubRepoBase = 'https://github.com/bhearth/khela/new/main/pages';
-        const fileContent = `# ${c.title}\n\n**My Physical Observation:**\n[Write what you noticed here...]\n\n**Category:** ${c.category.name}\n\n**Task:** ${c.category.ikrw(c.title)}`;
-        const githubUrl = `${githubRepoBase}?filename=${encodeURIComponent(c.title.replace(/\s+/g,'_'))}.md&value=${encodeURIComponent(fileContent)}`;
-        
-        const mediaWikiUrl = `https://kids.miraheze.org/wiki/${encodeURIComponent(c.title.replace(/\s+/g,'_'))}?action=edit`;
-        const googleUrl = `https://www.google.com/search?q=${encodeURIComponent(c.title + ' facts for kids')}`;
-
-        document.getElementById('v-actions').innerHTML = `
-            <a href="${mediaWikiUrl}" target="_blank" class="action-chip chip-wiki">
-                <span class="material-symbols-rounded">edit_document</span> Edit on Kids Wiki
-            </a>
-            <a href="${githubUrl}" target="_blank" class="action-chip chip-github">
-                <span class="material-symbols-rounded">code</span> Map to GitHub Repo
-            </a>
-            <a href="${googleUrl}" target="_blank" class="action-chip chip-google">
-                <span class="material-symbols-rounded">travel_explore</span> Search Google Knowledge
-            </a>
-        `;
-
-        document.getElementById('viewerOverlay').classList.add('open');
-        this.route('experience'); // Auto-advance flow
-    },
-
-    closeViewer() {
-        document.getElementById('viewerOverlay').classList.remove('open');
-    },
-
-    /**
-     * STREAMING_CHUNK: Dynamic AST Compilation (Dot Engine)
-     */
-    buildPipelines() {
-        const c = this.currentConcept;
-        if(!c) return;
-
-        // 3. Experience Tab
-        document.getElementById('experience-list').innerHTML = `
-            <div class="simple-item" style="border-color: ${c.category.color}">
-                <span class="text-4xl">${c.category.icon}</span>
-                <div>
-                    <div class="t">Physical Grounding Protocol (IKRw)</div>
-                    <div class="d text-white font-bold my-2 text-lg">${c.category.ikrw(c.title)}</div>
-                    <label class="mt-4 flex items-center gap-3 cursor-pointer text-sm text-teal-400 font-bold border border-teal-500/30 w-max px-4 py-2 rounded-full hover:bg-teal-500/10 transition">
-                        <input type="checkbox" onchange="if(this.checked) App.route('collaborate')"> I have completed this physical action
-                    </label>
-                </div>
-            </div>
-        `;
-
-        // 4. Collaborate Tab (Concept Wonder Graph)
-        const centerNode = { title: c.title, icon: c.category.icon, color: c.category.color };
-        const satellites = c.links.map(link => {
-            const cat = this.getCategory(link);
-            return { title: link, icon: cat.icon, color: cat.color };
-        });
-        
-        // Slight delay to ensure panel is active and has dimensions
-        setTimeout(() => {
-            WonderGraph.renderRadial('collaborate-graph', centerNode, satellites);
-        }, 50);
-
-        // 5. Contribute Tab
-        document.getElementById('contribute-list').innerHTML = document.getElementById('v-actions').innerHTML;
-
-        // 6. Evolve Tab (Master Graph)
-        this.renderMasterGraph();
-    },
-
-    renderMasterGraph() {
-        if(document.getElementById('panel-evolve').classList.contains('active') === false) return;
-
-        const centerNode = { title: 'Explorer', icon: '👶', color: '#E8A33D' };
-        const satellites = this.learnedConcepts.map(c => ({
-            title: c.title, icon: c.category.icon, color: c.category.color
-        }));
-
-        if (satellites.length === 0) {
-            document.getElementById('evolve-nodes').innerHTML = '<div style="color:var(--muted); text-align:center; padding-top:200px;">Search concepts to map your universe.</div>';
-            document.getElementById('evolve-svg').innerHTML = '';
-        } else {
-            setTimeout(() => {
-                WonderGraph.renderRadial('evolve-graph', centerNode, satellites);
-            }, 50);
+            return {
+                title: page.title,
+                extract: page.extract || "Knowledge parsed structurally.",
+                image: page.thumbnail ? page.thumbnail.source : null,
+                links: links,
+                words: (page.extract || "").split(/\s+/).length
+            };
+        } catch (e) {
+            // FMEA FALLBACK: Math-driven synthetic data
+            const spuData = SPU.analyze(query);
+            return {
+                title: query,
+                extract: `Data fetch failed. Synthesizing semantic profile for ${query} using SPU deterministic mathematics.`,
+                image: null,
+                links: [`Nature of ${query}`, `Physics of ${query}`, `Ethics of ${query}`],
+                words: 0
+            };
         }
     }
 };
 
-          /* ============ WONDER GRAPH (Dot Coding) ============ */
-        .graph-container { position: relative; background: rgba(0,0,0,0.4); border: 1px solid var(--panel-edge); border-radius: 24px; box-shadow: inset 0 0 30px rgba(0,0,0,0.5); width: 100%; min-height: 450px; overflow: hidden; display: flex; justify-content: center; align-items: center; background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px); background-size: 20px 20px;}
-        
-        .dot-node {
-<!-- ... existing code ... -->
-        .viewer .status-pill{ display:inline-block; font-size:0.72rem; font-weight:700; padding:3px 9px; border-radius:999px; border:1.5px solid currentColor; margin-bottom:8px; }
-        .viewer p#v-extract { font-size: 1.1rem; line-height: 1.7; color: var(--text); font-weight: 500; letter-spacing: 0.2px; }
-        .viewer-actions{ display:flex; flex-direction:column; gap:8px; margin-top:14px; }
-<!-- ... existing code ... -->
-        <!-- 4. COLLABORATE (Dot Code Node Map) -->
-        <section class="panel" id="panel-collaborate">
-            <h2><span class="material-symbols-rounded text-purple-400 text-3xl">hub</span> Collaborate</h2>
-            <p class="lede">How does this concept connect to the universe?</p>
-            <div class="graph-container" id="collaborate-graph-container">
-                <svg id="collaborate-graph-svg" style="position:absolute; inset:0; width:100%; height:100%; pointer-events:none;"></svg>
-                <div id="collaborate-graph-nodes" style="position:absolute; inset:0;"></div>
-            </div>
-            <button class="mt-6 w-full text-center text-sm text-purple-400 font-bold uppercase tracking-widest" onclick="App.route('contribute')">Next: Share Your Findings →</button>
-        </section>
+/**
+ * STREAMING_CHUNK: MODULE - WonderGraph Engine
+ * Extensible 3D/2D renderer. Renders any given array of concepts.
+ */
+const WonderGraph = {
+    state: {}, // Stores nodes and edges per container
+    
+    render(containerId, centerData, satelliteArray, layout = 'orbit') {
+        const container = document.getElementById(`${containerId}`);
+        const svg = document.getElementById(`${containerId}-svg`);
+        const nodesLayer = document.getElementById(`${containerId}-nodes`);
+        if(!container || !svg || !nodesLayer) return;
 
-        <!-- 5. CONTRIBUTE (Universal Connectors) -->
-        <section class="panel" id="panel-contribute">
-<!-- ... existing code ... -->
-        <!-- 6. EVOLVE (The Master Dot Map) -->
-        <section class="panel" id="panel-evolve">
-            <h2><span class="material-symbols-rounded text-amber-400 text-3xl">all_inclusive</span> Evolve</h2>
-            <p class="lede">Your infinite journey mapped across the matrix.</p>
-            <div class="graph-container" id="evolve-graph-container">
-                <svg id="evolve-graph-svg" style="position:absolute; inset:0; width:100%; height:100%; pointer-events:none;"></svg>
-                <div id="evolve-graph-nodes" style="position:absolute; inset:0;"></div>
-            </div>
-        </section>
-    </main>
-<!-- ... existing code ... -->
-    init() { 
-        this.loadMemory();
-        this.route('discover'); 
-        this.renderMasterGraph(); 
+        nodesLayer.innerHTML = ''; svg.innerHTML = '';
+        const W = container.clientWidth; const H = container.clientHeight;
+        const cx = W / 2; const cy = H / 2;
+
+        this.state[containerId] = { nodes: [], edges: [], layout, cx, cy };
+        const st = this.state[containerId];
+
+        // 1. Draw Center (if provided)
+        if (centerData) {
+            const rData = SPU.analyze(centerData.title);
+            st.nodes.push(this.createDOMNode(nodesLayer, rData, true));
+        }
+
+        // 2. Draw Satellites
+        satelliteArray.forEach((sat) => {
+            const sData = SPU.analyze(sat.title);
+            st.nodes.push(this.createDOMNode(nodesLayer, sData, false));
+        });
+
+        // 3. Apply Layout & Draw Edges
+        this.applyLayout(containerId);
         
-        // Handle window resize for graphs
+        // Handle Resize
         window.addEventListener('resize', () => {
-            if(this.currentConcept) this.renderCollaborateGraph();
-            this.renderMasterGraph();
+            st.cx = container.clientWidth / 2;
+            st.cy = container.clientHeight / 2;
+            this.applyLayout(containerId);
         });
     },
-<!-- ... existing code ... -->
-    route(panelId) {
-        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        document.getElementById(`panel-${panelId}`).classList.add('active');
-        document.querySelector(`[data-panel="${panelId}"]`).classList.add('active');
-        
-        const navs = Array.from(document.querySelectorAll('.nav-item'));
-        const idx = navs.findIndex(n => n.dataset.panel === panelId);
-        navs.forEach((n, i) => { n.classList.toggle('done', i < idx); });
-        
-        // JIT Compilation: Only render the graph math when the container is visible
-        if(panelId === 'evolve') this.renderMasterGraph();
-        if(panelId === 'collaborate') this.renderCollaborateGraph();
+
+    setLayout(containerId, layoutType) {
+        if(this.state[containerId]) {
+            this.state[containerId].layout = layoutType;
+            this.applyLayout(containerId);
+        }
     },
 
-    scrambleAndSearch(btn, wordA, wordB, targetSearch) {
-<!-- ... existing code ... -->
-    buildPipelines() {
-        const c = this.currentConcept;
-        if(!c) return;
+    applyLayout(containerId) {
+        const st = this.state[containerId];
+        const svg = document.getElementById(`${containerId}-svg`);
+        svg.innerHTML = ''; // Clear lines
 
-        // 3. Experience Tab
-        document.getElementById('experience-list').innerHTML = `
-            <div class="simple-item" style="border-color: ${c.category.color}">
-                <span class="text-4xl">${c.category.icon}</span>
-                <div>
-                    <div class="t">Physical Grounding Protocol (IKRw)</div>
-                    <div class="d text-white font-bold my-2 text-lg">${c.category.ikrw(c.title)}</div>
-                    <label class="mt-4 flex items-center gap-3 cursor-pointer text-sm text-teal-400 font-bold border border-teal-500/30 w-max px-4 py-2 rounded-full hover:bg-teal-500/10 transition">
-                        <input type="checkbox" onchange="if(this.checked) App.route('collaborate')"> I have completed this physical action
-                    </label>
+        const centerNode = st.nodes.find(n => n.isRoot);
+        const petals = st.nodes.filter(n => !n.isRoot);
+
+        if(centerNode) { centerNode.tx = st.cx; centerNode.ty = st.cy; }
+
+        petals.forEach((n, i) => {
+            if (st.layout === 'flower') {
+                const a = i * 137.508 * (Math.PI/180);
+                const r = 40 * Math.sqrt(i) + 60;
+                n.tx = st.cx + Math.cos(a)*r; n.ty = st.cy + Math.sin(a)*r;
+            } else if (st.layout === 'orbit') {
+                const a = (i / petals.length) * Math.PI * 2;
+                const r = Math.min(st.cx, st.cy) * 0.7;
+                n.tx = st.cx + Math.cos(a)*r; n.ty = st.cy + Math.sin(a)*r;
+            } else if (st.layout === 'matrix') {
+                const cols = Math.ceil(Math.sqrt(petals.length));
+                const spacing = 90;
+                n.tx = st.cx + (i % cols - cols/2 + 0.5) * spacing;
+                n.ty = st.cy + (Math.floor(i/cols) - cols/2 + 0.5) * spacing;
+            }
+
+            // Draw line to root if exists, else nearest logic
+            if(centerNode) this.drawEdge(svg, centerNode, n, n.data.color);
+        });
+
+        // Apply transforms
+        st.nodes.forEach(n => {
+            n.el.style.setProperty('--x', `${n.tx}px`);
+            n.el.style.setProperty('--y', `${n.ty}px`);
+        });
+    },
+
+    createDOMNode(layer, spuData, isRoot) {
+        const el = document.createElement('div');
+        el.className = 'wg-node';
+        const sz = isRoot ? 80 : 60;
+        
+        el.style.cssText = `--x:0px; --y:0px; --col:${spuData.color}; width:${sz}px; height:${sz}px; --icon-sz:${sz*0.4}px;`;
+        el.innerHTML = `
+            <div class="wg-icon">${spuData.icon}</div>
+            <div class="wg-label" style="color:${spuData.color}">${spuData.raw}</div>
+        `;
+        
+        el.onclick = () => { AudioDSP.playTone(spuData.hue); App.executeSearch(spuData.raw); };
+        layer.appendChild(el);
+        
+        return { el, data: spuData, tx:0, ty:0, isRoot };
+    },
+
+    drawEdge(svg, n1, n2, color) {
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        line.setAttribute("class", "res-line");
+        // Simple bezier curve for organic feel
+        const mx = (n1.tx + n2.tx)/2 - (n2.ty - n1.ty)*0.1;
+        const my = (n1.ty + n2.ty)/2 + (n2.tx - n1.tx)*0.1;
+        line.setAttribute("d", `M${n1.tx} ${n1.ty} Q${mx} ${my} ${n2.tx} ${n2.ty}`);
+        line.setAttribute("stroke", color);
+        svg.appendChild(line);
+    }
+};
+
+/**
+ * STREAMING_CHUNK: MODULE - Viewer (Janm Kundali UI)
+ */
+const Viewer = {
+    open(apiData, spuData) {
+        const p = document.getElementById('viewer-panel');
+        document.getElementById('viewer-overlay').classList.add('active');
+        
+        p.style.setProperty('--col', spuData.color);
+        document.getElementById('v-icon').innerText = spuData.icon;
+        document.getElementById('v-icon').style.color = spuData.color;
+        document.getElementById('v-domain').innerText = spuData.category;
+        document.getElementById('v-domain').style.color = spuData.color;
+        document.getElementById('v-title').innerText = apiData.title;
+        
+        document.getElementById('v-hue').innerText = `${Math.round(spuData.hue)}° HZ`;
+        document.getElementById('v-hue').style.color = spuData.color;
+        document.getElementById('v-words').innerText = apiData.words.toLocaleString();
+        
+        document.getElementById('v-extract').innerText = apiData.extract;
+        document.getElementById('v-ikrw').innerText = spuData.ikrw;
+
+        const img = document.getElementById('v-image');
+        if(apiData.image) { img.src = apiData.image; img.style.display = 'block'; }
+        else { img.style.display = 'none'; }
+    },
+    close() {
+        document.getElementById('viewer-overlay').classList.remove('active');
+    }
+};
+
+/**
+ * STREAMING_CHUNK: MODULE - App Controller (The Master Router)
+ */
+const App = {
+    activeConcept: null, // Full merged object (API + SPU)
+    learnedConcepts: [], // Master memory array
+    
+    init() {
+        document.body.addEventListener('pointerdown', () => AudioDSP.init(), { once: true });
+        this.learnedConcepts = Storage.load();
+        
+        this.buildNav();
+        this.buildDiscoverSeeds();
+        this.route('discover');
+    },
+
+    buildNav() {
+        const nav = document.getElementById('evod-nav');
+        CONFIG.EVOD_STEPS.forEach((step, i) => {
+            const el = document.createElement('div');
+            el.className = `nav-item`;
+            el.id = `nav-${step.id}`;
+            el.onclick = () => this.route(step.id);
+            el.innerHTML = `<div class="n-badge">${i+1}</div> <span>${step.label}</span>`;
+            nav.appendChild(el);
+        });
+    },
+
+    buildDiscoverSeeds() {
+        const c = document.getElementById('discover-seeds');
+        CONFIG.SEEDS.forEach(s => {
+            const btn = document.createElement('button');
+            btn.className = 'glass-box px-6 py-4 flex font-disp font-bold text-xl hover:scale-105 transition';
+            btn.innerHTML = `<span style="color:${s.colorA}">${s.wordA}</span><span style="color:${s.colorB}">${s.wordB}</span>`;
+            btn.onclick = () => {
+                document.getElementById('omni-search').value = s.target;
+                this.executeSearch(s.target);
+            };
+            c.appendChild(btn);
+        });
+    },
+
+    route(panelId) {
+        if(navigator.vibrate) navigator.vibrate(10);
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active', 'completed'));
+        
+        const target = document.getElementById(`panel-${panelId}`);
+        if(target) target.classList.add('active');
+        
+        const navs = Array.from(document.querySelectorAll('.nav-item'));
+        const idx = navs.findIndex(n => n.id === `nav-${panelId}`);
+        navs.forEach((n, i) => {
+            if(i === idx) n.classList.add('active');
+            if(i < idx) n.classList.add('completed');
+        });
+
+        // JIT Graph Rendering
+        if(panelId === 'collaborate' && this.activeConcept) this.buildLocalGraph();
+        if(panelId === 'evolve') this.buildMasterGraph();
+    },
+
+    toast(msg) {
+        const t = document.getElementById('toast');
+        t.innerText = msg; t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 3000);
+    },
+
+    async executeSearch(forceQuery = null) {
+        const query = forceQuery || document.getElementById('omni-search').value.trim();
+        if(!query) return;
+        
+        document.getElementById('omni-search').value = query;
+        this.route('learn');
+        
+        document.getElementById('search-loader').style.display = 'flex';
+        document.getElementById('search-results').innerHTML = '';
+
+        // 1. Fetch API Data & SPU Data in parallel
+        const spuData = SPU.analyze(query);
+        const apiData = await WikiAPI.fetchDetails(query);
+        
+        this.activeConcept = { ...apiData, spu: spuData };
+        document.getElementById('search-loader').style.display = 'none';
+
+        // 2. Render Result Card
+        document.getElementById('search-results').innerHTML = `
+            <div class="glass-box cursor-pointer hover:border-[${spuData.color}] transition group" onclick="Viewer.open(App.activeConcept, App.activeConcept.spu)">
+                <div class="flex items-center gap-4 mb-4">
+                    <span class="text-4xl filter drop-shadow-md group-hover:scale-110 transition">${spuData.icon}</span>
+                    <div>
+                        <h3 class="f-disp text-2xl font-bold text-white leading-tight">${apiData.title}</h3>
+                        <div class="text-[10px] uppercase tracking-widest font-bold mt-1" style="color:${spuData.color}">${spuData.category}</div>
+                    </div>
+                </div>
+                <p class="text-sm text-slate-300 line-clamp-3">${apiData.extract}</p>
+                <div class="mt-4 flex gap-2">
+                    <span class="bg-white/5 border border-white/10 px-3 py-1 rounded-full text-xs text-slate-400">🔗 ${apiData.links.length} Branches</span>
+                    <span class="bg-white/5 border border-white/10 px-3 py-1 rounded-full text-xs text-slate-400">📝 ${apiData.words} Words</span>
                 </div>
             </div>
         `;
-
-        // 4. Collaborate Tab (Concept Wonder Graph) - Prepared but deferred to route()
-        this.renderCollaborateGraph();
-
-        // 5. Contribute Tab
-        document.getElementById('contribute-list').innerHTML = document.getElementById('v-actions').innerHTML;
-
-        // 6. Evolve Tab (Master Graph)
-        this.renderMasterGraph();
+        
+        // Auto-open viewer
+        Viewer.open(this.activeConcept, spuData);
     },
 
-    renderCollaborateGraph() {
-        if(!this.currentConcept || document.getElementById('panel-collaborate').classList.contains('active') === false) return;
-        const c = this.currentConcept;
-        const centerNode = { title: c.title, icon: c.category.icon, color: c.category.color };
-        const satellites = c.links.map(link => {
-            const cat = this.getCategory(link);
-            return { title: link, icon: cat.icon, color: cat.color };
-        });
-        WonderGraph.renderRadial('collaborate-graph', centerNode, satellites);
+    pushToFlow() {
+        Viewer.close();
+        
+        // Add to persistent memory if new
+        if(!this.learnedConcepts.find(c => c.title === this.activeConcept.title)) {
+            this.learnedConcepts.push({ title: this.activeConcept.title });
+            Storage.save(this.learnedConcepts);
+            this.toast(`Node Encoded: ${this.activeConcept.title}`);
+        }
+        
+        this.buildExperiencePanel();
+        this.route('experience');
     },
 
-    renderMasterGraph() {
-        if(document.getElementById('panel-evolve').classList.contains('active') === false) return;
+    buildExperiencePanel() {
+        const c = this.activeConcept;
+        document.getElementById('experience-container').innerHTML = `
+            <div class="text-left">
+                <div class="flex items-center gap-4 mb-4 pb-4 border-b border-white/10">
+                    <span class="text-4xl">${c.spu.icon}</span>
+                    <h3 class="f-disp text-2xl font-bold text-white">${c.title}</h3>
+                </div>
+                <div class="text-[10px] text-emerald-400 font-bold uppercase tracking-widest mb-2">Grounding Task</div>
+                <p class="text-lg text-white mb-6">${c.spu.ikrw}</p>
+                <label class="flex items-center justify-center gap-3 bg-emerald-500/20 border border-emerald-500/50 text-emerald-400 px-6 py-4 rounded-2xl cursor-pointer hover:bg-emerald-500/30 transition">
+                    <input type="checkbox" class="w-5 h-5 accent-emerald-500" onchange="if(this.checked) App.route('collaborate')">
+                    <span class="font-bold">I have completed this physical action.</span>
+                </label>
+            </div>
+        `;
 
-        const centerNode = { title: 'Explorer', icon: '👶', color: '#E8A33D' }
+        // Pre-build Contribute Panel
+        const safeTitle = encodeURIComponent(c.title.replace(/\s+/g,'_'));
+        document.getElementById('contribute-container').innerHTML = `
+            <a href="https://kids.miraheze.org/wiki/${safeTitle}?action=edit" target="_blank" class="btn-action !justify-start !bg-teal-500/20 !text-teal-400 border border-teal-500/50">
+                <span class="material-symbols-rounded">edit_document</span> Edit on Kids Wiki
+            </a>
+            <a href="https://github.com/bhearth/khela/new/main/pages?filename=${safeTitle}.md" target="_blank" class="btn-action !justify-start !bg-violet-500/20 !text-violet-400 border border-violet-500/50">
+                <span class="material-symbols-rounded">code</span> Map to GitHub Repo
+            </a>
+            <a href="https://www.google.com/search?q=${safeTitle}+facts+for+kids" target="_blank" class="btn-action !justify-start !bg-amber-500/20 !text-amber-400 border border-amber-500/50">
+                <span class="material-symbols-rounded">travel_explore</span> Search Google Knowledge
+            </a>
+            <div class="mt-4 text-center">
+                <button class="text-sm text-slate-400 hover:text-white font-bold underline" onclick="App.route('evolve')">Skip to Master Evolution Map</button>
+            </div>
+        `;
+    },
 
+    buildLocalGraph() {
+        if(!this.activeConcept) return;
+        const c = this.activeConcept;
+        const satellites = c.links.slice(0, 8).map(title => ({ title }));
+        WonderGraph.render('local-graph', { title: c.title }, satellites, 'orbit');
+    },
+
+    buildMasterGraph() {
+        if(this.learnedConcepts.length === 0) {
+            document.getElementById('master-nodes').innerHTML = '<div class="absolute inset-0 flex items-center justify-center text-slate-500">Search concepts to map your universe.</div>';
+            document.getElementById('master-svg').innerHTML = '';
+            return;
+        }
+        
+        WonderGraph.render('master-graph', { title: 'Explorer' }, this.learnedConcepts, 'flower');
+    }
+};
+
+// Ignite!
 window.onload = () => App.init();
 </script>
 </body>
