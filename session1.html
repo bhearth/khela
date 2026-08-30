@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Khel.o · Session 1: Core Kernel & SPU Engine</title>
+<style>
+  /* GLOBAL HOST STYLES (Minimal, just to hold the plugin) */
+  body { margin: 0; background: #02040a; font-family: system-ui, sans-serif; overflow: hidden; height: 100vh; }
+  #khel-plugin-container { width: 100%; height: 100%; }
+</style>
+</head>
+<body>
+
+<!-- THE SACRED CONTAINER: All UI must be injected here -->
+<div id="khel-plugin-container"></div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   KHEL.OS META-CONTRACT (SESSION SYNC & ERROR ARREST PROTOCOL)
+   ══════════════════════════════════════════════════════════ */
+const KhelOS = {
+    registry: {},
+    logs: [],
+    register: function(sessionId, plugin) {
+        try {
+            if (!plugin.init || !plugin.destroy) throw new Error("Missing init/destroy methods");
+            
+            // Auto-namespace CSS
+            if (plugin.css) {
+                const style = document.createElement('style');
+                style.id = `k${sessionId}-styles`;
+                style.textContent = plugin.css; 
+                document.head.appendChild(style);
+            }
+            
+            // Isolate DOM
+            const container = document.getElementById('khel-plugin-container');
+            if (!container) throw new Error("Missing #khel-plugin-container");
+            container.innerHTML = `<div id="k${sessionId}-root">${plugin.html || ''}</div>`;
+            
+            // Initialize safely
+            plugin.init();
+            this.registry[sessionId] = plugin;
+            this.logs.push(`[OK] Session ${sessionId} loaded successfully.`);
+            console.log(`%c[KhelOS] Session ${sessionId} Active`, 'color: #10b981; font-weight: bold;');
+        } catch (e) {
+            this.logs.push(`[CRITICAL] Session ${sessionId} failed: ${e.message}`);
+            console.error(`[KhelOS] Session ${sessionId} crashed and was isolated.`, e);
+            if(container) container.innerHTML = `<div style="color:red; padding:20px;">System Error: ${e.message}</div>`;
+        }
+    },
+    unload: function(sessionId) {
+        if (this.registry[sessionId]) {
+            if(this.registry[sessionId].destroy) this.registry[sessionId].destroy();
+            delete this.registry[sessionId];
+            document.getElementById(`k${sessionId}-root`)?.remove();
+            document.getElementById(`k${sessionId}-styles`)?.remove();
+        }
+    }
+};
+
+/* ═══════════════════════════════════════════════════════════
+   SESSION 1: CORE KERNEL & SPU ENGINE
+   ═══════════════════════════════════════════════════════════ */
+const Session1_CoreKernel = {
+    // --- ISOLATED CSS (Namespaced with k1-) ---
+    css: `
+        :root {
+            --k1-bg: #02040a; --k1-panel: rgba(10, 15, 25, 0.9); --k1-edge: rgba(255, 255, 255, 0.08);
+            --k1-text: #f8fafc; --k1-muted: #94a3b8;
+            --k1-accent: #38bdf8; --k1-emerald: #10b981; --k1-gold: #fbbf24;
+        }
+        #k1-root {
+            display: flex; flex-direction: column; height: 100vh; padding: 20px; box-sizing: border-box;
+            background: var(--k1-bg); color: var(--k1-text); overflow-y: auto;
+        }
+        .k1-header { text-align: center; margin-bottom: 30px; }
+        .k1-title { font-size: 1.8rem; font-weight: 800; letter-spacing: 1px; margin: 0; 
+                    background: linear-gradient(135deg, var(--k1-accent), var(--k1-emerald)); 
+                    -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .k1-subtitle { font-size: 0.8rem; color: var(--k1-muted); text-transform: uppercase; letter-spacing: 2px; margin-top: 5px; }
+        
+        .k1-input-wrap { max-width: 600px; margin: 0 auto 30px; position: relative; }
+        .k1-input { width: 100%; padding: 16px 20px; border-radius: 30px; border: 2px solid var(--k1-edge);
+                    background: rgba(0,0,0,0.4); color: #fff; font-size: 1.1rem; outline: none; transition: 0.3s; box-sizing: border-box;}
+        .k1-input:focus { border-color: var(--k1-accent); box-shadow: 0 0 20px rgba(56,189,248,0.2); }
+        
+        .k1-spu-display { max-width: 600px; margin: 0 auto 40px; text-align: center; }
+        .k1-hex-code { font-family: 'Courier New', monospace; font-size: 1.5rem; color: var(--k1-accent); 
+                       letter-spacing: 4px; background: rgba(56,189,248,0.1); padding: 10px 20px; 
+                       border-radius: 12px; display: inline-block; border: 1px solid rgba(56,189,248,0.3); }
+        .k1-label { font-size: 0.7rem; color: var(--k1-muted); text-transform: uppercase; margin-top: 10px; letter-spacing: 1px; }
+
+        .k1-radical-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 12px; max-width: 800px; margin: 0 auto; }
+        .k1-radical { background: rgba(255,255,255,0.03); border: 1px solid var(--k1-edge); border-radius: 16px;
+                      padding: 15px 10px; text-align: center; cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .k1-radical:hover { background: rgba(255,255,255,0.08); transform: translateY(-4px); border-color: rgba(255,255,255,0.2); }
+        .k1-radical:active { transform: scale(0.95); }
+        .k1-r-icon { font-size: 1.8rem; filter: drop-shadow(0 0 8px currentColor); }
+        .k1-r-name { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--k1-muted); }
+        
+        .k1-toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); 
+                    background: var(--k1-emerald); color: #000; padding: 12px 24px; border-radius: 30px; 
+                    font-weight: 800; font-size: 0.9rem; opacity: 0; transition: 0.3s; pointer-events: none; z-index: 1000;}
+        .k1-toast.show { opacity: 1; transform: translateX(-50%) translateY(-10px); }
+    `,
+
+    // --- ISOLATED HTML ---
+    html: `
+        <div class="k1-header">
+            <h1 class="k1-title">Khel.o NPU Kernel</h1>
+            <div class="k1-subtitle">Session 1 · Semantic Processing Unit Active</div>
+        </div>
+        <div class="k1-input-wrap">
+            <input type="text" class="k1-input" id="k1-spu-input" placeholder="Type any concept to generate 3-Byte DNA..." autocomplete="off">
+        </div>
+        <div class="k1-spu-display">
+            <div class="k1-hex-code" id="k1-hex-output">0x00 0x00 0x00</div>
+            <div class="k1-label">Semantic DNA (Domain · Action · Scale)</div>
+        </div>
+        <div class="k1-radical-grid" id="k1-radical-container"></div>
+        <div class="k1-toast" id="k1-toast">Resonance Activated</div>
+    `,
+
+    // --- DATA: THE 24 RADICALS ---
+    radicals: [
+        { id: 'truti', name: 'Seed', icon: '', color: '#10b981', hue: 140, affinity: ['jiva', 'prakriti'] },
+        { id: 'jiva', name: 'Life', icon: '🧬', color: '#34d399', hue: 150, affinity: ['truti', 'manas'] },
+        { id: 'prakriti', name: 'Earth', icon: '🌍', color: '#10b981', hue: 140, affinity: ['truti', 'jal'] },
+        { id: 'agni', name: 'Energy', icon: '⚡', color: '#f59e0b', hue: 40, affinity: ['vayu', 'yantra'] },
+        { id: 'jal', name: 'Flow', icon: '💧', color: '#38bdf8', hue: 200, affinity: ['prakriti', 'jiva'] },
+        { id: 'vayu', name: 'Air', icon: '🌬️', color: '#94a3b8', hue: 210, affinity: ['agni', 'akasha'] },
+        { id: 'akasha', name: 'Space', icon: '🌌', color: '#8b5cf6', hue: 260, affinity: ['vayu', 'moksha'] },
+        { id: 'manas', name: 'Mind', icon: '🧠', color: '#ec4899', hue: 330, affinity: ['jiva', 'buddhi'] },
+        { id: 'buddhi', name: 'Logic', icon: '', color: '#6366f1', hue: 240, affinity: ['manas', 'yantra'] },
+        { id: 'atma', name: 'Soul', icon: '◎', color: '#fbbf24', hue: 50, affinity: ['moksha', 'ananda'] },
+        { id: 'karma', name: 'Action', icon: '⚙️', color: '#64748b', hue: 210, affinity: ['agni', 'dharma'] },
+        { id: 'dharma', name: 'Duty', icon: '⚖️', color: '#f43f5e', hue: 350, affinity: ['karma', 'sangha'] },
+        { id: 'artha', name: 'Resource', icon: '💎', color: '#14b8a6', hue: 160, affinity: ['kshetra', 'karma'] },
+        { id: 'kama', name: 'Desire', icon: '🧲', color: '#f472b6', hue: 320, affinity: ['manas', 'rupa'] },
+        { id: 'moksha', name: 'Evolve', icon: '🚀', color: '#a855f7', hue: 270, affinity: ['akasha', 'atma'] },
+        { id: 'kala', name: 'Time', icon: '', color: '#d97706', hue: 35, affinity: ['karma', 'prakriti'] },
+        { id: 'rupa', name: 'Form', icon: '📐', color: '#0ea5e9', hue: 190, affinity: ['kama', 'buddhi'] },
+        { id: 'shabda', name: 'Sound', icon: '🔊', color: '#818cf8', hue: 250, affinity: ['akasha', 'manas'] },
+        { id: 'sangha', name: 'Community', icon: '🤝', color: '#f97316', hue: 25, affinity: ['dharma', 'jiva'] },
+        { id: 'shiksha', name: 'Learn', icon: '🪷', color: '#e879f9', hue: 290, affinity: ['manas', 'moksha'] },
+        { id: 'yantra', name: 'Tech', icon: '💻', color: '#22d3ee', hue: 180, affinity: ['buddhi', 'agni'] },
+        { id: 'kshetra', name: 'Agri', icon: '🌾', color: '#84cc16', hue: 80, affinity: ['prakriti', 'artha'] },
+        { id: 'yuddha', name: 'Risk', icon: '🛡️', color: '#ef4444', hue: 0, affinity: ['karma', 'dharma'] },
+        { id: 'ananda', name: 'Bliss', icon: '☀️', color: '#fde047', hue: 55, affinity: ['atma', 'shabda'] }
+    ],
+
+    // --- SPU ENGINE (Deterministic 3-Byte Hashing) ---
+    spu: {
+        // FNV-1a Hash Algorithm for deterministic 32-bit hashing
+        hash: function(str) {
+            let h = 0x811c9dc5;
+            for (let i = 0; i < str.length; i++) {
+                h ^= str.charCodeAt(i);
+                h = Math.imul(h, 0x01000193);
+            }
+            return Math.abs(h >>> 0);
+        },
+        generate: function(text) {
+            if (!text) return '0x00 0x00 0x00';
+            const fullHash = this.hash(text.toLowerCase().trim());
+            // Extract 3 Bytes (24 bits)
+            const byte1 = (fullHash >> 16) & 0xFF; // Domain
+            const byte2 = (fullHash >> 8) & 0xFF;  // Action
+            const byte3 = fullHash & 0xFF;         // Scale
+            
+            return {
+                hex: `0x${byte1.toString(16).padStart(2,'0').toUpperCase()} 0x${byte2.toString(16).padStart(2,'0').toUpperCase()} 0x${byte3.toString(16).padStart(2,'0').toUpperCase()}`,
+                raw: [byte1, byte2, byte3],
+                // Map Byte 1 to a Hue for visual representation
+                hue: (byte1 / 255) * 360 
+            };
+        }
+    },
+
+    // --- AUDIO DSP ENGINE (432Hz Resonance) ---
+    audio: {
+        ctx: null,
+        init: function() {
+            if (!this.ctx) {
+                try {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                } catch(e) { console.warn("Audio API not supported"); }
+            }
+            if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
+        },
+        play: function(hue) {
+            this.init();
+            if (!this.ctx) return;
+            try {
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                // Map Hue (0-360) to a pleasant frequency range around 432Hz
+                const freq = 200 + (hue * 0.65); 
+                osc.frequency.setTargetAtTime(freq, this.ctx.currentTime, 0.05);
+                gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.8);
+                osc.connect(gain); gain.connect(this.ctx.destination);
+                osc.start(); osc.stop(this.ctx.currentTime + 0.8);
+                if (navigator.vibrate) navigator.vibrate(15);
+            } catch(e) { console.warn("Audio playback failed", e); }
+        }
+    },
+
+    // --- UI CONTROLLER ---
+    ui: {
+        toastTimer: null,
+        showToast: function(msg) {
+            const t = document.getElementById('k1-toast');
+            if(!t) return;
+            t.innerText = msg; t.classList.add('show');
+            clearTimeout(this.toastTimer);
+            this.toastTimer = setTimeout(() => t.classList.remove('show'), 2000);
+        }
+    },
+
+    // --- LIFECYCLE METHODS ---
+    init: function() {
+        try {
+            this.renderRadicals();
+            this.bindEvents();
+            console.log("[Session 1] Core Kernel Initialized.");
+        } catch(e) {
+            throw new Error("UI Initialization failed: " + e.message);
+        }
+    },
+
+    renderRadicals: function() {
+        const container = document.getElementById('k1-radical-container');
+        if(!container) return;
+        
+        this.radicals.forEach(r => {
+            const el = document.createElement('div');
+            el.className = 'k1-radical';
+            el.style.color = r.color;
+            el.innerHTML = `<div class="k1-r-icon">${r.icon}</div><div class="k1-r-name">${r.name}</div>`;
+            el.onclick = () => {
+                this.audio.play(r.hue);
+                this.ui.showToast(`${r.name} Radical Activated`);
+                // Auto-fill input to demonstrate SPU
+                const input = document.getElementById('k1-spu-input');
+                if(input) {
+                    input.value = r.name;
+                    this.processSPU(r.name);
+                }
+            };
+            container.appendChild(el);
+        });
+    },
+
+    bindEvents: function() {
+        const input = document.getElementById('k1-spu-input');
+        if(input) {
+            input.addEventListener('input', (e) => this.processSPU(e.target.value));
+        }
+    },
+
+    processSPU: function(text) {
+        const result = this.spu.generate(text);
+        const display = document.getElementById('k1-hex-output');
+        if(display) {
+            display.innerText = result.hex;
+            // Subtle color shift based on generated hue
+            display.style.color = `hsl(${result.hue}, 80%, 60%)`;
+            display.style.borderColor = `hsla(${result.hue}, 80%, 60%, 0.5)`;
+            display.style.background = `hsla(${result.hue}, 80%, 60%, 0.1)`;
+        }
+    },
+
+    destroy: function() {
+        console.log("[Session 1] Core Kernel Unloaded.");
+        if(this.audio.ctx) this.audio.ctx.close();
+    }
+};
+
+/* ═══════════════════════════════════════════════════════════
+   BOOT SEQUENCE
+   ═══════════════════════════════════════════════════════════ */
+window.onload = () => {
+    KhelOS.register(1, Session1_CoreKernel);
+};
+</script>
+</body>
+</html>
