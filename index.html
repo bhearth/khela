@@ -1,765 +1,673 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=no">
-    <title>Khel.o · Universal Extensible OS</title>
-
-    <!-- Premium Typography & Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700;800&family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,1,0" />
-
-    <!-- Core Libraries -->
-    <script src="https://cdn.tailwindcss.com"></script>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Khel.o WonderGraph</title>
     <style>
         :root {
-            --bg-void: #030508;
-            --panel-bg: rgba(13, 19, 34, 0.7);
-            --panel-border: rgba(255, 255, 255, 0.08);
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --gold: #fbbf24;
-            --accent: #38bdf8;
-            --sidebar-w: 260px;
+            --bg: #0B0F1A; --panel: #121A29; --panel-border: #232E45;
+            --text: #F2EFE9; --text-muted: #A9B0C0;
+            --accent: #4FD1C5; --accent-hover: #38bdf8;
+            --sidebar-w: 220px;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg-void); color: var(--text-main); font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+        body { background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
+        button { cursor: pointer; border: none; background: none; color: inherit; font: inherit; }
+        input { font: inherit; }
 
-        .f-disp { font-family: 'Space Grotesk', sans-serif; }
-        .f-mono { font-family: 'JetBrains Mono', monospace; }
-
-        /* ==========================================
-           SHELL & SIDEBAR 
-           ========================================== */
-        .app-shell { display: flex; height: 100vh; overflow: hidden; }
-        
-        .sidebar {
-            width: var(--sidebar-w); background: rgba(5, 8, 14, 0.95);
-            border-right: 1px solid var(--panel-border); display: flex; flex-direction: column;
-            padding: 24px 16px; z-index: 50; flex-shrink: 0; backdrop-filter: blur(20px);
-        }
-        
-        .brand { font-size: 1.8rem; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 8px; margin-bottom: 30px; padding: 0 10px;}
+        /* Sidebar Navigation */
+        aside { width: var(--sidebar-w); background: var(--panel); border-right: 1px solid var(--panel-border); display: flex; flex-direction: column; z-index: 10; transition: transform 0.3s ease; }
+        .brand { font-size: 1.5rem; font-weight: bold; padding: 20px; color: #fff; letter-spacing: 1px; }
         .brand span { color: var(--accent); }
+        nav { display: flex; flex-direction: column; padding: 0 10px; gap: 5px; }
+        .nav-btn { padding: 12px 15px; text-align: left; border-radius: 8px; font-weight: 600; color: var(--text-muted); transition: all 0.2s; display: flex; align-items: center; gap: 10px; }
+        .nav-btn:hover { background: rgba(255,255,255,0.05); color: #fff; }
+        .nav-btn.active { background: rgba(79, 209, 197, 0.15); color: var(--accent); }
+        .nav-num { width: 22px; height: 22px; background: var(--panel-border); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; color: #fff; }
+        .nav-btn.active .nav-num { background: var(--accent); color: #000; }
 
-        .nav-item {
-            display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 12px;
-            color: var(--text-muted); font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: 0.2s;
-            border: 1px solid transparent; margin-bottom: 4px;
-        }
-        .nav-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
-        .nav-item.active { background: rgba(56, 189, 248, 0.1); border-color: rgba(56, 189, 248, 0.2); color: #fff; }
-        .nav-item .n-badge {
-            width: 24px; height: 24px; border-radius: 50%; background: var(--panel-border); color: #fff;
-            display: flex; align-items: center; justify-content: center; font-size: 0.75rem; flex-shrink: 0;
-        }
-        .nav-item.active .n-badge { background: var(--accent); color: #000; }
-        .nav-item.completed .n-badge { background: #10b981; color: #000; }
-
-        /* ==========================================
-           MAIN STAGE & PANELS
-           ========================================== */
-        main { flex: 1; position: relative; background: radial-gradient(circle at top right, #0a1128, #010204); overflow-y: auto; overflow-x: hidden; scroll-behavior: smooth;}
+        /* Main Content */
+        main { flex: 1; overflow-y: auto; padding: 30px; position: relative; }
+        .tab-panel { display: none; animation: fadeIn 0.3s; }
+        .tab-panel.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        .panel { display: none; padding: 40px; max-width: 1000px; margin: 0 auto; animation: fadeUp 0.4s ease forwards; }
-        .panel.active { display: block; }
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        h2 { font-size: 2rem; margin-bottom: 10px; }
+        .subtitle { color: var(--text-muted); margin-bottom: 25px; }
 
-        .panel-title { font-size: 2.5rem; font-weight: 800; color: #fff; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; }
-        .panel-desc { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 30px; line-height: 1.6; }
+        /* Search & Input */
+        .search-bar { display: flex; gap: 10px; margin-bottom: 20px; max-width: 600px; }
+        .search-bar input { flex: 1; padding: 12px 20px; border-radius: 25px; border: 2px solid var(--panel-border); background: rgba(0,0,0,0.3); color: #fff; outline: none; transition: 0.2s; }
+        .search-bar input:focus { border-color: var(--accent); }
+        .btn-primary { background: var(--accent); color: #000; padding: 12px 25px; border-radius: 25px; font-weight: bold; transition: 0.2s; }
+        .btn-primary:hover { background: var(--accent-hover); transform: scale(1.05); }
+        .btn-icon { width: 44px; height: 44px; border-radius: 50%; background: var(--panel-border); display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .btn-icon:hover { background: var(--accent); color: #000; }
+        .btn-icon.recording { background: #ef4444; color: #fff; animation: pulse 1s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
 
-        .glass-box { background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 20px; padding: 24px; backdrop-filter: blur(12px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        /* Discover Jumble */
+        .jumble-grid { display: flex; gap: 10px; flex-wrap: wrap; }
+        .jumble-btn { padding: 15px 25px; background: var(--panel); border: 1px solid var(--panel-border); border-radius: 12px; font-weight: bold; font-size: 1.1rem; transition: 0.2s; }
+        .jumble-btn:hover { border-color: var(--accent); transform: translateY(-3px); }
+
+        /* Lists & Cards */
+        .list-grid { display: grid; gap: 15px; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+        .card { background: var(--panel); border: 1px solid var(--panel-border); padding: 20px; border-radius: 15px; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; gap: 10px; }
+        .card:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .card-icon { font-size: 2rem; }
+        .card-title { font-weight: bold; font-size: 1.2rem; }
+        .card-desc { font-size: 0.9rem; color: var(--text-muted); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+        /* Slide-over Viewer */
+        .viewer { position: fixed; top: 0; right: -100%; width: min(450px, 100vw); height: 100vh; background: var(--panel); border-left: 1px solid var(--panel-border); z-index: 100; transition: right 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); display: flex; flex-direction: column; box-shadow: -10px 0 30px rgba(0,0,0,0.6); }
+        .viewer.open { right: 0; }
+        .viewer-close { position: absolute; top: 15px; right: 15px; width: 35px; height: 35px; border-radius: 50%; background: rgba(0,0,0,0.5); color: #fff; font-weight: bold; font-size: 1.2rem; z-index: 101; display: flex; align-items: center; justify-content: center; }
+        .viewer-close:hover { background: #ef4444; }
         
-        .search-wrap { display: flex; align-items: center; background: rgba(0,0,0,0.5); border: 1px solid var(--accent); border-radius: 40px; padding: 10px 24px; width: 100%; max-width: 600px; transition: 0.3s; }
-        .search-wrap:focus-within { border-color: #fff; box-shadow: 0 0 30px rgba(56,189,248,0.3); background: rgba(15,23,42,0.9); }
-        .search-wrap input { flex: 1; background: transparent; border: none; color: #fff; font-size: 1.1rem; outline: none; font-family: 'Inter'; margin-left: 12px;}
-
-        .btn-action { background: var(--accent); color: #000; font-family: 'Space Grotesk'; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding: 14px 28px; border-radius: 30px; border: none; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px;}
-        .btn-action:hover { transform: translateY(-2px); filter: brightness(1.1); box-shadow: 0 10px 20px rgba(56,189,248,0.3); }
-
-        /* ==========================================
-           WONDER GRAPH ENGINE (Extensible CSS3D)
-           ========================================== */
-        .graph-stage { position: relative; width: 100%; height: 500px; background: rgba(0,0,0,0.3); border: 1px solid var(--panel-border); border-radius: 24px; overflow: hidden; }
-        .graph-svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
-        .res-line { fill: none; stroke-width: 2; stroke-linecap: round; opacity: 0.5; stroke-dasharray: 4 4; animation: flowDash 20s linear infinite; }
-        @keyframes flowDash { to { stroke-dashoffset: -1000; } }
-
-        .wg-node {
-            position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            border-radius: 50%; cursor: pointer; text-align: center;
-            background: rgba(10, 15, 25, 0.95); border: 2px solid var(--col);
-            transform: translate3d(calc(-50% + var(--x)), calc(-50% + var(--y)), 0) scale(var(--s, 0));
-            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s;
-            animation: popNode 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-            z-index: 10; pointer-events: auto;
-        }
-        @keyframes popNode { to { transform: translate3d(calc(-50% + var(--x)), calc(-50% + var(--y)), 0) scale(var(--s, 1)); } }
+        .viewer-content { flex: 1; overflow-y: auto; padding: 25px; padding-top: 50px; display: flex; flex-direction: column; gap: 20px; }
+        .viewer-img { width: 100%; height: 200px; object-fit: cover; border-radius: 12px; background: rgba(0,0,0,0.3); }
+        .viewer-tag { display: inline-block; padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; width: max-content; }
+        .viewer-title { font-size: 2rem; font-weight: bold; line-height: 1.1; }
+        .viewer-extract { font-size: 1rem; line-height: 1.6; color: #ddd; }
         
-        .wg-node:hover { transform: translate3d(calc(-50% + var(--x)), calc(-50% + var(--y)), 0) scale(1.15) !important; z-index: 20; box-shadow: 0 0 30px var(--col), inset 0 0 15px rgba(255,255,255,0.2); }
-        .wg-icon { font-size: var(--icon-sz); filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6)); line-height: 1; }
-        .wg-label { position: absolute; top: calc(100% + 8px); font-family: 'Space Grotesk'; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #fff; text-shadow: 0 2px 4px #000; white-space: nowrap; pointer-events: none;}
-
-        /* ==========================================
-           JANM KUNDALI (DECODER SHEET)
-           ========================================== */
-        .viewer-overlay { position: fixed; inset: 0; background: rgba(2,3,5,0.85); backdrop-filter: blur(10px); z-index: 200; display: none; justify-content: flex-end; }
-        .viewer-overlay.active { display: flex; animation: fadeIn 0.3s; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        .viewer-panel {
-            width: 100%; max-width: 480px; height: 100vh; background: var(--panel-bg);
-            border-left: 1px solid var(--col); padding: 40px; overflow-y: auto;
-            transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            display: flex; flex-direction: column; box-shadow: -20px 0 60px rgba(0,0,0,0.8);
-        }
-        .viewer-overlay.active .viewer-panel { transform: translateX(0); }
-
-        .v-close { position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); width: 40px; height: 40px; border-radius: 50%; color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s;}
-        .v-close:hover { background: #ef4444; border-color: #ef4444; transform: rotate(90deg); }
-
-        .v-hero-img { width: 100%; height: 220px; object-fit: cover; border-radius: 16px; margin-bottom: 20px; border: 1px solid var(--panel-border); box-shadow: 0 10px 20px rgba(0,0,0,0.4); display: none;}
-        .v-meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
-        .v-meta-box { background: rgba(0,0,0,0.4); border: 1px solid var(--panel-border); padding: 12px; border-radius: 12px; text-align: center;}
+        .action-box { background: rgba(0,0,0,0.3); border: 1px solid var(--panel-border); padding: 15px; border-radius: 12px; }
+        .action-box h4 { margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .action-box p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; }
         
-        .ikrw-box { background: linear-gradient(135deg, rgba(16,185,129,0.1), rgba(16,185,129,0.05)); border: 1px solid rgba(16,185,129,0.3); border-radius: 16px; padding: 20px; margin-bottom: 24px; }
+        .btn-link { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border-radius: 12px; font-weight: bold; text-decoration: none; text-align: center; border: 1px solid transparent; transition: 0.2s; }
+        .btn-miraheze { background: rgba(16, 185, 129, 0.1); color: #10b981; border-color: rgba(16, 185, 129, 0.3); }
+        .btn-github { background: rgba(168, 85, 247, 0.1); color: #a855f7; border-color: rgba(168, 85, 247, 0.3); }
+        .btn-google { background: rgba(234, 179, 8, 0.1); color: #eab308; border-color: rgba(234, 179, 8, 0.3); }
+        .btn-link:hover { filter: brightness(1.2); transform: translateY(-2px); }
 
-        #toast { position: fixed; top: 30px; left: 50%; transform: translateX(-50%); background: #10b981; color: #000; padding: 12px 24px; border-radius: 30px; font-family: 'Space Grotesk'; font-weight: 800; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 10px 40px rgba(16,185,129,0.5); z-index: 1000; opacity: 0; pointer-events: none; transition: 0.4s; }
-        #toast.show { opacity: 1; transform: translateX(-50%) translateY(10px); }
-
+        /* Graphs */
+        .graph-wrap { position: relative; width: 100%; height: 60vh; min-height: 400px; background: rgba(0,0,0,0.3); border: 1px solid var(--panel-border); border-radius: 20px; overflow: hidden; margin-top: 15px; }
+        .graph-controls { display: flex; gap: 10px; margin-bottom: 10px; }
+        .graph-controls button { padding: 8px 15px; border-radius: 20px; background: var(--panel); border: 1px solid var(--panel-border); font-size: 0.85rem; font-weight: bold; color: var(--text-muted); }
+        .graph-controls button.active { background: var(--accent); color: #000; border-color: var(--accent); }
+        
+        svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+        .node { position: absolute; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; transition: transform 0.2s; }
+        .node:hover { transform: translate(-50%, -50%) scale(1.2); z-index: 10; }
+        .node-dot { display: flex; align-items: center; justify-content: center; border-radius: 50%; border: 2px solid; background: var(--bg); box-shadow: 0 0 15px currentColor; }
+        .node-label { font-size: 0.75rem; font-weight: bold; text-shadow: 0 2px 4px #000; white-space: nowrap; pointer-events: none; }
+        
+        /* Mobile Hamburger */
+        .mobile-toggle { display: none; position: fixed; bottom: 20px; left: 20px; width: 50px; height: 50px; border-radius: 50%; background: var(--accent); color: #000; z-index: 50; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        
         @media (max-width: 768px) {
-            .app-shell { flex-direction: column; }
-            .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--panel-border); padding: 16px; flex-direction: row; overflow-x: auto; white-space: nowrap; gap: 10px; }
-            .brand { display: none; }
-            .nav-item { padding: 8px 12px; min-height: 40px; margin-bottom: 0; }
-            main { padding: 20px; }
-            .panel { padding: 20px; }
-            .viewer-panel { max-width: 100%; }
+            aside { position: fixed; left: -100%; height: 100%; box-shadow: 10px 0 30px rgba(0,0,0,0.5); }
+            aside.open { left: 0; }
+            .mobile-toggle { display: block; }
         }
+        
+        #loader { display: none; align-items: center; gap: 10px; margin-bottom: 15px; color: var(--accent); font-weight: bold; }
+        .spinner { width: 20px; height: 20px; border: 3px solid rgba(79,209,197,0.3); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-<div class="app-shell">
-    <!-- EVOD SIDEBAR -->
-    <aside class="sidebar">
-        <div class="brand">Khel<span style="color:var(--accent);">.</span>o</div>
-        <nav id="evod-nav" style="display: flex; flex-direction: column; gap: 4px;"></nav>
+    <!-- Sidebar Navigation -->
+    <aside id="sidebar" aria-label="Main Navigation">
+        <div class="brand">Khel.o<span>Graph</span></div>
+        <nav id="navMenu">
+            <button class="nav-btn active" data-tab="discover"><span class="nav-num">1</span> Discover</button>
+            <button class="nav-btn" data-tab="learn"><span class="nav-num">2</span> Learn</button>
+            <button class="nav-btn" data-tab="experience"><span class="nav-num">3</span> Experience</button>
+            <button class="nav-btn" data-tab="collaborate"><span class="nav-num">4</span> Collaborate</button>
+            <button class="nav-btn" data-tab="contribute"><span class="nav-num">5</span> Contribute</button>
+            <button class="nav-btn" data-tab="evolve"><span class="nav-num">6</span> Evolve</button>
+        </nav>
     </aside>
+    <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle Menu">☰</button>
 
-    <main>
-        <section class="panel active" id="panel-discover">
-            <div class="panel-title"><span class="material-symbols-rounded text-sky-400 text-4xl">travel_explore</span> Discover & Innovate</div>
-            <p class="panel-desc">Tap a scrambled seed to ignite the flow of learning.</p>
-            
-            <div class="flex flex-wrap gap-4 mb-10" id="discover-seeds">
-                <!-- Injected via CONFIG -->
-            </div>
-            
-            <button class="btn-action" onclick="App.route('learn')">Launch Universal Search <span class="material-symbols-rounded">arrow_forward</span></button>
+    <!-- Main Content Area -->
+    <main id="mainContent">
+        
+        <!-- 1. Discover -->
+        <section class="tab-panel active" id="tab-discover">
+            <h2>Discover</h2>
+            <p class="subtitle">Tap a scrambled word to reveal its secret and start your journey.</p>
+            <div class="jumble-grid" id="jumbleGrid"></div>
         </section>
 
-        <section class="panel" id="panel-learn">
-            <div class="panel-title"><span class="material-symbols-rounded text-emerald-400 text-4xl">menu_book</span> Learn</div>
-            <p class="panel-desc">Query the universal matrix. We extract the essence automatically.</p>
-            
-            <div class="search-wrap mb-8">
-                <span class="material-symbols-rounded text-slate-400">search</span>
-                <input type="text" id="omni-search" placeholder="e.g. Quantum Physics, Permaculture..." autocomplete="off" onkeypress="if(event.key==='Enter') App.executeSearch()">
-                <button class="bg-transparent border-none text-sky-400 cursor-pointer flex items-center justify-center p-2" onclick="App.executeSearch()">
-                    <span class="material-symbols-rounded">arrow_forward</span>
-                </button>
+        <!-- 2. Learn -->
+        <section class="tab-panel" id="tab-learn">
+            <h2>Learn</h2>
+            <p class="subtitle">Search for any concept. We'll map its DNA.</p>
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="e.g. Gravity, Forest, Telescope..." aria-label="Search Concept">
+                <button class="btn-icon" id="micBtn" aria-label="Voice Search">🎤</button>
+                <button class="btn-primary" id="searchBtn">Search</button>
             </div>
-
-            <div id="search-loader" style="display:none;" class="text-sky-400 f-mono text-sm tracking-widest uppercase mb-6 flex items-center gap-3">
-                <span class="material-symbols-rounded animate-spin">sync</span> Synthesizing Data...
-            </div>
-
-            <div id="search-results" class="flex flex-col gap-4"></div>
+            <div id="loader"><div class="spinner"></div> Extracting Knowledge...</div>
+            <div id="searchResults" class="list-grid"></div>
         </section>
 
-        <section class="panel" id="panel-experience">
-            <div class="panel-title"><span class="material-symbols-rounded text-rose-400 text-4xl">directions_run</span> Experience</div>
-            <p class="panel-desc">Knowledge requires physical anchoring. Complete your IKRw Protocol.</p>
-            
-            <div id="experience-container" class="glass-box text-center text-slate-500">
-                Search and select a concept in the 'Learn' tab first.
-            </div>
+        <!-- 3. Experience -->
+        <section class="tab-panel" id="tab-experience">
+            <h2>Experience</h2>
+            <p class="subtitle">Knowledge must be grounded. Complete these physical actions.</p>
+            <div id="experienceList" class="list-grid"></div>
         </section>
 
-        <section class="panel" id="panel-collaborate">
-            <div class="panel-title"><span class="material-symbols-rounded text-purple-400 text-4xl">hub</span> Collaborate</div>
-            <p class="panel-desc">Visualizing local resonance. How does this concept connect to its immediate ecosystem?</p>
-            
-            <div class="graph-stage" id="local-graph">
-                <svg class="graph-svg" id="local-svg"></svg>
-                <div id="local-nodes" class="absolute inset-0"></div>
-            </div>
-            
-            <div class="mt-6 text-center">
-                <button class="btn-action" onclick="App.route('contribute')">Next: Synthesize Findings <span class="material-symbols-rounded">arrow_forward</span></button>
+        <!-- 4. Collaborate -->
+        <section class="tab-panel" id="tab-collaborate">
+            <h2>Collaborate</h2>
+            <p class="subtitle">How your current concept connects to the universe.</p>
+            <div class="graph-wrap" id="collabGraph">
+                <svg id="collabSvg"></svg>
+                <div id="collabNodes"></div>
             </div>
         </section>
 
-        <section class="panel" id="panel-contribute">
-            <div class="panel-title"><span class="material-symbols-rounded text-gold text-4xl">volunteer_activism</span> Contribute</div>
-            <p class="panel-desc">Export your physical observations back into the digital commons.</p>
-            
-            <div id="contribute-container" class="flex flex-col gap-4 max-w-lg">
-                <div class="glass-box text-center text-slate-500">Pending concept selection.</div>
+        <!-- 5. Contribute -->
+        <section class="tab-panel" id="tab-contribute">
+            <h2>Contribute</h2>
+            <p class="subtitle">Expand the matrix. Where do you want to add your findings?</p>
+            <div id="contributeList" class="list-grid"></div>
+        </section>
+
+        <!-- 6. Evolve -->
+        <section class="tab-panel" id="tab-evolve">
+            <h2>Evolve</h2>
+            <p class="subtitle">Your complete, expanding learning journey.</p>
+            <div class="graph-controls">
+                <button class="layout-btn active" data-layout="spiral">Fibonacci Spiral</button>
+                <button class="layout-btn" data-layout="grid">Matrix Grid</button>
+                <button class="layout-btn" data-layout="radial">Radial Orbit</button>
+            </div>
+            <div class="graph-wrap" id="evolveGraph">
+                <svg id="evolveSvg"></svg>
+                <div id="evolveNodes"></div>
             </div>
         </section>
 
-        <section class="panel" id="panel-evolve">
-            <div class="panel-title"><span class="material-symbols-rounded text-green-400 text-4xl">all_inclusive</span> Evolve</div>
-            <p class="panel-desc">Your expanding cognitive universe. All learned nodes permanently mapped.</p>
-            
-            <div class="flex gap-2 mb-4">
-                <button class="bg-white/10 px-4 py-2 rounded-full text-xs font-bold text-white hover:bg-white/20 transition" onclick="WonderGraph.setLayout('master', 'flower')">🌸 Flower</button>
-                <button class="bg-white/10 px-4 py-2 rounded-full text-xs font-bold text-white hover:bg-white/20 transition" onclick="WonderGraph.setLayout('master', 'orbit')">🎯 Orbit</button>
-                <button class="bg-white/10 px-4 py-2 rounded-full text-xs font-bold text-white hover:bg-white/20 transition" onclick="WonderGraph.setLayout('master', 'matrix')">🧮 Matrix</button>
-            </div>
-
-            <div class="graph-stage" id="master-graph" style="height: 600px;">
-                <svg class="graph-svg" id="master-svg"></svg>
-                <div id="master-nodes" class="absolute inset-0"></div>
-            </div>
-        </section>
     </main>
-</div>
 
-<div class="viewer-overlay" id="viewer-overlay">
-    <div class="viewer-panel" id="viewer-panel">
-        <button class="v-close" onclick="Viewer.close()"><span class="material-symbols-rounded">close</span></button>
-        
-        <div class="flex items-center gap-4 mb-6">
-            <div id="v-icon" class="text-5xl filter drop-shadow-[0_0_15px_currentColor]">✨</div>
-            <div>
-                <div id="v-domain" class="text-[10px] uppercase tracking-widest font-bold mb-1 opacity-80">Domain</div>
-                <h2 id="v-title" class="f-disp text-3xl font-bold text-white leading-tight">Concept</h2>
-            </div>
+    <!-- Viewer Slide-over -->
+    <div class="viewer" id="viewer" aria-hidden="true" role="dialog">
+        <button class="viewer-close" id="closeViewer" aria-label="Close viewer">×</button>
+        <div class="viewer-content" id="viewerContent">
+            <!-- Dynamic Content Injected Here -->
         </div>
-
-        <img id="v-image" class="v-hero-img" alt="Knowledge Hero" />
-
-        <div class="v-meta-grid">
-            <div class="v-meta-box">
-                <div class="text-[9px] text-slate-400 uppercase tracking-widest mb-1">Color DNA</div>
-                <div id="v-hue" class="font-mono text-lg font-bold">0° HZ</div>
-            </div>
-            <div class="v-meta-box">
-                <div class="text-[9px] text-slate-400 uppercase tracking-widest mb-1">Wiki Words</div>
-                <div id="v-words" class="f-disp text-xl font-bold text-white">0</div>
-            </div>
-        </div>
-
-        <div class="bg-black/30 p-5 rounded-2xl border border-white/10 mb-6">
-            <p id="v-extract" class="text-sm text-slate-300 leading-relaxed">Extracting semantic truth...</p>
-        </div>
-
-        <div class="ikrw-box">
-            <span class="material-symbols-rounded text-3xl text-emerald-400">directions_run</span>
-            <div>
-                <div class="text-[9px] text-emerald-400 font-bold uppercase tracking-widest mb-1">IKRw Grounding Protocol</div>
-                <div id="v-ikrw" class="text-sm text-emerald-50 leading-relaxed font-medium">Physical action required.</div>
-            </div>
-        </div>
-
-        <button class="btn-action w-full" id="v-btn-read" onclick="AudioDSP.speakExtract()">
-            <span class="material-symbols-rounded">volume_up</span> Read Aloud (Drishti)
-        </button>
-        
-        <button class="btn-action w-full mt-3 !bg-transparent border border-sky-500 !text-sky-400" onclick="Viewer.pushToFlow()">
-            Add to Evolution Matrix <span class="material-symbols-rounded">add_circle</span>
-        </button>
     </div>
-</div>
-
-<div id="toast"></div>
 
 <script>
-/**
- * STREAMING_CHUNK: CORE CONFIGURATION
- * The ultimate "Edit Anywhere, Extend Easily" dictionary.
- * Adding a new category requires ZERO changes to the rendering logic.
- */
-const CONFIG = {
-    // 1. The EVOD Flow Steps
-    EVOD_STEPS: [
-        { id: 'discover', label: 'Discover & Innovate' },
-        { id: 'learn', label: 'Learn' },
-        { id: 'experience', label: 'Experience' },
-        { id: 'collaborate', label: 'Collaborate' },
-        { id: 'contribute', label: 'Contribute' },
-        { id: 'evolve', label: 'Evolve' }
-    ],
+    /* =========================================================================
+       1. DATA & CONFIGURATION
+       ========================================================================= */
 
-    // 2. Discover Scramble Seeds
-    SEEDS: [
-        { wordA: 'KHEL', wordB: '.O', target: 'Khel.o', colorA: '#38bdf8', colorB: '#fbbf24' },
-        { wordA: 'ECO', wordB: 'LOGY', target: 'Ecology', colorA: '#10b981', colorB: '#a7f3d0' },
-        { wordA: 'GRAV', wordB: 'ITY', target: 'Gravity', colorA: '#a855f7', colorB: '#c084fc' }
-    ],
+    // The 14-Way Semantic Categories with dynamic Physical Experience Prompts & Contribute prompts
+    const CATEGORIES = [
+        { id: 'Animals', test: /animal|mammal|species|bird|fish|insect|reptile/i, color: '#f97316', icon: '🦁', 
+          exp: t => `Go outside and observe an animal or insect safely. Compare its movement to ${t}.`, cont: t => `Add a fact about ${t}'s habitat.` },
+        { id: 'Ocean', test: /ocean|sea|water|marine|coral|fish/i, color: '#0ea5e9', icon: '🌊', 
+          exp: t => `Fill a bowl with water. Think about how ${t} relies on water properties.`, cont: t => `Write why protecting ${t} matters.` },
+        { id: 'Space', test: /space|planet|star|galaxy|universe|moon/i, color: '#8b5cf6', icon: '🌌', 
+          exp: t => `Look at the night sky. Try to imagine the scale and distance of ${t}.`, cont: t => `Add a numerical fact (distance/size) about ${t}.` },
+        { id: 'Plants', test: /plant|tree|flower|forest|botany|grass|agriculture/i, color: '#10b981', icon: '🌱', 
+          exp: t => `Find a plant or leaf. Examine its veins and think how it connects to ${t}.`, cont: t => `Describe how ${t} helps the ecosystem.` },
+        { id: 'Math', test: /math|number|geometry|equation|spiral|fibonacci/i, color: '#ec4899', icon: '🧮', 
+          exp: t => `Find an object in your room that uses the geometry or rules of ${t}.`, cont: t => `Provide a real-world example of ${t}.` },
+        { id: 'Physics', test: /physics|gravity|force|motion|energy|light|sound|chemistry/i, color: '#06b6d4', icon: '⚛️', 
+          exp: t => `Drop an object or use a flashlight to physically demonstrate ${t}.`, cont: t => `Explain ${t} in one simple sentence.` },
+        { id: 'Art', test: /art|music|paint|draw|dance|culture/i, color: '#f43f5e', icon: '🎨', 
+          exp: t => `Draw a quick sketch or hum a tune representing how ${t} feels.`, cont: t => `Add an example of a famous ${t} creation.` },
+        { id: 'History', test: /history|ancient|king|war|empire|civilization/i, color: '#d97706', icon: '🏛️', 
+          exp: t => `Ask an elder in your family if they know a story related to ${t}.`, cont: t => `Add why ${t} is important to remember.` },
+        { id: 'Food', test: /food|cook|recipe|fruit|vegetable|nutrition/i, color: '#eab308', icon: '🍎', 
+          exp: t => `Go to the kitchen. Find an ingredient that shares properties with ${t}.`, cont: t => `Add where ${t} originally came from.` },
+        { id: 'Geography', test: /geography|country|mountain|river|city|continent/i, color: '#14b8a6', icon: '🗺️', 
+          exp: t => `Look at a physical map or globe and try to locate ${t}.`, cont: t => `Add a unique geographical feature of ${t}.` },
+        { id: 'Tech', test: /technology|computer|machine|robot|software|engine/i, color: '#64748b', icon: '💻', 
+          exp: t => `Look at a device in your home. Think about how ${t} makes it work.`, cont: t => `Explain how ${t} helps people.` },
+        { id: 'Language', test: /language|word|book|literature|poem|write/i, color: '#a855f7', icon: '📚', 
+          exp: t => `Write a physical note to someone using concepts from ${t}.`, cont: t => `Add the root/origin of the word ${t}.` },
+        { id: 'Sports', test: /sport|game|play|athlete|ball|run/i, color: '#ef4444', icon: '⚽', 
+          exp: t => `Stand up and mimic the physical movement required in ${t}.`, cont: t => `Add a rule or record about ${t}.` },
+        { id: 'General', test: /.*/, color: '#94a3b8', icon: '✨', 
+          exp: t => `Explain the concept of ${t} aloud to an imaginary person.`, cont: t => `Add a fun fact about ${t}.` }
+    ];
 
-    // 3. Extensible Taxonomy (Add anything here)
-    CATEGORIES: [
-        { test: /farm|soil|crop|seed|plant|tree|agriculture/i, name: 'Ecology', color: '#10b981', icon: '🌱', 
-          ikrw: t => `Go outside and touch the soil. Find a plant similar to ${t}.` },
-        { test: /food|nutrition|eat|diet|vitamin/i, name: 'Nutrition', color: '#fbbf24', icon: '🍎', 
-          ikrw: t => `Look in your kitchen for an ingredient related to ${t}.` },
-        { test: /physics|gravity|force|energy|space|quantum/i, name: 'Physics', color: '#a855f7', icon: '⚛️', 
-          ikrw: t => `Create a physical experiment demonstrating ${t} using safe household objects.` },
-        { test: /build|structure|water|purify|architecture/i, name: 'Engineering', color: '#38bdf8', icon: '🏗️', 
-          ikrw: t => `Draw a blueprint on paper showing how you would engineer ${t}.` },
-        { test: /animal|mammal|species|bird|fish/i, name: 'Biology', color: '#f43f5e', icon: '🦁', 
-          ikrw: t => `Observe a local animal or insect outside. Compare it to ${t}.` },
-        { test: /math|number|geometry|equation|fibonacci/i, name: 'Mathematics', color: '#8b5cf6', icon: '🧮', 
-          ikrw: t => `Find a pattern in nature that reflects the rules of ${t}.` }
-    ],
-    
-    // Fallback Category
-    DEFAULT_CATEGORY: { name: 'Universal Truth', color: '#94a3b8', icon: '✨', 
-          ikrw: t => `Explain the concept of ${t} to someone younger than you in simple words.` }
-};
+    const JUMBLES = [
+        { scrambled: "VIYATRG", clear: "Gravity" },
+        { scrambled: "YSHTIESNOHTSPO", clear: "Photosynthesis" },
+        { scrambled: "RTAHCTICERUE", clear: "Architecture" },
+        { scrambled: "LEYESVTCO", clear: "Velocity" }
+    ];
 
-/**
- * STREAMING_CHUNK: MODULE - SPU (Semantic Processing Unit)
- * Pure mathematical logic. Independent of DOM.
- */
-const SPU = {
-    hash(str) {
-        let h = 0x811c9dc5;
-        for (let i = 0; i < str.length; i++) h = Math.imul(h ^ str.charCodeAt(i), 0x01000193);
-        return Math.abs(h >>> 0);
-    },
-    
-    analyze(text) {
-        const hVal = this.hash(text);
-        const cat = CONFIG.CATEGORIES.find(c => c.test.test(text)) || CONFIG.DEFAULT_CATEGORY;
-        
-        return {
-            raw: text,
-            hash: hVal,
-            hue: hVal % 360,
-            category: cat.name,
-            color: cat.color,
-            icon: cat.icon,
-            ikrw: cat.ikrw(text)
-        };
+    // State Management
+    let state = {
+        learned: JSON.parse(localStorage.getItem('khelo_learned') || '[]'),
+        currentConcept: null,
+        activeLayout: 'spiral'
+    };
+
+    /* =========================================================================
+       2. LOGIC & API
+       ========================================================================= */
+
+    // Unscramble animation
+    function unscramble(btn, target) {
+        let iterations = 0;
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        const interval = setInterval(() => {
+            btn.innerText = target.split("").map((l, i) => {
+                if(i < iterations) return target[i];
+                return chars[Math.floor(Math.random() * chars.length)];
+            }).join("");
+            if(iterations >= target.length) {
+                clearInterval(interval);
+                document.getElementById('searchInput').value = target;
+                fetchAndProcess(target);
+            }
+            iterations += 1/3;
+        }, 30);
     }
-};
 
-/**
- * STREAMING_CHUNK: MODULE - AudioDSP
- * Blind-first accessibility. Independent of DOM.
- */
-const AudioDSP = {
-    ctx: null, ready: false,
-    init() {
-        if(this.ready) return;
-        this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-        this.ready = true;
-    },
-    playTone(hue) {
-        if(!this.ready) this.init();
-        if(navigator.vibrate) navigator.vibrate(15);
-        const freq = 432 * (1 + (hue / 360));
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-        gain.gain.setValueAtTime(0, this.ctx.currentTime);
-        gain.gain.linearRampToValueAtTime(0.2, this.ctx.currentTime + 0.05);
-        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 1.0);
-        osc.connect(gain); gain.connect(this.ctx.destination);
-        osc.start(); osc.stop(this.ctx.currentTime + 1.2);
-    },
-    speakExtract() {
-        if(!App.activeConcept || !('speechSynthesis' in window)) return;
-        window.speechSynthesis.cancel();
-        const text = `${App.activeConcept.title}. ${App.activeConcept.extract}`;
-        const u = new SpeechSynthesisUtterance(text);
-        u.rate = 0.95;
-        window.speechSynthesis.speak(u);
+    // Classify concept based on text
+    function classify(title, text) {
+        const str = (title + " " + text).toLowerCase();
+        return CATEGORIES.find(c => c.test.test(str));
     }
-};
 
-/**
- * STREAMING_CHUNK: MODULE - Storage (FMEA Persistence)
- */
-const Storage = {
-    KEY: 'khelo_universal_memory',
-    save(dataArray) {
-        localStorage.setItem(this.KEY, JSON.stringify(dataArray));
-    },
-    load() {
-        try { return JSON.parse(localStorage.getItem(this.KEY)) || []; } 
-        catch(e) { return []; }
-    }
-};
-
-/**
- * STREAMING_CHUNK: MODULE - WikiAPI (External Gateway)
- * Features FMEA Fallback. If API fails, SPU takes over completely.
- */
-const WikiAPI = {
-    async fetchDetails(query) {
+    // Fetch from Wiki API (REST first, Action API fallback)
+    async function fetchWiki(query) {
+        const restUrl = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query)}`;
         try {
-            const url = `https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(query)}&gsrlimit=1&prop=extracts|pageimages|links&exintro=1&explaintext=1&piprop=thumbnail&pithumbsize=600&pllimit=8&format=json&origin=*`;
-            const res = await fetch(url);
-            const data = await res.json();
-            
-            if(!data.query || !data.query.pages) throw new Error("No Page");
-            
-            const page = data.query.pages[Object.keys(data.query.pages)[0]];
-            const links = (page.links || []).filter(l => l.ns === 0).map(l => l.title);
-            
+            let res = await fetch(restUrl);
+            if (!res.ok) throw new Error("REST failed");
+            let data = await res.json();
             return {
-                title: page.title,
-                extract: page.extract || "Knowledge parsed structurally.",
-                image: page.thumbnail ? page.thumbnail.source : null,
-                links: links,
-                words: (page.extract || "").split(/\s+/).length
+                title: data.title,
+                extract: data.extract || data.description || "A concept in the universe.",
+                image: data.thumbnail ? data.thumbnail.source : null,
+                url: data.content_urls ? data.content_urls.desktop.page : `https://en.wikipedia.org/wiki/${query}`
             };
         } catch (e) {
-            // FMEA FALLBACK: Math-driven synthetic data
-            const spuData = SPU.analyze(query);
-            return {
-                title: query,
-                extract: `Data fetch failed. Synthesizing semantic profile for ${query} using SPU deterministic mathematics.`,
-                image: null,
-                links: [`Nature of ${query}`, `Physics of ${query}`, `Ethics of ${query}`],
-                words: 0
-            };
-        }
-    }
-};
-
-/**
- * STREAMING_CHUNK: MODULE - WonderGraph Engine
- * Extensible 3D/2D renderer. Renders any given array of concepts.
- */
-const WonderGraph = {
-    state: {}, // Stores nodes and edges per container
-    
-    render(containerId, centerData, satelliteArray, layout = 'orbit') {
-        const container = document.getElementById(`${containerId}`);
-        const svg = document.getElementById(`${containerId}-svg`);
-        const nodesLayer = document.getElementById(`${containerId}-nodes`);
-        if(!container || !svg || !nodesLayer) return;
-
-        nodesLayer.innerHTML = ''; svg.innerHTML = '';
-        const W = container.clientWidth; const H = container.clientHeight;
-        const cx = W / 2; const cy = H / 2;
-
-        this.state[containerId] = { nodes: [], edges: [], layout, cx, cy };
-        const st = this.state[containerId];
-
-        // 1. Draw Center (if provided)
-        if (centerData) {
-            const rData = SPU.analyze(centerData.title);
-            st.nodes.push(this.createDOMNode(nodesLayer, rData, true));
-        }
-
-        // 2. Draw Satellites
-        satelliteArray.forEach((sat) => {
-            const sData = SPU.analyze(sat.title);
-            st.nodes.push(this.createDOMNode(nodesLayer, sData, false));
-        });
-
-        // 3. Apply Layout & Draw Edges
-        this.applyLayout(containerId);
-        
-        // Handle Resize
-        window.addEventListener('resize', () => {
-            st.cx = container.clientWidth / 2;
-            st.cy = container.clientHeight / 2;
-            this.applyLayout(containerId);
-        });
-    },
-
-    setLayout(containerId, layoutType) {
-        if(this.state[containerId]) {
-            this.state[containerId].layout = layoutType;
-            this.applyLayout(containerId);
-        }
-    },
-
-    applyLayout(containerId) {
-        const st = this.state[containerId];
-        const svg = document.getElementById(`${containerId}-svg`);
-        svg.innerHTML = ''; // Clear lines
-
-        const centerNode = st.nodes.find(n => n.isRoot);
-        const petals = st.nodes.filter(n => !n.isRoot);
-
-        if(centerNode) { centerNode.tx = st.cx; centerNode.ty = st.cy; }
-
-        petals.forEach((n, i) => {
-            if (st.layout === 'flower') {
-                const a = i * 137.508 * (Math.PI/180);
-                const r = 40 * Math.sqrt(i) + 60;
-                n.tx = st.cx + Math.cos(a)*r; n.ty = st.cy + Math.sin(a)*r;
-            } else if (st.layout === 'orbit') {
-                const a = (i / petals.length) * Math.PI * 2;
-                const r = Math.min(st.cx, st.cy) * 0.7;
-                n.tx = st.cx + Math.cos(a)*r; n.ty = st.cy + Math.sin(a)*r;
-            } else if (st.layout === 'matrix') {
-                const cols = Math.ceil(Math.sqrt(petals.length));
-                const spacing = 90;
-                n.tx = st.cx + (i % cols - cols/2 + 0.5) * spacing;
-                n.ty = st.cy + (Math.floor(i/cols) - cols/2 + 0.5) * spacing;
+            // Fallback
+            const actionUrl = `https://en.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=true&explaintext=true&titles=${encodeURIComponent(query)}&format=json&origin=*`;
+            try {
+                let res2 = await fetch(actionUrl);
+                let data2 = await res2.json();
+                let pages = data2.query.pages;
+                let pageId = Object.keys(pages)[0];
+                if (pageId == "-1") throw new Error("Not found");
+                return {
+                    title: pages[pageId].title,
+                    extract: pages[pageId].extract.split('\n')[0] || "Found in the depths of the matrix.",
+                    image: null,
+                    url: `https://en.wikipedia.org/wiki/${pages[pageId].title}`
+                };
+            } catch (err) {
+                return null;
             }
-
-            // Draw line to root if exists, else nearest logic
-            if(centerNode) this.drawEdge(svg, centerNode, n, n.data.color);
-        });
-
-        // Apply transforms
-        st.nodes.forEach(n => {
-            n.el.style.setProperty('--x', `${n.tx}px`);
-            n.el.style.setProperty('--y', `${n.ty}px`);
-        });
-    },
-
-    createDOMNode(layer, spuData, isRoot) {
-        const el = document.createElement('div');
-        el.className = 'wg-node';
-        const sz = isRoot ? 80 : 60;
-        
-        el.style.cssText = `--x:0px; --y:0px; --col:${spuData.color}; width:${sz}px; height:${sz}px; --icon-sz:${sz*0.4}px;`;
-        el.innerHTML = `
-            <div class="wg-icon">${spuData.icon}</div>
-            <div class="wg-label" style="color:${spuData.color}">${spuData.raw}</div>
-        `;
-        
-        el.onclick = () => { AudioDSP.playTone(spuData.hue); App.executeSearch(spuData.raw); };
-        layer.appendChild(el);
-        
-        return { el, data: spuData, tx:0, ty:0, isRoot };
-    },
-
-    drawEdge(svg, n1, n2, color) {
-        const line = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        line.setAttribute("class", "res-line");
-        // Simple bezier curve for organic feel
-        const mx = (n1.tx + n2.tx)/2 - (n2.ty - n1.ty)*0.1;
-        const my = (n1.ty + n2.ty)/2 + (n2.tx - n1.tx)*0.1;
-        line.setAttribute("d", `M${n1.tx} ${n1.ty} Q${mx} ${my} ${n2.tx} ${n2.ty}`);
-        line.setAttribute("stroke", color);
-        svg.appendChild(line);
-    }
-};
-
-/**
- * STREAMING_CHUNK: MODULE - Viewer (Janm Kundali UI)
- */
-const Viewer = {
-    open(apiData, spuData) {
-        const p = document.getElementById('viewer-panel');
-        document.getElementById('viewer-overlay').classList.add('active');
-        
-        p.style.setProperty('--col', spuData.color);
-        document.getElementById('v-icon').innerText = spuData.icon;
-        document.getElementById('v-icon').style.color = spuData.color;
-        document.getElementById('v-domain').innerText = spuData.category;
-        document.getElementById('v-domain').style.color = spuData.color;
-        document.getElementById('v-title').innerText = apiData.title;
-        
-        document.getElementById('v-hue').innerText = `${Math.round(spuData.hue)}° HZ`;
-        document.getElementById('v-hue').style.color = spuData.color;
-        document.getElementById('v-words').innerText = apiData.words.toLocaleString();
-        
-        document.getElementById('v-extract').innerText = apiData.extract;
-        document.getElementById('v-ikrw').innerText = spuData.ikrw;
-
-        const img = document.getElementById('v-image');
-        if(apiData.image) { img.src = apiData.image; img.style.display = 'block'; }
-        else { img.style.display = 'none'; }
-    },
-    close() {
-        document.getElementById('viewer-overlay').classList.remove('active');
-    }
-};
-
-/**
- * STREAMING_CHUNK: MODULE - App Controller (The Master Router)
- */
-const App = {
-    activeConcept: null, // Full merged object (API + SPU)
-    learnedConcepts: [], // Master memory array
-    
-    init() {
-        document.body.addEventListener('pointerdown', () => AudioDSP.init(), { once: true });
-        this.learnedConcepts = Storage.load();
-        
-        this.buildNav();
-        this.buildDiscoverSeeds();
-        this.route('discover');
-    },
-
-    buildNav() {
-        const nav = document.getElementById('evod-nav');
-        CONFIG.EVOD_STEPS.forEach((step, i) => {
-            const el = document.createElement('div');
-            el.className = `nav-item`;
-            el.id = `nav-${step.id}`;
-            el.onclick = () => this.route(step.id);
-            el.innerHTML = `<div class="n-badge">${i+1}</div> <span>${step.label}</span>`;
-            nav.appendChild(el);
-        });
-    },
-
-    buildDiscoverSeeds() {
-        const c = document.getElementById('discover-seeds');
-        CONFIG.SEEDS.forEach(s => {
-            const btn = document.createElement('button');
-            btn.className = 'glass-box px-6 py-4 flex font-disp font-bold text-xl hover:scale-105 transition';
-            btn.innerHTML = `<span style="color:${s.colorA}">${s.wordA}</span><span style="color:${s.colorB}">${s.wordB}</span>`;
-            btn.onclick = () => {
-                document.getElementById('omni-search').value = s.target;
-                this.executeSearch(s.target);
-            };
-            c.appendChild(btn);
-        });
-    },
-
-    route(panelId) {
-        if(navigator.vibrate) navigator.vibrate(10);
-        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active', 'completed'));
-        
-        const target = document.getElementById(`panel-${panelId}`);
-        if(target) target.classList.add('active');
-        
-        const navs = Array.from(document.querySelectorAll('.nav-item'));
-        const idx = navs.findIndex(n => n.id === `nav-${panelId}`);
-        navs.forEach((n, i) => {
-            if(i === idx) n.classList.add('active');
-            if(i < idx) n.classList.add('completed');
-        });
-
-        // JIT Graph Rendering
-        if(panelId === 'collaborate' && this.activeConcept) this.buildLocalGraph();
-        if(panelId === 'evolve') this.buildMasterGraph();
-    },
-
-    toast(msg) {
-        const t = document.getElementById('toast');
-        t.innerText = msg; t.classList.add('show');
-        setTimeout(() => t.classList.remove('show'), 3000);
-    },
-
-    async executeSearch(forceQuery = null) {
-        const query = forceQuery || document.getElementById('omni-search').value.trim();
-        if(!query) return;
-        
-        document.getElementById('omni-search').value = query;
-        this.route('learn');
-        
-        document.getElementById('search-loader').style.display = 'flex';
-        document.getElementById('search-results').innerHTML = '';
-
-        // 1. Fetch API Data & SPU Data in parallel
-        const spuData = SPU.analyze(query);
-        const apiData = await WikiAPI.fetchDetails(query);
-        
-        this.activeConcept = { ...apiData, spu: spuData };
-        document.getElementById('search-loader').style.display = 'none';
-
-        // 2. Render Result Card
-        document.getElementById('search-results').innerHTML = `
-            <div class="glass-box cursor-pointer hover:border-[${spuData.color}] transition group" onclick="Viewer.open(App.activeConcept, App.activeConcept.spu)">
-                <div class="flex items-center gap-4 mb-4">
-                    <span class="text-4xl filter drop-shadow-md group-hover:scale-110 transition">${spuData.icon}</span>
-                    <div>
-                        <h3 class="f-disp text-2xl font-bold text-white leading-tight">${apiData.title}</h3>
-                        <div class="text-[10px] uppercase tracking-widest font-bold mt-1" style="color:${spuData.color}">${spuData.category}</div>
-                    </div>
-                </div>
-                <p class="text-sm text-slate-300 line-clamp-3">${apiData.extract}</p>
-                <div class="mt-4 flex gap-2">
-                    <span class="bg-white/5 border border-white/10 px-3 py-1 rounded-full text-xs text-slate-400">🔗 ${apiData.links.length} Branches</span>
-                    <span class="bg-white/5 border border-white/10 px-3 py-1 rounded-full text-xs text-slate-400">📝 ${apiData.words} Words</span>
-                </div>
-            </div>
-        `;
-        
-        // Auto-open viewer
-        Viewer.open(this.activeConcept, spuData);
-    },
-
-    pushToFlow() {
-        Viewer.close();
-        
-        // Add to persistent memory if new
-        if(!this.learnedConcepts.find(c => c.title === this.activeConcept.title)) {
-            this.learnedConcepts.push({ title: this.activeConcept.title });
-            Storage.save(this.learnedConcepts);
-            this.toast(`Node Encoded: ${this.activeConcept.title}`);
         }
+    }
+
+    // Main fetch and process loop
+    async function fetchAndProcess(query) {
+        switchTab('learn');
+        const loader = document.getElementById('loader');
+        const results = document.getElementById('searchResults');
         
-        this.buildExperiencePanel();
-        this.route('experience');
-    },
+        loader.style.display = 'flex';
+        results.innerHTML = '';
 
-    buildExperiencePanel() {
-        const c = this.activeConcept;
-        document.getElementById('experience-container').innerHTML = `
-            <div class="text-left">
-                <div class="flex items-center gap-4 mb-4 pb-4 border-b border-white/10">
-                    <span class="text-4xl">${c.spu.icon}</span>
-                    <h3 class="f-disp text-2xl font-bold text-white">${c.title}</h3>
-                </div>
-                <div class="text-[10px] text-emerald-400 font-bold uppercase tracking-widest mb-2">Grounding Task</div>
-                <p class="text-lg text-white mb-6">${c.spu.ikrw}</p>
-                <label class="flex items-center justify-center gap-3 bg-emerald-500/20 border border-emerald-500/50 text-emerald-400 px-6 py-4 rounded-2xl cursor-pointer hover:bg-emerald-500/30 transition">
-                    <input type="checkbox" class="w-5 h-5 accent-emerald-500" onchange="if(this.checked) App.route('collaborate')">
-                    <span class="font-bold">I have completed this physical action.</span>
-                </label>
-            </div>
-        `;
+        let wikiData = await fetchWiki(query);
+        loader.style.display = 'none';
 
-        // Pre-build Contribute Panel
-        const safeTitle = encodeURIComponent(c.title.replace(/\s+/g,'_'));
-        document.getElementById('contribute-container').innerHTML = `
-            <a href="https://kids.miraheze.org/wiki/${safeTitle}?action=edit" target="_blank" class="btn-action !justify-start !bg-teal-500/20 !text-teal-400 border border-teal-500/50">
-                <span class="material-symbols-rounded">edit_document</span> Edit on Kids Wiki
-            </a>
-            <a href="https://github.com/bhearth/khela/new/main/pages?filename=${safeTitle}.md" target="_blank" class="btn-action !justify-start !bg-violet-500/20 !text-violet-400 border border-violet-500/50">
-                <span class="material-symbols-rounded">code</span> Map to GitHub Repo
-            </a>
-            <a href="https://www.google.com/search?q=${safeTitle}+facts+for+kids" target="_blank" class="btn-action !justify-start !bg-amber-500/20 !text-amber-400 border border-amber-500/50">
-                <span class="material-symbols-rounded">travel_explore</span> Search Google Knowledge
-            </a>
-            <div class="mt-4 text-center">
-                <button class="text-sm text-slate-400 hover:text-white font-bold underline" onclick="App.route('evolve')">Skip to Master Evolution Map</button>
-            </div>
-        `;
-    },
-
-    buildLocalGraph() {
-        if(!this.activeConcept) return;
-        const c = this.activeConcept;
-        const satellites = c.links.slice(0, 8).map(title => ({ title }));
-        WonderGraph.render('local-graph', { title: c.title }, satellites, 'orbit');
-    },
-
-    buildMasterGraph() {
-        if(this.learnedConcepts.length === 0) {
-            document.getElementById('master-nodes').innerHTML = '<div class="absolute inset-0 flex items-center justify-center text-slate-500">Search concepts to map your universe.</div>';
-            document.getElementById('master-svg').innerHTML = '';
+        if (!wikiData) {
+            results.innerHTML = `<p style="color:#ef4444;">Concept "${query}" not found. Try another word.</p>`;
             return;
         }
-        
-        WonderGraph.render('master-graph', { title: 'Explorer' }, this.learnedConcepts, 'flower');
-    }
-};
 
-// Ignite!
-window.onload = () => App.init();
+        const cat = classify(wikiData.title, wikiData.extract);
+        
+        const concept = {
+            id: Date.now().toString(),
+            title: wikiData.title,
+            extract: wikiData.extract,
+            image: wikiData.image,
+            category: cat.id,
+            color: cat.color,
+            icon: cat.icon,
+            expPrompt: cat.exp(wikiData.title),
+            contPrompt: cat.cont(wikiData.title)
+        };
+
+        state.currentConcept = concept;
+        
+        // Save if not already learned
+        if (!state.learned.find(c => c.title.toLowerCase() === concept.title.toLowerCase())) {
+            state.learned.push(concept);
+            localStorage.setItem('khelo_learned', JSON.stringify(state.learned));
+        }
+
+        // Render card
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+            <div style="display:flex; align-items:center; gap:10px;">
+                <span class="card-icon">${concept.icon}</span>
+                <span style="color:${concept.color}; font-size:0.8rem; font-weight:bold; text-transform:uppercase;">${concept.category}</span>
+            </div>
+            <div class="card-title">${concept.title}</div>
+            <div class="card-desc">${concept.extract}</div>
+        `;
+        card.onclick = () => openViewer(concept);
+        results.appendChild(card);
+        
+        updateSubsequentTabs();
+    }
+
+    /* =========================================================================
+       3. UI & RENDERERS
+       ========================================================================= */
+
+    // Tab Switching
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const tab = e.currentTarget.getAttribute('data-tab');
+            switchTab(tab);
+        });
+    });
+
+    function switchTab(tabId) {
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        
+        document.querySelector(`.nav-btn[data-tab="${tabId}"]`).classList.add('active');
+        document.getElementById(`tab-${tabId}`).classList.add('active');
+
+        // Close sidebar on mobile
+        document.getElementById('sidebar').classList.remove('open');
+
+        // Graph rendering protection (Black Screen Fix)
+        if (tabId === 'collaborate') renderCollaborateGraph();
+        if (tabId === 'evolve') renderEvolveGraph();
+    }
+
+    // Mobile Toggle
+    document.getElementById('mobileToggle').addEventListener('click', () => {
+        document.getElementById('sidebar').classList.toggle('open');
+    });
+
+    // Populate Discover
+    const jgrid = document.getElementById('jumbleGrid');
+    JUMBLES.forEach(j => {
+        let btn = document.createElement('button');
+        btn.className = 'jumble-btn';
+        btn.innerText = j.scrambled;
+        btn.onclick = () => unscramble(btn, j.clear);
+        jgrid.appendChild(btn);
+    });
+
+    // Viewer Logic
+    const viewer = document.getElementById('viewer');
+    const vContent = document.getElementById('viewerContent');
+    
+    function openViewer(concept) {
+        const encTitle = encodeURIComponent(concept.title);
+        
+        let html = `
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+                <span style="font-size:2rem;">${concept.icon}</span>
+                <span class="viewer-tag" style="background:${concept.color}20; color:${concept.color}; border:1px solid ${concept.color}50;">${concept.category}</span>
+            </div>
+            <div class="viewer-title">${concept.title}</div>
+            ${concept.image ? `<img src="${concept.image}" class="viewer-img" alt="${concept.title}">` : ''}
+            
+            <button class="btn-primary" style="display:flex; align-items:center; justify-content:center; gap:10px; padding:10px;" onclick="readAloud('${concept.title}. ${concept.extract.replace(/'/g, "\\'")}')">
+                🔊 Read Aloud
+            </button>
+
+            <div class="viewer-extract">${concept.extract}</div>
+            
+            <div class="action-box">
+                <h4 style="color:var(--accent);">🏃 IKRw Experience Protocol</h4>
+                <p>${concept.expPrompt}</p>
+            </div>
+
+            <div class="action-box">
+                <h4 style="color:#a855f7;">✍️ Contribution Task</h4>
+                <p>${concept.contPrompt}</p>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <a href="https://kids.miraheze.org/wiki/${encTitle}?action=edit" target="_blank" class="btn-link btn-miraheze">📝 Edit on Kids Miraheze</a>
+                <a href="https://github.com/bhearth/khela/new/main/pages?filename=${encTitle}.md&value=${encodeURIComponent('# '+concept.title+'\n\n'+concept.contPrompt)}" target="_blank" class="btn-link btn-github">🐙 Create GitHub Subpage</a>
+                <a href="https://www.google.com/search?q=${encTitle}+facts+for+kids" target="_blank" class="btn-link btn-google">🔍 Google Knowledge Fallback</a>
+            </div>
+        `;
+        
+        vContent.innerHTML = html;
+        viewer.classList.add('open');
+        viewer.setAttribute('aria-hidden', 'false');
+    }
+
+    document.getElementById('closeViewer').addEventListener('click', () => {
+        viewer.classList.remove('open');
+        viewer.setAttribute('aria-hidden', 'true');
+        window.speechSynthesis.cancel();
+    });
+
+    // Update other tabs
+    function updateSubsequentTabs() {
+        // Experience Tab
+        const expList = document.getElementById('experienceList');
+        expList.innerHTML = state.learned.map(c => `
+            <div class="card" style="border-left: 4px solid ${c.color}">
+                <div class="card-title">${c.icon} ${c.title}</div>
+                <div class="card-desc" style="color:#fff;">${c.expPrompt}</div>
+            </div>
+        `).join('');
+
+        // Contribute Tab
+        const contList = document.getElementById('contributeList');
+        contList.innerHTML = state.learned.map(c => `
+            <div class="card" style="border-left: 4px solid ${c.color}" onclick="openViewer(state.learned.find(x=>x.id==='${c.id}'))">
+                <div class="card-title">${c.icon} ${c.title}</div>
+                <div class="card-desc">${c.contPrompt}</div>
+                <div style="font-size:0.8rem; color:var(--accent); margin-top:5px;">Tap to open contribution links →</div>
+            </div>
+        `).join('');
+    }
+
+    /* =========================================================================
+       4. GRAPHING ENGINE (Fixing Black Screen via ClientWidth check)
+       ========================================================================= */
+    
+    function drawNode(container, c, x, y, size=50) {
+        let el = document.createElement('div');
+        el.className = 'node';
+        el.style.left = `${x}px`;
+        el.style.top = `${y}px`;
+        el.style.color = c.color;
+        el.innerHTML = `
+            <div class="node-dot" style="width:${size}px; height:${size}px; font-size:${size*0.4}px;">${c.icon}</div>
+            <div class="node-label">${c.title}</div>
+        `;
+        el.onclick = () => openViewer(c);
+        container.appendChild(el);
+    }
+
+    function drawLine(svg, x1, y1, x2, y2, color) {
+        let line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", x1); line.setAttribute("y1", y1);
+        line.setAttribute("x2", x2); line.setAttribute("y2", y2);
+        line.setAttribute("stroke", color);
+        line.setAttribute("stroke-width", "2");
+        line.setAttribute("stroke-dasharray", "5,5");
+        line.style.opacity = "0.4";
+        svg.appendChild(line);
+    }
+
+    // Collaborate Graph: Current concept and pseudo-related concepts radially
+    function renderCollaborateGraph() {
+        const wrap = document.getElementById('collabGraph');
+        if(wrap.clientWidth === 0) return; // Black screen fix
+        
+        const svg = document.getElementById('collabSvg');
+        const nodesDiv = document.getElementById('collabNodes');
+        svg.innerHTML = ''; nodesDiv.innerHTML = '';
+
+        const c = state.currentConcept;
+        if(!c) {
+            nodesDiv.innerHTML = `<div style="text-align:center; padding-top:100px; color:var(--text-muted);">Search a concept first to see connections.</div>`;
+            return;
+        }
+
+        const cx = wrap.clientWidth / 2;
+        const cy = wrap.clientHeight / 2;
+        const r = Math.min(cx, cy) - 50;
+
+        // Draw Center
+        drawNode(nodesDiv, c, cx, cy, 70);
+
+        // Mock related nodes based on words in extract
+        let words = c.extract.split(' ').filter(w => w.length > 5).slice(0, 5);
+        words.forEach((w, i) => {
+            let cat = CATEGORIES[i % CATEGORIES.length];
+            let angle = (i / words.length) * Math.PI * 2;
+            let nx = cx + Math.cos(angle) * r;
+            let ny = cy + Math.sin(angle) * r;
+            
+            drawLine(svg, cx, cy, nx, ny, c.color);
+            drawNode(nodesDiv, {title: w.replace(/[^a-zA-Z]/g,''), icon: cat.icon, color: cat.color}, nx, ny, 40);
+        });
+    }
+
+    // Evolve Graph: All learned concepts in chosen layout
+    function renderEvolveGraph() {
+        const wrap = document.getElementById('evolveGraph');
+        if(wrap.clientWidth === 0) return; // Black screen fix
+
+        const svg = document.getElementById('evolveSvg');
+        const nodesDiv = document.getElementById('evolveNodes');
+        svg.innerHTML = ''; nodesDiv.innerHTML = '';
+
+        if(state.learned.length === 0) {
+            nodesDiv.innerHTML = `<div style="text-align:center; padding-top:100px; color:var(--text-muted);">Your journey is empty. Discover concepts to grow the tree.</div>`;
+            return;
+        }
+
+        const cx = wrap.clientWidth / 2;
+        const cy = wrap.clientHeight / 2;
+        const layout = state.activeLayout;
+
+        state.learned.forEach((c, i) => {
+            let nx, ny;
+            if (layout === 'spiral') {
+                // Fibonacci Spiral
+                const angle = i * 137.508 * (Math.PI / 180);
+                const r = 35 * Math.sqrt(i);
+                nx = cx + Math.cos(angle) * r;
+                ny = cy + Math.sin(angle) * r;
+                // Connect to previous
+                if(i > 0) {
+                    let pa = (i-1) * 137.508 * (Math.PI / 180);
+                    let pr = 35 * Math.sqrt(i-1);
+                    drawLine(svg, cx + Math.cos(pa)*pr, cy + Math.sin(pa)*pr, nx, ny, c.color);
+                }
+            } else if (layout === 'grid') {
+                // Grid
+                const cols = Math.ceil(Math.sqrt(state.learned.length));
+                const spacing = 100;
+                const startX = cx - ((cols-1) * spacing)/2;
+                const startY = cy - ((Math.ceil(state.learned.length/cols)-1) * spacing)/2;
+                nx = startX + (i % cols) * spacing;
+                ny = startY + Math.floor(i / cols) * spacing;
+                // Connect to previous in row
+                if(i % cols !== 0) {
+                    drawLine(svg, nx - spacing, ny, nx, ny, c.color);
+                }
+                // Connect to top
+                if(i >= cols) {
+                    drawLine(svg, nx, ny - spacing, nx, ny, c.color);
+                }
+            } else if (layout === 'radial') {
+                // Radial
+                if(i === 0) { nx = cx; ny = cy; }
+                else {
+                    const r = 120 + Math.floor(i/8)*60;
+                    const angle = (i % 8) * (Math.PI / 4) + (Math.floor(i/8)*0.2);
+                    nx = cx + Math.cos(angle) * r;
+                    ny = cy + Math.sin(angle) * r;
+                    drawLine(svg, cx, cy, nx, ny, state.learned[0].color);
+                }
+            }
+            drawNode(nodesDiv, c, nx, ny, 50);
+        });
+    }
+
+    // Graph Layout Controls
+    document.querySelectorAll('.layout-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            document.querySelectorAll('.layout-btn').forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+            state.activeLayout = e.target.getAttribute('data-layout');
+            renderEvolveGraph();
+        });
+    });
+
+    window.addEventListener('resize', () => {
+        if(document.getElementById('tab-collaborate').classList.contains('active')) renderCollaborateGraph();
+        if(document.getElementById('tab-evolve').classList.contains('active')) renderEvolveGraph();
+    });
+
+    /* =========================================================================
+       5. ACCESSIBILITY & EVENTS
+       ========================================================================= */
+
+    // Text to Speech
+    function readAloud(text) {
+        if(!('speechSynthesis' in window)) return alert("Speech Synthesis not supported in this browser.");
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 0.9;
+        window.speechSynthesis.speak(utterance);
+    }
+
+    // Search Logic
+    document.getElementById('searchBtn').addEventListener('click', () => {
+        const q = document.getElementById('searchInput').value;
+        if(q) fetchAndProcess(q);
+    });
+    document.getElementById('searchInput').addEventListener('keypress', (e) => {
+        if(e.key === 'Enter') document.getElementById('searchBtn').click();
+    });
+
+    // Web Speech API Voice Search
+    const micBtn = document.getElementById('micBtn');
+    if('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+
+        recognition.onstart = () => micBtn.classList.add('recording');
+        recognition.onend = () => micBtn.classList.remove('recording');
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            document.getElementById('searchInput').value = transcript;
+            fetchAndProcess(transcript);
+        };
+
+        micBtn.addEventListener('click', () => {
+            try { recognition.start(); } catch(e) { recognition.stop(); }
+        });
+    } else {
+        micBtn.style.display = 'none';
+    }
+
+    // Initial load
+    updateSubsequentTabs();
 </script>
 </body>
 </html>
