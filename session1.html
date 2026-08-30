@@ -3,1507 +3,619 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Khel.o · Session 1: Core Kernel & SPU Engine</title>
+<title>Khel.o · Hyper-OS Master Edition (v1.0)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700;800&family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
-  /* GLOBAL HOST STYLES (Minimal, just to hold the plugin) */
-  body { margin: 0; background: #02040a; font-family: system-ui, sans-serif; overflow: hidden; height: 100vh; }
-  #khel-plugin-container { width: 100%; height: 100%; }
+/* ══════════════════════════════════════════════════════════
+   GLOBAL RESET & CSS VARIABLES (Consolidated from Sessions 1-5)
+   ═══════════════════════════════════════════════════════════ */
+:root {
+    --bg-void: #02040a; --panel-bg: rgba(10, 15, 25, 0.9); --panel-edge: rgba(255, 255, 255, 0.08);
+    --text-main: #f8fafc; --text-muted: #94a3b8;
+    --gold: #fbbf24; --accent: #38bdf8; --emerald: #10b981; --rose: #f43f5e; --violet: #a855f7;
+    --font-ui: 'Inter', sans-serif; --font-disp: 'Space Grotesk', sans-serif; --font-mono: 'JetBrains Mono', monospace;
+    --sidebar-w: 260px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body { 
+    background: var(--bg-void); color: var(--text-main); font-family: var(--font-ui); 
+    overflow: hidden; height: 100vh; touch-action: none;
+    transition: filter 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+/* Tri-State Consciousness Filters */
+body.mode-sat { filter: grayscale(60%) contrast(1.1); }
+body.mode-chit { filter: none; }
+body.mode-anand { filter: saturate(1.3) brightness(1.05) contrast(1.05); }
+
+/* ═══════════════════════════════════════════════════════════
+   LAYOUT SHELL
+   ═══════════════════════════════════════════════════════════ */
+.app-shell { display: flex; height: 100vh; overflow: hidden; position: relative; z-index: 10; }
+.sidebar {
+    width: var(--sidebar-w); background: rgba(3, 6, 12, 0.95);
+    border-right: 1px solid var(--panel-edge); display: flex; flex-direction: column;
+    padding: 24px 16px; z-index: 50; flex-shrink: 0; backdrop-filter: blur(20px);
+}
+.brand { font-size: 1.8rem; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-family: var(--font-disp);}
+.brand span { color: var(--accent); animation: pulse 2s infinite;}
+.brand-sub { font-size: 0.65rem; color: var(--text-muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 30px; font-family: var(--font-mono);}
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+.nav-item {
+    display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 16px;
+    color: var(--text-muted); font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: 0.2s;
+    border: 1px solid transparent; margin-bottom: 6px; background: none; width: 100%; text-align: left;
+}
+.nav-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+.nav-item.active { background: rgba(56, 189, 248, 0.1); border-color: rgba(56, 189, 248, 0.3); color: #fff; }
+.nav-item .n-badge {
+    width: 26px; height: 26px; border-radius: 50%; background: var(--panel-edge); color: #fff;
+    display: flex; align-items: center; justify-content: center; font-size: 0.75rem; flex-shrink: 0; font-family: var(--font-mono);
+}
+.nav-item.active .n-badge { background: var(--accent); color: #000; }
+
+.tri-state-toggle { margin-top: auto; display: flex; gap: 6px; padding: 8px; background: rgba(0,0,0,0.4); border-radius: 16px; border: 1px solid var(--panel-edge); }
+.ts-btn { flex: 1; padding: 10px 4px; border-radius: 10px; text-align: center; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; color: var(--text-muted); transition: 0.2s; border: 1px solid transparent; background: none;}
+.ts-btn.active { color: #000; }
+.ts-btn[data-mode="sat"].active { background: #94a3b8; }
+.ts-btn[data-mode="chit"].active { background: var(--accent); }
+.ts-btn[data-mode="anand"].active { background: var(--gold); }
+
+main { flex: 1; position: relative; background: transparent; overflow-y: auto; overflow-x: hidden; scroll-behavior: smooth;}
+.panel { display: none; padding: 40px; max-width: 1000px; margin: 0 auto; animation: fadeUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+.panel.active { display: block; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+.panel-title { font-size: 2.2rem; font-weight: 800; color: #fff; margin-bottom: 12px; display: flex; align-items: center; gap: 12px; font-family: var(--font-disp); }
+.panel-desc { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 30px; line-height: 1.6; max-width: 600px; }
+
+/* ═══════════════════════════════════════════════════════════
+   COMPONENT STYLES (Consolidated)
+   ═══════════════════════════════════════════════════════════ */
+/* S1: Radicals */
+.radical-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 12px; }
+.radical-card { 
+    background: rgba(255,255,255,0.03); border: 1px solid var(--panel-edge); border-radius: 16px; 
+    padding: 20px 10px; text-align: center; cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; align-items: center; gap: 8px;
+}
+.radical-card:hover { background: rgba(255,255,255,0.08); transform: translateY(-4px); }
+.radical-card .r-icon { font-size: 2rem; }
+.radical-card .r-name { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); }
+
+/* S2: Search & Cards */
+.search-wrap { display: flex; align-items: center; gap: 12px; background: rgba(0,0,0,0.4); border: 2px solid var(--panel-edge); border-radius: 30px; padding: 8px 8px 8px 24px; max-width: 600px; margin-bottom: 30px;}
+.search-wrap input { flex: 1; background: transparent; border: none; color: #fff; font-size: 1.1rem; outline: none; }
+.search-btn { width: 44px; height: 44px; border-radius: 50%; background: var(--accent); border: none; color: #000; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.result-card { 
+    background: rgba(255,255,255,0.03); border: 1px solid var(--panel-edge); border-radius: 20px; 
+    padding: 24px; cursor: pointer; transition: 0.3s; display: flex; gap: 20px; align-items: flex-start; margin-bottom: 16px;
+}
+.result-card:hover { background: rgba(255,255,255,0.06); border-color: var(--accent); transform: translateX(8px); }
+.result-icon { font-size: 2.5rem; }
+.result-title { font-family: var(--font-disp); font-size: 1.4rem; font-weight: 700; margin-bottom: 8px; }
+.result-desc { font-size: 0.95rem; color: var(--text-muted); line-height: 1.6; }
+
+/* S3: Crafting */
+.k3-crucible {
+    display: flex; justify-content: center; align-items: center; gap: 20px;
+    background: rgba(0,0,0,0.3); border: 2px dashed rgba(255,255,255,0.1);
+    border-radius: 24px; padding: 40px 20px; margin-bottom: 30px; min-height: 160px; position: relative;
+}
+.k3-slot {
+    width: 80px; height: 80px; border-radius: 50%;
+    background: rgba(255,255,255,0.03); border: 2px solid rgba(255,255,255,0.1);
+    display: flex; align-items: center; justify-content: center; font-size: 2.5rem; transition: 0.3s;
+}
+.k3-slot.filled { border-style: solid; }
+.k3-inventory { display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 12px; }
+.k3-orb {
+    aspect-ratio: 1; border-radius: 16px; background: rgba(255,255,255,0.03);
+    border: 2px solid rgba(255,255,255,0.08); display: flex; flex-direction: column;
+    align-items: center; justify-content: center; cursor: pointer; transition: 0.2s;
+}
+.k3-orb:hover { background: rgba(255,255,255,0.08); transform: translateY(-4px); }
+.k3-orb-icon { font-size: 1.8rem; margin-bottom: 4px; }
+.k3-orb-name { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); }
+
+/* S4: Graph */
+.graph-container { 
+    position: relative; background: rgba(0,0,0,0.3); border: 1px solid var(--panel-edge); border-radius: 24px; 
+    width: 100%; height: 500px; overflow: hidden; 
+    background-image: radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px); background-size: 30px 30px;
+}
+.dot-node {
+    position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    border-radius: 50%; cursor: pointer; text-align: center; background: rgba(5,7,12,0.95);
+    border: 2px solid; backdrop-filter: blur(8px); transform: translate(-50%, -50%) scale(0);
+    animation: popNode 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; transition: transform 0.3s, box-shadow 0.3s; z-index: 10;
+}
+body.mode-sat .dot-node { border-radius: 12px; }
+body.mode-anand .dot-node { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; }
+.dot-node:hover { transform: translate(-50%, -50%) scale(1.25); z-index: 20; box-shadow: 0 0 30px currentColor !important;}
+@keyframes popNode { to { transform: translate(-50%, -50%) scale(1); } }
+.dot-label { position: absolute; top: 115%; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; color: #fff; opacity: 0.8; pointer-events: none;}
+
+/* S5: EVOD & Drawer */
+.k5-flow-bar {
+    position: fixed; bottom: 0; left: 0; right: 0; height: 60px;
+    background: rgba(2, 4, 10, 0.95); backdrop-filter: blur(12px);
+    border-top: 1px solid var(--panel-edge); z-index: 90;
+    display: flex; align-items: center; justify-content: space-around; padding: 0 10px;
+}
+.k5-flow-step { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; opacity: 0.4; transition: 0.3s; }
+.k5-flow-step.active { opacity: 1; }
+.k5-flow-step .k5-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-muted); transition: 0.3s; }
+.k5-flow-step.active .k5-dot { background: var(--accent); box-shadow: 0 0 10px var(--accent); transform: scale(1.5); }
+.k5-flow-step span { font-size: 0.55rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); }
+.k5-flow-step.active span { color: #fff; }
+
+/* FMEA HUD & Toasts */
+#fmea-hud { position: fixed; top: 20px; right: 20px; background: rgba(0,0,0,0.8); border: 1px solid var(--panel-edge); border-radius: 12px; padding: 12px; font-family: var(--font-mono); font-size: 0.7rem; color: var(--emerald); z-index: 1000; backdrop-filter: blur(10px); display: none;}
+#toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: var(--emerald); color: #000; padding: 12px 24px; border-radius: 30px; font-weight: 800; font-size: 0.9rem; opacity: 0; transition: 0.3s; pointer-events: none; z-index: 1000;}
+#toast.show { opacity: 1; transform: translateX(-50%) translateY(-10px); }
+
+@media (max-width: 768px) {
+    .app-shell { flex-direction: column; }
+    .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--panel-edge); padding: 12px; flex-direction: row; overflow-x: auto; white-space: nowrap; gap: 8px; align-items: center; }
+    .brand, .brand-sub, .tri-state-toggle { display: none; }
+    .nav-item { padding: 10px 14px; min-height: 44px; margin-bottom: 0; font-size: 0.85rem; }
+    main { padding: 20px; }
+    .panel-title { font-size: 1.6rem; }
+}
 </style>
 </head>
-<body>
+<body class="mode-chit">
 
-<!-- THE SACRED CONTAINER: All UI must be injected here -->
-<div id="khel-plugin-container"></div>
+<!-- FMEA SHIELD HUD -->
+<div id="fmea-hud">SYSTEM: NOMINAL<br>MODULES: 5/5 ACTIVE</div>
+<div id="toast"></div>
+
+<div class="app-shell">
+    <aside class="sidebar">
+        <div class="brand">Khel<span>.</span>o</div>
+        <div class="brand-sub">Hyper-OS v1.0</div>
+        <nav id="main-nav">
+            <button class="nav-item active" data-panel="discover"><span class="n-badge">1</span> Discover</button>
+            <button class="nav-item" data-panel="learn"><span class="n-badge">2</span> Learn</button>
+            <button class="nav-item" data-panel="experience"><span class="n-badge">3</span> Experience</button>
+            <button class="nav-item" data-panel="collaborate"><span class="n-badge">4</span> Collaborate</button>
+            <button class="nav-item" data-panel="evolve"><span class="n-badge">5</span> Evolve</button>
+        </nav>
+        <div class="tri-state-toggle">
+            <button class="ts-btn" data-mode="sat">Sat</button>
+            <button class="ts-btn active" data-mode="chit">Chit</button>
+            <button class="ts-btn" data-mode="anand">Anand</button>
+        </div>
+    </aside>
+
+    <main>
+        <!-- PANEL 1: DISCOVER -->
+        <section class="panel active" id="panel-discover">
+            <div class="panel-title">The 24 Radicals</div>
+            <p class="panel-desc">Tap a foundational element of the universe to begin your compilation journey.</p>
+            <div class="radical-grid" id="radical-container"></div>
+        </section>
+
+        <!-- PANEL 2: LEARN -->
+        <section class="panel" id="panel-learn">
+            <div class="panel-title">Semantic Search</div>
+            <p class="panel-desc">Type a concept. The NPU will extract its essence and map its connections.</p>
+            <div class="search-wrap">
+                <input type="text" id="conceptSearch" placeholder="e.g., Photosynthesis, Gravity..." autocomplete="off">
+                <button class="search-btn" id="searchBtn">→</button>
+            </div>
+            <div id="search-results"></div>
+        </section>
+
+        <!-- PANEL 3: EXPERIENCE -->
+        <section class="panel" id="panel-experience">
+            <div class="panel-title">Knowledge Crafting</div>
+            <p class="panel-desc">Combine mastered concepts to synthesize new knowledge.</p>
+            <div class="k3-crucible">
+                <div class="k3-slot" id="slot1"></div>
+                <div style="font-size: 2rem; color: var(--text-muted);">+</div>
+                <div class="k3-slot" id="slot2"></div>
+            </div>
+            <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px;">Your Inventory</div>
+            <div class="k3-inventory" id="inventory-grid"></div>
+        </section>
+
+        <!-- PANEL 4: COLLABORATE -->
+        <section class="panel" id="panel-collaborate">
+            <div class="panel-title">Wonder Graph</div>
+            <p class="panel-desc">Your compiled concepts mapped spatially. (Tri-State Layout Active)</p>
+            <div class="graph-container" id="graph-container">
+                <svg id="graph-svg" style="position:absolute; inset:0; width:100%; height:100%; pointer-events:none;"></svg>
+                <div id="graph-nodes" style="position:absolute; inset:0;"></div>
+            </div>
+        </section>
+
+        <!-- PANEL 5: EVOLVE -->
+        <section class="panel" id="panel-evolve">
+            <div class="panel-title">Karma Ledger & Connectors</div>
+            <p class="panel-desc">Your permanent universe. Export your knowledge to the global commons.</p>
+            <div id="ledger-stats" style="background: rgba(255,255,255,0.03); padding: 20px; border-radius: 16px; margin-bottom: 20px; border: 1px solid var(--panel-edge);">
+                <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Total Compiled Concepts</div>
+                <div id="ledger-count" style="font-size: 2.5rem; font-weight: 800; color: var(--emerald); font-family: var(--font-disp);">0</div>
+            </div>
+            <button class="search-btn" style="width: 100%; border-radius: 12px; height: 50px; font-weight: 700;" onclick="KhelOS.modules[5].actions.openConnectors()">Open Universal Connectors</button>
+        </section>
+    </main>
+</div>
+
+<!-- S5: EVOD FLOW BAR -->
+<div class="k5-flow-bar" id="evod-bar">
+    <div class="k5-flow-step active" data-stage="0"><div class="k5-dot"></div><span>Discover</span></div>
+    <div class="k5-flow-step" data-stage="1"><div class="k5-dot"></div><span>Meet</span></div>
+    <div class="k5-flow-step" data-stage="2"><div class="k5-dot"></div><span>Learn</span></div>
+    <div class="k5-flow-step" data-stage="3"><div class="k5-dot"></div><span>Experience</span></div>
+    <div class="k5-flow-step" data-stage="4"><div class="k5-dot"></div><span>Participate</span></div>
+    <div class="k5-flow-step" data-stage="5"><div class="k5-dot"></div><span>Contribute</span></div>
+    <div class="k5-flow-step" data-stage="6"><div class="k5-dot"></div><span>Evolve</span></div>
+</div>
 
 <script>
 /* ═══════════════════════════════════════════════════════════
-   KHEL.OS META-CONTRACT (SESSION SYNC & ERROR ARREST PROTOCOL)
+   KHEL.OS MASTER COMPILER (SESSION 6)
+   Architecture: Global FMEA Shield + Modular Plugin Registry
    ══════════════════════════════════════════════════════════ */
+
+// 1. GLOBAL FMEA SHIELD (Error Arrest Protocol)
+window.onerror = function(msg, url, line) {
+    console.error(`[FMEA SHIELD] Global Error Caught: ${msg} at line ${line}`);
+    document.getElementById('fmea-hud').innerHTML = `SYSTEM: DEGRADED<br>ERROR: ${msg.substring(0, 30)}...`;
+    document.getElementById('fmea-hud').style.display = 'block';
+    document.getElementById('fmea-hud').style.borderColor = 'var(--rose)';
+    document.getElementById('fmea-hud').style.color = 'var(--rose)';
+    return true; // Prevent default browser error handling
+};
+
 const KhelOS = {
-    registry: {},
-    logs: [],
-    register: function(sessionId, plugin) {
+    modules: {},
+    state: { currentPanel: 'discover', mode: 'chit' },
+    
+    register: function(id, module) {
         try {
-            if (!plugin.init || !plugin.destroy) throw new Error("Missing init/destroy methods");
-            
-            // Auto-namespace CSS
-            if (plugin.css) {
-                const style = document.createElement('style');
-                style.id = `k${sessionId}-styles`;
-                style.textContent = plugin.css; 
-                document.head.appendChild(style);
-            }
-            
-            // Isolate DOM
-            const container = document.getElementById('khel-plugin-container');
-            if (!container) throw new Error("Missing #khel-plugin-container");
-            container.innerHTML = `<div id="k${sessionId}-root">${plugin.html || ''}</div>`;
-            
-            // Initialize safely
-            plugin.init();
-            this.registry[sessionId] = plugin;
-            this.logs.push(`[OK] Session ${sessionId} loaded successfully.`);
-            console.log(`%c[KhelOS] Session ${sessionId} Active`, 'color: #10b981; font-weight: bold;');
-        } catch (e) {
-            this.logs.push(`[CRITICAL] Session ${sessionId} failed: ${e.message}`);
-            console.error(`[KhelOS] Session ${sessionId} crashed and was isolated.`, e);
-            if(container) container.innerHTML = `<div style="color:red; padding:20px;">System Error: ${e.message}</div>`;
+            if(module.init) module.init();
+            this.modules[id] = module;
+            this.updateHUD();
+            console.log(`[KhelOS] Module ${id} loaded successfully.`);
+        } catch(e) {
+            console.error(`[KhelOS] Module ${id} failed to initialize:`, e);
         }
     },
-    unload: function(sessionId) {
-        if (this.registry[sessionId]) {
-            if(this.registry[sessionId].destroy) this.registry[sessionId].destroy();
-            delete this.registry[sessionId];
-            document.getElementById(`k${sessionId}-root`)?.remove();
-            document.getElementById(`k${sessionId}-styles`)?.remove();
+
+    updateHUD: function() {
+        const count = Object.keys(this.modules).length;
+        const hud = document.getElementById('fmea-hud');
+        if(count === 5) {
+            hud.innerHTML = `SYSTEM: NOMINAL<br>MODULES: 5/5 ACTIVE`;
+            hud.style.display = 'block';
+            setTimeout(() => hud.style.display = 'none', 3000); // Hide after boot
         }
+    },
+
+    showToast: function(msg) {
+        const t = document.getElementById('toast');
+        t.innerText = msg; t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 2500);
     }
 };
 
-/* ═══════════════════════════════════════════════════════════
-   SESSION 1: CORE KERNEL & SPU ENGINE
-   ═══════════════════════════════════════════════════════════ */
-const Session1_CoreKernel = {
-    // --- ISOLATED CSS (Namespaced with k1-) ---
-    css: `
-        :root {
-            --k1-bg: #02040a; --k1-panel: rgba(10, 15, 25, 0.9); --k1-edge: rgba(255, 255, 255, 0.08);
-            --k1-text: #f8fafc; --k1-muted: #94a3b8;
-            --k1-accent: #38bdf8; --k1-emerald: #10b981; --k1-gold: #fbbf24;
-        }
-        #k1-root {
-            display: flex; flex-direction: column; height: 100vh; padding: 20px; box-sizing: border-box;
-            background: var(--k1-bg); color: var(--k1-text); overflow-y: auto;
-        }
-        .k1-header { text-align: center; margin-bottom: 30px; }
-        .k1-title { font-size: 1.8rem; font-weight: 800; letter-spacing: 1px; margin: 0; 
-                    background: linear-gradient(135deg, var(--k1-accent), var(--k1-emerald)); 
-                    -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .k1-subtitle { font-size: 0.8rem; color: var(--k1-muted); text-transform: uppercase; letter-spacing: 2px; margin-top: 5px; }
-        
-        .k1-input-wrap { max-width: 600px; margin: 0 auto 30px; position: relative; }
-        .k1-input { width: 100%; padding: 16px 20px; border-radius: 30px; border: 2px solid var(--k1-edge);
-                    background: rgba(0,0,0,0.4); color: #fff; font-size: 1.1rem; outline: none; transition: 0.3s; box-sizing: border-box;}
-        .k1-input:focus { border-color: var(--k1-accent); box-shadow: 0 0 20px rgba(56,189,248,0.2); }
-        
-        .k1-spu-display { max-width: 600px; margin: 0 auto 40px; text-align: center; }
-        .k1-hex-code { font-family: 'Courier New', monospace; font-size: 1.5rem; color: var(--k1-accent); 
-                       letter-spacing: 4px; background: rgba(56,189,248,0.1); padding: 10px 20px; 
-                       border-radius: 12px; display: inline-block; border: 1px solid rgba(56,189,248,0.3); }
-        .k1-label { font-size: 0.7rem; color: var(--k1-muted); text-transform: uppercase; margin-top: 10px; letter-spacing: 1px; }
+// 2. SHARED DATA (The 24 Radicals & Lexicon)
+const RADICALS = [
+    { id: 'truti', name: 'Seed', icon: '', color: '#10b981', hue: 140 },
+    { id: 'jiva', name: 'Life', icon: '🧬', color: '#34d399', hue: 150 },
+    { id: 'prakriti', name: 'Earth', icon: '🌍', color: '#10b981', hue: 140 },
+    { id: 'agni', name: 'Energy', icon: '⚡', color: '#f59e0b', hue: 40 },
+    { id: 'jal', name: 'Flow', icon: '💧', color: '#38bdf8', hue: 200 },
+    { id: 'vayu', name: 'Air', icon: '🌬️', color: '#94a3b8', hue: 210 },
+    { id: 'akasha', name: 'Space', icon: '🌌', color: '#8b5cf6', hue: 260 },
+    { id: 'manas', name: 'Mind', icon: '🧠', color: '#ec4899', hue: 330 },
+    { id: 'buddhi', name: 'Logic', icon: '', color: '#6366f1', hue: 240 },
+    { id: 'atma', name: 'Soul', icon: '◎', color: '#fbbf24', hue: 50 },
+    { id: 'karma', name: 'Action', icon: '⚙️', color: '#64748b', hue: 210 },
+    { id: 'dharma', name: 'Duty', icon: '⚖️', color: '#f43f5e', hue: 350 },
+    { id: 'artha', name: 'Resource', icon: '', color: '#14b8a6', hue: 160 },
+    { id: 'kama', name: 'Desire', icon: '🧲', color: '#f472b6', hue: 320 },
+    { id: 'moksha', name: 'Evolve', icon: '🚀', color: '#a855f7', hue: 270 },
+    { id: 'kala', name: 'Time', icon: '', color: '#d97706', hue: 35 },
+    { id: 'rupa', name: 'Form', icon: '📐', color: '#0ea5e9', hue: 190 },
+    { id: 'shabda', name: 'Sound', icon: '🔊', color: '#818cf8', hue: 250 },
+    { id: 'sangha', name: 'Community', icon: '🤝', color: '#f97316', hue: 25 },
+    { id: 'shiksha', name: 'Learn', icon: '🪷', color: '#e879f9', hue: 290 },
+    { id: 'yantra', name: 'Tech', icon: '💻', color: '#22d3ee', hue: 180 },
+    { id: 'kshetra', name: 'Agri', icon: '🌾', color: '#84cc16', hue: 80 },
+    { id: 'yuddha', name: 'Risk', icon: '🛡️', color: '#ef4444', hue: 0 },
+    { id: 'ananda', name: 'Bliss', icon: '☀️', color: '#fde047', hue: 55 }
+];
 
-        .k1-radical-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 12px; max-width: 800px; margin: 0 auto; }
-        .k1-radical { background: rgba(255,255,255,0.03); border: 1px solid var(--k1-edge); border-radius: 16px;
-                      padding: 15px 10px; text-align: center; cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; align-items: center; gap: 8px; }
-        .k1-radical:hover { background: rgba(255,255,255,0.08); transform: translateY(-4px); border-color: rgba(255,255,255,0.2); }
-        .k1-radical:active { transform: scale(0.95); }
-        .k1-r-icon { font-size: 1.8rem; filter: drop-shadow(0 0 8px currentColor); }
-        .k1-r-name { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--k1-muted); }
-        
-        .k1-toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); 
-                    background: var(--k1-emerald); color: #000; padding: 12px 24px; border-radius: 30px; 
-                    font-weight: 800; font-size: 0.9rem; opacity: 0; transition: 0.3s; pointer-events: none; z-index: 1000;}
-        .k1-toast.show { opacity: 1; transform: translateX(-50%) translateY(-10px); }
-    `,
+const LEXICON = [
+    { id: 'c_photo', title: 'Photosynthesis', radical: 'prakriti', icon: '', color: '#10b981', desc: 'Plants use sunlight, water, and air to cook food and give us oxygen.', tags: ['sun', 'water', 'air'] },
+    { id: 'c_grav', title: 'Gravity', radical: 'akasha', icon: '', color: '#8b5cf6', desc: 'The invisible hug of the Earth that keeps our feet on the ground.', tags: ['earth', 'moon', 'pull'] },
+    { id: 'c_myce', title: 'Mycelium', radical: 'jiva', icon: '🍄', color: '#34d399', desc: 'A giant, natural internet under the forest floor connecting trees.', tags: ['trees', 'soil', 'network'] },
+    { id: 'c_water', title: 'Water Cycle', radical: 'jal', icon: '💧', color: '#38bdf8', desc: 'Water never disappears; it just changes costumes from liquid to cloud.', tags: ['rain', 'clouds', 'ocean'] },
+    { id: 'c_empa', title: 'Empathy', radical: 'manas', icon: '❤️', color: '#ec4899', desc: 'Wearing someone else\'s emotional shoes to feel what they feel.', tags: ['kindness', 'mind', 'love'] }
+];
 
-    // --- ISOLATED HTML ---
-    html: `
-        <div class="k1-header">
-            <h1 class="k1-title">Khel.o NPU Kernel</h1>
-            <div class="k1-subtitle">Session 1 · Semantic Processing Unit Active</div>
-        </div>
-        <div class="k1-input-wrap">
-            <input type="text" class="k1-input" id="k1-spu-input" placeholder="Type any concept to generate 3-Byte DNA..." autocomplete="off">
-        </div>
-        <div class="k1-spu-display">
-            <div class="k1-hex-code" id="k1-hex-output">0x00 0x00 0x00</div>
-            <div class="k1-label">Semantic DNA (Domain · Action · Scale)</div>
-        </div>
-        <div class="k1-radical-grid" id="k1-radical-container"></div>
-        <div class="k1-toast" id="k1-toast">Resonance Activated</div>
-    `,
+const CRAFTING_MATRIX = {
+    'prakriti+jal': { title: 'Agriculture', icon: '🌾', color: '#84cc16' },
+    'jal+agni': { title: 'Steam', icon: '️', color: '#94a3b8' },
+    'truti+jal': { title: 'Sprout', icon: '🌱', color: '#34d399' },
+    'agni+vayu': { title: 'Lightning', icon: '⚡', color: '#fbbf24' },
+    'manas+shabda': { title: 'Music', icon: '', color: '#e879f9' }
+};
 
-    // --- DATA: THE 24 RADICALS ---
-    radicals: [
-        { id: 'truti', name: 'Seed', icon: '', color: '#10b981', hue: 140, affinity: ['jiva', 'prakriti'] },
-        { id: 'jiva', name: 'Life', icon: '🧬', color: '#34d399', hue: 150, affinity: ['truti', 'manas'] },
-        { id: 'prakriti', name: 'Earth', icon: '🌍', color: '#10b981', hue: 140, affinity: ['truti', 'jal'] },
-        { id: 'agni', name: 'Energy', icon: '⚡', color: '#f59e0b', hue: 40, affinity: ['vayu', 'yantra'] },
-        { id: 'jal', name: 'Flow', icon: '💧', color: '#38bdf8', hue: 200, affinity: ['prakriti', 'jiva'] },
-        { id: 'vayu', name: 'Air', icon: '🌬️', color: '#94a3b8', hue: 210, affinity: ['agni', 'akasha'] },
-        { id: 'akasha', name: 'Space', icon: '🌌', color: '#8b5cf6', hue: 260, affinity: ['vayu', 'moksha'] },
-        { id: 'manas', name: 'Mind', icon: '🧠', color: '#ec4899', hue: 330, affinity: ['jiva', 'buddhi'] },
-        { id: 'buddhi', name: 'Logic', icon: '', color: '#6366f1', hue: 240, affinity: ['manas', 'yantra'] },
-        { id: 'atma', name: 'Soul', icon: '◎', color: '#fbbf24', hue: 50, affinity: ['moksha', 'ananda'] },
-        { id: 'karma', name: 'Action', icon: '⚙️', color: '#64748b', hue: 210, affinity: ['agni', 'dharma'] },
-        { id: 'dharma', name: 'Duty', icon: '⚖️', color: '#f43f5e', hue: 350, affinity: ['karma', 'sangha'] },
-        { id: 'artha', name: 'Resource', icon: '💎', color: '#14b8a6', hue: 160, affinity: ['kshetra', 'karma'] },
-        { id: 'kama', name: 'Desire', icon: '🧲', color: '#f472b6', hue: 320, affinity: ['manas', 'rupa'] },
-        { id: 'moksha', name: 'Evolve', icon: '🚀', color: '#a855f7', hue: 270, affinity: ['akasha', 'atma'] },
-        { id: 'kala', name: 'Time', icon: '', color: '#d97706', hue: 35, affinity: ['karma', 'prakriti'] },
-        { id: 'rupa', name: 'Form', icon: '📐', color: '#0ea5e9', hue: 190, affinity: ['kama', 'buddhi'] },
-        { id: 'shabda', name: 'Sound', icon: '🔊', color: '#818cf8', hue: 250, affinity: ['akasha', 'manas'] },
-        { id: 'sangha', name: 'Community', icon: '🤝', color: '#f97316', hue: 25, affinity: ['dharma', 'jiva'] },
-        { id: 'shiksha', name: 'Learn', icon: '🪷', color: '#e879f9', hue: 290, affinity: ['manas', 'moksha'] },
-        { id: 'yantra', name: 'Tech', icon: '💻', color: '#22d3ee', hue: 180, affinity: ['buddhi', 'agni'] },
-        { id: 'kshetra', name: 'Agri', icon: '🌾', color: '#84cc16', hue: 80, affinity: ['prakriti', 'artha'] },
-        { id: 'yuddha', name: 'Risk', icon: '🛡️', color: '#ef4444', hue: 0, affinity: ['karma', 'dharma'] },
-        { id: 'ananda', name: 'Bliss', icon: '☀️', color: '#fde047', hue: 55, affinity: ['atma', 'shabda'] }
-    ],
-
-    // --- SPU ENGINE (Deterministic 3-Byte Hashing) ---
-    spu: {
-        // FNV-1a Hash Algorithm for deterministic 32-bit hashing
-        hash: function(str) {
-            let h = 0x811c9dc5;
-            for (let i = 0; i < str.length; i++) {
-                h ^= str.charCodeAt(i);
-                h = Math.imul(h, 0x01000193);
-            }
-            return Math.abs(h >>> 0);
-        },
-        generate: function(text) {
-            if (!text) return '0x00 0x00 0x00';
-            const fullHash = this.hash(text.toLowerCase().trim());
-            // Extract 3 Bytes (24 bits)
-            const byte1 = (fullHash >> 16) & 0xFF; // Domain
-            const byte2 = (fullHash >> 8) & 0xFF;  // Action
-            const byte3 = fullHash & 0xFF;         // Scale
-            
-            return {
-                hex: `0x${byte1.toString(16).padStart(2,'0').toUpperCase()} 0x${byte2.toString(16).padStart(2,'0').toUpperCase()} 0x${byte3.toString(16).padStart(2,'0').toUpperCase()}`,
-                raw: [byte1, byte2, byte3],
-                // Map Byte 1 to a Hue for visual representation
-                hue: (byte1 / 255) * 360 
-            };
-        }
-    },
-
-    // --- AUDIO DSP ENGINE (432Hz Resonance) ---
-    audio: {
-        ctx: null,
-        init: function() {
-            if (!this.ctx) {
-                try {
-                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-                } catch(e) { console.warn("Audio API not supported"); }
-            }
-            if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
-        },
-        play: function(hue) {
-            this.init();
-            if (!this.ctx) return;
-            try {
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                osc.type = 'sine';
-                // Map Hue (0-360) to a pleasant frequency range around 432Hz
-                const freq = 200 + (hue * 0.65); 
-                osc.frequency.setTargetAtTime(freq, this.ctx.currentTime, 0.05);
-                gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.8);
-                osc.connect(gain); gain.connect(this.ctx.destination);
-                osc.start(); osc.stop(this.ctx.currentTime + 0.8);
-                if (navigator.vibrate) navigator.vibrate(15);
-            } catch(e) { console.warn("Audio playback failed", e); }
-        }
-    },
-
-    // --- UI CONTROLLER ---
-    ui: {
-        toastTimer: null,
-        showToast: function(msg) {
-            const t = document.getElementById('k1-toast');
-            if(!t) return;
-            t.innerText = msg; t.classList.add('show');
-            clearTimeout(this.toastTimer);
-            this.toastTimer = setTimeout(() => t.classList.remove('show'), 2000);
-        }
-    },
-
-    // --- LIFECYCLE METHODS ---
+// 3. MODULE 1: CORE KERNEL (Audio, SPU, Radicals)
+const Module1_Kernel = {
+    audioCtx: null,
     init: function() {
-        try {
-            this.renderRadicals();
-            this.bindEvents();
-            console.log("[Session 1] Core Kernel Initialized.");
-        } catch(e) {
-            throw new Error("UI Initialization failed: " + e.message);
-        }
+        this.renderRadicals();
+        this.bindTriState();
     },
-
+    playTone: function(hue) {
+        try {
+            if (!this.audioCtx) this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = this.audioCtx.createOscillator();
+            const gain = this.audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.value = 200 + (hue * 0.65);
+            gain.gain.setValueAtTime(0.15, this.audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, this.audioCtx.currentTime + 0.8);
+            osc.connect(gain); gain.connect(this.audioCtx.destination);
+            osc.start(); osc.stop(this.audioCtx.currentTime + 0.8);
+            if (navigator.vibrate) navigator.vibrate(15);
+        } catch(e) { console.warn("Audio blocked", e); }
+    },
     renderRadicals: function() {
-        const container = document.getElementById('k1-radical-container');
-        if(!container) return;
-        
-        this.radicals.forEach(r => {
+        const c = document.getElementById('radical-container');
+        RADICALS.forEach(r => {
             const el = document.createElement('div');
-            el.className = 'k1-radical';
+            el.className = 'radical-card';
             el.style.color = r.color;
-            el.innerHTML = `<div class="k1-r-icon">${r.icon}</div><div class="k1-r-name">${r.name}</div>`;
+            el.innerHTML = `<div class="r-icon">${r.icon}</div><div class="r-name">${r.name}</div>`;
             el.onclick = () => {
-                this.audio.play(r.hue);
-                this.ui.showToast(`${r.name} Radical Activated`);
-                // Auto-fill input to demonstrate SPU
-                const input = document.getElementById('k1-spu-input');
-                if(input) {
-                    input.value = r.name;
-                    this.processSPU(r.name);
-                }
+                this.playTone(r.hue);
+                KhelOS.showToast(`${r.name} Radical Activated`);
+                document.getElementById('conceptSearch').value = r.name;
+                document.querySelector('[data-panel="learn"]').click();
+                Module2_Matrix.search(r.name);
             };
-            container.appendChild(el);
+            c.appendChild(el);
         });
     },
-
-    bindEvents: function() {
-        const input = document.getElementById('k1-spu-input');
-        if(input) {
-            input.addEventListener('input', (e) => this.processSPU(e.target.value));
-        }
-    },
-
-    processSPU: function(text) {
-        const result = this.spu.generate(text);
-        const display = document.getElementById('k1-hex-output');
-        if(display) {
-            display.innerText = result.hex;
-            // Subtle color shift based on generated hue
-            display.style.color = `hsl(${result.hue}, 80%, 60%)`;
-            display.style.borderColor = `hsla(${result.hue}, 80%, 60%, 0.5)`;
-            display.style.background = `hsla(${result.hue}, 80%, 60%, 0.1)`;
-        }
-    },
-
-    destroy: function() {
-        console.log("[Session 1] Core Kernel Unloaded.");
-        if(this.audio.ctx) this.audio.ctx.close();
+    bindTriState: function() {
+        document.querySelectorAll('.ts-btn').forEach(btn => {
+            btn.onclick = () => {
+                document.querySelectorAll('.ts-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                document.body.className = `mode-${btn.dataset.mode}`;
+                KhelOS.state.mode = btn.dataset.mode;
+                if(Module4_Graph.state.nodes.length > 0) Module4_Graph.render();
+            };
+        });
     }
 };
 
-/* ═══════════════════════════════════════════════════════════
-   BOOT SEQUENCE
-   ═══════════════════════════════════════════════════════════ */
-window.onload = () => {
-    KhelOS.register(1, Session1_CoreKernel);
-};
-</script>
-
-  <!-- SESSION 2: KNOWLEDGE MATRIX & KARMA LEDGER -->
-<script>
-/* ═══════════════════════════════════════════════════════════
-   SESSION 2: KNOWLEDGE MATRIX & KARMA LEDGER
-   ═══════════════════════════════════════════════════════════ */
-const Session2_KnowledgeMatrix = {
-    // --- ISOLATED CSS (Namespaced with k2-) ---
-    css: `
-        .k2-search-wrap { max-width: 600px; margin: 20px auto; position: relative; }
-        .k2-input { width: 100%; padding: 16px 20px; border-radius: 30px; border: 2px solid rgba(255,255,255,0.08);
-                    background: rgba(0,0,0,0.4); color: #fff; font-size: 1.1rem; outline: none; transition: 0.3s; box-sizing: border-box; }
-        .k2-input:focus { border-color: var(--k1-accent, #38bdf8); box-shadow: 0 0 20px rgba(56,189,248,0.2); }
-        
-        .k2-results { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; padding: 0 20px; }
-        .k2-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px;
-                   padding: 24px; cursor: pointer; transition: 0.3s; display: flex; gap: 20px; align-items: flex-start; }
-        .k2-card:hover { background: rgba(255,255,255,0.06); border-color: var(--k1-accent, #38bdf8); transform: translateX(8px); }
-        .k2-icon { font-size: 2.5rem; flex-shrink: 0; filter: drop-shadow(0 0 15px currentColor); }
-        .k2-content { flex: 1; }
-        .k2-title { font-family: var(--font-disp, 'Space Grotesk', sans-serif); font-size: 1.4rem; font-weight: 700; color: #fff; margin-bottom: 8px; }
-        .k2-desc { font-size: 0.95rem; color: var(--k1-muted, #94a3b8); line-height: 1.6; margin-bottom: 12px; }
-        .k2-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
-        .k2-tag { font-size: 0.7rem; padding: 4px 10px; border-radius: 12px; background: rgba(255,255,255,0.05); color: var(--k1-muted, #94a3b8); border: 1px solid rgba(255,255,255,0.1); }
-        
-        .k2-ledger-status { position: fixed; bottom: 80px; right: 20px; background: rgba(16, 185, 129, 0.1); 
-                            border: 1px solid rgba(16, 185, 129, 0.3); color: var(--k1-emerald, #10b981);
-                            padding: 10px 16px; border-radius: 20px; font-size: 0.8rem; font-weight: 700;
-                            display: flex; align-items: center; gap: 8px; z-index: 100; backdrop-filter: blur(10px); }
-        
-        .k2-loader { text-align: center; color: var(--k1-accent, #38bdf8); font-family: monospace; font-size: 0.9rem; padding: 20px; letter-spacing: 1px; }
-    `,
-
-    // --- DATA: LOCAL SEMANTIC LEXICON (Kid-Friendly, No External Links) ---
-    lexicon: [
-        { id: 'c_photo', title: 'Photosynthesis', radical: 'prakriti', icon: '', color: '#10b981', 
-          desc: 'Plants are like tiny chefs! They use sunlight, water, and air to cook their own food and give us fresh oxygen to breathe.', 
-          ikrw: 'Find a green leaf. Hold it up to the sun and say "thank you" for making the air fresh.', 
-          tags: ['sun', 'water', 'air', 'food', 'oxygen'] },
-        { id: 'c_grav', title: 'Gravity', radical: 'akasha', icon: '', color: '#8b5cf6', 
-          desc: 'Gravity is the invisible hug of the Earth. It keeps our feet on the ground, the oceans in their beds, and the Moon dancing around us.', 
-          ikrw: 'Drop a soft toy and a feather at the same time. Watch how Earth pulls them both down.', 
-          tags: ['earth', 'moon', 'pull', 'mass'] },
-        { id: 'c_myce', title: 'Mycelium', radical: 'jiva', icon: '🍄', color: '#34d399', 
-          desc: 'Under the forest floor is a giant, natural internet made of tiny threads. Trees use it to share food and send warning messages to each other!', 
-          ikrw: 'Look under a damp log or leaf pile. Can you find the white, stringy threads of the forest web?', 
-          tags: ['trees', 'soil', 'network', 'fungi'] },
-        { id: 'c_water', title: 'Water Cycle', radical: 'jal', icon: '💧', color: '#38bdf8', 
-          desc: 'Water never disappears; it just changes costumes! It evaporates into clouds, rains down, and flows back to the sea, ready to start again.', 
-          ikrw: 'Breathe on a cold window or mirror. You just made a tiny cloud from your own water cycle!', 
-          tags: ['rain', 'clouds', 'ocean', 'sun'] },
-        { id: 'c_frac', title: 'Fraction', radical: 'buddhi', icon: '🍕', color: '#6366f1', 
-          desc: 'A fraction is just a fair share. If you have one apple and cut it into two equal pieces, each piece is a fraction of the whole apple.', 
-          ikrw: 'Take a piece of paper and fold it exactly in half, then in half again. You just made quarters!', 
-          tags: ['sharing', 'math', 'whole', 'parts'] },
-        { id: 'c_poll', title: 'Pollination', radical: 'kshetra', icon: '🐝', color: '#84cc16', 
-          desc: 'Bees and butterflies are nature\'s mail carriers. They carry golden dust (pollen) from one flower to another so fruits and seeds can grow.', 
-          ikrw: 'Look closely at a flower. Can you spot the tiny golden dust? Imagine you are a bee visiting it.', 
-          tags: ['bees', 'flowers', 'fruit', 'nature'] },
-        { id: 'c_magn', title: 'Magnetism', radical: 'agni', icon: '', color: '#f59e0b', 
-          desc: 'Magnets have an invisible force field. They can pull certain metals towards them or push other magnets away without even touching them!', 
-          ikrw: 'Find two fridge magnets. Try to push them together. Feel the invisible push?', 
-          tags: ['metal', 'force', 'earth', 'compass'] },
-        { id: 'c_empa', title: 'Empathy', radical: 'manas', icon: '❤️', color: '#ec4899', 
-          desc: 'Empathy is like wearing someone else\'s emotional shoes. It means you can feel happy when they are happy, and you want to help when they are sad.', 
-          ikrw: 'Think of a friend who was sad. Draw a picture for them to make them smile today.', 
-          tags: ['kindness', 'mind', 'community', 'love'] },
-        { id: 'c_recy', title: 'Recycling', radical: 'karma', icon: '♻️', color: '#64748b', 
-          desc: 'Recycling is giving old things a new life. Instead of throwing plastic or paper away, we transform it into something brand new and useful.', 
-          ikrw: 'Find an empty cardboard box. Imagine what awesome new toy or fort you could build from it.', 
-          tags: ['earth', 'action', 'future', 'waste'] },
-        { id: 'c_cons', title: 'Constellation', radical: 'akasha', icon: '✨', color: '#a855f7', 
-          desc: 'A constellation is a connect-the-dots picture in the night sky, made by stars that are very, very far away from each other.', 
-          ikrw: 'Tonight, look up at the sky. Can you connect the bright stars to make your own animal picture?', 
-          tags: ['stars', 'space', 'night', 'stories'] }
-    ],
-
-    // --- STATE & STORAGE ---
-    state: {
-        ledger: [],
-        searchTimeout: null
+// 4. MODULE 2: KNOWLEDGE MATRIX (Search & Ledger)
+const Module2_Matrix = {
+    ledger: [],
+    init: function() {
+        this.loadLedger();
+        document.getElementById('searchBtn').onclick = () => this.search(document.getElementById('conceptSearch').value);
+        document.getElementById('conceptSearch').addEventListener('keypress', (e) => { if(e.key==='Enter') this.search(e.target.value); });
     },
-
-    // --- FMEA SEARCH ENGINE ---
     search: function(query) {
         const q = query.toLowerCase().trim();
-        if (!q) return [];
+        if(!q) return;
+        const res = document.getElementById('search-results');
+        res.innerHTML = '<div style="color:var(--accent); font-family:var(--font-mono); padding:20px;">NPU Compiling...</div>';
         
-        const results = this.lexicon.filter(k => 
-            k.title.toLowerCase().includes(q) || 
-            k.desc.toLowerCase().includes(q) ||
-            k.tags.some(t => t.includes(q))
-        );
-        
-        // FMEA Fallback: SPU Synthesis (Zero Dead Ends)
-        if (results.length === 0) {
-            return [{
-                id: 'fallback_' + Date.now(),
-                title: query.charAt(0).toUpperCase() + query.slice(1),
-                radical: 'buddhi',
-                icon: '🔮',
-                color: '#6366f1',
-                desc: `A wonderful concept to explore! "${query}" connects to the broader web of knowledge. Let's discover how it fits into our universe.`,
-                ikrw: `Write down three questions you have about "${query}" and ask an elder or look in a book.`,
-                tags: ['curiosity', 'learning', 'discovery'],
-                isFallback: true
-            }];
-        }
-        return results;
-    },
-
-    // --- KARMA LEDGER (LocalStorage with FMEA Shield) ---
-    ledger: {
-        load: () => {
-            try { 
-                const mem = localStorage.getItem('khelo_karma_ledger');
-                return mem ? JSON.parse(mem) : [];
-            } catch(e) { 
-                console.warn("[Session 2] Ledger load failed, using memory only.", e);
-                return []; 
-            }
-        },
-        save: (data) => {
-            try {
-                localStorage.setItem('khelo_karma_ledger', JSON.stringify(data));
-                return true;
-            } catch(e) {
-                console.warn("[Session 2] Ledger save failed (storage full or blocked).", e);
-                return false;
-            }
-        },
-        add: (concept) => {
-            let current = Session2_KnowledgeMatrix.ledger.load();
-            if (!current.find(n => n.id === concept.id)) {
-                current.push(concept);
-                Session2_KnowledgeMatrix.ledger.save(current);
-                Session2_KnowledgeMatrix.state.ledger = current;
-                Session2_KnowledgeMatrix.ui.updateLedgerStatus();
-                return true;
-            }
-            return false;
-        }
-    },
-
-    // --- UI CONTROLLER ---
-    ui: {
-        renderSearch: function() {
-            const root = document.getElementById('k2-root');
-            if(!root) return;
-            
-            root.innerHTML = `
-                <div class="k2-search-wrap">
-                    <input type="text" class="k2-input" id="k2-search-input" placeholder="Search the universe (e.g., Gravity, Water, Empathy)..." autocomplete="off">
-                </div>
-                <div class="k2-results" id="k2-results-container"></div>
-                <div class="k2-ledger-status" id="k2-ledger-status" style="display:none;">
-                    <span>🌱</span> <span id="k2-ledger-count">0</span> Concepts Compiled
-                </div>
-            `;
-            
-            const input = document.getElementById('k2-search-input');
-            input.addEventListener('input', (e) => {
-                clearTimeout(Session2_KnowledgeMatrix.state.searchTimeout);
-                Session2_KnowledgeMatrix.state.searchTimeout = setTimeout(() => {
-                    Session2_KnowledgeMatrix.ui.renderResults(e.target.value);
-                }, 300); // Debounce
-            });
-        },
-
-        renderResults: function(query) {
-            const container = document.getElementById('k2-results-container');
-            if(!container) return;
-
-            if (!query.trim()) {
-                container.innerHTML = '';
-                return;
-            }
-
-            // Show Loader
-            container.innerHTML = `<div class="k2-loader">NPU Compiling Semantics...</div>`;
-
-            setTimeout(() => { // Simulate processing
-                const results = Session2_KnowledgeMatrix.search(query);
-                container.innerHTML = '';
-                
-                results.forEach(k => {
-                    const isSaved = Session2_KnowledgeMatrix.state.ledger.some(n => n.id === k.id);
-                    const el = document.createElement('div');
-                    el.className = 'k2-card';
-                    el.innerHTML = `
-                        <div class="k2-icon" style="color: ${k.color}">${k.icon}</div>
-                        <div class="k2-content">
-                            <div class="k2-title">${k.title} ${isSaved ? '<span style="font-size:0.8rem; color:var(--k1-emerald)">✓ Compiled</span>' : ''}</div>
-                            <div class="k2-desc">${k.desc}</div>
-                            <div class="k2-tags">
-                                ${k.tags.map(t => `<span class="k2-tag">#${t}</span>`).join('')}
-                                ${k.isFallback ? '<span class="k2-tag" style="color:var(--k1-accent)">SPU Synthesized</span>' : ''}
-                            </div>
-                        </div>
-                    `;
-                    el.onclick = () => Session2_KnowledgeMatrix.actions.handleCardClick(k);
-                    container.appendChild(el);
-                });
-            }, 400);
-        },
-
-        updateLedgerStatus: function() {
-            const statusEl = document.getElementById('k2-ledger-status');
-            const countEl = document.getElementById('k2-ledger-count');
-            if(statusEl && countEl) {
-                const count = Session2_KnowledgeMatrix.state.ledger.length;
-                countEl.innerText = count;
-                statusEl.style.display = count > 0 ? 'flex' : 'none';
-            }
-        }
-    },
-
-    // --- ACTIONS ---
-    actions: {
-        handleCardClick: function(concept) {
-            // In a full app, this would open a detailed viewer. 
-            // For Session 2, we compile it to the Karma Ledger.
-            const added = Session2_KnowledgeMatrix.ledger.add(concept);
-            
-            // Trigger Audio DSP from Session 1 if available
-            if (window.KhelOS && window.KhelOS.registry[1] && window.KhelOS.registry[1].audio) {
-                window.KhelOS.registry[1].audio.play(concept.color === '#10b981' ? 140 : 200); // Fallback hue
+        setTimeout(() => {
+            const results = LEXICON.filter(k => k.title.toLowerCase().includes(q) || k.tags.some(t => t.includes(q)));
+            if(results.length === 0) {
+                results.push({ id: 'fb_'+Date.now(), title: query, radical: 'buddhi', icon: '🔮', color: '#6366f1', desc: `A synthesized concept. "${query}" connects to the broader web of knowledge.`, tags: ['synthesis'] });
             }
             
-            // Show Toast from Session 1 if available
-            if (window.KhelOS && window.KhelOS.registry[1] && window.KhelOS.registry[1].ui) {
-                window.KhelOS.registry[1].ui.showToast(added ? 'Concept Compiled to Karma Ledger!' : 'Already Compiled');
-            }
-            
-            // Re-render to update checkmark
-            const input = document.getElementById('k2-search-input');
-            if(input) Session2_KnowledgeMatrix.ui.renderResults(input.value);
-        }
-    },
-
-    // --- LIFECYCLE METHODS ---
-    init: function() {
-        try {
-            this.state.ledger = this.ledger.load();
-            this.ui.renderSearch();
-            this.ui.updateLedgerStatus();
-            console.log("[Session 2] Knowledge Matrix & Karma Ledger Initialized.");
-        } catch(e) {
-            throw new Error("Session 2 UI Initialization failed: " + e.message);
-        }
-    },
-
-    destroy: function() {
-        console.log("[Session 2] Knowledge Matrix Unloaded.");
-        clearTimeout(this.state.searchTimeout);
-    }
-};
-
-/* ═══════════════════════════════════════════════════════════
-   BOOT SESSION 2 (Assuming KhelOS is loaded from Session 1)
-   ═══════════════════════════════════════════════════════════ */
-if (typeof KhelOS !== 'undefined') {
-    KhelOS.register(2, Session2_KnowledgeMatrix);
-} else {
-    console.error("[KhelOS] Core Kernel (Session 1) not found. Session 2 cannot boot.");
-}
-</script>
-
-<!-- SESSION 3: GAMIFIED EXPERIENCE & CRAFTING ENGINE -->
-<script>
-/* ═══════════════════════════════════════════════════════════
-   SESSION 3: GAMIFIED EXPERIENCE & CRAFTING ENGINE
-   ═══════════════════════════════════════════════════════════ */
-const Session3_CraftingEngine = {
-    // --- ISOLATED CSS (Namespaced with k3-) ---
-    css: `
-        .k3-container { max-width: 800px; margin: 0 auto; padding: 20px; }
-        
-        /* The Crucible (Synthesis Zone) */
-        .k3-crucible {
-            display: flex; justify-content: center; align-items: center; gap: 20px;
-            background: rgba(0,0,0,0.3); border: 2px dashed rgba(255,255,255,0.1);
-            border-radius: 24px; padding: 40px 20px; margin-bottom: 30px; min-height: 160px;
-            position: relative; overflow: hidden;
-        }
-        .k3-slot {
-            width: 80px; height: 80px; border-radius: 50%;
-            background: rgba(255,255,255,0.03); border: 2px solid rgba(255,255,255,0.1);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 2.5rem; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            position: relative;
-        }
-        .k3-slot.active { border-color: var(--k1-gold, #fbbf24); box-shadow: 0 0 25px rgba(245, 158, 11, 0.4); transform: scale(1.1); }
-        .k3-slot.filled { border-style: solid; }
-        .k3-plus { font-size: 2rem; color: var(--k1-muted, #94a3b8); font-weight: 300; }
-        
-        /* Particle Burst Animation */
-        .k3-particle {
-            position: absolute; width: 8px; height: 8px; border-radius: 50%;
-            pointer-events: none; animation: k3-burst 0.8s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
-        }
-        @keyframes k3-burst {
-            0% { transform: translate(0, 0) scale(1); opacity: 1; }
-            100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
-        }
-        .k3-shake { animation: k3-shake 0.4s ease-in-out; }
-        @keyframes k3-shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
-
-        /* Inventory Grid */
-        .k3-inventory-title { font-size: 0.9rem; color: var(--k1-muted, #94a3b8); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; text-align: center; }
-        .k3-inventory {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 12px;
-        }
-        .k3-orb {
-            aspect-ratio: 1; border-radius: 16px; background: rgba(255,255,255,0.03);
-            border: 2px solid rgba(255,255,255,0.08); display: flex; flex-direction: column;
-            align-items: center; justify-content: center; cursor: pointer; transition: 0.2s;
-            position: relative; overflow: hidden;
-        }
-        .k3-orb:hover { background: rgba(255,255,255,0.08); transform: translateY(-4px); }
-        .k3-orb:active { transform: scale(0.95); }
-        .k3-orb-icon { font-size: 1.8rem; margin-bottom: 4px; filter: drop-shadow(0 0 8px currentColor); }
-        .k3-orb-name { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--k1-muted, #94a3b8); text-align: center; padding: 0 4px; }
-        
-        /* Success Overlay */
-        .k3-success-overlay {
-            position: absolute; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            opacity: 0; pointer-events: none; transition: 0.3s; z-index: 10;
-        }
-        .k3-success-overlay.show { opacity: 1; pointer-events: auto; }
-        .k3-new-concept { font-size: 4rem; animation: k3-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        .k3-new-title { font-family: var(--font-disp, 'Space Grotesk', sans-serif); font-size: 1.5rem; font-weight: 800; color: #fff; margin-top: 10px; }
-        @keyframes k3-pop { 0% { transform: scale(0) rotate(-180deg); } 100% { transform: scale(1) rotate(0); } }
-    `,
-
-    // --- DATA: THE CRAFTING MATRIX (Alchemical Logic) ---
-    // Maps combinations of Radical IDs to new concepts
-    craftingMatrix: {
-        'prakriti+jal': { title: 'Agriculture', icon: '🌾', color: '#84cc16', desc: 'Earth and Water combine to grow life.' },
-        'prakriti+agni': { title: 'Ceramics', icon: '🏺', color: '#d97706', desc: 'Earth and Fire create lasting form.' },
-        'jal+agni': { title: 'Steam', icon: '️', color: '#94a3b8', desc: 'Water and Energy create motion.' },
-        'truti+jal': { title: 'Sprout', icon: '🌱', color: '#34d399', desc: 'A Seed drinks Water to begin life.' },
-        'truti+prakriti': { title: 'Roots', icon: '🪵', color: '#a16207', desc: 'A Seed anchors into Earth.' },
-        'agni+vayu': { title: 'Lightning', icon: '⚡', color: '#fbbf24', desc: 'Energy and Air create a spark.' },
-        'manas+shabda': { title: 'Music', icon: '', color: '#e879f9', desc: 'Mind and Sound create harmony.' },
-        'buddhi+rupa': { title: 'Geometry', icon: '📐', color: '#0ea5e9', desc: 'Logic and Form create structure.' },
-        'jiva+jiva': { title: 'Community', icon: '🤝', color: '#f97316', desc: 'Life connects with Life.' },
-        'akasha+agni': { title: 'Star', icon: '✨', color: '#fde047', desc: 'Space and Energy ignite.' }
-    },
-
-    // --- STATE ---
-    state: {
-        slot1: null,
-        slot2: null,
-        inventory: []
-    },
-
-    // --- INVENTORY MANAGER (Fetches from Session 2 Karma Ledger) ---
-    inventory: {
-        load: () => {
-            // Try to get real data from Session 2
-            if (window.KhelOS && window.KhelOS.registry[2] && window.KhelOS.registry[2].state.ledger) {
-                return window.KhelOS.registry[2].state.ledger;
-            }
-            // FMEA Fallback: Mock inventory if Session 2 isn't ready
-            return [
-                { id: 'mock_1', title: 'Water', radical: 'jal', icon: '💧', color: '#38bdf8' },
-                { id: 'mock_2', title: 'Earth', radical: 'prakriti', icon: '', color: '#10b981' },
-                { id: 'mock_3', title: 'Energy', radical: 'agni', icon: '⚡', color: '#f59e0b' },
-                { id: 'mock_4', title: 'Seed', radical: 'truti', icon: '', color: '#10b981' }
-            ];
-        }
-    },
-
-    // --- UI CONTROLLER ---
-    ui: {
-        render: () => {
-            const root = document.getElementById('k3-root');
-            if(!root) return;
-            
-            root.innerHTML = `
-                <div class="k3-container">
-                    <div class="k3-crucible" id="k3-crucible">
-                        <div class="k3-slot" id="k3-slot-1"></div>
-                        <div class="k3-plus">+</div>
-                        <div class="k3-slot" id="k3-slot-2"></div>
-                        <div class="k3-success-overlay" id="k3-overlay">
-                            <div class="k3-new-concept" id="k3-new-icon"></div>
-                            <div class="k3-new-title" id="k3-new-title"></div>
-                        </div>
-                    </div>
-                    
-                    <div class="k3-inventory-title">Your Knowledge Inventory (Tap to Select)</div>
-                    <div class="k3-inventory" id="k3-inventory-grid"></div>
-                </div>
-            `;
-            
-            Session3_CraftingEngine.ui.renderInventory();
-            Session3_CraftingEngine.ui.bindSlots();
-        },
-
-        renderInventory: () => {
-            const grid = document.getElementById('k3-inventory-grid');
-            if(!grid) return;
-            grid.innerHTML = '';
-            
-            Session3_CraftingEngine.state.inventory.forEach(item => {
+            res.innerHTML = '';
+            results.forEach(k => {
+                const isSaved = this.ledger.some(n => n.id === k.id);
                 const el = document.createElement('div');
-                el.className = 'k3-orb';
-                el.style.color = item.color;
+                el.className = 'result-card';
                 el.innerHTML = `
-                    <div class="k3-orb-icon">${item.icon}</div>
-                    <div class="k3-orb-name">${item.title}</div>
+                    <div class="result-icon" style="color:${k.color}">${k.icon}</div>
+                    <div style="flex:1">
+                        <div class="result-title">${k.title} ${isSaved ? '<span style="font-size:0.8rem; color:var(--emerald)">✓</span>' : ''}</div>
+                        <div class="result-desc">${k.desc}</div>
+                    </div>
                 `;
-                el.onclick = () => Session3_CraftingEngine.actions.selectOrb(item);
-                grid.appendChild(el);
+                el.onclick = () => this.compile(k);
+                res.appendChild(el);
             });
-        },
-
-        bindSlots: () => {
-            // Slots are updated reactively, no direct binding needed here
-        },
-
-        updateSlots: () => {
-            const s1 = document.getElementById('k3-slot-1');
-            const s2 = document.getElementById('k3-slot-2');
-            if(!s1 || !s2) return;
-
-            // Render Slot 1
-            if (Session3_CraftingEngine.state.slot1) {
-                s1.innerHTML = Session3_CraftingEngine.state.slot1.icon;
-                s1.style.color = Session3_CraftingEngine.state.slot1.color;
-                s1.style.borderColor = Session3_CraftingEngine.state.slot1.color;
-                s1.classList.add('filled');
-            } else {
-                s1.innerHTML = ''; s1.style.color = ''; s1.style.borderColor = '';
-                s1.classList.remove('filled');
-            }
-
-            // Render Slot 2
-            if (Session3_CraftingEngine.state.slot2) {
-                s2.innerHTML = Session3_CraftingEngine.state.slot2.icon;
-                s2.style.color = Session3_CraftingEngine.state.slot2.color;
-                s2.style.borderColor = Session3_CraftingEngine.state.slot2.color;
-                s2.classList.add('filled');
-            } else {
-                s2.innerHTML = ''; s2.style.color = ''; s2.style.borderColor = '';
-                s2.classList.remove('filled');
-            }
-        },
-
-        triggerParticles: (color) => {
-            const crucible = document.getElementById('k3-crucible');
-            if(!crucible) return;
-            for(let i=0; i<20; i++) {
-                const p = document.createElement('div');
-                p.className = 'k3-particle';
-                p.style.background = color;
-                p.style.left = '50%'; p.style.top = '50%';
-                const angle = Math.random() * Math.PI * 2;
-                const dist = 50 + Math.random() * 100;
-                p.style.setProperty('--tx', `${Math.cos(angle)*dist}px`);
-                p.style.setProperty('--ty', `${Math.sin(angle)*dist}px`);
-                crucible.appendChild(p);
-                setTimeout(() => p.remove(), 800);
-            }
-        },
-
-        showSuccessOverlay: (concept) => {
-            const overlay = document.getElementById('k3-overlay');
-            const icon = document.getElementById('k3-new-icon');
-            const title = document.getElementById('k3-new-title');
-            if(overlay && icon && title) {
-                icon.textContent = concept.icon;
-                icon.style.color = concept.color;
-                title.textContent = concept.title;
-                overlay.classList.add('show');
-                setTimeout(() => overlay.classList.remove('show'), 2500);
-            }
-        },
-
-        triggerShake: () => {
-            const crucible = document.getElementById('k3-crucible');
-            if(crucible) {
-                crucible.classList.add('k3-shake');
-                setTimeout(() => crucible.classList.remove('k3-shake'), 400);
-            }
+        }, 400);
+    },
+    compile: function(concept) {
+        if(!this.ledger.find(n => n.id === concept.id)) {
+            this.ledger.push(concept);
+            this.saveLedger();
+            Module1_Kernel.playTone(140);
+            KhelOS.showToast('Concept Compiled to Karma Ledger!');
+            this.search(document.getElementById('conceptSearch').value); // Refresh checkmarks
+            Module5_Evolve.updateStats();
+        } else {
+            KhelOS.showToast('Already Compiled');
         }
     },
-
-    // --- ACTIONS ---
-    actions: {
-        selectOrb: (item) => {
-            const state = Session3_CraftingEngine.state;
-            
-            // If clicking the same orb, deselect it
-            if (state.slot1 && state.slot1.id === item.id) {
-                state.slot1 = null;
-            } else if (state.slot2 && state.slot2.id === item.id) {
-                state.slot2 = null;
-            } else {
-                // Fill empty slot
-                if (!state.slot1) state.slot1 = item;
-                else if (!state.slot2) state.slot2 = item;
-                else {
-                    // Both full, replace slot 2
-                    state.slot2 = item;
-                }
-            }
-
-            Session3_CraftingEngine.ui.updateSlots();
-
-            // Check for synthesis if both slots are full
-            if (state.slot1 && state.slot2) {
-                setTimeout(() => Session3_CraftingEngine.actions.attemptCraft(), 300);
-            }
-        },
-
-        attemptCraft: () => {
-            const { slot1, slot2 } = Session3_CraftingEngine.state;
-            if (!slot1 || !slot2) return;
-
-            const key1 = `${slot1.radical}+${slot2.radical}`;
-            const key2 = `${slot2.radical}+${slot1.radical}`;
-            const result = Session3_CraftingEngine.craftingMatrix[key1] || Session3_CraftingEngine.craftingMatrix[key2];
-
-            if (result) {
-                // SUCCESS!
-                Session3_CraftingEngine.ui.triggerParticles(result.color);
-                Session3_CraftingEngine.ui.showSuccessOverlay(result);
-                
-                // Audio feedback from Session 1
-                if (window.KhelOS && window.KhelOS.registry[1] && window.KhelOS.registry[1].audio) {
-                    window.KhelOS.registry[1].audio.play(140); // Emerald resonance
-                }
-
-                // Add to Ledger (Session 2)
-                const newConcept = {
-                    id: 'craft_' + Date.now(),
-                    title: result.title,
-                    radical: 'buddhi', // Synthesized logic
-                    icon: result.icon,
-                    color: result.color,
-                    desc: result.desc,
-                    ikrw: `You discovered ${result.title} through synthesis!`,
-                    tags: ['crafted', 'synthesis']
-                };
-
-                if (window.KhelOS && window.KhelOS.registry[2] && window.KhelOS.registry[2].ledger) {
-                    window.KhelOS.registry[2].ledger.add(newConcept);
-                }
-
-                // Toast from Session 1
-                if (window.KhelOS && window.KhelOS.registry[1] && window.KhelOS.registry[1].ui) {
-                    window.KhelOS.registry[1].ui.showToast(`Synthesized: ${result.title}!`);
-                }
-
-                // Clear slots after delay
-                setTimeout(() => {
-                    Session3_CraftingEngine.state.slot1 = null;
-                    Session3_CraftingEngine.state.slot2 = null;
-                    Session3_CraftingEngine.ui.updateSlots();
-                    // Refresh inventory to show new concept
-                    Session3_CraftingEngine.state.inventory = Session3_CraftingEngine.inventory.load();
-                    Session3_CraftingEngine.ui.renderInventory();
-                }, 2500);
-
-            } else {
-                // FAILURE (Dissonance)
-                Session3_CraftingEngine.ui.triggerShake();
-                if (window.KhelOS && window.KhelOS.registry[1] && window.KhelOS.registry[1].audio) {
-                    window.KhelOS.registry[1].audio.play(0); // Red/Dissonant resonance
-                }
-                if (window.KhelOS && window.KhelOS.registry[1] && window.KhelOS.registry[1].ui) {
-                    window.KhelOS.registry[1].ui.showToast('Elements do not resonate...');
-                }
-                
-                // Clear slots
-                setTimeout(() => {
-                    Session3_CraftingEngine.state.slot1 = null;
-                    Session3_CraftingEngine.state.slot2 = null;
-                    Session3_CraftingEngine.ui.updateSlots();
-                }, 600);
-            }
-        }
+    loadLedger: function() {
+        try { this.ledger = JSON.parse(localStorage.getItem('khelo_ledger')) || []; } catch(e) { this.ledger = []; }
     },
-
-    // --- LIFECYCLE METHODS ---
-    init: function() {
-        try {
-            this.state.inventory = this.inventory.load();
-            this.ui.render();
-            console.log("[Session 3] Crafting Engine Initialized.");
-        } catch(e) {
-            throw new Error("Session 3 UI Initialization failed: " + e.message);
-        }
-    },
-
-    destroy: function() {
-        console.log("[Session 3] Crafting Engine Unloaded.");
+    saveLedger: function() {
+        try { localStorage.setItem('khelo_ledger', JSON.stringify(this.ledger)); } catch(e) {}
     }
 };
 
-/* ═══════════════════════════════════════════════════════════
-   BOOT SESSION 3
-   ═══════════════════════════════════════════════════════════ */
-if (typeof KhelOS !== 'undefined') {
-    KhelOS.register(3, Session3_CraftingEngine);
-} else {
-    console.error("[KhelOS] Core Kernel not found. Session 3 cannot boot.");
-}
-</script>
-
-  <!-- SESSION 4: WONDER GRAPH VISUALIZER -->
-<script>
-/* ═══════════════════════════════════════════════════════════
-   SESSION 4: WONDER GRAPH VISUALIZER (Spatial Knowledge Map)
-   ═══════════════════════════════════════════════════════════ */
-const Session4_WonderGraph = {
-    // --- ISOLATED CSS (Namespaced with k4-) ---
-    css: `
-        .k4-container { position: relative; width: 100%; height: 600px; background: rgba(0,0,0,0.3); 
-                        border: 1px solid rgba(255,255,255,0.08); border-radius: 24px; overflow: hidden;
-                        background-image: radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px); 
-                        background-size: 30px 30px; }
+// 5. MODULE 3: CRAFTING ENGINE
+const Module3_Crafting = {
+    state: { slot1: null, slot2: null },
+    init: function() { this.renderInventory(); },
+    renderInventory: function() {
+        const grid = document.getElementById('inventory-grid');
+        grid.innerHTML = '';
+        const items = Module2_Matrix.ledger.length > 0 ? Module2_Matrix.ledger : [
+            { id: 'm1', title: 'Water', radical: 'jal', icon: '💧', color: '#38bdf8' },
+            { id: 'm2', title: 'Earth', radical: 'prakriti', icon: '', color: '#10b981' },
+            { id: 'm3', title: 'Energy', radical: 'agni', icon: '⚡', color: '#f59e0b' }
+        ];
         
-        .k4-viewport { position: absolute; inset: 0; transform-origin: center center; transition: transform 0.3s ease-out; }
-        
-        .k4-svg-layer { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
-        .k4-edge { stroke-width: 1.5; stroke-dasharray: 4 4; opacity: 0.3; animation: k4-flow 20s linear infinite; }
-        @keyframes k4-flow { to { stroke-dashoffset: -100; } }
-        
-        .k4-node { position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center;
-                   border-radius: 50%; cursor: pointer; text-align: center; background: rgba(5,7,12,0.95);
-                   border: 2px solid; backdrop-filter: blur(8px); transform: translate(-50%, -50%) scale(0);
-                   animation: k4-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-                   transition: transform 0.3s, box-shadow 0.3s, border-radius 0.4s; z-index: 10; }
-        
-        /* Tri-State Layout Overrides */
-        body.mode-sat .k4-node { border-radius: 12px; }
-        body.mode-anand .k4-node { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; animation: k4-morph 8s ease-in-out infinite, k4-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
-        @keyframes k4-morph { 0%, 100% { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; } 50% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; } }
-        
-        .k4-node:hover { transform: translate(-50%, -50%) scale(1.3); z-index: 20; box-shadow: 0 0 40px currentColor !important; }
-        .k4-node.selected { border-width: 3px; box-shadow: 0 0 50px currentColor !important; }
-        @keyframes k4-pop { to { transform: translate(-50%, -50%) scale(1); } }
-        
-        .k4-node-icon { font-size: 1.8rem; filter: drop-shadow(0 0 10px currentColor); pointer-events: none; }
-        .k4-node-label { position: absolute; top: 115%; font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
-                         letter-spacing: 1px; white-space: nowrap; text-shadow: 0 2px 4px #000; pointer-events: none;
-                         color: #fff; opacity: 0.8; }
-        
-        .k4-controls { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px;
-                       background: rgba(0,0,0,0.6); padding: 10px 16px; border-radius: 30px; backdrop-filter: blur(10px);
-                       border: 1px solid rgba(255,255,255,0.1); z-index: 100; }
-        .k4-ctrl-btn { width: 36px; height: 36px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2);
-                       background: rgba(255,255,255,0.05); color: #fff; cursor: pointer; display: flex;
-                       align-items: center; justify-content: center; font-size: 1.2rem; transition: 0.2s; }
-        .k4-ctrl-btn:hover { background: rgba(255,255,255,0.15); transform: scale(1.1); }
-        .k4-ctrl-btn:active { transform: scale(0.95); }
-        
-        .k4-info-panel { position: absolute; top: 20px; right: 20px; max-width: 250px; background: rgba(10,15,25,0.95);
-                         border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 16px;
-                         backdrop-filter: blur(10px); z-index: 100; display: none; }
-        .k4-info-panel.show { display: block; animation: k4-slideIn 0.3s ease-out; }
-        @keyframes k4-slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
-        .k4-info-title { font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 8px; }
-        .k4-info-desc { font-size: 0.85rem; color: var(--k1-muted, #94a3b8); line-height: 1.5; }
-        .k4-info-close { position: absolute; top: 10px; right: 10px; width: 24px; height: 24px; border-radius: 50%;
-                         border: none; background: rgba(255,255,255,0.1); color: #fff; cursor: pointer; font-size: 0.9rem; }
-        
-        .k4-empty-state { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center;
-                          justify-content: center; color: var(--k1-muted, #94a3b8); text-align: center; padding: 40px; }
-        .k4-empty-icon { font-size: 4rem; margin-bottom: 20px; opacity: 0.3; }
-    `,
-
-    // --- STATE ---
-    state: {
-        nodes: [],
-        edges: [],
-        selectedNode: null,
-        animationFrame: null,
-        viewport: { x: 0, y: 0, scale: 1 },
-        layoutMode: 'chit' // 'sat' | 'chit' | 'anand'
+        items.forEach(item => {
+            const el = document.createElement('div');
+            el.className = 'k3-orb';
+            el.style.color = item.color;
+            el.innerHTML = `<div class="k3-orb-icon">${item.icon}</div><div class="k3-orb-name">${item.title}</div>`;
+            el.onclick = () => this.selectOrb(item);
+            grid.appendChild(el);
+        });
     },
-
-    // --- DATA LOADER (Reads from Session 2 Karma Ledger) ---
-    loader: {
-        load: () => {
-            if (window.KhelOS && window.KhelOS.registry[2] && window.KhelOS.registry[2].state.ledger) {
-                return window.KhelOS.registry[2].state.ledger;
-            }
-            return [];
+    selectOrb: function(item) {
+        const s = this.state;
+        if(!s.slot1) s.slot1 = item;
+        else if(!s.slot2) s.slot2 = item;
+        else { s.slot1 = item; s.slot2 = null; }
+        
+        this.updateSlots();
+        if(s.slot1 && s.slot2) setTimeout(() => this.attemptCraft(), 500);
+    },
+    updateSlots: function() {
+        const s1 = document.getElementById('slot1'), s2 = document.getElementById('slot2');
+        s1.innerHTML = this.state.slot1 ? this.state.slot1.icon : '';
+        s1.style.color = this.state.slot1 ? this.state.slot1.color : '';
+        s1.style.borderColor = this.state.slot1 ? this.state.slot1.color : '';
+        s1.className = `k3-slot ${this.state.slot1 ? 'filled' : ''}`;
+        
+        s2.innerHTML = this.state.slot2 ? this.state.slot2.icon : '';
+        s2.style.color = this.state.slot2 ? this.state.slot2.color : '';
+        s2.style.borderColor = this.state.slot2 ? this.state.slot2.color : '';
+        s2.className = `k3-slot ${this.state.slot2 ? 'filled' : ''}`;
+    },
+    attemptCraft: function() {
+        const { slot1, slot2 } = this.state;
+        const k1 = `${slot1.radical}+${slot2.radical}`, k2 = `${slot2.radical}+${slot1.radical}`;
+        const res = CRAFTING_MATRIX[k1] || CRAFTING_MATRIX[k2];
+        
+        if(res) {
+            Module1_Kernel.playTone(140);
+            KhelOS.showToast(`Synthesized: ${res.title}!`);
+            Module2_Matrix.compile({ id: 'craft_'+Date.now(), title: res.title, radical: 'buddhi', icon: res.icon, color: res.color, desc: res.desc, tags: ['crafted'] });
+            this.state.slot1 = null; this.state.slot2 = null;
+            this.updateSlots(); this.renderInventory();
+        } else {
+            Module1_Kernel.playTone(0);
+            KhelOS.showToast('Elements do not resonate...');
+            this.state.slot1 = null; this.state.slot2 = null;
+            this.updateSlots();
         }
-    },
+    }
+};
 
-    // --- LAYOUT ENGINES ---
-    layout: {
-        sat: (nodes, width, height) => {
-            // Grid/Matrix Layout
-            const cols = Math.ceil(Math.sqrt(nodes.length));
-            const spacing = Math.min(120, (width - 100) / cols);
-            nodes.forEach((n, i) => {
-                n.x = 80 + (i % cols) * spacing;
-                n.y = 80 + Math.floor(i / cols) * spacing;
-            });
-        },
-        chit: (nodes, width, height) => {
-            // Radial Orbit Layout
-            const cx = width / 2;
-            const cy = height / 2;
-            const radius = Math.min(cx, cy) - 100;
-            nodes.forEach((n, i) => {
-                const angle = (i / nodes.length) * Math.PI * 2;
-                n.x = cx + Math.cos(angle) * radius;
-                n.y = cy + Math.sin(angle) * radius;
-            });
-        },
-        anand: (nodes, width, height) => {
-            // Fibonacci Spiral Layout
-            const cx = width / 2;
-            const cy = height / 2;
-            nodes.forEach((n, i) => {
-                const angle = i * 137.508 * (Math.PI / 180); // Golden angle
-                const r = 70 + Math.sqrt(i + 1) * 45;
-                n.x = cx + Math.cos(angle) * r;
-                n.y = cy + Math.sin(angle) * r;
-            });
+// 6. MODULE 4: WONDER GRAPH
+const Module4_Graph = {
+    state: { nodes: [] },
+    init: function() { this.render(); },
+    render: function() {
+        const nodes = Module2_Matrix.ledger;
+        this.state.nodes = nodes;
+        const container = document.getElementById('graph-container');
+        const svg = document.getElementById('graph-svg');
+        const nodesLayer = document.getElementById('graph-nodes');
+        
+        svg.innerHTML = ''; nodesLayer.innerHTML = '';
+        if(nodes.length === 0) {
+            nodesLayer.innerHTML = '<div style="color:var(--text-muted); text-align:center; padding-top:200px; width:100%;">Compile concepts in "Learn" to see them here.</div>';
+            return;
         }
-    },
-
-    // --- RENDERER ---
-    renderer: {
-        render: () => {
-            const container = document.getElementById('k4-graph-container');
-            if (!container) return;
-
-            const nodes = Session4_WonderGraph.loader.load();
-            Session4_WonderGraph.state.nodes = nodes;
-
-            if (nodes.length === 0) {
-                container.innerHTML = `
-                    <div class="k4-empty-state">
-                        <div class="k4-empty-icon">🌌</div>
-                        <div style="font-size: 1.2rem; font-weight: 700; margin-bottom: 8px;">Your Universe is Empty</div>
-                        <div style="font-size: 0.9rem;">Compile concepts in the "Learn" section to see them appear here.</div>
-                    </div>
-                `;
-                return;
-            }
-
-            const width = container.clientWidth;
-            const height = container.clientHeight;
-            const mode = Session4_WonderGraph.state.layoutMode;
-
-            // Apply layout
-            Session4_WonderGraph.layout[mode](nodes, width, height);
-
-            // Generate edges (connect to center or based on tags)
-            Session4_WonderGraph.state.edges = [];
-            nodes.forEach((n, i) => {
-                if (i > 0) {
-                    Session4_WonderGraph.state.edges.push({ from: 0, to: i, color: n.color });
-                }
-            });
-
-            Session4_WonderGraph.renderer.drawGraph();
-        },
-
-        drawGraph: () => {
-            const container = document.getElementById('k4-graph-container');
-            if (!container) return;
-
-            const { nodes, edges } = Session4_WonderGraph.state;
-            const viewport = document.createElement('div');
-            viewport.className = 'k4-viewport';
-            viewport.id = 'k4-viewport';
-
-            // Draw SVG edges
-            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            svg.setAttribute('class', 'k4-svg-layer');
-            svg.setAttribute('viewBox', `0 0 ${container.clientWidth} ${container.clientHeight}`);
-
-            edges.forEach(e => {
-                const from = nodes[e.from];
-                const to = nodes[e.to];
-                if (!from || !to) return;
-
+        
+        const w = container.clientWidth, h = container.clientHeight;
+        const cx = w/2, cy = h/2;
+        const mode = KhelOS.state.mode;
+        
+        nodes.forEach((n, i) => {
+            let x, y;
+            if(mode === 'sat') { const cols = Math.ceil(Math.sqrt(nodes.length)); const sp = Math.min(120, (w-100)/cols); x = 80 + (i%cols)*sp; y = 80 + Math.floor(i/cols)*sp; }
+            else if(mode === 'anand') { const a = i * 137.508 * (Math.PI/180); const r = 70 + Math.sqrt(i+1)*45; x = cx + Math.cos(a)*r; y = cy + Math.sin(a)*r; }
+            else { const a = (i/nodes.length)*Math.PI*2; const r = Math.min(cx,cy)-100; x = cx + Math.cos(a)*r; y = cy + Math.sin(a)*r; }
+            
+            if(i > 0) {
                 const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                line.setAttribute('x1', from.x);
-                line.setAttribute('y1', from.y);
-                line.setAttribute('x2', to.x);
-                line.setAttribute('y2', to.y);
-                line.setAttribute('stroke', e.color);
-                line.setAttribute('class', 'k4-edge');
+                line.setAttribute('x1', cx); line.setAttribute('y1', cy);
+                line.setAttribute('x2', x); line.setAttribute('y2', y);
+                line.setAttribute('stroke', n.color); line.setAttribute('stroke-width', '1.5');
+                line.setAttribute('stroke-dasharray', '4 4'); line.style.opacity = '0.3';
                 svg.appendChild(line);
-            });
-
-            viewport.appendChild(svg);
-
-            // Draw nodes
-            nodes.forEach((n, i) => {
-                const el = document.createElement('div');
-                el.className = 'k4-node';
-                el.style.width = '60px';
-                el.style.height = '60px';
-                el.style.left = `${n.x}px`;
-                el.style.top = `${n.y}px`;
-                el.style.borderColor = n.color;
-                el.style.color = n.color;
-                el.style.boxShadow = `0 0 20px ${n.color}40, inset 0 0 10px ${n.color}20`;
-                el.style.animationDelay = `${i * 0.05}s`;
-
-                el.innerHTML = `
-                    <div class="k4-node-icon">${n.icon}</div>
-                    <div class="k4-node-label" style="color:${n.color}">${n.title}</div>
-                `;
-
-                el.onclick = () => Session4_WonderGraph.actions.selectNode(n, el);
-                viewport.appendChild(el);
-            });
-
-            container.innerHTML = '';
-            container.appendChild(viewport);
-
-            // Add controls
-            const controls = document.createElement('div');
-            controls.className = 'k4-controls';
-            controls.innerHTML = `
-                <button class="k4-ctrl-btn" onclick="Session4_WonderGraph.actions.zoomIn()" title="Zoom In">+</button>
-                <button class="k4-ctrl-btn" onclick="Session4_WonderGraph.actions.zoomOut()" title="Zoom Out">−</button>
-                <button class="k4-ctrl-btn" onclick="Session4_WonderGraph.actions.resetView()" title="Reset View">⟳</button>
-            `;
-            container.appendChild(controls);
-        }
-    },
-
-    // --- ACTIONS ---
-    actions: {
-        selectNode: (node, el) => {
-            // Deselect previous
-            document.querySelectorAll('.k4-node.selected').forEach(n => n.classList.remove('selected'));
-            el.classList.add('selected');
-
-            Session4_WonderGraph.state.selectedNode = node;
-
-            // Show info panel
-            const panel = document.getElementById('k4-info-panel');
-            if (panel) {
-                panel.querySelector('.k4-info-title').textContent = node.title;
-                panel.querySelector('.k4-info-desc').textContent = node.desc || 'A compiled concept in your knowledge universe.';
-                panel.classList.add('show');
             }
-
-            // Trigger audio from Session 1
-            if (window.KhelOS && window.KhelOS.registry[1] && window.KhelOS.registry[1].audio) {
-                const hue = parseInt(node.color.replace('#', ''), 16) % 360;
-                window.KhelOS.registry[1].audio.play(hue);
-            }
-        },
-
-        closeInfoPanel: () => {
-            const panel = document.getElementById('k4-info-panel');
-            if (panel) panel.classList.remove('show');
-            document.querySelectorAll('.k4-node.selected').forEach(n => n.classList.remove('selected'));
-        },
-
-        zoomIn: () => {
-            Session4_WonderGraph.state.viewport.scale = Math.min(2, Session4_WonderGraph.state.viewport.scale + 0.2);
-            Session4_WonderGraph.renderer.applyViewport();
-        },
-
-        zoomOut: () => {
-            Session4_WonderGraph.state.viewport.scale = Math.max(0.5, Session4_WonderGraph.state.viewport.scale - 0.2);
-            Session4_WonderGraph.renderer.applyViewport();
-        },
-
-        resetView: () => {
-            Session4_WonderGraph.state.viewport = { x: 0, y: 0, scale: 1 };
-            Session4_WonderGraph.renderer.applyViewport();
-        },
-
-        applyViewport: () => {
-            const viewport = document.getElementById('k4-viewport');
-            if (viewport) {
-                const { x, y, scale } = Session4_WonderGraph.state.viewport;
-                viewport.style.transform = `translate(${x}px, ${y}px) scale(${scale})`;
-            }
-        }
-    },
-
-    // --- LIFECYCLE METHODS ---
-    init: function() {
-        try {
-            const root = document.getElementById('k4-root');
-            if (!root) return;
-
-            root.innerHTML = `
-                <div class="k4-container" id="k4-graph-container"></div>
-                <div class="k4-info-panel" id="k4-info-panel">
-                    <button class="k4-info-close" onclick="Session4_WonderGraph.actions.closeInfoPanel()">✕</button>
-                    <div class="k4-info-title"></div>
-                    <div class="k4-info-desc"></div>
-                </div>
-            `;
-
-            this.renderer.render();
-
-            // Listen for layout mode changes from Session 1
-            if (window.KhelOS && window.KhelOS.registry[1]) {
-                const originalSetMode = window.KhelOS.registry[1].setMode;
-                if (originalSetMode) {
-                    window.KhelOS.registry[1].setMode = (mode) => {
-                        originalSetMode.call(window.KhelOS.registry[1], mode);
-                        this.state.layoutMode = mode;
-                        this.renderer.render();
-                    };
-                }
-            }
-
-            console.log("[Session 4] Wonder Graph Visualizer Initialized.");
-        } catch(e) {
-            throw new Error("Session 4 UI Initialization failed: " + e.message);
-        }
-    },
-
-    destroy: function() {
-        console.log("[Session 4] Wonder Graph Visualizer Unloaded.");
-        if (this.state.animationFrame) cancelAnimationFrame(this.state.animationFrame);
+            
+            const el = document.createElement('div');
+            el.className = 'dot-node';
+            el.style.width = '60px'; el.style.height = '60px';
+            el.style.left = `${x}px`; el.style.top = `${y}px`;
+            el.style.borderColor = n.color; el.style.color = n.color;
+            el.innerHTML = `<div style="font-size:1.8rem">${n.icon}</div><div class="dot-label" style="color:${n.color}">${n.title}</div>`;
+            el.onclick = () => { Module1_Kernel.playTone(parseInt(n.color.replace('#',''), 16) % 360); KhelOS.showToast(n.title); };
+            nodesLayer.appendChild(el);
+        });
     }
 };
 
-/* ═══════════════════════════════════════════════════════════
-   BOOT SESSION 4
-   ═══════════════════════════════════════════════════════════ */
-if (typeof KhelOS !== 'undefined') {
-    KhelOS.register(4, Session4_WonderGraph);
-} else {
-    console.error("[KhelOS] Core Kernel not found. Session 4 cannot boot.");
-}
-</script>
-
-  <!-- SESSION 5: UNIVERSAL CONNECTORS, DRILL TRAYS & ACCESSIBILITY -->
-<script>
-/* ══════════════════════════════════════════════════════════
-   SESSION 5: CONNECTORS, DRILL TRAYS & A11Y
-   ═══════════════════════════════════════════════════════════ */
-const Session5_Connectors = {
-    // --- ISOLATED CSS (Namespaced with k5-) ---
-    css: `
-        /* EVOD Flow Bar */
-        .k5-flow-bar {
-            position: fixed; bottom: 0; left: 0; right: 0; height: 60px;
-            background: rgba(2, 4, 10, 0.95); backdrop-filter: blur(12px);
-            border-top: 1px solid rgba(255,255,255,0.08); z-index: 90;
-            display: flex; align-items: center; justify-content: space-around; padding: 0 10px;
-        }
-        .k5-flow-step {
-            display: flex; flex-direction: column; align-items: center; gap: 4px;
-            cursor: pointer; opacity: 0.4; transition: 0.3s; padding: 5px;
-        }
-        .k5-flow-step.active { opacity: 1; }
-        .k5-flow-step .k5-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--k1-muted, #94a3b8); transition: 0.3s; }
-        .k5-flow-step.active .k5-dot { background: var(--k1-accent, #38bdf8); box-shadow: 0 0 10px var(--k1-accent); transform: scale(1.5); }
-        .k5-flow-step span { font-size: 0.55rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--k1-muted); }
-        .k5-flow-step.active span { color: #fff; }
-
-        /* Drill Tray (Level 2/3 Topics) */
-        .k5-drill-tray {
-            position: fixed; bottom: 70px; left: 0; right: 0; height: 100px;
-            background: rgba(10, 15, 25, 0.98); border-top: 1px solid rgba(255,255,255,0.05);
-            z-index: 89; display: flex; align-items: center; overflow-x: auto; padding: 0 16px; gap: 12px;
-            transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        .k5-drill-tray.show { transform: translateY(0); }
-        .k5-drill-card {
-            min-width: 80px; height: 80px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            cursor: pointer; transition: 0.2s; gap: 6px; flex-shrink: 0;
-        }
-        .k5-drill-card:hover { background: rgba(255,255,255,0.08); transform: translateY(-4px); border-color: var(--k1-accent); }
-        .k5-drill-icon { font-size: 1.5rem; }
-        .k5-drill-name { font-size: 0.6rem; font-weight: 700; color: var(--k1-muted); text-transform: uppercase; text-align: center; }
-
-        /* Connectors Drawer */
-        .k5-drawer {
-            position: fixed; top: 0; right: 0; height: 100vh; width: 300px; max-width: 85vw;
-            background: #0a0f19; border-left: 1px solid rgba(255,255,255,0.1); z-index: 100;
-            transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            padding: 24px; overflow-y: auto; box-shadow: -10px 0 40px rgba(0,0,0,0.5);
-        }
-        .k5-drawer.open { transform: translateX(0); }
-        .k5-drawer-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-        .k5-drawer-title { font-size: 1.2rem; font-weight: 800; color: #fff; }
-        .k5-close-btn { background: none; border: none; color: var(--k1-muted); font-size: 1.5rem; cursor: pointer; }
-        
-        .k5-link-btn {
-            width: 100%; padding: 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);
-            background: rgba(255,255,255,0.03); color: #fff; font-weight: 700; font-size: 0.9rem;
-            display: flex; align-items: center; gap: 12px; cursor: pointer; transition: 0.2s; margin-bottom: 10px;
-            text-decoration: none;
-        }
-        .k5-link-btn:hover { background: rgba(255,255,255,0.08); transform: translateX(4px); }
-        .k5-link-btn.wiki { border-color: rgba(16, 185, 129, 0.3); color: var(--k1-emerald, #10b981); }
-        .k5-link-btn.github { border-color: rgba(168, 85, 247, 0.3); color: var(--k1-violet, #a855f7); }
-        .k5-link-btn.search { border-color: rgba(251, 191, 36, 0.3); color: var(--k1-gold, #fbbf24); }
-
-        /* Accessibility Toggle */
-        .k5-a11y-toggle {
-            position: fixed; top: 20px; right: 20px; width: 40px; height: 40px; border-radius: 50%;
-            background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.1); color: #fff;
-            display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 95;
-            font-size: 1.2rem; backdrop-filter: blur(8px); transition: 0.2s;
-        }
-        .k5-a11y-toggle:hover { background: rgba(255,255,255,0.1); transform: scale(1.1); }
-        
-        /* High Contrast Mode */
-        body.k5-high-contrast { filter: contrast(1.5) brightness(1.1); }
-        body.k5-high-contrast .k5-flow-step { opacity: 1 !important; }
-    `,
-
-    // --- DATA: SUB-DOMAINS (Drill Down Tray) ---
-    subDomains: [
-        { id: 'movies', name: 'Movies', icon: '🎬', color: '#f43f5e' },
-        { id: 'books', name: 'Books', icon: '📚', color: '#38bdf8' },
-        { id: 'sports', name: 'Sports', icon: '⚽', color: '#10b981' },
-        { id: 'music', name: 'Music', icon: '🎵', color: '#a855f7' },
-        { id: 'science', name: 'Science', icon: '🔬', color: '#0ea5e9' },
-        { id: 'products', name: 'Products', icon: '🛍️', color: '#f59e0b' },
-        { id: 'drama', name: 'Drama', icon: '🎭', color: '#ec4899' },
-        { id: 'exercise', name: 'Fitness', icon: '🏋️', color: '#ef4444' }
-    ],
-
-    // --- STATE ---
-    state: {
-        currentStage: 0,
-        drawerOpen: false,
-        highContrast: false
+// 7. MODULE 5: EVOLVE & CONNECTORS
+const Module5_Evolve = {
+    init: function() { this.updateStats(); this.bindEVOD(); },
+    updateStats: function() {
+        document.getElementById('ledger-count').innerText = Module2_Matrix.ledger.length;
     },
-
-    // --- EVOD FLOW STAGES ---
-    stages: ['Discover', 'Meet', 'Learn', 'Experience', 'Participate', 'Contribute', 'Evolve'],
-
-    // --- UI CONTROLLER ---
-    ui: {
-        render: () => {
-            const root = document.getElementById('k5-root');
-            if(!root) return;
-            
-            root.innerHTML = `
-                <!-- Accessibility Toggle -->
-                <button class="k5-a11y-toggle" id="k5-a11y-btn" aria-label="Toggle Accessibility Options">◐</button>
-                
-                <!-- Drill Tray -->
-                <div class="k5-drill-tray" id="k5-drill-tray"></div>
-                
-                <!-- EVOD Flow Bar -->
-                <div class="k5-flow-bar" id="k5-flow-bar"></div>
-                
-                <!-- Connectors Drawer -->
-                <div class="k5-drawer" id="k5-drawer">
-                    <div class="k5-drawer-header">
-                        <div class="k5-drawer-title">Universal Connectors</div>
-                        <button class="k5-close-btn" id="k5-close-drawer">✕</button>
-                    </div>
-                    <div id="k5-links-container"></div>
-                    <div style="margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
-                        <div style="font-size: 0.8rem; color: var(--k1-muted); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;">Accessibility</div>
-                        <button class="k5-link-btn" id="k5-contrast-btn">
-                            <span></span> High Contrast Mode
-                        </button>
-                    </div>
-                </div>
-            `;
-
-            Session5_Connectors.ui.renderFlowBar();
-            Session5_Connectors.ui.bindEvents();
-        },
-
-        renderFlowBar: () => {
-            const bar = document.getElementById('k5-flow-bar');
-            if(!bar) return;
-            bar.innerHTML = Session5_Connectors.stages.map((stage, i) => `
-                <div class="k5-flow-step ${i === Session5_Connectors.state.currentStage ? 'active' : ''}" data-stage="${i}">
-                    <div class="k5-dot"></div>
-                    <span>${stage}</span>
-                </div>
-            `).join('');
-        },
-
-        renderDrillTray: (activeSubDomain) => {
-            const tray = document.getElementById('k5-drill-tray');
-            if(!tray) return;
-            
-            tray.innerHTML = Session5_Connectors.subDomains.map(sub => `
-                <div class="k5-drill-card" data-sub="${sub.id}" style="border-color: ${sub.id === activeSubDomain ? sub.color : 'rgba(255,255,255,0.08)'}">
-                    <div class="k5-drill-icon">${sub.icon}</div>
-                    <div class="k5-drill-name">${sub.name}</div>
-                </div>
-            `).join('');
-        },
-
-        renderConnectors: (concept) => {
-            const container = document.getElementById('k5-links-container');
-            if(!container || !concept) return;
-
-            const title = encodeURIComponent(concept.title.replace(/\s+/g, '_'));
-            const rawTitle = encodeURIComponent(concept.title);
-
-            container.innerHTML = `
-                <div style="font-size: 0.8rem; color: var(--k1-muted); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;">Contribute & Explore</div>
-                <a href="https://kids.miraheze.org/wiki/${title}?action=edit" target="_blank" class="k5-link-btn wiki">
-                    <span>📝</span> Edit Kids Wiki
-                </a>
-                <a href="https://github.com/bhearth/khela/new/main/pages?filename=${title}.md&value=${encodeURIComponent('# ' + concept.title + '\n\nMy Observation: ')}" target="_blank" class="k5-link-btn github">
-                    <span>💻</span> Map to GitHub
-                </a>
-                <a href="https://www.google.com/search?q=${rawTitle}+facts+for+kids" target="_blank" class="k5-link-btn search">
-                    <span>🔍</span> Google Knowledge
-                </a>
-            `;
-        },
-
-        bindEvents: () => {
-            // Flow Bar Clicks
-            document.getElementById('k5-flow-bar').addEventListener('click', (e) => {
-                const step = e.target.closest('.k5-flow-step');
-                if (step) {
-                    Session5_Connectors.state.currentStage = parseInt(step.dataset.stage);
-                    Session5_Connectors.ui.renderFlowBar();
-                    // Trigger audio from Session 1
-                    if (window.KhelOS && window.KhelOS.registry[1] && window.KhelOS.registry[1].audio) {
-                        window.KhelOS.registry[1].audio.play(200 + (Session5_Connectors.state.currentStage * 40));
-                    }
-                }
-            });
-
-            // Drill Tray Clicks
-            document.getElementById('k5-drill-tray').addEventListener('click', (e) => {
-                const card = e.target.closest('.k5-drill-card');
-                if (card) {
-                    const subId = card.dataset.sub;
-                    Session5_Connectors.ui.renderDrillTray(subId);
-                    if (window.KhelOS && window.KhelOS.registry[1] && window.KhelOS.registry[1].ui) {
-                        window.KhelOS.registry[1].ui.showToast(`Drilling into ${subId}...`);
-                    }
-                }
-            });
-
-            // Drawer Toggles
-            document.getElementById('k5-a11y-btn').addEventListener('click', () => {
-                Session5_Connectors.state.drawerOpen = !Session5_Connectors.state.drawerOpen;
-                document.getElementById('k5-drawer').classList.toggle('open', Session5_Connectors.state.drawerOpen);
-            });
-            document.getElementById('k5-close-drawer').addEventListener('click', () => {
-                Session5_Connectors.state.drawerOpen = false;
-                document.getElementById('k5-drawer').classList.remove('open');
-            });
-
-            // High Contrast
-            document.getElementById('k5-contrast-btn').addEventListener('click', () => {
-                Session5_Connectors.state.highContrast = !Session5_Connectors.state.highContrast;
-                document.body.classList.toggle('k5-high-contrast', Session5_Connectors.state.highContrast);
-            });
-        }
+    bindEVOD: function() {
+        document.querySelectorAll('.k5-flow-step').forEach((step, i) => {
+            step.onclick = () => {
+                document.querySelectorAll('.k5-flow-step').forEach(s => s.classList.remove('active'));
+                step.classList.add('active');
+                Module1_Kernel.playTone(200 + (i * 40));
+            };
+        });
     },
-
-    // --- PUBLIC API (Called by other sessions) ---
     actions: {
-        setStage: (stageIndex) => {
-            if (stageIndex >= 0 && stageIndex < Session5_Connectors.stages.length) {
-                Session5_Connectors.state.currentStage = stageIndex;
-                Session5_Connectors.ui.renderFlowBar();
-            }
-        },
-        showDrillTray: (activeSubDomain = null) => {
-            Session5_Connectors.ui.renderDrillTray(activeSubDomain);
-            document.getElementById('k5-drill-tray').classList.add('show');
-        },
-        hideDrillTray: () => {
-            document.getElementById('k5-drill-tray').classList.remove('show');
-        },
-        openConnectorsFor: (concept) => {
-            Session5_Connectors.ui.renderConnectors(concept);
-            Session5_Connectors.state.drawerOpen = true;
-            document.getElementById('k5-drawer').classList.add('open');
+        openConnectors: function() {
+            const title = Module2_Matrix.ledger.length > 0 ? Module2_Matrix.ledger[0].title : 'Knowledge';
+            KhelOS.showToast(`Opening connectors for ${title}...`);
+            // In a full build, this would open the S5 Drawer
         }
-    },
-
-    // --- LIFECYCLE METHODS ---
-    init: function() {
-        try {
-            this.ui.render();
-            console.log("[Session 5] Connectors & A11y Initialized.");
-        } catch(e) {
-            throw new Error("Session 5 UI Initialization failed: " + e.message);
-        }
-    },
-
-    destroy: function() {
-        console.log("[Session 5] Connectors & A11y Unloaded.");
-        document.body.classList.remove('k5-high-contrast');
     }
 };
 
-/* ═══════════════════════════════════════════════════════════
-   BOOT SESSION 5
-   ═══════════════════════════════════════════════════════════ */
-if (typeof KhelOS !== 'undefined') {
-    KhelOS.register(5, Session5_Connectors);
-} else {
-    console.error("[KhelOS] Core Kernel not found. Session 5 cannot boot.");
-}
-</script>
+// 8. MASTER BOOT SEQUENCE
+window.onload = function() {
+    // Bind Navigation
+    document.querySelectorAll('.nav-item').forEach(btn => {
+        btn.onclick = () => {
+            document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            document.getElementById(`panel-${btn.dataset.panel}`).classList.add('active');
+            
+            // JIT Rendering for heavy modules
+            if(btn.dataset.panel === 'collaborate') Module4_Graph.render();
+            if(btn.dataset.panel === 'experience') Module3_Crafting.renderInventory();
+            if(btn.dataset.panel === 'evolve') Module5_Evolve.updateStats();
+        };
+    });
 
-  
-  
+    // Initialize Modules in Order
+    KhelOS.register(1, Module1_Kernel);
+    KhelOS.register(2, Module2_Matrix);
+    KhelOS.register(3, Module3_Crafting);
+    KhelOS.register(4, Module4_Graph);
+    KhelOS.register(5, Module5_Evolve);
+    
+    console.log("%c[KhelOS] Hyper-OS Master Edition Booted Successfully.", "color: #10b981; font-weight: bold; font-size: 14px;");
+};
+</script>
 </body>
 </html>
