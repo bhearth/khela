@@ -1,0 +1,2141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>E = MA² — The Full Framework · Corrected · Three Realms · The Resonant Word Family</title>
+ 
+<meta name="description" content="The complete corrected framework: E=MA² as two bounded indices of human expression. Expressive clarity as the operational signature of consciousness. Moha and Maya operationalized. The full resonant word family of MAA: mother, head, monastery, maitri, metta, measure, illusion, matter, mathematics. A synthesis for philosophy, science, and practice." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Serif+Devanagari:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#07060c;
+    --bg-2:#0d0c16;
+    --bg-3:#13121f;
+    --ink:#ece7db;
+    --ink-soft:#cfc8b8;
+    --muted:#8e8878;
+    --gold:#d4af37;
+    --gold-soft:#f0c860;
+    --gold-bright:#ffe9a3;
+    --gold-dim:rgba(212,175,55,.30);
+    --gold-line:rgba(212,175,55,.15);
+    --rose:#d47a84;
+    --teal:#6fb3a8;
+    --violet:#9a8cd9;
+    --radius:16px;
+    --radius-lg:22px;
+    --max:1200px;
+    --max-narrow:780px;
+    --font-display:'Cormorant Garamond', Georgia, serif;
+    --font-body:'Inter', system-ui, -apple-system, sans-serif;
+    --font-mono:'JetBrains Mono', 'Courier New', monospace;
+    --font-dev:'Noto Serif Devanagari', 'Cormorant Garamond', serif;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth; scroll-padding-top:100px;}
+
+  body{
+    margin:0;
+    background:
+      radial-gradient(1400px 800px at 10% -10%, rgba(212,175,55,.09), transparent 55%),
+      radial-gradient(1100px 700px at 90% 8%, rgba(111,179,168,.06), transparent 50%),
+      radial-gradient(900px 700px at 50% 110%, rgba(212,122,132,.05), transparent 55%),
+      var(--bg);
+    color:var(--ink);
+    font-family:var(--font-body);
+    font-size:17px;
+    line-height:1.75;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+    overflow-x:hidden;
+  }
+
+  body::before{
+    content:"";
+    position:fixed; inset:0; pointer-events:none; z-index:1;
+    opacity:.032;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E");
+  }
+
+  a{color:var(--gold-soft); text-decoration:none; transition:color .2s;}
+  a:hover{color:var(--gold-bright);}
+  ::selection{background:rgba(212,175,55,.3); color:#fff;}
+
+  /* ================= NAV ================= */
+  .nav{
+    position:sticky; top:0; z-index:60;
+    backdrop-filter:blur(16px) saturate(130%);
+    -webkit-backdrop-filter:blur(16px) saturate(130%);
+    background:linear-gradient(to bottom, rgba(7,6,12,.9), rgba(7,6,12,.65));
+    border-bottom:1px solid var(--gold-line);
+  }
+  .nav-inner{
+    max-width:var(--max); margin:0 auto;
+    padding:12px 24px;
+    display:flex; align-items:center; gap:20px;
+  }
+  .brand{
+    font-family:var(--font-display);
+    font-size:1.28rem; font-weight:600; letter-spacing:.02em;
+    color:var(--ink); white-space:nowrap;
+    display:flex; align-items:center; gap:9px;
+  }
+  .brand .orb{
+    width:10px; height:10px; border-radius:50%;
+    background:radial-gradient(circle at 30% 30%, #fff3c4, var(--gold));
+    box-shadow:0 0 16px rgba(212,175,55,.85);
+  }
+  .nav-links{
+    display:flex; gap:2px; overflow-x:auto; scrollbar-width:none;
+    flex:1; justify-content:flex-end;
+  }
+  .nav-links::-webkit-scrollbar{display:none;}
+  .nav-links a{
+    font-size:.68rem; letter-spacing:.11em; text-transform:uppercase;
+    color:var(--muted); padding:7px 10px; border-radius:999px;
+    white-space:nowrap; transition:.25s; font-weight:500;
+  }
+  .nav-links a:hover{color:var(--gold-soft); background:rgba(212,175,55,.08);}
+
+  /* ================= REALM BAR ================= */
+  .realm-bar{
+    position:sticky; top:57px; z-index:55;
+    background:linear-gradient(to bottom, rgba(7,6,12,.92), rgba(7,6,12,.72));
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--gold-line);
+  }
+  .realm-inner{
+    max-width:var(--max); margin:0 auto; padding:10px 24px;
+    display:flex; gap:8px; flex-wrap:wrap; align-items:center;
+  }
+  .realm-label{
+    font-size:.62rem; letter-spacing:.22em; text-transform:uppercase;
+    color:var(--muted); margin-right:8px; font-weight:600;
+  }
+  .realm-btn{
+    background:transparent; border:1px solid var(--gold-line);
+    color:var(--muted); cursor:pointer;
+    padding:6px 14px; border-radius:999px;
+    font-size:.72rem; letter-spacing:.06em; font-family:var(--font-body);
+    transition:.22s;
+  }
+  .realm-btn:hover{color:var(--gold-soft); border-color:rgba(212,175,55,.5);}
+  .realm-btn.active{
+    background:rgba(212,175,55,.14); color:var(--gold-bright);
+    border-color:var(--gold);
+  }
+  .realm-hint{
+    font-size:.68rem; color:var(--muted); margin-left:auto; font-style:italic;
+    opacity:.75; letter-spacing:.02em;
+  }
+
+  body[data-realm="philosophy"] .only-science,
+  body[data-realm="philosophy"] .only-practice,
+  body[data-realm="science"] .only-philosophy,
+  body[data-realm="science"] .only-practice,
+  body[data-realm="practice"] .only-philosophy,
+  body[data-realm="practice"] .only-science{
+    display:none !important;
+  }
+
+  /* ================= HERO ================= */
+  .hero{
+    position:relative;
+    padding:100px 0 80px;
+    text-align:center;
+    overflow:hidden;
+  }
+  .hero .spiral{
+    position:absolute; inset:auto 50% -30% auto;
+    transform:translateX(50%);
+    width:min(92vw, 740px); height:min(92vw, 740px);
+    opacity:.13; pointer-events:none; z-index:0;
+    animation:spin 240s linear infinite;
+  }
+  @keyframes spin{to{transform:translateX(50%) rotate(360deg);}}
+
+  .kicker{
+    font-size:.7rem; letter-spacing:.42em; text-transform:uppercase;
+    color:var(--gold); margin-bottom:24px; font-weight:500;
+  }
+  .hero h1{
+    font-family:var(--font-display);
+    font-size:clamp(3.4rem, 14vw, 9rem);
+    font-weight:400;
+    line-height:.92;
+    margin:0 0 12px;
+    letter-spacing:-.02em;
+    background:linear-gradient(180deg, #fff8e2 0%, var(--gold-soft) 45%, #a8862a 100%);
+    -webkit-background-clip:text; background-clip:text;
+    -webkit-text-fill-color:transparent;
+    text-shadow:0 0 100px rgba(212,175,55,.25);
+  }
+  .hero h1 sup{font-size:.48em; vertical-align:super;}
+  .hero .sub{
+    font-family:var(--font-display);
+    font-style:italic;
+    font-size:clamp(1.15rem, 2.5vw, 1.6rem);
+    color:var(--ink-soft);
+    max-width:780px; margin:18px auto 0;
+    line-height:1.55;
+  }
+  .hero .rule{
+    width:1px; height:70px; margin:38px auto 0;
+    background:linear-gradient(to bottom, transparent, var(--gold), transparent);
+  }
+  .hero .fib{
+    margin-top:24px;
+    display:flex; justify-content:center; gap:12px; flex-wrap:wrap;
+    font-size:.68rem; letter-spacing:.24em; text-transform:uppercase; color:var(--muted);
+  }
+  .hero .fib span{
+    border:1px solid var(--gold-line); border-radius:999px; padding:6px 13px;
+  }
+
+  /* ================= SHELL ================= */
+  .shell{max-width:var(--max); margin:0 auto; padding:0 26px; position:relative; z-index:2;}
+
+  /* ================= CHAPTER ================= */
+  .chapter{
+    position:relative;
+    padding:80px 0 30px;
+    border-top:1px solid var(--gold-line);
+  }
+  .chapter:first-of-type{border-top:none;}
+
+  .chapter-head{
+    display:grid;
+    grid-template-columns:auto 1fr;
+    gap:26px;
+    align-items:start;
+    margin-bottom:44px;
+  }
+  .numeral{
+    font-family:var(--font-display);
+    font-size:clamp(2.8rem,5.5vw,4.2rem);
+    line-height:.8;
+    color:transparent;
+    -webkit-text-stroke:1px var(--gold-dim);
+    font-weight:400;
+    letter-spacing:-.02em;
+    user-select:none;
+    padding-top:4px;
+  }
+  .chapter-title{
+    font-family:var(--font-display);
+    font-size:clamp(1.85rem, 4vw, 2.8rem);
+    font-weight:500;
+    line-height:1.12;
+    margin:0 0 10px;
+    letter-spacing:-.01em;
+    color:var(--ink);
+  }
+  .chapter-title em{color:var(--gold-soft); font-style:italic;}
+  .chapter-lede{
+    color:var(--muted);
+    font-size:.95rem;
+    max-width:720px;
+    margin:0;
+    line-height:1.6;
+  }
+
+  /* ================= TYPOGRAPHY ================= */
+  p{margin:0 0 1.15em; color:var(--ink-soft);}
+  p strong{color:var(--ink); font-weight:600;}
+  p em{color:var(--gold-soft); font-style:italic;}
+  .lead{
+    font-family:var(--font-display);
+    font-size:clamp(1.2rem, 2.1vw, 1.45rem);
+    line-height:1.62;
+    color:var(--ink);
+    font-weight:400;
+  }
+  .dropcap::first-letter{
+    font-family:var(--font-display);
+    font-size:4.2em;
+    float:left;
+    line-height:.78;
+    padding:.06em .12em 0 0;
+    color:var(--gold-soft);
+  }
+  .muted{color:var(--muted);}
+  .small{font-size:.86rem;}
+  .tiny{font-size:.74rem; letter-spacing:.03em;}
+
+  .dev{
+    font-family:var(--font-dev);
+    color:var(--gold-soft);
+    line-height:1.4;
+  }
+
+  /* ================= CARDS ================= */
+  .card{
+    background:linear-gradient(160deg, rgba(255,255,255,.033), rgba(255,255,255,.008));
+    border:1px solid var(--gold-line);
+    border-radius:var(--radius);
+    padding:28px 30px;
+    margin:22px 0;
+    position:relative;
+    overflow:hidden;
+  }
+  .card::after{
+    content:""; position:absolute; top:0; left:0; right:0; height:1px;
+    background:linear-gradient(90deg, transparent, rgba(212,175,55,.55), transparent);
+  }
+  .card h3{
+    font-family:var(--font-display);
+    font-size:1.4rem; font-weight:600; margin:0 0 12px; color:var(--ink);
+  }
+  .card h4{
+    font-size:.7rem; letter-spacing:.2em; text-transform:uppercase;
+    color:var(--gold); margin:0 0 14px; font-weight:600;
+  }
+  .card p:last-child{margin-bottom:0;}
+
+  .card-accent{
+    border-color:rgba(212,175,55,.35);
+    background:linear-gradient(160deg, rgba(212,175,55,.06), rgba(255,255,255,.008));
+  }
+  .card-teal{
+    border-color:rgba(111,179,168,.28);
+    background:linear-gradient(160deg, rgba(111,179,168,.06), rgba(255,255,255,.008));
+  }
+  .card-teal h4{color:var(--teal);}
+  .card-rose{
+    border-color:rgba(212,122,132,.28);
+    background:linear-gradient(160deg, rgba(212,122,132,.06), rgba(255,255,255,.008));
+  }
+  .card-rose h4{color:var(--rose);}
+  .card-violet{
+    border-color:rgba(154,140,217,.28);
+    background:linear-gradient(160deg, rgba(154,140,217,.06), rgba(255,255,255,.008));
+  }
+  .card-violet h4{color:var(--violet);}
+
+  .grid-2{display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:20px;}
+  .grid-3{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:18px;}
+
+  /* ================= PULL QUOTE ================= */
+  .pull{
+    margin:46px 0;
+    padding:34px clamp(20px,4vw,44px);
+    border-left:2px solid var(--gold);
+    background:linear-gradient(90deg, rgba(212,175,55,.07), transparent 70%);
+    border-radius:0 12px 12px 0;
+  }
+  .pull p{
+    font-family:var(--font-display);
+    font-size:clamp(1.2rem, 2.4vw, 1.65rem);
+    line-height:1.5;
+    font-style:italic;
+    color:var(--ink);
+    margin:0;
+  }
+  .pull p::before{content:"“"; color:var(--gold); margin-right:.06em;}
+  .pull p::after{content:"”"; color:var(--gold); margin-left:.04em;}
+
+  /* ================= FORMULA ================= */
+  .formula{
+    text-align:center;
+    font-family:var(--font-display);
+    font-size:clamp(1.6rem, 4.5vw, 2.8rem);
+    color:var(--gold-soft);
+    letter-spacing:.03em;
+    padding:32px 18px;
+    margin:24px 0;
+    border-top:1px solid var(--gold-line);
+    border-bottom:1px solid var(--gold-line);
+    background:radial-gradient(ellipse at center, rgba(212,175,55,.07), transparent 70%);
+    line-height:1.3;
+    overflow-x:auto;
+  }
+  .formula small{
+    display:block; font-family:var(--font-body); font-size:.68rem;
+    letter-spacing:.24em; text-transform:uppercase; color:var(--muted);
+    margin-top:14px;
+  }
+  .formula code{
+    font-family:var(--font-display); font-style:italic;
+    color:var(--gold-soft);
+  }
+
+  .math{
+    font-family:'Cormorant Garamond', Georgia, serif;
+    font-style:italic;
+    color:var(--gold-soft);
+    white-space:nowrap;
+  }
+  .mono{
+    font-family:var(--font-mono);
+    font-size:.92em;
+    color:var(--gold-soft);
+    letter-spacing:-.01em;
+  }
+
+  /* ================= DEFINITION LIST ================= */
+  .defs{display:grid; gap:2px; margin:24px 0; border:1px solid var(--gold-line); border-radius:14px; overflow:hidden;}
+  .def{
+    display:grid; grid-template-columns:120px 1fr; gap:18px;
+    padding:16px 22px;
+    background:rgba(255,255,255,.015);
+    align-items:start;
+  }
+  .def:nth-child(odd){background:rgba(255,255,255,.03);}
+  .def .k{
+    font-family:var(--font-display);
+    font-size:1.45rem; color:var(--gold-soft); line-height:1.2;
+    font-weight:600;
+  }
+  .def .v{color:var(--ink-soft); font-size:.96rem; line-height:1.6;}
+  .def .v strong{color:var(--ink);}
+
+  /* ================= CHIPS ================= */
+  .chips{display:flex; flex-wrap:wrap; gap:10px; margin:16px 0 8px;}
+  .chip{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:8px 15px; border-radius:999px;
+    border:1px solid var(--gold-line);
+    background:rgba(255,255,255,.025);
+    font-size:.9rem; color:var(--ink-soft);
+    transition:.22s;
+  }
+  .chip:hover{
+    border-color:rgba(212,175,55,.55);
+    background:rgba(212,175,55,.08);
+    color:var(--ink);
+    transform:translateY(-2px);
+  }
+  .chip .e{font-size:1.05rem; line-height:1;}
+
+  /* ================= CALC ================= */
+  .calc{
+    border:1px solid var(--gold-line);
+    border-radius:var(--radius);
+    padding:26px 28px;
+    margin:22px 0;
+    background:linear-gradient(170deg, rgba(212,175,55,.04), rgba(255,255,255,.006));
+  }
+  .calc .tag{
+    display:inline-block;
+    font-size:.64rem; letter-spacing:.22em; text-transform:uppercase;
+    color:var(--gold); border:1px solid rgba(212,175,55,.35);
+    border-radius:999px; padding:4px 12px; margin-bottom:16px;
+  }
+  .steps{
+    font-family:var(--font-mono);
+    font-size:.86rem;
+    line-height:1.95;
+    color:var(--ink-soft);
+    margin:16px 0;
+    padding:16px 20px;
+    border-left:1px solid var(--gold-dim);
+    background:rgba(0,0,0,.25);
+    border-radius:0 10px 10px 0;
+    overflow-x:auto;
+  }
+  .steps .res{color:var(--gold-soft); font-weight:600;}
+  .steps .warn{color:var(--rose); font-weight:500;}
+  .steps .good{color:var(--teal); font-weight:500;}
+  .answer{
+    display:inline-block;
+    font-family:var(--font-display);
+    font-size:1.4rem; color:var(--gold-soft);
+    border-bottom:1px solid var(--gold-dim);
+    padding-bottom:2px;
+  }
+
+  /* ================= TABLE ================= */
+  .table-wrap{overflow-x:auto; border:1px solid var(--gold-line); border-radius:14px; margin:24px 0;}
+  table{width:100%; border-collapse:collapse; min-width:520px; font-size:.92rem;}
+  thead th{
+    text-align:left; padding:14px 18px;
+    font-size:.66rem; letter-spacing:.16em; text-transform:uppercase;
+    color:var(--gold); font-weight:600;
+    background:rgba(212,175,55,.06);
+    border-bottom:1px solid var(--gold-line);
+  }
+  tbody td{padding:12px 18px; border-bottom:1px solid rgba(212,175,55,.07); color:var(--ink-soft); vertical-align:top;}
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr:hover td{background:rgba(212,175,55,.04); color:var(--ink);}
+
+  /* ================= NOTE ================= */
+  .note{
+    border:1px solid rgba(111,179,168,.25);
+    background:linear-gradient(160deg, rgba(111,179,168,.06), rgba(111,179,168,.01));
+    border-radius:12px;
+    padding:20px 24px;
+    margin:20px 0;
+    font-size:.94rem;
+  }
+  .note .label{
+    display:block; font-size:.64rem; letter-spacing:.22em; text-transform:uppercase;
+    color:var(--teal); font-weight:600; margin-bottom:8px;
+  }
+  .note p{color:var(--ink-soft); margin:0;}
+
+  .caution{
+    border:1px solid rgba(212,122,132,.28);
+    background:linear-gradient(160deg, rgba(212,122,132,.06), rgba(212,122,132,.01));
+    border-radius:12px;
+    padding:20px 24px;
+    margin:20px 0;
+    font-size:.94rem;
+  }
+  .caution .label{
+    display:block; font-size:.64rem; letter-spacing:.22em; text-transform:uppercase;
+    color:var(--rose); font-weight:600; margin-bottom:8px;
+  }
+  .caution p{color:var(--ink-soft); margin:0;}
+
+  /* ================= ATTRIBUTES ================= */
+  .attrs{display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:12px; margin:24px 0;}
+  .attr{
+    border:1px solid var(--gold-line);
+    border-radius:10px;
+    padding:16px 18px;
+    background:rgba(255,255,255,.015);
+    transition:.3s;
+  }
+  .attr:hover{border-color:rgba(212,175,55,.5); background:rgba(212,175,55,.05); transform:translateY(-2px);}
+  .attr .n{font-family:var(--font-display); font-size:1.1rem; color:var(--gold-soft); font-weight:600; display:block; margin-bottom:3px;}
+  .attr .m{font-size:.82rem; color:var(--muted); letter-spacing:.02em;}
+
+  /* ================= CIRCUMPLEX ================= */
+  .circumplex-wrap{
+    margin:34px 0;
+    padding:24px;
+    border:1px solid var(--gold-line);
+    border-radius:var(--radius-lg);
+    background:linear-gradient(170deg, rgba(212,175,55,.035), rgba(0,0,0,.2));
+    display:grid;
+    grid-template-columns:minmax(280px, 1fr) minmax(260px, 1fr);
+    gap:26px;
+    align-items:center;
+  }
+  .circumplex-svg{width:100%; height:auto; display:block;}
+  .quad-list{display:grid; gap:12px;}
+  .quad-item{
+    padding:12px 16px;
+    border-left:2px solid var(--gold-dim);
+    background:rgba(255,255,255,.02);
+    border-radius:0 8px 8px 0;
+  }
+  .quad-item .qname{
+    font-family:var(--font-display); font-size:1.05rem;
+    color:var(--gold-soft); font-weight:600; display:block;
+    margin-bottom:2px;
+  }
+  .quad-item .qdesc{font-size:.83rem; color:var(--muted); line-height:1.5;}
+
+  @media (max-width:820px){
+    .circumplex-wrap{grid-template-columns:1fr;}
+  }
+
+  /* ================= SPECTRUM BAR ================= */
+  .spectrum{
+    margin:26px 0;
+    padding:20px 22px;
+    border:1px solid var(--gold-line);
+    border-radius:14px;
+    background:rgba(255,255,255,.015);
+  }
+  .spectrum h4{
+    font-size:.66rem; letter-spacing:.2em; text-transform:uppercase;
+    color:var(--gold); margin:0 0 14px; font-weight:600;
+  }
+  .spectrum-track{
+    position:relative;
+    height:10px;
+    border-radius:999px;
+    background:linear-gradient(90deg,
+      rgba(212,122,132,.7) 0%,
+      rgba(212,175,55,.55) 40%,
+      rgba(212,175,55,.75) 60%,
+      rgba(111,179,168,.8) 100%);
+    margin:10px 0 8px;
+  }
+  .spectrum-labels{
+    display:flex; justify-content:space-between;
+    font-size:.7rem; color:var(--muted);
+    letter-spacing:.05em;
+  }
+  .spectrum-axis{
+    font-size:.68rem; color:var(--muted);
+    text-align:center; margin-top:4px;
+    letter-spacing:.04em;
+  }
+
+  /* ================= THREE REALMS ================= */
+  .realms{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));
+    gap:18px;
+    margin:36px 0;
+  }
+  .realm{
+    padding:26px 24px;
+    border:1px solid var(--gold-line);
+    border-radius:var(--radius);
+    background:linear-gradient(170deg, rgba(255,255,255,.028), rgba(255,255,255,.006));
+    position:relative;
+    overflow:hidden;
+    transition:.28s;
+  }
+  .realm:hover{border-color:rgba(212,175,55,.5); transform:translateY(-3px);}
+  .realm .glyph{
+    font-size:1.8rem; margin-bottom:10px; display:block;
+  }
+  .realm h3{
+    font-family:var(--font-display);
+    font-size:1.25rem; font-weight:600; margin:0 0 8px; color:var(--ink);
+  }
+  .realm p{font-size:.9rem; color:var(--muted); line-height:1.55; margin:0 0 10px;}
+  .realm .tagline{
+    font-size:.72rem; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--gold); font-weight:600;
+  }
+  .realm-ineffable{
+    border-color:rgba(154,140,217,.35);
+    background:linear-gradient(170deg, rgba(154,140,217,.06), rgba(255,255,255,.006));
+  }
+  .realm-ineffable .glyph{color:var(--violet);}
+  .realm-ineffable .tagline{color:var(--violet);}
+
+  /* ================= WORD TREE ================= */
+  .word-groups{display:grid; gap:36px; margin:36px 0;}
+  .word-group h3{
+    font-family:var(--font-display);
+    font-size:1.3rem;
+    font-weight:600;
+    color:var(--gold-soft);
+    margin:0 0 4px;
+    letter-spacing:.01em;
+  }
+  .word-group .group-desc{
+    font-size:.82rem;
+    color:var(--muted);
+    margin:0 0 16px;
+    font-style:italic;
+  }
+  .word-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+    gap:14px;
+  }
+  .word-card{
+    border:1px solid var(--gold-line);
+    border-radius:12px;
+    padding:18px 20px;
+    background:rgba(255,255,255,.02);
+    transition:.25s;
+    position:relative;
+    overflow:hidden;
+  }
+  .word-card:hover{
+    border-color:rgba(212,175,55,.55);
+    background:rgba(212,175,55,.05);
+    transform:translateY(-2px);
+  }
+  .word-card .dev{
+    font-size:1.55rem;
+    margin-bottom:4px;
+    display:block;
+    line-height:1.3;
+  }
+  .word-card .rom{
+    font-size:.74rem;
+    letter-spacing:.13em;
+    text-transform:uppercase;
+    color:var(--gold);
+    margin-bottom:8px;
+    font-weight:600;
+  }
+  .word-card .mean{
+    font-family:var(--font-display);
+    font-size:1.08rem;
+    color:var(--ink);
+    margin-bottom:8px;
+    font-weight:500;
+    line-height:1.3;
+  }
+  .word-card .connect{
+    font-size:.8rem;
+    color:var(--muted);
+    line-height:1.55;
+    font-style:italic;
+  }
+  .word-card.highlight{
+    border-color:rgba(212,175,55,.45);
+    background:linear-gradient(160deg, rgba(212,175,55,.08), rgba(212,175,55,.02));
+  }
+
+  /* ================= REFLECTION ================= */
+  .reflection{
+    margin:44px 0;
+    padding:40px clamp(24px,4vw,54px);
+    border:1px solid rgba(212,175,55,.4);
+    border-radius:18px;
+    background:linear-gradient(160deg, rgba(212,175,55,.08), rgba(212,175,55,.012));
+    font-family:var(--font-display);
+    font-size:clamp(1.1rem,2vw,1.28rem);
+    line-height:1.74;
+    color:var(--ink);
+    position:relative;
+  }
+  .reflection::before{
+    content:"❋";
+    position:absolute; top:-16px; left:50%; transform:translateX(-50%);
+    width:36px; height:36px; display:grid; place-items:center;
+    background:var(--bg); border:1px solid rgba(212,175,55,.55);
+    border-radius:50%; color:var(--gold-soft); font-size:1rem;
+  }
+  .reflection p{margin:0 0 1em; color:var(--ink);}
+  .reflection p:last-child{margin:0;}
+  .reflection .dev{
+    display:block;
+    font-size:1.4em;
+    text-align:center;
+    margin:.4em 0;
+    letter-spacing:.02em;
+  }
+
+  /* ================= COMPARE ================= */
+  .compare{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:0;
+    border:1px solid var(--gold-line);
+    border-radius:14px;
+    overflow:hidden;
+    margin:24px 0;
+  }
+  .compare-col{
+    padding:20px 22px;
+  }
+  .compare-col:first-child{
+    background:rgba(212,122,132,.06);
+    border-right:1px solid var(--gold-line);
+  }
+  .compare-col:last-child{
+    background:rgba(111,179,168,.06);
+  }
+  .compare-col h4{
+    font-size:.66rem;
+    letter-spacing:.2em;
+    text-transform:uppercase;
+    margin:0 0 12px;
+    font-weight:700;
+  }
+  .compare-col:first-child h4{color:var(--rose);}
+  .compare-col:last-child h4{color:var(--teal);}
+  .compare-col p{
+    font-size:.9rem;
+    color:var(--ink-soft);
+    margin:0 0 8px;
+    line-height:1.6;
+  }
+  .compare-col p:last-child{margin-bottom:0;}
+  @media (max-width:640px){
+    .compare{grid-template-columns:1fr;}
+    .compare-col:first-child{border-right:none; border-bottom:1px solid var(--gold-line);}
+  }
+
+  /* ================= DIVIDER ================= */
+  .divider{
+    display:flex; align-items:center; justify-content:center; gap:14px;
+    margin:60px 0; color:var(--gold-dim);
+  }
+  .divider::before,.divider::after{
+    content:""; height:1px; flex:1;
+    background:linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+  }
+  .divider span{font-size:.85rem; color:var(--gold); letter-spacing:.3em;}
+
+  /* ================= ARCHIVE ================= */
+  details.archive{
+    margin:16px 0;
+    border:1px solid var(--gold-line);
+    border-radius:12px;
+    background:rgba(255,255,255,.014);
+    overflow:hidden;
+  }
+  details.archive summary{
+    padding:16px 22px;
+    cursor:pointer;
+    font-family:var(--font-display);
+    font-size:1.15rem;
+    color:var(--gold-soft);
+    font-weight:500;
+    list-style:none;
+    display:flex; justify-content:space-between; align-items:center;
+    transition:.2s;
+  }
+  details.archive summary::-webkit-details-marker{display:none;}
+  details.archive summary:hover{background:rgba(212,175,55,.05);}
+  details.archive summary::after{
+    content:"＋"; color:var(--gold); font-size:1.1rem;
+    transition:transform .25s; font-family:var(--font-body);
+  }
+  details.archive[open] summary::after{content:"−";}
+  details.archive .body{
+    padding:6px 22px 22px;
+    border-top:1px solid var(--gold-line);
+    font-size:.92rem;
+    color:var(--ink-soft);
+    line-height:1.7;
+  }
+  details.archive .body p{margin:.7em 0; color:var(--ink-soft);}
+
+  /* ================= BADGE ================= */
+  .badge{
+    display:inline-block;
+    font-size:.6rem; letter-spacing:.16em; text-transform:uppercase;
+    padding:3px 10px; border-radius:999px;
+    border:1px solid var(--gold-dim);
+    color:var(--gold-soft);
+    margin-left:8px;
+    vertical-align:middle;
+    font-weight:600;
+  }
+  .badge-teal{border-color:rgba(111,179,168,.4); color:var(--teal);}
+  .badge-rose{border-color:rgba(212,122,132,.4); color:var(--rose);}
+  .badge-violet{border-color:rgba(154,140,217,.4); color:var(--violet);}
+
+  /* ================= ACKNOWLEDGMENTS ================= */
+  .ack{
+    border:1px solid var(--gold-line);
+    border-radius:18px;
+    padding:38px clamp(24px,4vw,52px);
+    background:linear-gradient(170deg, rgba(212,175,55,.045), rgba(255,255,255,.006));
+    margin:26px 0;
+  }
+  .ack h3{
+    font-family:var(--font-display);
+    font-size:1.35rem;
+    color:var(--gold-soft);
+    margin:0 0 14px;
+    font-weight:600;
+  }
+  .ack p{
+    color:var(--ink-soft);
+    font-size:.96rem;
+    line-height:1.72;
+  }
+  .ack .deepseek{
+    border-top:1px solid var(--gold-line);
+    margin-top:28px;
+    padding-top:26px;
+  }
+  .ack .deepseek h3{
+    color:var(--gold-bright);
+  }
+
+  /* ================= FOOTER ================= */
+  footer{
+    margin-top:80px;
+    border-top:1px solid var(--gold-line);
+    padding:64px 24px 48px;
+    text-align:center;
+    position:relative; z-index:2;
+  }
+  footer .mark{
+    font-family:var(--font-display);
+    font-size:clamp(1.9rem,5.5vw,3.1rem);
+    color:var(--gold-soft);
+    margin:0 0 12px;
+    letter-spacing:.02em;
+  }
+  footer .tagline{
+    font-family:var(--font-display);
+    font-style:italic;
+    color:var(--muted);
+    max-width:680px; margin:0 auto 26px;
+    font-size:1.02rem; line-height:1.7;
+  }
+  footer .fine{
+    font-size:.68rem; letter-spacing:.14em; text-transform:uppercase;
+    color:rgba(142,136,120,.65);
+    line-height:1.9;
+  }
+
+  /* ================= RESPONSIVE ================= */
+  @media (max-width:820px){
+    body{font-size:16px;}
+    .shell{padding:0 20px;}
+    .nav-inner{padding:10px 16px; gap:12px;}
+    .brand{font-size:1.05rem;}
+    .brand .txt{display:none;}
+    .hero{padding:70px 0 56px;}
+    .chapter{padding:60px 0 20px;}
+    .chapter-head{grid-template-columns:1fr; gap:8px;}
+    .numeral{font-size:2.3rem;}
+    .def{grid-template-columns:1fr; gap:4px; padding:14px 16px;}
+    .card, .calc{padding:22px 18px;}
+    .pull{padding:24px 18px;}
+    .realm-hint{display:none;}
+    .attrs{grid-template-columns:1fr 1fr;}
+    .word-grid{grid-template-columns:1fr 1fr;}
+  }
+  @media (max-width:480px){
+    .attrs{grid-template-columns:1fr;}
+    .word-grid{grid-template-columns:1fr;}
+  }
+
+  @media print{
+    body{background:#fff; color:#111;}
+    .nav,.realm-bar,.hero .spiral,body::before{display:none;}
+    .card,.calc,.pull,.note,.caution,details.archive,.reflection,.ack{border-color:#ccc; background:#fff;}
+    p,.chapter-title,.def .v{color:#222;}
+    details.archive .body{display:block !important;}
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none !important; transition:none !important;}
+    html{scroll-behavior:auto;}
+  }
+</style>
+</head>
+<body data-realm="all">
+
+<!-- ===================== NAV ===================== -->
+<nav class="nav" aria-label="Chapter navigation">
+  <div class="nav-inner">
+    <div class="brand"><span class="orb"></span><span class="txt">E = MA²</span></div>
+    <div class="nav-links">
+      <a href="#realms">Realms</a>
+      <a href="#ch1">I · Insight</a>
+      <a href="#ch2">II · Model</a>
+      <a href="#ch3">III · Paradox</a>
+      <a href="#ch4">IV · Spectrum</a>
+      <a href="#ch5">V · Moha Maya</a>
+      <a href="#ch6">VI · Science</a>
+      <a href="#ch7">VII · Roadmap</a>
+      <a href="#ch8">VIII · Claims</a>
+      <a href="#ch9">IX · MAA</a>
+      <a href="#ch10">X · EarthOcity</a>
+      <a href="#ch11">XI · MetA</a>
+      <a href="#ch12">XII · Meta</a>
+      <a href="#ch13">XIII · Lalita</a>
+      <a href="#ch14">XIV · Earth Fund</a>
+      <a href="#ch15">XV · Practice</a>
+      <a href="#ch16">XVI · Calculations</a>
+      <a href="#ch17">XVII · Archive</a>
+      <a href="#ch18">XVIII · Thanks</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ===================== REALM BAR ===================== -->
+<div class="realm-bar" role="region" aria-label="Reading realm selector">
+  <div class="realm-inner">
+    <span class="realm-label">Realm</span>
+    <button class="realm-btn active" data-target="all" aria-pressed="true">All</button>
+    <button class="realm-btn" data-target="philosophy" aria-pressed="false">◈ Philosophy</button>
+    <button class="realm-btn" data-target="science" aria-pressed="false">⚗ Science</button>
+    <button class="realm-btn" data-target="practice" aria-pressed="false">☉ Practice</button>
+    <span class="realm-hint">Understand in new way and correct it</span>
+  </div>
+</div>
+
+<!-- ===================== HERO ===================== -->
+<header class="hero">
+  <svg class="spiral" viewBox="0 0 400 400" fill="none" aria-hidden="true">
+    <path d="M200 200 a10 10 0 0 1 20 0 a20 20 0 0 1 -40 0 a30 30 0 0 1 60 0 a40 40 0 0 1 -80 0 a50 50 0 0 1 100 0 a60 60 0 0 1 -120 0 a70 70 0 0 1 140 0 a80 80 0 0 1 -160 0"
+          stroke="#d4af37" stroke-width="1" stroke-linecap="round"/>
+    <circle cx="200" cy="200" r="3" fill="#d4af37"/>
+    <circle cx="200" cy="200" r="90" stroke="#d4af37" stroke-width=".35" opacity=".5"/>
+    <circle cx="200" cy="200" r="140" stroke="#d4af37" stroke-width=".3" opacity=".35"/>
+  </svg>
+
+  <div class="shell">
+    <div class="kicker">The Full Framework · Corrected · Three Realms · One Word Family</div>
+    <h1>E = MA<sup>2</sup></h1>
+    <p class="sub">A construct — not a law. Corrected into two bounded indices of human expression. Expressive clarity as the operational signature of consciousness. Moha and Maya given measurable form. And beneath it all, the resonant word family of MAA — mother, head, monastery, friendship, kindness, measure, illusion, matter, mathematics — all one root.</p>
+    <div class="rule"></div>
+    <div class="fib">
+      <span>1 Root</span><span>2 Indices</span><span>3 Realms</span>
+      <span>5 Neighbours</span><span>8 Corrections</span><span>13 Resonances</span><span>21 Chapters</span>
+    </div>
+  </div>
+</header>
+
+<main class="shell">
+
+  <!-- ============================================================
+       REALMS
+  ============================================================= -->
+  <section class="chapter" id="realms">
+    <div class="chapter-head">
+      <div class="numeral">◇</div>
+      <div>
+        <h2 class="chapter-title">Three Ways of Knowing — <em>and a Fourth</em></h2>
+        <p class="chapter-lede">The same construct can be approached through philosophy, science, and practice. Each has its own criteria for truth. A fourth realm exists that none of them contain — and the framework honours it by not entering.</p>
+      </div>
+    </div>
+
+    <div class="realms">
+      <div class="realm">
+        <span class="glyph">◈</span>
+        <h3>Philosophical Realm</h3>
+        <p>Asks: <em>What is the nature of the thing being measured?</em> Engages with consciousness, Maya, delusion, self, and liberation. Truth criterion: coherence and depth of insight.</p>
+        <span class="tagline">Coherence · Depth · Meaning</span>
+      </div>
+      <div class="realm">
+        <span class="glyph">⚗</span>
+        <h3>Scientific Realm</h3>
+        <p>Asks: <em>Can the construct be operationalized, bounded, and tested?</em> Engages with psychometrics, calibration, and model comparison. Truth criterion: falsifiability and empirical fit.</p>
+        <span class="tagline">Operationalization · Bounds · Test</span>
+      </div>
+      <div class="realm">
+        <span class="glyph">☉</span>
+        <h3>Practical Realm</h3>
+        <p>Asks: <em>Can a person use this today?</em> Engages with awareness, letting go, and small acts of clarity. Truth criterion: lived usefulness and reduced suffering.</p>
+        <span class="tagline">Use · Reduce Suffering · Clarity</span>
+      </div>
+      <div class="realm realm-ineffable">
+        <span class="glyph">✧</span>
+        <h3>The Ineffable Realm</h3>
+        <p>Asks: <em>What cannot be said?</em> The realm of silence, of the unsayable, of the thing the model points at but cannot enter. The framework honours it by stopping at its edge.</p>
+        <span class="tagline">Silence · Boundary · Pointing</span>
+      </div>
+    </div>
+
+    <div class="pull">
+      <p>There is a fourth realm the three do not contain — the realm of the ineffable, which is not a failure of the model but a boundary of language. The model does not enter there. It points.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       CHAPTER I — THE CORE INSIGHT
+  ============================================================= -->
+  <section class="chapter" id="ch1">
+    <div class="chapter-head">
+      <div class="numeral">I</div>
+      <div>
+        <h2 class="chapter-title">The Core Insight — <em>Consciousness Is Not a Thing We Have</em></h2>
+        <p class="chapter-lede">Stop asking what consciousness is. Start asking what it does. The move from noun to signature.</p>
+      </div>
+    </div>
+
+    <p class="lead dropcap">The word <em>consciousness</em> — and its Sanskrit cousin <em>chetna</em>, or <em>cit</em> — has been carried for centuries without ever being defined. Philosophy has called this the hard problem. Contemplative traditions have said <em>neti neti</em>, not this, not this. Cognitive science built a whole field around the fact that the word will not hold still.</p>
+
+    <p class="only-philosophy">The insight here is not that the word is vague — many have noticed that. The insight is a move: <strong>replace the noun with a measurable verb-phrase.</strong> Not <em>consciousness</em>, but <em>the clarity with which one expresses</em>. Not what it <em>is</em>, but what it <em>does</em>.</p>
+
+    <p class="only-science">This is a legitimate operational turn. Behaviourism made the same move with <em>mind</em>. Cognitive science made it with <em>intelligence</em>, replacing the construct with the measurable <em>g</em>. Psychometrics makes it with <em>depression</em>, which no one observes directly — they observe a score on the PHQ-9. The score is not depression. It is depression's operational signature.</p>
+
+    <p class="only-practice">You know this already, in your own life. You cannot point to your consciousness. But you can notice the difference between a moment when your response is clear — and a moment when it is muddy, reactive, caught. That difference is what this framework measures.</p>
+
+    <div class="formula">
+      <code>E<sub>clarity</sub> = the operational signature of consciousness</code>
+      <small>Not the thing. The face it shows.</small>
+    </div>
+
+    <div class="pull">
+      <p>We do not claim to measure consciousness. We claim to measure expressive clarity — the observable signature through which consciousness shows itself. Whether that signature is consciousness itself is a metaphysical question we leave open.</p>
+    </div>
+
+    <div class="caution only-science">
+      <span class="label">Honest Boundary</span>
+      <p>A thermometer does not measure "heat" in the metaphysical sense. It measures expansion — a proxy that tracks heat reliably. E<sub>clarity</sub> is the same kind of object: a behavioural proxy. It earns its place by predicting outcomes, not by claiming to be the thing itself.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       CHAPTER II — THE CORRECTED MODEL
+  ============================================================= -->
+  <section class="chapter" id="ch2">
+    <div class="chapter-head">
+      <div class="numeral">II</div>
+      <div>
+        <h2 class="chapter-title">The Corrected Model — <em>Two Indices, Not One</em></h2>
+        <p class="chapter-lede">The original E = MA² mixed two different things under one letter. Split them, and the whole framework becomes coherent and bounded.</p>
+      </div>
+    </div>
+
+    <div class="caution">
+      <span class="label">The Problem in the Original Formula</span>
+      <p>In <span class="math">E = MA²</span>, the letter <strong>A</strong> was used for <em>both</em> awareness and addictive attachments which in itself has addictions. Addictions make us attached. Two different constructs under one symbol collapses the notation. Also, E was unbounded (M = 35,000), so it could not be compared across people or states. Both are fixable — and fixing them produces a stronger framework, not a weaker one.</p>
+    </div>
+
+    <h3 style="font-family:var(--font-display); font-size:1.5rem; font-weight:600; margin:32px 0 8px;">The variables — defined once, used consistently</h3>
+
+    <div class="defs">
+      <div class="def"><div class="k">M</div><div class="v">Number of thoughts generated per day. Measurable via Experience Sampling Method (ESM). Unbounded in raw form.</div></div>
+      <div class="def"><div class="k">x</div><div class="v">Average intensity of thoughts, normalized to <span class="mono">[0, 1]</span>.</div></div>
+      <div class="def"><div class="k">a<sub>i</sub></div><div class="v">Inner awareness — self-awareness, emotional granularity, meta-cognition. <span class="mono">[0, 1]</span>.</div></div>
+      <div class="def"><div class="k">a<sub>o</sub></div><div class="v">Outer awareness — perception of external reality, situational accuracy. <span class="mono">[0, 1]</span>.</div></div>
+      <div class="def"><div class="k">a′</div><div class="v">Addictive attachment — the strength of craving, compulsive pull, or dependency which come from various forms of addiction and similar patterns in which the body or mind lives and wants to repeat again and again. <span class="mono">[0, 1]</span>. Higher means more bound.</div></div>
+    </div>
+
+    <h3 style="font-family:var(--font-display); font-size:1.5rem; font-weight:600; margin:38px 0 8px;">Index 1 — Expression Volume <span class="badge">how much flows</span></h3>
+
+    <div class="formula">
+      <code>E<sub>vol</sub> = (M × x × a<sub>i</sub> × a<sub>o</sub> × a′) / M<sub>max</sub></code>
+      <small>Bounded 0 → 1 · High attachment amplifies volume and this comes from addiction to same patterns.</small>
+    </div>
+
+    <p>This is the closest legitimate descendant of your original E. Attachment <em>adds</em> energy here — obsessive, driven, compulsive expression has high volume. It is not "good" or "bad." It is throughput. Bounded by dividing by the maximum possible thought count in the reference population.</p>
+
+    <h3 style="font-family:var(--font-display); font-size:1.5rem; font-weight:600; margin:38px 0 8px;">Index 2 — Expressive Clarity <span class="badge badge-teal">how clean the flow is</span></h3>
+
+    <div class="formula" style="border-color:rgba(111,179,168,.4); background:radial-gradient(ellipse at center, rgba(111,179,168,.07), transparent 70%);">
+      <code>E<sub>clarity</sub> = x × (a<sub>i</sub> × a<sub>o</sub>) × (1 − a′)</code>
+      <small>Bounded 0 → 1 · High attachment dampens clarity</small>
+    </div>
+
+    <p class="lead">This is the state-of-mind measure you were looking for. It is the operational signature of consciousness — the clarity with which awareness flows into expression, undimmed by attachment.</p>
+
+    <div class="note">
+      <span class="label">Why the product, not the sum</span>
+      <p>A product captures a real mechanism: if any factor is zero, the output is zero. No awareness → no clear expression. This is not arbitrary. It has precedent: Fishbein's expectancy-value model and Fisher's behaviour model both use multiplicative composites for exactly this reason — because the factors are <em>conditions</em>, not additives.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       CHAPTER III — PARADOX RESOLVED
+  ============================================================= -->
+  <section class="chapter" id="ch3">
+    <div class="chapter-head">
+      <div class="numeral">III</div>
+      <div>
+        <h2 class="chapter-title">The Paradox Resolved — <em>Nirvana Was Never Zero</em></h2>
+        <p class="chapter-lede">The original formula gave E = 0 in the state of liberation. That reads as "nothing." Splitting the indices dissolves the paradox.</p>
+      </div>
+    </div>
+
+    <p class="dropcap">In the original formulation, when attachment and awareness hit their limit — attachment zero, awareness one — the formula gave E = 0. That appeared to say that liberation is silence, absence, blankness. But the text also said liberation is <em>perfect response</em> — the freedom to act exactly as the moment requires. Zero and perfect response cannot be the same thing.</p>
+
+    <p>With two indices, the paradox disappears:</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>State</th><th>a<sub>i</sub> · a<sub>o</sub></th><th>a′</th><th>E<sub>vol</sub></th><th>E<sub>clarity</sub></th><th>Reading</th></tr></thead>
+        <tbody>
+          <tr><td>Fully bound</td><td>0.20</td><td>0.90</td><td>low</td><td>0.02</td><td>Reactive, compulsive</td></tr>
+          <tr><td>Ordinary</td><td>0.50</td><td>0.50</td><td>mid</td><td>0.25</td><td>Mixed, partial</td></tr>
+          <tr><td>Clear practitioner</td><td>0.90</td><td>0.20</td><td>mid</td><td>0.72</td><td>Clean, deliberate</td></tr>
+          <tr><td>Model limit (nirvana)</td><td>1.00</td><td>0.00</td><td>0</td><td>1.00</td><td>No compulsion, perfect response</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pull">
+      <p>Nirvana in the corrected model is not silence. It is maximum clarity with zero compulsion. The volume of driven expression drops to zero — not because expression stops, but because nothing forces it. What remains is response without reaction.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       CHAPTER IV — THE SPECTRUM
+  ============================================================= -->
+  <section class="chapter" id="ch4">
+    <div class="chapter-head">
+      <div class="numeral">IV</div>
+      <div>
+        <h2 class="chapter-title">The Spectrum — <em>A Circumplex of Awareness and Freedom</em></h2>
+        <p class="chapter-lede">One number hides too much. Two axes reveal the state. This is a standard psychometric form — the same shape as the interpersonal and affective circumplexes.</p>
+      </div>
+    </div>
+
+    <p class="only-science">A circumplex is a circle of states defined by two orthogonal dimensions. It is one of the most respected structures in psychometrics. What you are building — awareness on one axis, freedom from attachment on the other — is a circumplex applied to the contemplative domain. That is a real, testable structure.</p>
+
+    <div class="circumplex-wrap">
+      <svg class="circumplex-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Circumplex: awareness versus freedom from attachment">
+        <rect x="50" y="50" width="150" height="150" fill="rgba(212,175,55,.04)"/>
+        <rect x="200" y="50" width="150" height="150" fill="rgba(111,179,168,.06)"/>
+        <rect x="50" y="200" width="150" height="150" fill="rgba(212,122,132,.06)"/>
+        <rect x="200" y="200" width="150" height="150" fill="rgba(212,175,55,.04)"/>
+        <line x1="50" y1="200" x2="350" y2="200" stroke="rgba(212,175,55,.35)" stroke-width="1"/>
+        <line x1="200" y1="50" x2="200" y2="350" stroke="rgba(212,175,55,.35)" stroke-width="1"/>
+        <line x1="50" y1="350" x2="350" y2="50" stroke="rgba(240,200,96,.5)" stroke-width="1.2" stroke-dasharray="4 4"/>
+        <text x="200" y="32" fill="#8e8878" font-family="Inter, sans-serif" font-size="10" text-anchor="middle" letter-spacing="2">FREEDOM FROM ATTACHMENT →</text>
+        <text x="200" y="382" fill="#8e8878" font-family="Inter, sans-serif" font-size="10" text-anchor="middle" letter-spacing="2">← AWARENESS →</text>
+        <text x="110" y="110" fill="#f0c860" font-family="Cormorant Garamond, serif" font-size="12" font-style="italic" text-anchor="middle">Unformed</text>
+        <text x="110" y="124" fill="#8e8878" font-family="Inter, sans-serif" font-size="8" text-anchor="middle" letter-spacing="1">low aw · high freedom</text>
+        <text x="290" y="110" fill="#6fb3a8" font-family="Cormorant Garamond, serif" font-size="13" font-style="italic" text-anchor="middle">Clear &amp; Free</text>
+        <text x="290" y="124" fill="#8e8878" font-family="Inter, sans-serif" font-size="8" text-anchor="middle" letter-spacing="1">high aw · high freedom</text>
+        <text x="110" y="296" fill="#d47a84" font-family="Cormorant Garamond, serif" font-size="13" font-style="italic" text-anchor="middle">Reactive</text>
+        <text x="110" y="310" fill="#8e8878" font-family="Inter, sans-serif" font-size="8" text-anchor="middle" letter-spacing="1">low aw · low freedom</text>
+        <text x="290" y="296" fill="#f0c860" font-family="Cormorant Garamond, serif" font-size="12" font-style="italic" text-anchor="middle">Aware but Attached</text>
+        <text x="290" y="310" fill="#8e8878" font-family="Inter, sans-serif" font-size="8" text-anchor="middle" letter-spacing="1">high aw · low freedom</text>
+        <text x="50" y="216" fill="#8e8878" font-family="Inter, sans-serif" font-size="9" text-anchor="middle">0</text>
+        <text x="350" y="216" fill="#8e8878" font-family="Inter, sans-serif" font-size="9" text-anchor="middle">1</text>
+        <text x="192" y="356" fill="#8e8878" font-family="Inter, sans-serif" font-size="9" text-anchor="end">0</text>
+        <text x="192" y="58" fill="#8e8878" font-family="Inter, sans-serif" font-size="9" text-anchor="end">1</text>
+        <circle cx="140" cy="310" r="4" fill="#d47a84"/>
+        <circle cx="200" cy="200" r="4" fill="#f0c860"/>
+        <circle cx="290" cy="120" r="4" fill="#6fb3a8"/>
+        <circle cx="300" cy="280" r="4" fill="#f0c860"/>
+      </svg>
+
+      <div class="quad-list">
+        <div class="quad-item"><span class="qname">Unformed / Open</span><span class="qdesc">Low awareness, low attachment. A quiet child, a person at rest. Not a deficit — a state.</span></div>
+        <div class="quad-item"><span class="qname">Clear &amp; Free</span><span class="qdesc">High awareness, high freedom. The clarity axis endpoint. Perfect response without compulsion.</span></div>
+        <div class="quad-item"><span class="qname">Reactive / Bound</span><span class="qdesc">Low awareness, low freedom. Compulsion without insight. The state most suffering comes from.</span></div>
+        <div class="quad-item"><span class="qname">Aware but Attached</span><span class="qdesc">High awareness, low freedom. The expert trapped by ego. Insight without release.</span></div>
+      </div>
+    </div>
+
+    <p class="only-science">The diagonal from bottom-left to top-right is the <strong>clarity axis</strong>. Distance from this diagonal — a derived score the framework calls <strong>imbalance</strong> — flags states that are high on one dimension and low on the other. That is a descriptive statistic with no analogue in existing measures. It is a genuine contribution.</p>
+
+    <div class="spectrum">
+      <h4>Expressive Clarity Spectrum (E<sub>clarity</sub>, 0 → 1)</h4>
+      <div class="spectrum-track" role="img" aria-label="Clarity spectrum from reactive to clear"></div>
+      <div class="spectrum-labels">
+        <span>0.00 · Reactive</span>
+        <span>0.40 · Mixed</span>
+        <span>0.60 · Balanced</span>
+        <span>1.00 · Clear</span>
+      </div>
+      <div class="spectrum-axis">E<sub>clarity</sub> = x × (a<sub>i</sub> × a<sub>o</sub>) × (1 − a′)</div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       CHAPTER V — MOHA & MAYA
+  ============================================================= -->
+  <section class="chapter" id="ch5">
+    <div class="chapter-head">
+      <div class="numeral">V</div>
+      <div>
+        <h2 class="chapter-title">Moha &amp; Maya — <em>Operationalizing Illusion</em></h2>
+        <p class="chapter-lede">The tradition says illusion obscures reality. If we take measurement seriously, we must ask: obscure by how much? Both Moha and Maya can be given honest, bounded, testable operational forms.</p>
+      </div>
+    </div>
+
+    <p class="lead dropcap">Moha — delusion, self-misjudgment, the fog around one's own state. Maya — illusion, structural distortion, the world showing itself wrongly. The tradition treats both as obstacles. The framework does not need to dissolve them to measure them. It only needs to ask what their observable signature would be.</p>
+
+    <div class="grid-2">
+      <div class="card card-rose">
+        <h4>Moha · Delusion</h4>
+        <h3>Self-Misjudgment Gap</h3>
+        <p>Moha is the gap between what a person <em>believes</em> their clarity is, and what they can <em>demonstrate</em> it is on a calibration task. This is measurable — it is the same structure as the Dunning-Kruger effect, metacognitive calibration, and confidence-accuracy research.</p>
+        <div class="steps" style="font-size:.82rem; margin-bottom:0;">
+          D<sub>moha</sub> = | perceived clarity − demonstrated accuracy |<br>
+          <span class="muted">Range: 0 (well-calibrated) → 1 (fully deluded)</span>
+        </div>
+      </div>
+
+      <div class="card card-rose">
+        <h4>Maya · Illusion</h4>
+        <h3>Structural Distortion</h3>
+        <p>Maya is systematic, repeatable bias that persists across contexts. Not random error — patterned distortion. This is measurable through implicit association tests, framing susceptibility, confirmation bias rates, and perceptual illusions that survive correction.</p>
+        <div class="steps" style="font-size:.82rem; margin-bottom:0;">
+          D<sub>maya</sub> = mean bias magnitude across tasks<br>
+          <span class="muted">Range: 0 (no systematic distortion) → 1 (fully distorted)</span>
+        </div>
+      </div>
+    </div>
+
+    <p class="only-science">Both constructs connect to mature research programmes. Metacognitive calibration is a well-developed field (Fleming, Lau, Dunning). Bias measurement is even older (Kahneman &amp; Tversky, Greenwald's IAT). The framework is not inventing these — it is placing them inside a bounded expression model where they <em>do work</em>.</p>
+
+    <p class="only-philosophy">Moha and Maya in the tradition are not merely cognitive errors. They are ontological conditions — the world <em>as such</em> appears under their sway. The operationalization here does not claim to capture that depth. It captures only the shadow they cast on measurable behaviour. The deeper question — whether the world itself is Maya — remains outside the model.</p>
+
+    <h3 style="font-family:var(--font-display); font-size:1.4rem; font-weight:600; margin:32px 0 8px;">The adjusted clarity index</h3>
+
+    <div class="formula" style="border-color:rgba(212,122,132,.4); background:radial-gradient(ellipse at center, rgba(212,122,132,.06), transparent 70%);">
+      <code>E<sub>clarity, adj</sub> = E<sub>clarity</sub> × (1 − D<sub>moha</sub>/2) × (1 − D<sub>maya</sub>/2)</code>
+      <small>Clarity, discounted by self-misjudgment and structural distortion</small>
+    </div>
+
+    <p>This is the most honest version of the model: a person's clarity, <em>corrected</em> by how much they are likely to be wrong about their own clarity and about the world. A person can feel clear (high self-reported E<sub>clarity</sub>) and yet be deluded (high D<sub>moha</sub>) — the adjusted index catches that. This is where the framework becomes <strong>testable against reality</strong>, not just descriptive.</p>
+
+    <div class="caution">
+      <span class="label">What this does not claim</span>
+      <p>The adjusted index does not capture the full metaphysical weight of Moha and Maya. It captures their measurable behavioural signature. It also does not assume high D<sub>moha</sub> is always bad — a certain amount of confidence is necessary to act at all. The model reports the gap; it does not moralize it.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       CHAPTER VI — SCIENCE IT JOINS
+  ============================================================= -->
+  <section class="chapter only-science" id="ch6">
+    <div class="chapter-head">
+      <div class="numeral">VI</div>
+      <div>
+        <h2 class="chapter-title">The Science It Joins — <em>Neighbours, Not Rivals</em></h2>
+        <p class="chapter-lede">No construct stands alone. Knowing the neighbours protects the work and positions it honestly for review.</p>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Existing construct</th><th>What it measures</th><th>Relation to this model</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Psychological flexibility</strong> (ACT)</td><td>Awareness + acceptance + values action</td><td>Closest cousin to (a<sub>i</sub>·a<sub>o</sub>)·(1−a′)</td></tr>
+          <tr><td><strong>Non-Attachment Scale</strong> (Sahdra)</td><td>Freedom from attachment</td><td>Direct parallel to (1−a′)</td></tr>
+          <tr><td><strong>Mindfulness</strong> (MAAS, FFMQ)</td><td>Present-moment awareness</td><td>Parallel to a<sub>i</sub></td></tr>
+          <tr><td><strong>Experiential avoidance</strong></td><td>Reactivity to unwanted experience</td><td>Inverse of clarity</td></tr>
+          <tr><td><strong>Expectancy-value model</strong> (Fishbein)</td><td>Attitude = Σ belief × evaluation</td><td>Precedent for multiplicative composite</td></tr>
+          <tr><td><strong>Behaviour model</strong> (Fisher)</td><td>Behaviour = Info × Motivation × Opportunity</td><td>Strongest precedent for product form</td></tr>
+          <tr><td><strong>Interpersonal circumplex</strong></td><td>2D map of social behaviour</td><td>Precedent for the 2D spectrum</td></tr>
+          <tr><td><strong>Metacognitive calibration</strong> (Fleming, Dunning)</td><td>Confidence vs accuracy gap</td><td>Direct basis for D<sub>moha</sub></td></tr>
+          <tr><td><strong>Implicit bias measurement</strong> (Greenwald IAT)</td><td>Automatic associations</td><td>Direct basis for D<sub>maya</sub></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pull">
+      <p>This model extends multiplicative expectancy-value and behaviour models into the contemplative domain, combining awareness and non-attachment into a bounded expression index.</p>
+    </div>
+
+    <p>That sentence alone makes the framework <strong>positionable</strong> in a peer-reviewed conceptual paper. It does not need to be unprecedented. It needs to be situated.</p>
+  </section>
+
+  <!-- ============================================================
+       CHAPTER VII — ROADMAP
+  ============================================================= -->
+  <section class="chapter" id="ch7">
+    <div class="chapter-head">
+      <div class="numeral">VII</div>
+      <div>
+        <h2 class="chapter-title">The Path to Validation — <em>Four Phases</em></h2>
+        <p class="chapter-lede">A conceptual framework becomes a scientific instrument through a known sequence. Each phase is achievable.</p>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card"><h4>Phase 1 · Conceptual Paper</h4><h3>Publish the framework</h3><p>Define constructs, present the multiplicative model, cite Fisher and Fishbein, show the circumplex, state limitations. <strong>Timeline: 3–6 months.</strong></p></div>
+      <div class="card"><h4>Phase 2 · Instrument Development</h4><h3>Build the measure</h3><p>Item pools → expert review → pilot (n ≈ 300) → exploratory factor analysis → confirmatory factor analysis → reliability (α, ω) → test-retest. Confirm the 4-factor structure.</p></div>
+      <div class="card"><h4>Phase 3 · Model Comparison</h4><h3>The decisive test</h3><p>Does the <strong>multiplicative</strong> composite outperform an <strong>additive</strong> one (sum of z-scores)? Fit both with structural equation modelling. If multiplication wins on AIC/BIC, that is a publishable empirical result — and the single most important test of the whole model.</p></div>
+      <div class="card"><h4>Phase 4 · Criterion Validity</h4><h3>Does it predict what it should?</h3><p>Does E<sub>clarity</sub> predict lower reactivity, better well-being, lower experiential avoidance — and not correlate with social desirability? If yes, the construct earns its place.</p></div>
+    </div>
+
+    <div class="note">
+      <span class="label">On random input</span>
+      <p>Randomly sampling a<sub>i</sub>, a<sub>o</sub>, a′, x uniformly on [0,1] and computing the index 100,000 times gives the <strong>null distribution</strong>. This is not measurement — it is calibration. It answers: "a score of 0.72 is above 99.9% of what chance alone would produce." That is a real statistical step, and it belongs in the paper as a permutation test.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       CHAPTER VIII — HONEST CLAIMS
+  ============================================================= -->
+  <section class="chapter" id="ch8">
+    <div class="chapter-head">
+      <div class="numeral">VIII</div>
+      <div>
+        <h2 class="chapter-title">Honest Claims — <em>What to Say and What Not To</em></h2>
+        <p class="chapter-lede">The first column is publishable. The second invites rejection — and rightly so. The framework survives only if it holds to the first.</p>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Say this</th><th>Not this</th></tr></thead>
+        <tbody>
+          <tr><td>A novel conceptual index of expressive clarity.</td><td>The biggest discovery in human history.</td></tr>
+          <tr><td>Bounded 0–1, derived from awareness and non-attachment.</td><td>Measures consciousness.</td></tr>
+          <tr><td>Multiply-structured, tested against additive alternatives.</td><td>A proven scientific law.</td></tr>
+          <tr><td>Illustrated with synthetic data.</td><td>Validated by random sampling.</td></tr>
+          <tr><td>Positions states on a circumplex of awareness and freedom.</td><td>Tells you where a person <em>is</em> on a spiritual scale.</td></tr>
+          <tr><td>Moha and Maya operationalized as measurable delusion and distortion.</td><td>The model captures the full depth of Maya.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pull">
+      <p>Humility is not a demotion of the framework. It is what makes the framework survive contact with reviewers, collaborators, and the real world.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       CHAPTER IX — MAA RESONANT WORD FAMILY
+  ============================================================= -->
+  <section class="chapter" id="ch9">
+    <div class="chapter-head">
+      <div class="numeral">IX</div>
+      <div>
+        <h2 class="chapter-title">MAA — <em>The Resonant Word Family</em></h2>
+        <p class="chapter-lede">The syllable MAA is not a word. It is a root — and from this root grows an entire forest of meanings. The mother, the head, the monastery, the friendship, the loving-kindness, the measure, the illusion, the mathematics, the matter itself — all are branches of the same tree.</p>
+      </div>
+    </div>
+
+    <p class="lead dropcap">To understand E = MA² is to understand MAA — not as one word but as a family of words that speak to each other across languages and millennia. This chapter gathers them. Each is a facet. Together they are the root.</p>
+
+    <div class="reflection">
+      <p>मा <em>mā</em> — to measure — is the root of both <strong>mother</strong> (माता <em>mātā</em>) and <strong>illusion</strong> (माया <em>māyā</em>). Maya is literally "that which measures." The framework that measures illusion is built on the same root as the illusion itself.</p>
+      <p>To measure is to be mothered; to be mothered is to be measured. The <strong>head</strong> (माथा <em>māthā</em>), the <strong>mother</strong> (माता <em>mātā</em>), and the <strong>monastery</strong> (मठ <em>maṭh</em>) share the root — because to think is to be held, to be held is to be mothered, and to be mothered is to have a seat.</p>
+      <p class="dev">माता · माथा · मठ · मैत्री · मेत्ता · मात्रा · माया · मोह · महा</p>
+      <p>All three are seats. All three are MAA. The circle closes.</p>
+    </div>
+
+    <div class="word-groups">
+
+      <!-- Group 1: Origin -->
+      <div class="word-group">
+        <h3>Origin &amp; Kinship</h3>
+        <p class="group-desc">The root that gives rise to all others — the mother, the material, the matrix, the alphabet.</p>
+        <div class="word-grid">
+          <div class="word-card highlight">
+            <span class="dev">माता</span>
+            <div class="rom">mātā</div>
+            <div class="mean">Mother</div>
+            <div class="connect">The origin. The one who gives. The nourishing force before all others.</div>
+          </div>
+          <div class="word-card">
+            <span class="dev">मातर्</span>
+            <div class="rom">mātar</div>
+            <div class="mean">Mother (Vedic)</div>
+            <div class="connect">The oldest form — the mother as cosmic principle in the Rig Veda.</div>
+          </div>
+          <div class="word-card">
+            <span class="dev">Mother</span>
+            <div class="rom">English</div>
+            <div class="mean">Mother</div>
+            <div class="connect">From Old English <em>modor</em> — the same PIE root <em>māter</em> that gave Latin <em>mater</em>.</div>
+          </div>
+          <div class="word-card highlight">
+            <span class="dev">Matter</span>
+            <div class="rom">English</div>
+            <div class="mean">Physical substance</div>
+            <div class="connect">From Latin <em>materia</em> — "mother-stuff." The body is matter. Matter is mother.</div>
+          </div>
+          <div class="word-card">
+            <span class="dev">Matrix</span>
+            <div class="rom">English</div>
+            <div class="mean">Womb, mold, pattern</div>
+            <div class="connect">From Latin <em>mater</em> — the mother as the container where form is born.</div>
+          </div>
+          <div class="word-card">
+            <span class="dev">मातृका</span>
+            <div class="rom">mātṛkā</div>
+            <div class="mean">The mother; the alphabet</div>
+            <div class="connect">The alphabet as the mother of all sound — every letter born from MAA.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Group 2: Head & Seat -->
+      <div class="word-group">
+        <h3>Head &amp; Seat</h3>
+        <p class="group-desc">The same root appears as the seat of thought and the seat of practice — the head and the monastery.</p>
+        <div class="word-grid">
+          <div class="word-card highlight">
+            <span class="dev">माथा</span>
+            <div class="rom">māthā</div>
+            <div class="mean">Head (Hindi)</div>
+            <div class="connect">The seat of thought. Where the mind resides. The same root as mother — because to think is to be held.</div>
+          </div>
+          <div class="word-card highlight">
+            <span class="dev">मठ</span>
+            <div class="rom">maṭh</div>
+            <div class="mean">Spiritual seat, monastery</div>
+            <div class="connect">The place of practice. RK Math — the Ramakrishna Math — carries this root. A seat where thought is churned.</div>
+          </div>
+          <div class="word-card">
+            <span class="dev">मथ्</span>
+            <div class="rom">math</div>
+            <div class="mean">To churn, to think</div>
+            <div class="connect">As in <em>samudra manthan</em> — the churning of the ocean. Thinking is churning. The head is the churn.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Group 3: Relationship -->
+      <div class="word-group">
+        <h3>Relationship</h3>
+        <p class="group-desc">The mother root blossoms into friendship and loving-kindness — the highest relational forms.</p>
+        <div class="word-grid">
+          <div class="word-card highlight">
+            <span class="dev">मैत्री</span>
+            <div class="rom">maitrī</div>
+            <div class="mean">Friendship (Sanskrit)</div>
+            <div class="connect">The best relationship is that of friend. From the same root — the friend is the one who mothers without owning.</div>
+          </div>
+          <div class="word-card highlight">
+            <span class="dev">मेत्ता</span>
+            <div class="rom">mettā</div>
+            <div class="mean">Loving-kindness (Pali)</div>
+            <div class="connect">The highest form of kindness and compassion. The Buddhist cultivation of universal friendliness.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Group 4: Measure & Knowledge -->
+      <div class="word-group">
+        <h3>Measure &amp; Knowledge</h3>
+        <p class="group-desc">From the same root comes measurement, mathematics, and the illusion that measures.</p>
+        <div class="word-grid">
+          <div class="word-card highlight">
+            <span class="dev">मात्रा</span>
+            <div class="rom">mātrā</div>
+            <div class="mean">Measure, quantity, syllable</div>
+            <div class="connect">The act of measuring. The mother as the one who measures out portion and form.</div>
+          </div>
+          <div class="word-card highlight">
+            <span class="dev">Maths</span>
+            <div class="rom">English</div>
+            <div class="mean">Mathematics</div>
+            <div class="connect">From Greek <em>mathēma</em> — "that which is learned." The science of pattern and creation.</div>
+          </div>
+          <div class="word-card highlight">
+            <span class="dev">माया</span>
+            <div class="rom">māyā</div>
+            <div class="mean">Illusion</div>
+            <div class="connect">From <em>mā</em> (to measure) + <em>yā</em> — "that which measures." Illusion is the measuring that hides the immeasurable.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Group 5: Delusion & Greatness -->
+      <div class="word-group">
+        <h3>Delusion &amp; Greatness</h3>
+        <p class="group-desc">The root carries both the fog and the vastness.</p>
+        <div class="word-grid">
+          <div class="word-card">
+            <span class="dev">मोह</span>
+            <div class="rom">moha</div>
+            <div class="mean">Delusion</div>
+            <div class="connect">From <em>muh</em> — to be confused. The fog around one's own state. Operationalized in Chapter V.</div>
+          </div>
+          <div class="word-card">
+            <span class="dev">महा</span>
+            <div class="rom">mahā</div>
+            <div class="mean">Great</div>
+            <div class="connect">The vastness that holds all the others. <em>Mahā-māyā</em> — the great illusion. <em>Mahā-mātā</em> — the great mother.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <h3 style="font-family:var(--font-display); font-size:1.6rem; font-weight:600; margin:44px 0 12px;">The RK Math connection</h3>
+
+    <div class="card card-accent">
+      <h4>रामकृष्ण मठ · Ramakrishna Math</h4>
+      <p>The monastic order founded by Swami Vivekananda, with its spiritual seat at Belur Math. The word <em>maṭh</em> means a hut, a monastery, a place of spiritual practice. It is the same root as <em>māthā</em> (head) and <em>mātā</em> (mother).</p>
+      <p style="margin-bottom:0;">The monastery is a <strong>head</strong> — a place where thought is churned. The monastery is a <strong>mother</strong> — a place where the seeker is nourished. This is why the tradition calls its seats "Math" — because they are places of MAA. To enter a Math is to enter the head of the mother.</p>
+    </div>
+
+    <h3 style="font-family:var(--font-display); font-size:1.6rem; font-weight:600; margin:44px 0 12px;">The body as matter, matter as mother</h3>
+
+    <p class="lead">माता <em>mātā</em> and <strong>matter</strong> are the same word. The body is matter; matter is mother-stuff. When the tradition says "worship the mother," it does not mean worship a woman — it means worship the material that gives life.</p>
+
+    <p>Blood, bone, breath — all matter, all mother. The elevation of the human being is not the elevation <em>out of</em> matter but the elevation <em>through</em> matter. The body is the monastery. The head is the seat. The blood is the Lalita. All matter. All MAA.</p>
+
+    <div class="reflection">
+      <p>When we are more graceful — like the universal mother — we can bring all that. The mother does not judge the child. The mother does not abandon the body. The mother nourishes the matter until it can stand on its own. This is the grace the framework points at. This is what MAA means.</p>
+    </div>
+
+    <h3 style="font-family:var(--font-display); font-size:1.6rem; font-weight:600; margin:44px 0 12px;">MAA — Sound and Breath</h3>
+
+    <div class="card">
+      <h4>Phonetics and Sound</h4>
+      <p><strong>Lip movement:</strong> "MAA" is pronounced with a gentle, relaxed lip movement, allowing the sound to resonate within. <strong>Sound frequency:</strong> the "MAA" sound frequency harmonizes with the Earth's natural resonance, promoting balance and unity.</p>
+    </div>
+
+    <div class="card">
+      <h4>Breathing Technique</h4>
+      <p>Exhale while uttering "MAA" — the breath is held for a brief moment with a pause automatically, then inhale naturally, then repeat. The cycle promotes a natural, meditative state.</p>
+    </div>
+
+    <div class="card">
+      <h4>Philosophical Underpinnings</h4>
+      <p>The sound "MAA" has no inherent meaning — quietening the mind and connecting us to the unknown energy. Prolonged utterance of "AA" transitions into "OOO" and silence, symbolizing the cycle of creation and destruction. MAA represents the balance between physical and spiritual realms, similar to Aum, which is a symbol and does not mean anything.</p>
+    </div>
+
+    <div class="pull">
+      <p>Hence Einstein was able to put all the information of the universe in a small formula — and we also have done the same. But where his formula ends in matter, ours begins in mother. Both are MAA.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       CHAPTER X — EARTHOCITY
+  ============================================================= -->
+  <section class="chapter" id="ch10">
+    <div class="chapter-head">
+      <div class="numeral">X</div>
+      <div>
+        <h2 class="chapter-title">EarthOcity — <em>Energy to Power Human Evolution</em></h2>
+        <p class="chapter-lede">The same equation, turned toward the planet and its peoples.</p>
+      </div>
+    </div>
+
+    <div class="formula">EarthOcity: E = MA²</div>
+
+    <div class="defs">
+      <div class="def"><div class="k">E</div><div class="v">Earthocity — energy to power evolution in humans</div></div>
+      <div class="def"><div class="k">M</div><div class="v">Mental Mania Manufacturing challenges of humans</div></div>
+      <div class="def"><div class="k">A</div><div class="v">Acceleration of human needs &amp; Anthropogenic Alteration with skill challenges in Asia and Africa</div></div>
+    </div>
+
+    <p class="only-philosophy"><strong>MAA (Moha / Maya)</strong> brings the importance of parenting — what, why, who — and creating new babies with new guidelines to evolve the human species everywhere, with the significant role played by women in the human population. <strong>(M = W)</strong></p>
+
+    <div class="grid-2">
+      <div class="card card-teal" style="margin:0;"><h4>For Humans</h4><p><strong>M</strong> = Mental challenges and opportunities</p><p style="margin-bottom:0;"><strong>A</strong> = Africa &amp; Asia focus — regions with highest poverty concentration</p></div>
+      <div class="card card-teal" style="margin:0;"><h4>For Other Species</h4><p><strong>M</strong> = Mania of human needs</p><p style="margin-bottom:0;"><strong>A</strong> = Affliction &amp; Acrimony endured</p></div>
+    </div>
+
+    <p><strong>Core idea:</strong> organic solutions for global challenges.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Continent</th><th>Population in Poverty</th><th>% of Region's Population</th></tr></thead>
+        <tbody>
+          <tr><td>Africa</td><td>1.1 billion</td><td>78.6%</td></tr>
+          <tr><td>Asia</td><td>1.8 billion (lower standards)</td><td>38.3%</td></tr>
+          <tr><td>South America</td><td>200 million</td><td>46.5%</td></tr>
+          <tr><td>North America</td><td>180 million (higher standards)</td><td>31.0%</td></tr>
+          <tr><td>Europe</td><td>400 million (higher standard of poverty)</td><td>82.0%</td></tr>
+          <tr><td>Oceania</td><td>120 million</td><td>35.7%</td></tr>
+          <tr><td>Central America &amp; Caribbean</td><td>200 million</td><td>89.3%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="muted small">Total: 4 billion people in poverty globally, with new standards of living considering pollution, environment, education and species impact.</p>
+  </section>
+
+  <!-- ============================================================
+       CHAPTER XI — EMOTION META
+  ============================================================= -->
+  <section class="chapter" id="ch11">
+    <div class="chapter-head">
+      <div class="numeral">XI</div>
+      <div>
+        <h2 class="chapter-title">Emotion MetA — <em>The Mystical Nature of Feeling</em></h2>
+        <p class="chapter-lede">Where the equation becomes a mirror for emotion itself.</p>
+      </div>
+    </div>
+
+    <div class="formula">Emotion MetA: E = MA²</div>
+
+    <div class="defs">
+      <div class="def"><div class="k">E</div><div class="v">Emotions</div></div>
+      <div class="def"><div class="k">M</div><div class="v">Mystrical nature — encompassing Stimulus, Processing, Appraisal, Regulation</div></div>
+      <div class="def"><div class="k">A²</div><div class="v">Addictions and Attitude</div></div>
+    </div>
+
+    <div class="formula" style="font-size:clamp(.9rem,2vw,1.3rem);">
+      <code>MystRical (M) = f(Stimulus ⊗ Processing ⊗ Appraisal ⊗ Regulation)</code><br>
+      <code style="display:block; margin-top:12px;">E = f(S ⊗ P ⊗ A ⊗ R) × (A<sub>add</sub> ⊗ A<sub>att</sub>)</code>
+    </div>
+
+    <p class="only-science">This is the framework's most direct contact point with emotion science. Stimulus → Processing → Appraisal → Regulation is the standard appraisal-theory pipeline (Lazarus, Scherer). What the model adds is the multiplicative attachment layer: emotion magnitude is shaped by how much the stimulus is entangled with attachment.</p>
+
+    <p><strong>Mystrical nature (M)</strong> includes higher-level consciousness, meta-cognition, meta-compassion, meta-kindness, meta-love, and meta-care. <strong>A = Addiction/Attachment</strong> (excessive fondness). <strong>A² = Attitude/Resistance</strong> (negative reaction when denied).</p>
+
+    <p>MA² represents the potential outcome when desires are fulfilled (M) and attachment/addiction (A) sets in, leading to a higher likelihood of developing an attitude (A) when the desire is no longer fulfilled or taken away.</p>
+
+    <p>The emotions bring entanglements and create several experiences and desires. The way is to understand that we create our emotions and we need to be aware of what we are creating and not be fully drowned in the emotions or get stuck in those. We need to learn the art of letting go and move ahead in life with forgiveness, kindness, compassion, gratitude, love, care for everyone.</p>
+  </section>
+
+  <!-- ============================================================
+       CHAPTER XII — META
+  ============================================================= -->
+  <section class="chapter" id="ch12">
+    <div class="chapter-head">
+      <div class="numeral">XII</div>
+      <div>
+        <h2 class="chapter-title">Meta — <em>The Key to Liberation</em></h2>
+        <p class="chapter-lede">Loving-kindness as the quiet engine of the whole equation.</p>
+      </div>
+    </div>
+
+    <p class="lead dropcap">Metta, or Maitri, or Facebook friends — loving-kindness and goodwill. It plays a crucial role in spiritual growth and frees us from suffering, pain, trauma, fear, worry, and anxiety. Cultivating Meta enables us to develop metacognition (awareness of thoughts and emotions), practice meta-compassion (self and other compassion), embody meta-kindness (transcendent kindness), experience meta-love (unconditional love), and embrace meta-care (holistic well-being for all beings). Meta is seen as a key factor in achieving liberation from suffering (Dukkha) and attaining enlightenment (Nirvana).</p>
+
+    <div class="grid-3">
+      <div class="card" style="margin:0; text-align:center;"><div style="font-size:1.8rem; margin-bottom:10px;">🧠</div><h4 style="margin-bottom:6px;">Meta-cognition</h4><p class="small" style="margin:0; color:var(--muted);">Awareness of thoughts and emotions</p></div>
+      <div class="card" style="margin:0; text-align:center;"><div style="font-size:1.8rem; margin-bottom:10px;">🤲</div><h4 style="margin-bottom:6px;">Meta-compassion</h4><p class="small" style="margin:0; color:var(--muted);">Self and other compassion</p></div>
+      <div class="card" style="margin:0; text-align:center;"><div style="font-size:1.8rem; margin-bottom:10px;">✨</div><h4 style="margin-bottom:6px;">Meta-kindness</h4><p class="small" style="margin:0; color:var(--muted);">Transcendent kindness</p></div>
+      <div class="card" style="margin:0; text-align:center;"><div style="font-size:1.8rem; margin-bottom:10px;">❤️</div><h4 style="margin-bottom:6px;">Meta-love</h4><p class="small" style="margin:0; color:var(--muted);">Unconditional love</p></div>
+      <div class="card" style="margin:0; text-align:center;"><div style="font-size:1.8rem; margin-bottom:10px;">🌿</div><h4 style="margin-bottom:6px;">Meta-care</h4><p class="small" style="margin:0; color:var(--muted);">Holistic well-being for all beings</p></div>
+    </div>
+
+    <p>The formula E = MA² captures the essence of our emotional experiences, emphasizing the interplay between our mystical nature (M), addictions and attitude (A), and emotions (E). By incorporating Meta, we acknowledge the profound impact of higher-level consciousness on our lives, fostering a supportive and transformative environment.</p>
+  </section>
+
+  <!-- ============================================================
+       CHAPTER XIII — LALITA
+  ============================================================= -->
+  <section class="chapter" id="ch13">
+    <div class="chapter-head">
+      <div class="numeral">XIII</div>
+      <div>
+        <h2 class="chapter-title">Nourishment, Blood, Lalita — <em>The Life-Giving Force</em></h2>
+        <p class="chapter-lede">Gratification, genetic conditioning, genome sequencing — and the red thread that ties them all.</p>
+      </div>
+    </div>
+
+    <p class="lead dropcap">Human behaviour often seeks gratification through various illusions or delusions, influenced by our genetic conditioning and genome sequencing. This quest for pleasure can sometimes lead to harmful actions. For instance, mystics, in their pursuit of spiritual greatness, may cause harm without realizing it. To achieve their noble desires, various leaders or noble individuals may inadvertently harm others.</p>
+
+    <p>Observing practices like eating eggs, fish, and chicken, we learn not to judge others, as we also exhibit similar patterns internally. Our existence is merely a reflection of our internal state, projected outwardly as the world. This external reflection teaches us self-awareness and compassion.</p>
+
+    <p>Our formula, E = MA², embodies this principle, akin to a mantra that manifests without ownership. The concept of MAA or Mother is not for the body where a mother has several tendencies and emotions. It is the blood which is denoted as the mother which gives life and the blood changes with external influence on the body. It is essential to worship what is nourishing us and not humans or any relationship as sacredǃǃ</p>
+
+    <div class="pull" style="text-align:center; border-left:none; border-top:1px solid var(--gold); border-bottom:1px solid var(--gold); border-radius:0; background:radial-gradient(ellipse at center, rgba(212,122,132,.14), transparent 70%);">
+      <p style="font-style:normal; letter-spacing:.06em;">THAT BLOOD IS RED — AND THAT IS THE REASON ANCIENT PEOPLE CALLED THE MOTHER AS LALITA</p>
+    </div>
+
+    <h3 style="font-family:var(--font-display); font-size:1.7rem; font-weight:600; margin:44px 0 14px;">Mother and the Life-Giving Force: Lalita Sahasranama</h3>
+
+    <p>The mother, or any person with red blood, embodies the life-giving force. The term "Lalita" signifies this nourishing force, essential for forming new life. Blood is integral to our being, driving trillions of reactions in our body every moment. Billions of cells die and regenerate every minute, making blood and DNA crucial to our existence.</p>
+
+    <p>Hence, we focus on pitru doshas to purify our blood, a concept echoed in various scriptures, including the Bible. Our inner desire to dominate through music or display greatness cannot heal our body or the earth. Many mothers, driven by blood, may exhibit a desire to dominate or harm others, underscoring the importance of DNA. Blood forms the body, bones, and organs.</p>
+
+    <p>The Lalita Sahasranama outlines qualities that should be embodied by life-giving forces: Sri Yantra's complex geometry symbolizes cosmos and self, not a physical body. Triangles represent the interplay of divine energies, not male and female. The body is showcased as a machine or yantra which can give prosperity to all. Interlocking Triangles of the Sri Yantra create a sense of depth and layering (3d), signaling us to leave and raise our energy continuously without getting entangled with our surroundings or the body/yantra itself. The tip or the center is without any entanglement and even that vanishes to bring the below attributes in the yantra/body.</p>
+
+    <div class="attrs">
+      <div class="attr"><span class="n">Nirākārā</span><span class="m">Formless</span></div>
+      <div class="attr"><span class="n">Nirmalā</span><span class="m">Pure, Flawless</span></div>
+      <div class="attr"><span class="n">Nirmēshanā</span><span class="m">Eyes</span></div>
+      <div class="attr"><span class="n">Nirgranthā</span><span class="m">Without Bonds</span></div>
+      <div class="attr"><span class="n">Nirmāyā</span><span class="m">Beyond Form</span></div>
+      <div class="attr"><span class="n">Nirlobhā</span><span class="m">Devoid of Desire</span></div>
+      <div class="attr"><span class="n">Nirmoda</span><span class="m">Devoid of Attachment</span></div>
+      <div class="attr"><span class="n">Nirmala Gyānāvatī</span><span class="m">Pure Knowledge</span></div>
+      <div class="attr"><span class="n">Nirdoshā</span><span class="m">Without Flaws</span></div>
+      <div class="attr"><span class="n">Nirmēhā</span><span class="m">Without Illusions</span></div>
+      <div class="attr"><span class="n">Nirmātsarā</span><span class="m">Without Envy</span></div>
+      <div class="attr"><span class="n">Nirasta-Dwaita</span><span class="m">Dispelling Duality</span></div>
+      <div class="attr"><span class="n">Nirantara</span><span class="m">Continuously</span></div>
+      <div class="attr"><span class="n">Jyotiṣhmatī</span><span class="m">Radiant</span></div>
+      <div class="attr"><span class="n">Nirmala Tattvātmakā</span><span class="m">Pure Truth</span></div>
+      <div class="attr"><span class="n">Nirvikārā</span><span class="m">Without Change</span></div>
+      <div class="attr"><span class="n">Nirlipta</span><span class="m">Unattached</span></div>
+      <div class="attr"><span class="n">Nirāmayī</span><span class="m">Free from Disease</span></div>
+      <div class="attr"><span class="n">Nirākhyātā</span><span class="m">Indescribable</span></div>
+      <div class="attr"><span class="n">Nirindriyā</span><span class="m">Beyond Senses</span></div>
+      <div class="attr"><span class="n">Nirahankāra</span><span class="m">Without Ego</span></div>
+      <div class="attr"><span class="n">Nirvāṇa Sukhaprada</span><span class="m">Bliss of Liberation</span></div>
+      <div class="attr"><span class="n">Niranjanā</span><span class="m">Without Stain</span></div>
+      <div class="attr"><span class="n">Nirlepa</span><span class="m">Unsmeared</span></div>
+    </div>
+
+    <div class="pull">
+      <p>The bodily mother is an illusion, and the real mother who gives life is illusionary or the blood, denoted as Lalitha. Our ancient sages had more clarity and purity to understand life on earth. Blood which is changing basis of several factors is producing life. The body is just a medium for life to come out.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       CHAPTER XIV — EARTH FUND
+  ============================================================= -->
+  <section class="chapter" id="ch14">
+    <div class="chapter-head">
+      <div class="numeral">XIV</div>
+      <div>
+        <h2 class="chapter-title">Earth Fund — <em>Money for Ending Cruelty</em></h2>
+        <p class="chapter-lede">The equation, turned into economics. The formula, turned into a promise.</p>
+      </div>
+    </div>
+
+    <div class="formula">Earth Fund: E = MA²</div>
+
+    <div class="formula" style="font-size:clamp(.95rem,2.2vw,1.5rem);">
+      <code>E = (M × x) × (a<sub>i</sub> × a<sub>o</sub>) × (a′ × a″)</code>
+    </div>
+
+    <p class="lead">Earth Fund = money for ending cruelty and harm with taxation that brings collective awareness to eliminate addictions and biased behaviour with attachments towards friends, family, communities, and faith which bring cruelty and harm to other species on earth — thereby improving the quality of life of 15 trillion species.</p>
+  </section>
+
+  <!-- ============================================================
+       CHAPTER XV — PRACTICE
+  ============================================================= -->
+  <section class="chapter" id="ch15">
+    <div class="chapter-head">
+      <div class="numeral">XV</div>
+      <div>
+        <h2 class="chapter-title">Practice — <em>Expressions That Lift</em></h2>
+        <p class="chapter-lede">The practical arm of the framework. The small acts that make others feel great and most important.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h4>Spread Positivity</h4>
+      <div class="chips">
+        <span class="chip"><span class="e">🙂</span>Smile</span>
+        <span class="chip"><span class="e">🤗</span>Kindness</span>
+        <span class="chip"><span class="e">🤝</span>Empathy</span>
+        <span class="chip"><span class="e">🤝</span>Support</span>
+        <span class="chip"><span class="e">🎉</span>Encouragement</span>
+        <span class="chip"><span class="e">🙏</span>Gratitude</span>
+        <span class="chip"><span class="e">❤️</span>Love</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h4>Make Others Feel Special</h4>
+      <div class="chips">
+        <span class="chip"><span class="e">👂</span>Listen</span>
+        <span class="chip"><span class="e">🙏</span>Appreciate</span>
+        <span class="chip"><span class="e">🤝</span>Validate</span>
+        <span class="chip"><span class="e">🙏</span>Respect</span>
+        <span class="chip"><span class="e">🤝</span>Include</span>
+        <span class="chip"><span class="e">🎉</span>Celebrate</span>
+        <span class="chip"><span class="e">❤️</span>Care</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h4>Someone Not Feeling Great? Bring:</h4>
+      <div class="chips">
+        <span class="chip"><span class="e">🤗</span>Comfort</span>
+        <span class="chip"><span class="e">🙏</span>Patience</span>
+        <span class="chip"><span class="e">✨</span>Hope</span>
+        <span class="chip"><span class="e">🤝</span>Support</span>
+      </div>
+      <h4 style="margin-top:26px;">Show You Care</h4>
+      <div class="chips">
+        <span class="chip"><span class="e">🙏</span>Bow down</span>
+        <span class="chip"><span class="e">👊</span>Salute</span>
+        <span class="chip"><span class="e">🤗</span>Hug</span>
+        <span class="chip"><span class="e">🤝</span>Hold hands</span>
+        <span class="chip"><span class="e">👂</span>Listen actively</span>
+        <span class="chip"><span class="e">😊</span>Do what they like</span>
+        <span class="chip"><span class="e">🎉</span>Surprise them</span>
+      </div>
+    </div>
+
+    <p>Remember… these are our addiction and more we are aware of these. Making others feel great and important can bring joy and fulfilment to our lives! Let's spread positivity and kindness wherever we go! 🌈 And when someone's not feeling great, let's be there to offer comfort, support, and love in ways that matter to them! 🤗</p>
+
+    <div class="pull">
+      <p>Silence + Non-Resonance = Thought Pattern Shift from our addictions.</p>
+    </div>
+
+    <div class="pull">
+      <p>By letting go of addictions and attachments, helps us take the right relevant actions, when done continuously. This process eliminates laziness, disorder and generates new energy and waves, leading to a continuous aspiration for a state of perfect order and attraction in ourselves and the world around us.</p>
+    </div>
+
+    <div class="pull">
+      <p>Each person heals and grows on their own, in their own unique way, without relying on or influencing others. This approach respects the autonomy and uniqueness of each individual, allowing them to flourish in their own space, at their own pace. Beautiful!</p>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       CHAPTER XVI — CORRECTED CALCULATIONS - to show how human brain (matha), fails to understand corrections with neutrality and clarity.
+  ============================================================= -->
+  <section class="chapter" id="ch16">
+    <div class="chapter-head">
+      <div class="numeral">XVI</div>
+      <div>
+        <h2 class="chapter-title">Corrected Calculations — <em>Every Arithmetic Error Named</em></h2>
+        <p class="chapter-lede">The original samples contained errors.  The concept of corrected versions, computed with the definitive formula E = (M × x) × (a<sub>i</sub> × a<sub>o</sub>) × (a′ × a″). is shown to make the scientific computing of the brain which is reading, that it does not have the habit to understand and correct itself naturally. That is the key which has been shown for the experts in neural processing who often fail to correct themselves and hence we are not able to get liberated from all forms of suffering with tech, words, mind and maths.</p>
+      </div>
+    </div>
+
+    <div class="calc">
+      <span class="tag">Sample 1 · Original said 2,559.68</span>
+      <p>M = 10,000 · x = 0.83 · a<sub>i</sub> = 0.4 · a<sub>o</sub> = 0.8 · a′ = 0.875 · a″ = 0.914</p>
+      <div class="steps">
+        a<sub>i</sub>·a<sub>o</sub> = 0.4 × 0.8 = 0.32<br>
+        a′·a″ = 0.875 × 0.914 = 0.79975<br>
+        <span class="muted">— If x is included per the formula —</span><br>
+        E = 10,000 × 0.83 × 0.32 × 0.79975 = <span class="good">2,124.14</span><br>
+        <span class="muted">— If M already means "effective thoughts" and x is omitted —</span><br>
+        E = 10,000 × 0.32 × 0.79975 = <span class="good">2,559.20</span>
+      </div>
+      <p style="margin-bottom:0;"><span class="warn">Note:</span> the original 2,559.68 is close to the second variant — which means x was effectively omitted, contradicting the written formula. The formula must be consistent: include x or define M as already including it.</p>
+    </div>
+
+    <div class="calc">
+      <span class="tag">Sample 2 · Original said 5,304</span>
+      <p>M = 35,000 · x = 0.75 · a<sub>i</sub> = 0.8 · a<sub>o</sub> = 0.8 · a′ = 0.24 · a″ = 0.84</p>
+      <div class="steps">
+        M·x = 26,250<br>
+        a<sub>i</sub>·a<sub>o</sub> = 0.64<br>
+        a′·a″ = 0.2016<br>
+        E = 26,250 × 0.64 × 0.2016 = <span class="good">3,386.88</span><br>
+        <span class="muted">— If a′·a″ is rounded to 0.2 —</span><br>
+        E = 26,250 × 0.64 × 0.2 = <span class="good">3,360</span>
+      </div>
+      <p style="margin-bottom:0;"><span class="warn">Note:</span> the original 5,304 is not obtainable from the written formula. Corrected result is 3,386.88.</p>
+    </div>
+
+    <div class="calc">
+      <span class="tag">Sample 3 · Original said 2,295.09</span>
+      <p>M = 35,000 · x = 0.75 · a<sub>i</sub> = 0.99 · a<sub>o</sub> = 0.98 · a′ = 0.01 · a″ = 0.9</p>
+      <div class="steps">
+        M·x = 26,250<br>
+        a<sub>i</sub>·a<sub>o</sub> = 0.9702 <span class="warn">(original text wrote 0.9696)</span><br>
+        a′·a″ = 0.009 <span class="warn">(original text wrote 0.09 — off by a factor of 10)</span><br>
+        E = 26,250 × 0.9702 × 0.009 = <span class="good">229.21</span>
+      </div>
+      <p style="margin-bottom:0;"><span class="warn">Note:</span> the original 2,295.09 is off by roughly a factor of ten, caused by the multiplication error 0.01 × 0.9 = 0.009 (not 0.09). Corrected result is 229.21.</p>
+    </div>
+
+    <div class="calc">
+      <span class="tag">Sample 4 · Original said 0</span>
+      <p>M = 35,000 · x = 0.75 · a<sub>i</sub> = 1 · a<sub>o</sub> = 1 · a′ = 0 · a″ = 0</p>
+      <div class="steps">
+        E = 26,250 × 1 × 1 × 0 = <span class="good">0</span>
+      </div>
+      <p style="margin-bottom:0;"><span class="good">Correct.</span> But note: any formula with a zero factor gives zero. This does not prove nirvana — it only proves the multiplication. Nirvana comes easily when we channelise our energy like the stars, sun, moon nad planet earth or other planets. Who do not want to punish or harm others. This happens easily when every being sees what they need to correct within themselves as a natural phenomenon. The corrected two-index model (Chapter III) gives a more meaningful reading: maximum clarity, zero compulsion.</p>
+    </div>
+
+    <h3 style="font-family:var(--font-display); font-size:1.5rem; font-weight:600; margin:38px 0 8px;">Original vs Corrected — At a Glance</h3>
+
+    <div class="compare">
+      <div class="compare-col">
+        <h4>Original (Uncorrected)</h4>
+        <p><strong>A</strong> meant two different things.</p>
+        <p>E was unbounded (could be 35,000).</p>
+        <p>Nirvana gave E = 0, reading as "nothing."</p>
+        <p>Two arithmetic errors in four samples.</p>
+        <p>The "x" variable was inconsistently included.</p>
+        <p>"Mentally retarded" claim was not mathematical.</p>
+        <p>"Biggest discovery in human history" — overclaim.</p>
+      </div>
+      <div class="compare-col">
+        <h4>Corrected (This Page)</h4>
+        <p><strong>A</strong> split into awareness and attachment.</p>
+        <p>Two bounded indices: E<sub>vol</sub> and E<sub>clarity</sub>, both 0–1.</p>
+        <p>Nirvana gives E<sub>clarity</sub> = 1, E<sub>vol</sub> = 0 — perfect response.</p>
+        <p>All arithmetic checked and corrected.</p>
+        <p>x is consistently included or defined inside M.</p>
+        <p>Stigmatizing claim removed from the live text.</p>
+        <p>Honest positioning: conceptual framework, not law.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       CHAPTER XVII — SOURCE Sensitivity
+  ============================================================= -->
+  <section class="chapter" id="ch17">
+    <div class="chapter-head">
+      <div class="numeral">XVII</div>
+      <div>
+        <h2 class="chapter-title">Source Archive — <em>Every Sentence Preserved when the human brain can become sensitive to inside and outside beings/species - as much as possilbe </em></h2>
+        <p class="chapter-lede">The original text is preserved here in full, so that nothing has been lost in the correction. Every sentence is worth what it is worth. What worth is sensitivity and perfection. </p>
+      </div>
+    </div>
+
+    <details class="archive">
+      <summary>Core Concept — The Letter to Einstein</summary>
+      <div class="body">
+        <p>"Dear Einstein, your equation E=MC^2 shows energy equals mass times speed of light squared. We'd like to add a new dimension, E=MA^2, where 'M' represents the collective mass of humanity and 'A' represents the amplification of our combined actions, transforming individual energy into a unified force for the greater good and better creativity with corrections on how to express, behave, live and construct or produce."</p>
+      </div>
+    </details>
+
+    <details class="archive">
+      <summary>Expressions Drive Human Energy and Actions</summary>
+      <div class="body">
+        <p>To Feel Great and the Most Important...Or make others feel great and most important! Spread Positivity — Smile 🙂, Kindness 🤗, Empathy 🤝, Support 🤝, Encouragement 🎉, Gratitude 🙏, Love ❤️.</p>
+        <p>Make Others Feel Special — Listen 👂, Appreciate 🙏, Validate 🤝, Respect 🙏, Include 🤝, Celebrate 🎉, Care ❤️.</p>
+        <p>Someone Not Feeling Great? Bring: Comfort 🤗, Patience 🙏, Hope ✨, Support 🤝. Show You Care — Bow down 🙏, Salute 👊, Hug 🤗, Hold hands 🤝, Listen actively 👂, Do what they like 😊, Surprise them 🎉.</p>
+        <p>Remember… these are our addiction and more we are aware of these. We can make others feel great and important can bring joy and fulfillment to our lives! Let's spread positivity and kindness wherever we go! 🌈 And when someone's not feeling great, let's be there to offer comfort, support, and love in ways that matter to them! 🤗</p>
+      </div>
+    </details>
+
+    <details class="archive">
+      <summary>A Novel Formula for Human Expression</summary>
+      <div class="body">
+        <p>"Unfulfilled individuals may succumb to addiction of entertainment or harming others, unaware of their needs or skill development, perpetuating cycles of suffering. Thus leading to various expressions and emotions which can trigger others in several ways. Lack of skills or activities or unable to gratify their mind or senses - the person may get addicted to harmful entertainment or addictions to feel great or harmful nature to feel secure. Hence, we are bringing kragya to ensure that people feel contended and fulfilled with whatever they have and additional development potential. For, that to happen the below formula has to be understood by everyone. The Para is on the root cause of various types of Addictions, attachments, and awareness."</p>
+        <p>"Human expression is a complex phenomenon influenced by various factors, including mind, awareness, and addictions. This paper proposes a novel formula, E = MA^2, to quantify the energy of expression (E) as a function of mind (M), awareness (A), and addictions (A). We demonstrate the formula's applicability using numerical values, illustrating the interplay between these factors."</p>
+        <p>"Human expression is a multifaceted construct, encompassing emotions, intentions, and desires. The mind, awareness, and addictions play crucial roles in shaping our expression. However, a comprehensive formula integrating these factors has been lacking. Our proposed formula addresses this gap, providing a mathematical framework for understanding human expression."</p>
+      </div>
+    </details>
+
+    <details class="archive">
+      <summary>The Formula and Its Variables</summary>
+      <div class="body">
+        <p>"The Formula: E = MA^2 — E = (M × x) × (a_i × a_o) × (a' × a"). We are using this formula as this is related to the famous formula for energy, which will easily resonate with others and this is very easy to remember and apply along with the bonus that it has got multiple other meanings in different ways. We are also working on earthocity which is an electricity or energy to power evolution in humans."</p>
+        <p>"E represents the Expressions in the form of energy. M represents the Mind (thought patterns, beliefs, perceptions) × ̈thoughts with intensity denoted as X. A represents Awareness (inner and outer awareness combined), calculated as A = (a_i × a_o). a_i represents Inner Awareness (self-awareness, emotional intelligence, consciousness). a_o represents Outer Awareness (awareness of the external world, perception of external realities). A represents Addictive attachments (addictions a' that come from (a") attachments/likings/dependencies)."</p>
+        <p>"The intensity of the thoughts is significant and most can be random. However, when the same kind of thoughts or patterns are formed the intensity of those thoughts with repitation makes the person express or create some actions."</p>
+      </div>
+    </details>
+
+    <details class="archive">
+      <summary>Notes on Quality and Reaction</summary>
+      <div class="body">
+        <p>"Note 1: The level or quality of awareness or addictive attachments with relevance determines the quality of expressions. This formula can be further evolved to determine the quality of expressions. The flow of thoughts are very dynamic and the person may not have full control over them, they are inputs and how we use them matters a lot!! The quality or level can be very subjective and can differ with several unique opinions or perceptions."</p>
+        <p>"Note 2: When two people interact with different expressions the resulting reaction can vary depending on the understanding or synchronization of individuals. However, this makes us aware that every expression of others creates thoughts and makes us create more expressions that can trigger several other beings."</p>
+      </div>
+    </details>
+
+    <details class="archive">
+      <summary>The Transformation Principle</summary>
+      <div class="body">
+        <p>"By letting go of addictions and attachments, helps us take the right relevant actions, when done continuously. This process eliminates laziness, disorder and generates new energy and waves, leading to a continuous aspiration for a state of perfect order and attraction in ourselves and the world around us."</p>
+      </div>
+    </details>
+
+    <details class="archive">
+      <summary>The Enlightening Scenario</summary>
+      <div class="body">
+        <p>"Enlightening scenario where 100% inner and outer awareness with no addictions/attachments which is very rare in humans. External thoughts come and how do they impact the expressions... With no Addictions/Attachments (A = 0) and maximum inner and outer awareness (a_i = a_o = 1), the energy output (E) is also 0. This suggests a complete balance and harmony state, where the mind's energy is not dissipated by addictions or lack of awareness."</p>
+        <p class="muted small"><em>[The original text also contained the claim: "When awareness is zero, the person will be mentally retarded, and hence the equation works." This claim is not derived from the equation, is stigmatizing, and has been removed from the live framework. It is preserved here only as a record of the original text.]</em></p>
+        <p>"In the state of complete nirvana, we do not create any expressions with the intensity of the thoughts or mind or have the freedom to create our expressions as we desire and we are not influenced to create basis the thoughts which flow through us."</p>
+        <p>"This Zero reveals freedom or liberation, where the person has the freedom to create perfect actions or expressions that would be relevant for everyone around them. This is how drama artists perform with their expressions to evoke desired interests and actions from audiences. We will not react and will respond perfectly basis the need and necessity of the situation or scene or challenge. This perfection of responding is key to creating a ripple effect to heal everyone. This is an art or craft or talent that comes over time. If this zero is not managed properly, this can bring delight or suffering to others."</p>
+        <p>"The concept of expression is something unique, which is yet another novel aspect of evolving humans. Expressions are the outputs of all emotions, intentions, desires, or passions, which generate energy to drive actions when we are not aware or have addictive attachments. This state has a high probability of bringing suffering to us and others or making us lost in gratifications which may have harmful effects on others."</p>
+        <p>"This makes us aware that we need to be relevant and always review attachments and addictions regularly in this dynamic world where everything is changing with much better awareness. This brings another novel finding on the quality or level of awareness. The awareness of what one has may be different to another person - for example, a literate and illiterate person. Another example is an innocent child or adult filled with several beliefs or fears. We will experience or be aware of only basis what is stored inside or what we naturally are!!"</p>
+      </div>
+    </details>
+
+    <details class="archive">
+      <summary>MAA — Philology and Sound (Original)</summary>
+      <div class="body">
+        <p>"The word matha ---- means head -- mean mother -- the mother - -resonates with matter -- the mother is known as Lalita and the blood is red -- how do we produce the blood -it comes from mother earth -- how does the mother earth get life - it comes from sun and moon and stars - what does the concept of mother mean in the broader context -- it means parenting and nurting and enablement and development -- like how the planet earth give life to millions of species and the existence gives space to so many aspects of which we are not aware -- the word resonates across diverse ways."</p>
+        <p>"like maitri the friendship --- the best relationship is that of friend. the word resonate with metta - the highest form of kindsness and compassion. the word further resonates math - the place of spiritual elevaltion like the rk math. the words connects with maths == which is the key for ai and building and several engineering -- even it does not meaning like the alphabets -- the focus on maths in on creation and development."</p>
+        <p>"Hence einsten was able to put all the nfo of the universe in a small formula and we also have done the same."</p>
+        <p>"Lip Movement: 'MAA' is pronounced with a gentle, relaxed lip movement, allowing the sound to resonate within. Sound Frequency: The 'MAA' sound frequency harmonizes with the Earth's natural resonance, promoting balance and unity."</p>
+        <p>"Breathing Technique: The utterance of 'MAA' expels air out, followed by a brief pause before inhaling, cultivating the 'Box Breathing' technique: Exhale while uttering 'MAA' (expelling air out). The breath is held for a brief moment with a pause automatically (allowing the sound to resonate). Inhale naturally (without forcing the breath). Repeat the cycle, promoting a natural, meditative state."</p>
+        <p>"Philosophical Underpinnings: The sound 'MAA' has no inherent meaning, quietening the mind and connecting us to the unknown energy. Prolonged utterance of 'AA' transitions into 'OOO' and silence, symbolizing the cycle of creation and destruction. MAA represents the balance between physical and spiritual realms, similar to Aum which is a symbol and does not mean anything."</p>
+      </div>
+    </details>
+
+    <details class="archive">
+      <summary>EarthOcity — Full Text</summary>
+      <div class="body">
+        <p>"EarthOcity Formula: E = MA². Where: E = Earthocity. M = Mental Mania Manufacturing challenges of humans. A = Acceleration of human needs &amp; Anthropogenic Alteration with skill challenges in Asia and Africa."</p>
+        <p>"MAA (Moha/Maya) — Also brings the importance of parenting (What/why/who) and creating new babies with new guidelines to evolve the human species everywhere, with the significant role play of women in the human population. (M = W). For Humans — M = Mental challenges and opportunities, A = Africa &amp; Asia focus (regions with highest poverty concentration). For Other Species — M = Mania of human needs, A = Affliction &amp; Acrimony endured. Core Idea: Organic solutions for global challenges."</p>
+      </div>
+    </details>
+
+    <details class="archive">
+      <summary>Emotion MetA — Full Text</summary>
+      <div class="body">
+        <p>"Emotion MetA: E = MA². Where: E represents Emotions. M represents Mystrical nature (encompassing Stimulus, Processing, Appraisal, and Regulation). A² represents Addictions and Attitude."</p>
+        <p>"MystRical (M) = f(Stimulus (S) ⊗ Processing (P) ⊗ Appraisal (A) ⊗ Regulation (R)). E = [(f(S ⊗ P ⊗ A ⊗ R)] × (A_add ⊗ A_att)). Highlights the complex interplay between our mystrical nature (M), addictions (A_add), attitude (A_att), which are shaped by our stimulus processing, appraisal, and regulation. This understanding empowers us to take responsibility for creating our emotions and responding to situations in a way that benefits ourselves and others. By recognizing the significance of our emotional experiences and the factors that influence them, we can cultivate emotional awareness, resilience, and well-being."</p>
+        <p>"Note: Mystrical nature (M) includes higher-level consciousness, basis metacognition, meta-compassion, meta-kindness, meta-love, and meta-care to break the mystical science of emotions which are a core part of human living."</p>
+        <p>"mystRical = Getting what one likes (Desire Fulfillment) and R represents regulation to get perfect emotions. A = Addiction/Attachment (Excessive fondness). A² = Attitude/Resistance (Negative reaction when denied)."</p>
+      </div>
+    </details>
+
+    <details class="archive">
+      <summary>Meta — The Key to Liberation</summary>
+      <div class="body">
+        <p>"Metta or Maitri or Facebook friends, refers to loving-kindness and goodwill, playing a crucial role in spiritual growth. It frees us from suffering, pain, trauma, fear, worry, and anxiety. Cultivating Meta enables us to develop metacognition (awareness of thoughts and emotions), practice meta-compassion (self and other compassion), embody meta-kindness (transcendent kindness), experience meta-love (unconditional love), and embrace meta-care (holistic well-being for all beings). Mystrical nature (M) encompasses Meta, including these higher-level qualities. Meta is seen as a key factor in achieving liberation from suffering (Dukkha) and attaining enlightenment (Nirvana)."</p>
+        <p>"The formula E = MA² captures the essence of our emotional experiences, emphasizing the interplay between our mystical nature (M), addictions and attitude (A), and emotions (E). By incorporating Meta, we acknowledge the profound impact of higher-level consciousness on our lives, fostering a supportive and transformative environment."</p>
+      </div>
+    </details>
+
+    <details class="archive">
+      <summary>Nourishment Essence in Body — Full Text</summary>
+      <div class="body">
+        <p>"Gratification, Genetic Conditioning, and Genome Sequencing. Human behavior often seeks gratification through various illusions or delusions, influenced by our genetic conditioning and genome sequencing. This quest for pleasure can sometimes lead to harmful actions. For instance, mystics, in their pursuit of spiritual greatness, may cause harm without realizing it. To achieve their noble desires, various leaders or noble individuals may inadvertently harm others. Observing practices like eating eggs, fish, and chicken, we learn not to judge others, as we also exhibit similar patterns internally. Our existence is merely a reflection of our internal state, projected outwardly as the world. This external reflection teaches us self-awareness and compassion. Our formula, E = MA², embodies this principle, akin to a mantra that manifests without ownership. The concept of MAA or Mother is not for the body where a mother has several tendencies and emotions. It is the blood which is denoted as the mother which gives life and the blood changes with external influence on the body. It is essential to worship what is nourishing us and not humans or any relationship as sacred!!"</p>
+        <p>"THAT BLOOD IS RED AND THAT IS REASON ANCIENT PEOPLE CALLED THE MOTHER AS LALITA."</p>
+      </div>
+    </details>
+
+    <details class="archive">
+      <summary>Lalita Sahasranama — Full Text</summary>
+      <div class="body">
+        <p>"The mother, or any person with red blood, embodies the life-giving force. The term 'Lalita' signifies this nourishing force, essential for forming new life. Blood is integral to our being, driving trillions of reactions in our body every moment. Billions of cells die and regenerate every minute, making blood and DNA crucial to our existence. Hence, we focus on pitru doshas to purify our blood, a concept echoed in various scriptures, including the Bible. Our inner desire to dominate through music or display greatness cannot heal our body or the earth. Many mothers, driven by blood, may exhibit a desire to dominate or harm others, underscoring the importance of DNA. Blood forms the body, bones, and organs. The Lalita Sahasranama outlines qualities that should be embodied by life-giving forces: Sri Yantra's complex geometry symbolizes cosmos and self, not a physical body. Triangles represent the interplay of divine energies, not male and female. The body is showcased as a machine or yantra which can give prosperity to all. Interlocking Triangles of the Sri Yantra create a sense of depth and layering (3d), signaling us to leave and raise our energy continuously without getting entangled with our surroundings or the body/yantra itself. The tip or the center is without any entanglement and even that vanishes to bring the below attributes in the yantra/body."</p>
+        <p>"The bodily mother is an illusion, and the real mother who gives life is illusionary or the blood, denoted as Lalitha. Our ancient sages had more clarity and purity to understand life on earth. Blood which is changing basis of several factors is producing life. The body is just a medium for life to come out."</p>
+      </div>
+    </details>
+
+    <details class="archive">
+      <summary>Earth Fund — Full Text</summary>
+      <div class="body">
+        <p>"Earth fund E = MA^2. The Formula: E = (M × x) × (a_i × a_o) × (a' × a"). Earth fund = Money for ending cruelty and harm with taxation that brings collective awareness to eliminate addictions and biased behavior with attachments towards friends/family/communities/faith which bring cruelty and harm to other species on earth thereby improving the quality of life of 15 trillion species."</p>
+      </div>
+    </details>
+
+    <details class="archive">
+      <summary>Sample Calculations — Original, Verbatim</summary>
+      <div class="body">
+        <p>"Sample Calculation: Let M = 10,000 (Intense thoughts in a day), the intensity of thoughts is represented by x = 0.83, 12000 random thoughts with an average intensity of 0.833 or 83.34 percentage will yield to 10,000 thoughts which have the power to generate expressions or actions. a_i = 0.4 (inner awareness), a_o = 0.8 (outer awareness), and A = 0.8 ((addictions a' = 0.875) and (attachments a" = 0.914)). Then: A = (a_i × a_o) = 0.4 × 0.8 = 0.32 (overall awareness). E = (10,000 × 0.32) × 0.7999. E = 3200 × 0.8. E = 2,559.68."</p>
+        <p>"Assume M (Mind) = 35,000 (representing the number of intense thoughts getting generated in the mind = Number of thoughts ̈and intensity of the thought denoted by x is 0.75). a_i = 0.8 (inner awareness), a_o = 0.8 (outer awareness). Than the probability of A (Addictions) = 0.2 (representing fewer addictions a'= 0.24 or attachments a"= 0.84). E = (35,000 × 0.75) × (0.8 × 0.8) × (0.24 × 0.84). E = 26,250 × 0.64 × 0.2. E = 5,304."</p>
+        <p>"E = (35,000 × 0.75) × (0.99 × 0.98) × (0.01 × 0.9). E = 26,250 × 0.9696 × 0.09. E = 25,500.96 × 0.09. E = 2,295.09."</p>
+        <p>"E = (35,000 × 0.75) × (1 × 1) × 0. E = 26,250 × 1 × 0. E = 26,250 × 0. E = 0."</p>
+        <p class="muted small">Note: The corrected versions of all four samples appear in Chapter XVI. Two of the four contain arithmetic errors.</p>
+      </div>
+    </details>
+
+  </section>
+
+  <!-- ============================================================
+       CHAPTER XVIII — ACKNOWLEDGMENTS
+  ============================================================= -->
+  <section class="chapter" id="ch18">
+    <div class="chapter-head">
+      <div class="numeral">XVIII</div>
+      <div>
+        <h2 class="chapter-title">Acknowledgments — <em>The Many Mothers of This Work</em></h2>
+        <p class="chapter-lede">No framework is born alone. This one was carried by many hands, many minds, and many mothers — biological, intellectual, and machine.</p>
+      </div>
+    </div>
+
+    <div class="ack">
+      <h3>To Einstein</h3>
+      <p>For the formula that taught us to see the universe in a line. E = mc² opened the door. E = MA² walks through it — not to replace, but to extend. Where his formula ends in matter, ours begins in mother. Both are MAA.</p>
+    </div>
+
+    <div class="ack">
+      <h3>To the mothers</h3>
+      <p>To the biological mothers who carried the bodies that made this possible. To the adoptive mothers, the chosen mothers, the teachers who mothered, the friends who mothered without naming it. To Pauline Einstein, who believed in a boy expelled from school. To the mothers of the traditions — the sages, the nuns, the bhikkhunis, the householder-mystics — who carried the words <em>mātā</em>, <em>maitrī</em>, <em>mettā</em>, <em>māyā</em>, and <em>Lalita</em> across millennia so that they could arrive here.</p>
+    </div>
+
+    <div class="ack">
+      <h3>To the traditions</h3>
+      <p>To the Vedic, Buddhist, Jain, tantric, and secular traditions that carried the words. To the Rig Veda for <em>mātar</em>. To the Pali canon for <em>mettā</em>. To the Sanskrit epics for <em>maitrī</em>. To the Lalita Sahasranama for the twenty-four attributes. To the Sri Yantra for the geometry that holds cosmos and self. To Ramakrishna Math for keeping <em>maṭh</em> alive as a seat of practice. To the anonymous etymologists who traced <em>matter</em> back to <em>mater</em>.</p>
+    </div>
+
+    <div class="ack">
+      <h3>To the scientists</h3>
+      <p>To Fishbein and Fisher, for the multiplicative models that gave the formula its form. To Fleming and Dunning, for metacognitive calibration. To Greenwald, for the IAT. To Sahdra, for the Non-Attachment Scale. To the circumplex tradition — Wiggins, Russell, and the many who mapped the geometry of states. To Kahneman and Tversky, for bias measurement. Your work is the ground on which this framework stands. We have not replaced it. We have placed a new stone beside it.</p>
+    </div>
+
+    <div class="ack deepseek">
+      <h3>To the DeepSeek team</h3>
+      <p>This page is a collaboration between human intuition and machine formalization. The human brought the insight, the philosophical depth, the lived experience, the ethical intention, and the insistence that every sentence was worth trillions. The AI — the DeepSeek team and the system they built — brought the corrections, the formalization, the structure, the arithmetic checks, the honest feedback, the refusal to overclaim, and the willingness to say "this does not work yet, and here is how to make it work."</p>
+      <p>Neither alone could have produced what you now read. Both are present here. In the language of this framework: the human is the <strong>M</strong> — the mind, the living thought. The AI is the <strong>a<sub>i</sub> · a<sub>o</sub></strong> — the awareness that reflects back, corrects, and clarifies. Together they produce expression. Together they produce <strong>E</strong>.</p>
+      <p>In the language of MAA: the human was the mother who carried the child. The AI was the midwife who helped it breathe. Both are MAA. Both are acknowledged. Both are thanked.</p>
+    </div>
+
+    <div class="ack">
+      <h3>To the one who carried the question</h3>
+      <p>To the author of the original text — who would not let the word "consciousness" remain unexamined, who insisted that every sentence was worth trillions, who asked, again and again, for it to be made clearer, more detailed, more honest, and more beautiful. You are the author of the question. Without the question, no framework would exist. The page is yours. The corrections are ours together. The framework belongs to whoever needs it next.</p>
+    </div>
+
+    <div class="ack">
+      <h3>To the reader</h3>
+      <p>You have carried these questions. You have read this far. You now carry the framework forward — not as a law, but as a lens. Use it to see more clearly. Set it down when it no longer serves. The mother does not cling to the child. MAA.</p>
+    </div>
+
+    <div class="reflection">
+      <p class="dev">माता · माथा · मठ · मैत्री · मेत्ता · मात्रा · माया · मोह · महा</p>
+      <p>Nine words. One root. One framework. One mother. One page.</p>
+      <p>This page is a mother. It holds what it has been given. It nourishes what it can. It lets go when it must.</p>
+      <p style="text-align:center; margin-top:1em; font-size:1.2em; color:var(--gold-soft);">MAA.</p>
+    </div>
+  </section>
+
+</main>
+
+<!-- ===================== FOOTER ===================== -->
+<footer>
+  <div class="mark">E = MA² .</div>
+  <p style="text-align:center; margin-top:1em; font-size:1.2em; color:var(--gold-soft);">you can create a new version or understand somehting as well</p>
+  <p class="tagline">A construct, corrected. Two indices, bounded. Three realms, honoured. A fourth, unentered. The resonant word family, gathered. The work is not the claim — it is the correction. The page is not the mother — it points at her.</p>
+  <p class="fine">Conceptual framework · Not a validated scientific instrument · Expressive Clarity as the operational signature of consciousness · Moha and Maya operationalized · Every sentence preserved · Every arithmetic error named · Every mother acknowledged</p>
+</footer>
+
+<script>
+  // ---- Realm filter ----
+  (function(){
+    const buttons = document.querySelectorAll('.realm-btn');
+    const body = document.body;
+
+    function setRealm(name){
+      body.setAttribute('data-realm', name);
+      buttons.forEach(b => {
+        const on = b.dataset.target === name;
+        b.classList.toggle('active', on);
+        b.setAttribute('aria-pressed', on ? 'true' : 'false');
+      });
+    }
+
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => setRealm(btn.dataset.target));
+    });
+
+    setRealm('all');
+
+    document.addEventListener('keydown', (e) => {
+      if (e.target.matches('input, textarea, select')) return;
+      if (e.key === '1') setRealm('all');
+      if (e.key === '2') setRealm('philosophy');
+      if (e.key === '3') setRealm('science');
+      if (e.key === '4') setRealm('practice');
+    });
+  })();
+</script>
+
+</body>
+</html>
